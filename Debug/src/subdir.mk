@@ -23,7 +23,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I/home/parallels/INZ/LIBS/pantheios-1.0.1-beta214/include -I"/home/parallels/Desktop/Parallels Shared Folders/Home/MojeBiblioteki/stlsoft-1.9.117/include" -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -I/home/parallels/INZ/PROJ/DDJ_Store/libs/pantheios/include -I/home/parallels/INZ/PROJ/DDJ_Store/libs/stlsoft/include -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

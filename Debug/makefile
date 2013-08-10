@@ -44,7 +44,7 @@ all: DDJ_Store
 DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/home/parallels/INZ/LIBS/pantheios-1.0.1-beta214/lib -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/home/parallels/INZ/PROJ/DDJ_Store/libs/pantheios/lib -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
