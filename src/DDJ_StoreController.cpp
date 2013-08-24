@@ -27,7 +27,6 @@ StoreController::~StoreController()
 
 bool StoreController::InsertValue(storeElement* element)
 {
-	StoreBuffer_Pointer newBuffer;
 	if(_buffers->count(element->tag) == 0)
 	{
 		_buffers->insert(store_hash_value_type( element->tag, new StoreBuffer(element->tag)) );

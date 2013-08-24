@@ -83,17 +83,23 @@ namespace store {
 		private:
 			/* BASIC */
 			int _tag;
-			/* THREADS */
-			boost::thread* _threadForTree;
+			boost::condition_variable _condSynchronization;
+			boost::mutex _mutexSynchronization;
 
-			 /* TREE */
-			 tree_pointer _bufferTree;
+			/* TREE */
+			tree_pointer _bufferInfoTree;
+			boost::condition_variable _condBufferInfoTree;
+			boost::condition_variable _condTreeBufferFree;
+			mutable boost::mutex _mutexBufferInfoTree;
+			boost::thread* _threadBufferTree;
+			volatile sig_atomic_t _threadBufferTreeStop;
+			bool _treeBufferThreadBusy;
+			infoElement* _infoElementToInsert;
 
-			 /* BUFFER */
-			 int _bufferElementsCount;
-			 bool _backBufferEmpty;
-			 boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;
-			 boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;
+			/* BUFFER */
+			int _bufferElementsCount;
+			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;
+			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;
 
 		/* METHODS */
 		public:
@@ -103,6 +109,7 @@ namespace store {
 			void Flush();
 			void Start();
 			void Stop();
+			void TESTME();
 		private:
 			/* BUFFER METHODS */
 			infoElement* insertToBuffer(storeElement* element);

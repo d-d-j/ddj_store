@@ -16,6 +16,7 @@
 #include <boost/array.hpp>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <c++/4.6/ext/hash_map>
 #include <pantheios/pantheios.hpp>
@@ -41,7 +42,27 @@ inline void h_LogThreadInfo(const char* text)
 {
 	try
 	{
-		pantheios::log_NOTICE(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
+		pantheios::log_INFORMATIONAL(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
+	}
+	catch(std::bad_alloc&)
+	{
+		pantheios::log(pantheios::alert, PSTR("out of memory"));
+	}
+	catch(std::exception& x)
+	{
+		pantheios::log_CRITICAL(PSTR("Exception: "), x);
+	}
+	catch(...)
+	{
+		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
+		}
+}
+
+inline void h_LogThreadDebug(const char* text)
+{
+	try
+	{
+		pantheios::log_DEBUG(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
 	}
 	catch(std::bad_alloc&)
 	{

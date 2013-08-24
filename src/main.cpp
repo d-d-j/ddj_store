@@ -29,6 +29,9 @@ int main(int argc, char** argv)
 	StoreController* store = new StoreController();
 	delete store;
 	StoreBuffer* buffer = new StoreBuffer(5);
+	buffer->TESTME();
+	buffer->TESTME();
+	buffer->TESTME();
 	delete buffer;
 	return EXIT_SUCCESS;
 }
