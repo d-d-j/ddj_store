@@ -21,21 +21,12 @@
 #ifndef DDJ_Store__DDJ_StoreBuffer_h
 #define DDJ_Store__DDJ_StoreBuffer_h
 
-#include "DDJ_StoreIncludes.h"
-#include "btree.h"
+#include "BTreeMonitor.h"
 
-#define STORE_BUFFER_SIZE 512
+#define STORE_BUFFER_SIZE 2
 
 namespace ddj {
 namespace store {
-    
-	/* TYPEDEFS */
-	typedef unsigned long long int ullint;
-	typedef stx::btree<ullint, int> tree;
-	typedef tree* tree_pointer;
-    typedef int tag_type;
-    typedef float store_value_type;
-    typedef float info_value_type;
 
     typedef struct storeElement
     {
@@ -60,22 +51,6 @@ namespace store {
 			~storeElement(){}
     } storeElement;
 
-    typedef struct infoElement
-	{
-		public:
-    		/* FIELDS */
-			tag_type tag;
-			ullint startTime;
-			ullint endTime;
-			info_value_type startValue;
-			info_value_type endValue;
-			/* CONSTRUCTORS */
-			infoElement(){ tag = 0; startTime = 0; endTime = 0; startValue = 0; endValue = 0; }
-			infoElement(tag_type _tag, ullint _startTime, ullint _endTime, info_value_type _startValue, info_value_type _endValue)
-			: tag(_tag), startTime(_startTime), endTime(_endTime), startValue(_startValue), endValue(_endValue) {}
-			~infoElement() {}
-	} infoElement;
-
     /* CLASSES */
     class StoreBuffer
     {
@@ -83,18 +58,10 @@ namespace store {
 		private:
 			/* BASIC */
 			int _tag;
-			boost::condition_variable _condSynchronization;
-			boost::mutex _mutexSynchronization;
 
 			/* TREE */
 			tree_pointer _bufferInfoTree;
-			boost::condition_variable _condBufferInfoTree;
-			boost::condition_variable _condTreeBufferFree;
-			mutable boost::mutex _mutexBufferInfoTree;
-			boost::thread* _threadBufferTree;
-			volatile sig_atomic_t _threadBufferTreeStop;
-			bool _treeBufferThreadBusy;
-			infoElement* _infoElementToInsert;
+			BTreeMonitor* _bufferInfoTreeMonitor;
 
 			/* BUFFER */
 			int _bufferElementsCount;
@@ -103,21 +70,14 @@ namespace store {
 
 		/* METHODS */
 		public:
-			 StoreBuffer(tag_type tag);
-			~StoreBuffer();
+			StoreBuffer(tag_type tag);
+			virtual ~StoreBuffer();
 			bool InsertElement(storeElement* element);
 			void Flush();
-			void Start();
-			void Stop();
-			void TESTME();
 		private:
 			/* BUFFER METHODS */
 			infoElement* insertToBuffer(storeElement* element);
 			void switchBuffers();
-
-			/* TREE METHODS */
-			void insertToTree(infoElement* element);
-			void treeInserterJob();
     };
 
 } /* end namespace store */

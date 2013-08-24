@@ -1,6 +1,6 @@
 src/DDJ_StoreController.d: ../src/DDJ_StoreController.cpp \
  ../src/DDJ_StoreController.h ../src/DDJ_StoreBuffer.h \
- ../src/DDJ_StoreIncludes.h \
+ ../src/BTreeMonitor.h ../src/DDJ_StoreIncludes.h \
  /home/parallels/INZ/PROJ/DDJ_Store/libs/pantheios/include/pantheios/pantheios.hpp \
  /home/parallels/INZ/PROJ/DDJ_Store/libs/pantheios/include/pantheios/pantheios.h \
  /home/parallels/INZ/PROJ/DDJ_Store/libs/stlsoft/include/stlsoft/stlsoft.h \
@@ -69,6 +69,8 @@ src/DDJ_StoreController.d: ../src/DDJ_StoreController.cpp \
 ../src/DDJ_StoreController.h:
 
 ../src/DDJ_StoreBuffer.h:
+
+../src/BTreeMonitor.h:
 
 ../src/DDJ_StoreIncludes.h:
 

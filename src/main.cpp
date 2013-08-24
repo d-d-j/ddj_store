@@ -29,9 +29,27 @@ int main(int argc, char** argv)
 	StoreController* store = new StoreController();
 	delete store;
 	StoreBuffer* buffer = new StoreBuffer(5);
-	buffer->TESTME();
-	buffer->TESTME();
-	buffer->TESTME();
+
+	storeElement e1,e2,e3;
+	e1.series = 1;
+	e1.tag = 5;
+	e1.time = 10;
+	e1.value = 1.1;
+
+	e2.series = 1;
+	e2.tag = 5;
+	e2.time = 12;
+	e2.value = 2.2;
+
+	e3.series = 1;
+	e3.tag = 5;
+	e3.time = 15;
+	e3.value = 3.3;
+
+	buffer->InsertElement(&e1);
+	buffer->InsertElement(&e2);
+	buffer->InsertElement(&e3);
+
 	delete buffer;
 	return EXIT_SUCCESS;
 }

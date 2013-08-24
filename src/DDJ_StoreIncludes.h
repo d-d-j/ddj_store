@@ -25,6 +25,7 @@
 #include <pantheios/backend.h>
 #include <pantheios/inserters/threadid.hpp>
 #include <pantheios/inserters/integer.hpp>
+#include "btree.h"
 
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
 
@@ -75,7 +76,35 @@ inline void h_LogThreadDebug(const char* text)
 	catch(...)
 	{
 		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
-		}
+	}
 }
+
+inline void h_LogThreadError(const char* text)
+{
+	try
+	{
+		pantheios::log_ERROR(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
+	}
+	catch(std::bad_alloc&)
+	{
+		pantheios::log(pantheios::alert, PSTR("out of memory"));
+	}
+	catch(std::exception& x)
+	{
+		pantheios::log_CRITICAL(PSTR("Exception: "), x);
+	}
+	catch(...)
+	{
+		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
+	}
+}
+
+/* TYPEDEFS */
+typedef unsigned long long int ullint;
+typedef stx::btree<ullint, int> tree;
+typedef tree* tree_pointer;
+typedef int tag_type;
+typedef float store_value_type;
+typedef float info_value_type;
 
 #endif /* DDJ_STOREINCLUDES_H_ */
