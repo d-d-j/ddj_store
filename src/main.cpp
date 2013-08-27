@@ -22,7 +22,7 @@ using namespace ddj::store;
 
 const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
 
-int main(int argc, char** argv)
+int main()
 {
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
