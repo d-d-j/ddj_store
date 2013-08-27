@@ -2,3 +2,6 @@
 /.metadata
 /Debug
 /Release
+*.o
+*.d
+DDJ_Store
