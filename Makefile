@@ -1,10 +1,10 @@
 RM := rm -rf
 
 CPP_SRCS += \
-../src/BTreeMonitor.cpp \
-../src/DDJ_StoreBuffer.cpp \
-../src/DDJ_StoreController.cpp \
-../src/main.cpp 
+./src/BTreeMonitor.cpp \
+./src/DDJ_StoreBuffer.cpp \
+./src/DDJ_StoreController.cpp \
+./src/main.cpp
 
 OBJS += \
 ./src/BTreeMonitor.o \
@@ -16,7 +16,8 @@ CPP_DEPS += \
 ./src/BTreeMonitor.d \
 ./src/DDJ_StoreBuffer.d \
 ./src/DDJ_StoreController.d \
-./src/main.d 
+./src/main.d
+
 
 LIBS := -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lboost_thread-mt -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46
 INCLUDES := -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
