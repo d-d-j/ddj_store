@@ -10,11 +10,6 @@
 namespace ddj {
 namespace store {
 
-//BTreeMonitor::BTreeMonitor()
-//{
-//	this->startThread();
-//}
-
 BTreeMonitor::BTreeMonitor(tree_pointer tree)
 {
 	this->_bufferInfoTree = tree;
