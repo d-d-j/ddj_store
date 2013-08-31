@@ -4,18 +4,21 @@ CPP_SRCS += \
 ./src/BTreeMonitor.cpp \
 ./src/StoreBuffer.cpp \
 ./src/StoreController.cpp \
+./src/GpuUploaderMonitor.cpp \
 ./src/main.cpp
 
 OBJS += \
 ./src/BTreeMonitor.o \
 ./src/StoreBuffer.o \
 ./src/StoreController.o \
+./src/GpuUploaderMonitor.o \
 ./src/main.o 
 
 CPP_DEPS += \
 ./src/BTreeMonitor.d \
 ./src/StoreBuffer.d \
 ./src/StoreController.d \
+./src/GpuUploaderMonitor.d \
 ./src/main.d
 
 
