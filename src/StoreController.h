@@ -1,8 +1,9 @@
 /*
- * main.cpp
+ *  StoreController.h
+ *  StoreController
  *
- *  Created on: Aug 10, 2013
- *      Author: Karol Dzitkowski
+ *  Created by Karol Dzitkowski on 27.07.2013.
+ *  Copyright (c) 2013 Karol Dzitkowski. All rights reserved.
  *
  *      NAZEWNICTWO
  * 1. nazwy klas:  CamelStyle z dużej litery np. StoreController
@@ -16,42 +17,33 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-#include "StoreController.h"
 
-using namespace ddj::store;
+#ifndef DDJ_Store_DDJ_StoreController_h
+#define DDJ_Store_DDJ_StoreController_h
 
-const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
+#include "StoreBuffer.h"
 
-int main()
+namespace ddj {
+namespace store {
+
+class StoreController
 {
-	pantheios::init();
-	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
-	StoreController* store = new StoreController();
-	delete store;
-	StoreBuffer* buffer = new StoreBuffer(5);
+    /* TYPEDEFS */
+    typedef StoreBuffer* StoreBuffer_Pointer;
+    typedef std::pair<tag_type, StoreBuffer_Pointer> store_hash_value_type;
 
-	storeElement e1,e2,e3;
-	e1.series = 1;
-	e1.tag = 5;
-	e1.time = 10;
-	e1.value = 1.1;
+    /* FIELDS */
+    private:
+        __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>* _buffers;
 
-	e2.series = 1;
-	e2.tag = 5;
-	e2.time = 12;
-	e2.value = 2.2;
+    public:
+        StoreController();
+        ~StoreController();
+        bool InsertValue(storeElement* element);
+        bool InsertValue(int series, tag_type tag, ullint time, store_value_type value);
+};
 
-	e3.series = 1;
-	e3.tag = 5;
-	e3.time = 15;
-	e3.value = 3.3;
+} /* end namespace store */
+} /* end namespace ddj */
 
-	buffer->InsertElement(&e1);
-	buffer->InsertElement(&e2);
-	buffer->InsertElement(&e3);
-
-	delete buffer;
-	return EXIT_SUCCESS;
-}
-
-
+#endif /* defined(DDJ_Store_DDJ_StoreController_h) */

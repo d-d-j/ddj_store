@@ -1,6 +1,5 @@
 /*
- *  DDJ_StoreBuffer.h
- *  DDJ_StoreController
+ *  StoreBuffer.h
  *
  *  Created by Karol Dzitkowski on 27.07.2013.
  *  Copyright (c) 2013 Karol Dzitkowski. All rights reserved.

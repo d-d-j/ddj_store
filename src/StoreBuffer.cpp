@@ -1,8 +1,8 @@
 /*
- * DDJ_StoreBuffer.cpp
+ * StoreBuffer.cpp
  *
  *  Created on: Aug 10, 2013
- *      Author: parallels
+ *      Author: Karol Dzitkowski
  *
  *      NAZEWNICTWO
  * 1. nazwy klas:  CamelStyle z dużej litery np. StoreController
@@ -16,7 +16,7 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-#include "DDJ_StoreBuffer.h"
+#include "StoreBuffer.h"
 
 using namespace ddj::store;
 
