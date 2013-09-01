@@ -41,6 +41,7 @@ namespace store {
 			BTreeMonitor* _bufferInfoTreeMonitor;
 
 			/* BUFFER */
+			GpuUploaderMonitor* _gpuUploader;
 			int _bufferElementsCount;
 			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;
 			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;

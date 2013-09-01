@@ -6,6 +6,7 @@
  */
 
 #include "GpuUploaderCore.h"
+#include "BTreeMonitor.h"
 
 #ifndef GPUUPLOADERMONITOR_H_
 #define GPUUPLOADERMONITOR_H_
@@ -24,8 +25,11 @@ namespace store {
 			boost::mutex _mutexSynchronization;
 			boost::mutex _mutexUploader;
 
+			BTreeMonitor* _bTreeInserter;
+
+
 		public:
-			GpuUploaderMonitor();
+			GpuUploaderMonitor(BTreeMonitor* bTreeInserter);
 			virtual ~GpuUploaderMonitor();
 
 		private:

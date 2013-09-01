@@ -10,7 +10,7 @@
 namespace ddj {
 namespace store {
 
-GpuUploaderMonitor::GpuUploaderMonitor() {
+GpuUploaderMonitor::GpuUploaderMonitor(BTreeMonitor* bTreeInserter) {
 	// TODO Auto-generated constructor stub
 
 }

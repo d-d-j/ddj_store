@@ -29,6 +29,7 @@ StoreBuffer::StoreBuffer(tag_type tag)
 	this->_bufferElementsCount = 0;
 	this->_bufferInfoTree = new tree();
 	this->_bufferInfoTreeMonitor = new BTreeMonitor(this->_bufferInfoTree);
+	this->_gpuUploader = new GpuUploaderMonitor(this->_bufferInfoTreeMonitor);
 }
 
 StoreBuffer::~StoreBuffer()
@@ -36,6 +37,7 @@ StoreBuffer::~StoreBuffer()
 	if(typeid(tag_type) == typeid(int))
 		pantheios::log_DEBUG(PSTR("StoreBuffer [Tag = "), pantheios::integer(this->_tag), PSTR("] is being freed"));
 
+	delete this->_gpuUploader;
 	delete this->_bufferInfoTreeMonitor;
 	delete this->_bufferInfoTree;
 
@@ -67,6 +69,7 @@ bool StoreBuffer::InsertElement(storeElement* element)
 	infoElement* result = this->insertToBuffer(element);
 	if(result != NULL)
 	{
+
 		// Buffers are now switched and it is time to upload back_buffer content to GPU memory
 		//
 		//	TODO: Uploading back_buffer to GPU memory

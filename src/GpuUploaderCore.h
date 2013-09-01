@@ -43,11 +43,11 @@ namespace store {
 			~storeElement(){}
 	} storeElement;
 
-	struct int2
+	typedef struct int2
 	{
 		int x;
 		int y;
-	};
+	} int2;
 
 	/*! \fn  int2 UploadStoreElementsArrayToGpu(storeElement* elements, int elemCount)
 	 * \brief Function which uploads an array of store elements to GPU and adds it to GPU array.
