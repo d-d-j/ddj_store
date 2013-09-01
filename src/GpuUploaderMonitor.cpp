@@ -10,11 +10,22 @@
 namespace ddj {
 namespace store {
 
-GpuUploaderMonitor::GpuUploaderMonitor(BTreeMonitor* bTreeInserter) {
+GpuUploaderMonitor::GpuUploaderMonitor(BTreeMonitor* bTreeInserter)
+{
 	this->_bTreeInserter = bTreeInserter;
+
 }
 
-GpuUploaderMonitor::~GpuUploaderMonitor() {
+GpuUploaderMonitor::~GpuUploaderMonitor()
+{
+
+}
+
+bool GpuUploaderMonitor::SendStoreElementsToGpu(boost::array<storeElement, STORE_BUFFER_SIZE>* elements)
+{
+	this->_elementsToUpload = elements->c_array();
+	this->_readyToUpload = 0;
+	return false;
 }
 
 } /* namespace store */

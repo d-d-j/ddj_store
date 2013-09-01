@@ -32,6 +32,8 @@
 #include "btree.h"
 #include <memory>
 
+#define STORE_BUFFER_SIZE 2
+
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
 
 #ifndef ERROR_WHEN_FALSE

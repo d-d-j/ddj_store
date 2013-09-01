@@ -23,8 +23,6 @@
 #include "BTreeMonitor.h"
 #include "GpuUploaderMonitor.h"
 
-#define STORE_BUFFER_SIZE 2
-
 namespace ddj {
 namespace store {
 

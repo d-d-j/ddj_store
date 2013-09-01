@@ -27,13 +27,17 @@ namespace store {
 
 			BTreeMonitor* _bTreeInserter;
 
+			volatile sig_atomic_t _readyToUpload;	/**< Whether or not elements were copied to queue */
+
+			//TODO: Change this to ringbuffer from boost
+			storeElement* _elementsToUpload;
 
 		public:
 			GpuUploaderMonitor(BTreeMonitor* bTreeInserter);
 			virtual ~GpuUploaderMonitor();
-
+			bool SendStoreElementsToGpu(boost::array<storeElement, STORE_BUFFER_SIZE>* elements);
 		private:
-
+			void threadFunction();	//!< a function which is being executed by _threadUploader thread
 	};
 
 } /* namespace store */
