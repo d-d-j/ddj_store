@@ -27,8 +27,6 @@ int main()
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 	StoreController* store = new StoreController();
-	delete store;
-	StoreBuffer* buffer = new StoreBuffer(5);
 
 	storeElement e1,e2,e3;
 	e1.series = 1;
@@ -46,11 +44,11 @@ int main()
 	e3.time = 15;
 	e3.value = 3.3;
 
-	buffer->InsertElement(&e1);
-	buffer->InsertElement(&e2);
-	buffer->InsertElement(&e3);
+	store->InsertValue(&e1);
+	store->InsertValue(&e2);
+	store->InsertValue(&e3);
 
-	delete buffer;
+	delete store;
 	return EXIT_SUCCESS;
 }
 

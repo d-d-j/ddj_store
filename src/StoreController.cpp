@@ -38,7 +38,8 @@ namespace store {
 	{
 		if(_buffers->count(element->tag) == 0)
 		{
-			_buffers->insert(store_hash_value_type( element->tag, new StoreBuffer(element->tag)) );
+			std::shared_ptr<StoreBuffer> p(new StoreBuffer(element->tag));
+			_buffers->insert(store_hash_value_type( element->tag, p));
 		}
 		return (*_buffers)[element->tag]->InsertElement(element);
 	}

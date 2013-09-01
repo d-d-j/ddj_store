@@ -5,6 +5,7 @@ CPP_SRCS += \
 ./src/StoreBuffer.cpp \
 ./src/StoreController.cpp \
 ./src/GpuUploaderMonitor.cpp \
+./src/GpuUploaderCore.cpp \
 ./src/main.cpp
 
 OBJS += \
@@ -12,6 +13,7 @@ OBJS += \
 ./src/StoreBuffer.o \
 ./src/StoreController.o \
 ./src/GpuUploaderMonitor.o \
+./src/GpuUploaderCore.o \
 ./src/main.o 
 
 CPP_DEPS += \
@@ -19,6 +21,7 @@ CPP_DEPS += \
 ./src/StoreBuffer.d \
 ./src/StoreController.d \
 ./src/GpuUploaderMonitor.d \
+./src/GpuUploaderCore.d \
 ./src/main.d
 
 
@@ -26,11 +29,12 @@ LIBS := -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lboost_thread-mt -lpa
 INCLUDES := -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
 WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Werror
 STANDART := -std=c++0x
+DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++  $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

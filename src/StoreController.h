@@ -29,7 +29,7 @@ namespace store {
 class StoreController
 {
     /* TYPEDEFS */
-    typedef StoreBuffer* StoreBuffer_Pointer;
+    typedef std::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
     typedef std::pair<tag_type, StoreBuffer_Pointer> store_hash_value_type;
 
     /* FIELDS */

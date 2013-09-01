@@ -38,6 +38,9 @@ StoreBuffer::~StoreBuffer()
 
 	delete this->_bufferInfoTreeMonitor;
 	delete this->_bufferInfoTree;
+
+	if(typeid(tag_type) == typeid(int))
+			pantheios::log_DEBUG(PSTR("StoreBuffer [Tag = "), pantheios::integer(this->_tag), PSTR("] has been freed"));
 }
 
 infoElement* StoreBuffer::insertToBuffer(storeElement* element)
