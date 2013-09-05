@@ -12,6 +12,9 @@
 #ifndef DDJ_STOREINCLUDES_H_
 #define DDJ_STOREINCLUDES_H_
 
+#include <cuda.h>
+#include <cuda_runtime_api.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
