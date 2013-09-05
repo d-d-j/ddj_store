@@ -1,6 +1,5 @@
 /*
- *  DDJ_StoreBuffer.h
- *  DDJ_StoreController
+ *  StoreBuffer.h
  *
  *  Created by Karol Dzitkowski on 27.07.2013.
  *  Copyright (c) 2013 Karol Dzitkowski. All rights reserved.
@@ -22,34 +21,10 @@
 #define DDJ_Store__DDJ_StoreBuffer_h
 
 #include "BTreeMonitor.h"
-
-#define STORE_BUFFER_SIZE 2
+#include "GpuUploaderMonitor.h"
 
 namespace ddj {
 namespace store {
-
-    typedef struct storeElement
-    {
-		public:
-    		/* FIELDS */
-			int series;
-			tag_type tag;
-			ullint time;
-			store_value_type value;
-
-			/* CONSTRUCTORS */
-			storeElement(){ series = 0; tag = 0; time = 0; value = 0; }
-			storeElement(int _series, tag_type _tag, ullint _time, store_value_type _value)
-			: series(_series), tag(_tag), time(_time), value(_value) {}
-			storeElement(const storeElement& elem)
-			{
-				this->series = elem.series;
-				this->tag = elem.tag;
-				this->time = elem.time;
-				this->value = elem.value;
-			}
-			~storeElement(){}
-    } storeElement;
 
     /* CLASSES */
     class StoreBuffer
@@ -64,6 +39,7 @@ namespace store {
 			BTreeMonitor* _bufferInfoTreeMonitor;
 
 			/* BUFFER */
+			GpuUploaderMonitor* _gpuUploader;
 			int _bufferElementsCount;
 			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;
 			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;

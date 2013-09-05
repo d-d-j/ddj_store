@@ -1,8 +1,12 @@
 /*
- * DDJ_StoreIncludes.h
+ * StoreIncludes.h
  *
  *  Created on: Aug 10, 2013
- *      Author: parallels
+ *      Author: Karol Dzitkowski
+ *
+ *  This file includes all required headers from outside libs like pantheios or boost
+ *  It also contains global inline helper functions and common used typedefs. Helper
+ *  macros also should be stored here.
  */
 
 #ifndef DDJ_STOREINCLUDES_H_
@@ -26,6 +30,9 @@
 #include <pantheios/inserters/threadid.hpp>
 #include <pantheios/inserters/integer.hpp>
 #include "btree.h"
+#include <memory>
+
+#define STORE_BUFFER_SIZE 2
 
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
 
