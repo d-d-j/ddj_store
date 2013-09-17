@@ -1,19 +1,19 @@
 RM := rm -rf
 
 OBJS += \
-./src/BTreeMonitor.o \
-./src/StoreBuffer.o \
-./src/StoreController.o \
-./src/GpuUploaderMonitor.o \
-./src/GpuUploaderCore.o \
-./src/main.o 
+./src/BTree/BTreeMonitor.o \
+./src/Store/StoreBuffer.o \
+./src/Store/StoreController.o \
+./src/GpuUploader/GpuUploaderMonitor.o \
+./src/GpuUploader/GpuUploaderCore.o \
+./src/main.o
 
 CPP_DEPS += \
-./src/BTreeMonitor.d \
-./src/StoreBuffer.d \
-./src/StoreController.d \
-./src/GpuUploaderMonitor.d \
-./src/GpuUploaderCore.d \
+./src/BTree/BTreeMonitor.d \
+./src/Store/StoreBuffer.d \
+./src/Store/StoreController.d \
+./src/GpuUploader/GpuUploaderMonitor.d \
+./src/GpuUploader/GpuUploaderCore.d \
 ./src/main.d
 
 
