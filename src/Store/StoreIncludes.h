@@ -32,7 +32,7 @@
 #include <pantheios/backend.h>
 #include <pantheios/inserters/threadid.hpp>
 #include <pantheios/inserters/integer.hpp>
-#include "btree.h"
+#include "../BTree/btree.h"
 #include <memory>
 
 #define STORE_BUFFER_SIZE 2
