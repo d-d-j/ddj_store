@@ -5,11 +5,11 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "GpuUploaderCore.h"
-#include "BTreeMonitor.h"
-
 #ifndef GPUUPLOADERMONITOR_H_
 #define GPUUPLOADERMONITOR_H_
+
+#include "GpuUploaderCore.h"
+#include "../BTree/BTreeMonitor.h"
 
 namespace ddj {
 namespace store {

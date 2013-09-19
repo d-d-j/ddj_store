@@ -16,7 +16,7 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-#include "StoreController.h"
+#include "Store/StoreController.h"
 
 using namespace ddj::store;
 
@@ -49,7 +49,6 @@ int main()
 	store->InsertValue(&e3);
 
 	delete store;
+
 	return EXIT_SUCCESS;
 }
-
-

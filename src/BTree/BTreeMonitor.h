@@ -8,7 +8,7 @@
 #ifndef BTREEMONITOR_H_
 #define BTREEMONITOR_H_
 
-#include "StoreIncludes.h"
+#include "../StoreIncludes.h"
 
 namespace ddj {
 namespace store {
