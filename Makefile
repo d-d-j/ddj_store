@@ -1,23 +1,26 @@
 RM := rm -rf
 
 OBJS += \
-./src/bin/BTreeMonitor.o \
-./src/bin/StoreBuffer.o \
-./src/bin/StoreController.o \
-./src/bin/GpuUploaderMonitor.o \
-./src/bin/GpuUploaderCore.o \
-./src/bin/main.o 
+./src/BTree/BTreeMonitor.o \
+./src/Store/StoreBuffer.o \
+./src/Store/StoreController.o \
+./src/GpuUploader/GpuUploaderMonitor.o \
+./src/GpuUploader/GpuUploaderCore.o \
+./src/Network/Server.o \
+./src/main.o 
 
 CPP_DEPS += \
-./src/bin/BTreeMonitor.d \
-./src/bin/StoreBuffer.d \
-./src/bin/StoreController.d \
-./src/bin/GpuUploaderMonitor.d \
-./src/bin/GpuUploaderCore.d \
-./src/bin/main.d
+./src/BTree/BTreeMonitor.d \
+./src/Store/StoreBuffer.d \
+./src/Store/StoreController.d \
+./src/GpuUploader/GpuUploaderMonitor.d \
+./src/GpuUploader/GpuUploaderCore.d \
+./src/Network/Server.d \
+./src/main.d
 
 
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lboost_thread-mt -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46
+LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
+
 INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
 WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Werror
 STANDART := -std=c++0x
@@ -31,14 +34,14 @@ endif
 	GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
 	GENCODE_FLAGS   := $(GENCODE_SM21) $(GENCODE_SM30)
 
-src/bin/%.o: src/**/*.cpp
+src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-src/bin/%.o: src/**/*.cu
+src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
 	nvcc $(GENCODE_FLAGS) -c -o "$@" "$<"

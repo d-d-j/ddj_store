@@ -20,8 +20,8 @@
 #ifndef DDJ_Store__DDJ_StoreBuffer_h
 #define DDJ_Store__DDJ_StoreBuffer_h
 
-#include "BTree/BTreeMonitor.h"
-#include "Upload/GpuUploaderMonitor.h"
+#include "../BTree/BTreeMonitor.h"
+#include "../GpuUploader/GpuUploaderMonitor.h"
 
 namespace ddj {
 namespace store {

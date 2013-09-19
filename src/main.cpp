@@ -17,6 +17,7 @@
  */
 
 #include "Store/StoreController.h"
+#include "Network/Server.h"
 
 using namespace ddj::store;
 
@@ -50,5 +51,10 @@ int main()
 
 	delete store;
 
+	Server s(8080);
+	s.listen();
+
 	return EXIT_SUCCESS;
 }
+
+
