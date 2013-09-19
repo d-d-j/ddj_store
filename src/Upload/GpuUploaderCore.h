@@ -8,7 +8,7 @@
 #ifndef GPUUPLOADERCORE_H_
 #define GPUUPLOADERCORE_H_
 
-#include "../Store/StoreIncludes.h"
+#include "../StoreIncludes.h"
 
 namespace ddj {
 namespace store {

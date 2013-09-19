@@ -14,7 +14,6 @@
 
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -32,7 +31,7 @@
 #include <pantheios/backend.h>
 #include <pantheios/inserters/threadid.hpp>
 #include <pantheios/inserters/integer.hpp>
-#include "../BTree/btree.h"
+#include "BTree/btree.h"
 #include <memory>
 
 #define STORE_BUFFER_SIZE 2
