@@ -7,7 +7,7 @@ OBJS += \
 ./src/GpuUploader/GpuUploaderMonitor.o \
 ./src/GpuUploader/GpuUploaderCore.o \
 ./src/Network/Server.o \
-./src/main.o
+./src/main.o 
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
