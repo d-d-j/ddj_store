@@ -48,7 +48,7 @@ int main()
 	store->InsertValue(&e1);
 	store->InsertValue(&e2);
 	store->InsertValue(&e3);
-
+	
 	delete store;
 
 	Server s(8080);

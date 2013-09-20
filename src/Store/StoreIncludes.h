@@ -14,7 +14,6 @@
 
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,6 +23,7 @@
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <c++/4.6/ext/hash_map>
 #include <pantheios/pantheios.hpp>

@@ -7,6 +7,10 @@ OBJS += \
 ./src/GpuUploader/GpuUploaderMonitor.o \
 ./src/GpuUploader/GpuUploaderCore.o \
 ./src/Network/Server.o \
+./src/Store/StoreTask.o \
+./src/Query/QueryMonitor.o \
+./src/Query/QueryCore.o \
+./src/CPU_MOCKS/StoreMock.o \
 ./src/main.o 
 
 CPP_DEPS += \
@@ -16,6 +20,10 @@ CPP_DEPS += \
 ./src/GpuUploader/GpuUploaderMonitor.d \
 ./src/GpuUploader/GpuUploaderCore.d \
 ./src/Network/Server.d \
+./src/Store/StoreTask.d \
+./src/Query/QueryMonitor.o \
+./src/Query/QueryCore.o \
+./src/CPU_MOCKS/StoreMock.o \
 ./src/main.d
 
 

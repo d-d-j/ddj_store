@@ -49,5 +49,20 @@ namespace store {
 		return this->InsertValue(new storeElement(series, tag, time, value));
 	}
 
+	void StoreController::startNotificationThread()
+	{
+
+	}
+
+	void StoreController::stopNotificationThread()
+	{
+
+	}
+
+	void StoreController::notificationThreadFunction()
+	{
+
+	}
+
 }
 }

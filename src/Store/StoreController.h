@@ -22,6 +22,7 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
+#include "StoreTask.h"
 
 namespace ddj {
 namespace store {
@@ -35,12 +36,20 @@ class StoreController
     /* FIELDS */
     private:
         __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>* _buffers;
-
+        boost::ptr_vector<StoreTask> _tasks;
+        boost::thread _notificationThread;
+        boost::condition_variable _notificationCond;
+        boost::mutex _notificationMutex;
     public:
         StoreController();
         ~StoreController();
         bool InsertValue(storeElement* element);
         bool InsertValue(int series, tag_type tag, ullint time, store_value_type value);
+
+    private:
+        void startNotificationThread();
+        void stopNotificationThread();
+        void notificationThreadFunction();
 };
 
 } /* end namespace store */
