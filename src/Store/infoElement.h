@@ -1,5 +1,5 @@
-#ifndef BTREEMONITOR_H_
-#define BTREEMONITOR_H_
+#ifndef INFOELEMENT_H_
+#define INFOELEMENT_H_
 
 #include "../Store/StoreIncludes.h"
 
@@ -31,3 +31,5 @@ namespace store {
 	
 } /* namespace ddj */
 } /* namespace store */
+
+#endif /* defined(INFOELEMENT_H_) */

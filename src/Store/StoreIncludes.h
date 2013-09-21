@@ -34,6 +34,7 @@
 #include <pantheios/inserters/integer.hpp>
 #include "../BTree/btree.h"
 #include <memory>
+#include <stdexcept>
 
 #define STORE_BUFFER_SIZE 2
 

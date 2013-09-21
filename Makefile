@@ -10,7 +10,7 @@ OBJS += \
 ./src/Store/StoreTask.o \
 ./src/Query/QueryMonitor.o \
 ./src/Query/QueryCore.o \
-./src/CPU_MOCKS/StoreMock.o \
+./src/Store/TaskResult.o \
 ./src/main.o 
 
 CPP_DEPS += \
@@ -21,9 +21,9 @@ CPP_DEPS += \
 ./src/GpuUploader/GpuUploaderCore.d \
 ./src/Network/Server.d \
 ./src/Store/StoreTask.d \
-./src/Query/QueryMonitor.o \
-./src/Query/QueryCore.o \
-./src/CPU_MOCKS/StoreMock.o \
+./src/Query/QueryMonitor.d \
+./src/Query/QueryCore.d \
+./src/Store/TaskResult.d \
 ./src/main.d
 
 
@@ -45,7 +45,7 @@ endif
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	clang++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

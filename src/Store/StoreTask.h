@@ -8,31 +8,36 @@
 #ifndef STORETASK_H_
 #define STORETASK_H_
 
-#include "../Store/StoreIncludes.h"
+#include "TaskResult.h"
 
 namespace ddj {
 namespace store {
 
-enum StoreResultType
+class StoreTask : public boost::noncopyable
 {
-	InsertResult = 1
-};
-
-class StoreTask {
 private:
-	void* _result;
-	StoreResultType _type;
-	int _dataPartsCount;
+	int _taskId;
+	void* _resultData;
+	int _resultSize;
+	TaskType _type;
+	char* _message;
+	bool _isSuccessfull;
+	bool _isDone;
 	boost::condition_variable* _condResponseReady;
 	boost::mutex _mutex;
+
 public:
-	StoreTask(boost::condition_variable* cond, StoreResultType type, int partsCount = 1);
+	StoreTask(int taskId, boost::condition_variable* cond, TaskType type);
 	virtual ~StoreTask();
 
-	void AddResult(void* result);
-	void* GetResult();
-};
+	void SetResult(
+			bool isSuccessfull,
+			char* message = nullptr,
+			void* resultData = nullptr,
+			int resultSize = 0);
 
+	TaskResult* GetResult();
+};
 
 } /* namespace store */
 } /* namespace ddj */

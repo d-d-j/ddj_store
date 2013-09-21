@@ -43,10 +43,12 @@ class StoreController
     public:
         StoreController();
         ~StoreController();
+
         bool InsertValue(storeElement* element);
         bool InsertValue(int series, tag_type tag, ullint time, store_value_type value);
 
     private:
+
         void startNotificationThread();
         void stopNotificationThread();
         void notificationThreadFunction();
