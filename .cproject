@@ -24,7 +24,7 @@
 							<builder id="com.nvidia.cuda.ide.builder.538174284" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CUDA Toolkit 5.5 Builder" superClass="com.nvidia.cuda.ide.builder"/>
 							<tool id="nvcc.compiler.base.745216352" name="NVCC Compiler" superClass="nvcc.compiler.base">
 								<option id="nvcc.compiler.pic.684341469" name="Position Independent Code (-fPIC)" superClass="nvcc.compiler.pic"/>
-								<option id="nvcc.compiler.include.paths.907518921" superClass="nvcc.compiler.include.paths" valueType="includePath">
+								<option id="nvcc.compiler.include.paths.907518921" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/boost"/>
 								</option>
 								<inputType id="nvcc.compiler.input.cu.1690536562" superClass="nvcc.compiler.input.cu"/>
@@ -39,7 +39,7 @@
 							</tool>
 							<tool id="nvcc.archiver.base.1623643665" name="NVCC Archiver" superClass="nvcc.archiver.base"/>
 							<tool id="com.nvidia.host.assembler.69542008" name="Host Assembler" superClass="com.nvidia.host.assembler">
-								<option id="gnu.both.asm.option.include.paths.1420700256" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+								<option id="gnu.both.asm.option.include.paths.1420700256" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/boost"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1885968380" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>

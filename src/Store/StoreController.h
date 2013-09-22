@@ -22,7 +22,7 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
-#include "StoreTask.h"
+#include "../Task/StoreTask.h"
 
 namespace ddj {
 namespace store {

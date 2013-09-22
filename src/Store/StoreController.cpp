@@ -64,5 +64,5 @@ namespace store {
 
 	}
 
-}
-}
+} /* namespace store */
+} /* namespace ddj */

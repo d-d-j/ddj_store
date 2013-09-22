@@ -12,34 +12,43 @@
 #ifndef DDJ_STOREINCLUDES_H_
 #define DDJ_STOREINCLUDES_H_
 
-#include <cuda.h>
-#include <cuda_runtime_api.h>
+/* COMMON */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
 #include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <c++/4.6/ext/hash_map>
+
+/* CUDA */
+#include <cuda.h>
+#include <cuda_runtime_api.h>
+
+/* BOOST */
 #include <boost/array.hpp>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <c++/4.6/ext/hash_map>
+#include <boost/thread/barrier.hpp>
+
+/* PANTHEIOS */
 #include <pantheios/pantheios.hpp>
 #include <pantheios/frontends/stock.h>
 #include <pantheios/inserters/args.hpp>
 #include <pantheios/backend.h>
 #include <pantheios/inserters/threadid.hpp>
 #include <pantheios/inserters/integer.hpp>
+
+/* OTHER */
 #include "../BTree/btree.h"
-#include <memory>
-#include <stdexcept>
 
+/* DEFINES */
 #define STORE_BUFFER_SIZE 2
-
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
-
 #ifndef ERROR_WHEN_FALSE
 #define ERROR_WHEN_FALSE(expression) \
 ({ \
@@ -49,66 +58,6 @@
     exit(EXIT_FAILURE);} \
 })
 #endif
-
-inline void h_LogThreadInfo(const char* text)
-{
-	try
-	{
-		pantheios::log_INFORMATIONAL(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
-	}
-	catch(std::bad_alloc&)
-	{
-		pantheios::log(pantheios::alert, PSTR("out of memory"));
-	}
-	catch(std::exception& x)
-	{
-		pantheios::log_CRITICAL(PSTR("Exception: "), x);
-	}
-	catch(...)
-	{
-		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
-		}
-}
-
-inline void h_LogThreadDebug(const char* text)
-{
-	try
-	{
-		pantheios::log_DEBUG(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
-	}
-	catch(std::bad_alloc&)
-	{
-		pantheios::log(pantheios::alert, PSTR("out of memory"));
-	}
-	catch(std::exception& x)
-	{
-		pantheios::log_CRITICAL(PSTR("Exception: "), x);
-	}
-	catch(...)
-	{
-		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
-	}
-}
-
-inline void h_LogThreadError(const char* text)
-{
-	try
-	{
-		pantheios::log_ERROR(PSTR("[Thread id="), boost::lexical_cast<std::string>(boost::this_thread::get_id()), PSTR("] "), PSTR(text));
-	}
-	catch(std::bad_alloc&)
-	{
-		pantheios::log(pantheios::alert, PSTR("out of memory"));
-	}
-	catch(std::exception& x)
-	{
-		pantheios::log_CRITICAL(PSTR("Exception: "), x);
-	}
-	catch(...)
-	{
-		pantheios::logputs(pantheios::emergency, PSTR("Unexpected unknown error"));
-	}
-}
 
 /* TYPEDEFS */
 typedef unsigned long long int ullint;
