@@ -5,18 +5,13 @@
  *      Author: ghashd
  */
 
-#include "StoreIncludes.h"
+#include "../Store/StoreIncludes.h"
+#include "TaskType.h"
 
 #ifndef TASKRESULT_H_
 #define TASKRESULT_H_
 
 namespace ddj {
-
-enum TaskType
-{
-	Insert = 1,
-	Select = 2
-};
 
 struct TaskResult
 {

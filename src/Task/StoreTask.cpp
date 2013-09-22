@@ -12,12 +12,16 @@ namespace store {
 
 StoreTask::StoreTask(
 		int taskId,
-		boost::condition_variable* cond,
-		TaskType type)
+		TaskType type,
+		void* taskData,
+		int dataSize,
+		boost::condition_variable* cond)
 {
 	this->_taskId = taskId;
-	this->_condResponseReady = cond;
 	this->_type = type;
+	this->_taskData = taskData;
+	this->_dataSize = dataSize;
+	this->_condResponseReady = cond;
 	this->_isDone = false;
 	this->_isSuccessfull = false;
 	this->_message = NULL;

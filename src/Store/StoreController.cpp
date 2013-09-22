@@ -24,16 +24,58 @@ namespace store {
 
 	StoreController::StoreController()
 	{
-		pantheios::log_DEBUG("Initializing new StoreController - creating StoreBuffer hash map");
-		_buffers = new __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>();
+		h_LogThreadDebug("StoreController constructor started");
+
+		this->_buffers = new __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>();
+		this->_taskBarrier = new boost::barrier(2);
+
+		// START TASK THRAED
+		this->_taskThread = new boost::thread(boost::bind(&StoreController::taskThreadFunction, this));
+		this->_taskBarrier->wait();
+
+		h_LogThreadDebug("StoreController constructor ended");
 	}
 
 	StoreController::~StoreController()
 	{
-		pantheios::log_DEBUG("Removing StoreController - delete StoreBuffer hash map");
-		delete _buffers;
+		h_LogThreadDebug("StoreController destructor started");
+
+		// STOP TASK THREAD
+		this->_taskThread->interrupt();
+		this->_taskThread->join();
+
+		delete this->_buffers;
+		delete this->_taskBarrier;
+		delete this->_taskThread;
+
+		h_LogThreadDebug("StoreController destructor ended");
 	}
 
+	void StoreController::CreateTask(int taskId, TaskType type, void* taskData, int dataSize)
+	{
+		// Add a new task to task monitor
+
+		// Fire a function from _TaskFunctions with this taskId
+		//this->_taskFunctions[taskId]();
+	}
+
+	void StoreController::taskThreadFunction()
+	{
+		h_LogThreadDebug("Task thread started");
+		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
+		h_LogThreadDebug("Task thread locked his mutex");
+		this->_taskBarrier->wait();
+		while(1)
+		{
+			h_LogThreadDebug("Task thread is waiting");
+			this->_taskCond.wait(lock);
+			h_LogThreadDebug("Task thread is doing his job");
+			// TODO: Implement taskThread real job...
+		}
+	}
+
+
+	/*
 	bool StoreController::InsertValue(storeElement* element)
 	{
 		if(_buffers->count(element->tag) == 0)
@@ -48,21 +90,7 @@ namespace store {
 	{
 		return this->InsertValue(new storeElement(series, tag, time, value));
 	}
-
-	void StoreController::startNotificationThread()
-	{
-
-	}
-
-	void StoreController::stopNotificationThread()
-	{
-
-	}
-
-	void StoreController::notificationThreadFunction()
-	{
-
-	}
+	*/
 
 } /* namespace store */
 } /* namespace ddj */

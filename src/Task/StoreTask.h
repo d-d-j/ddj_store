@@ -16,18 +16,31 @@ namespace store {
 class StoreTask : public boost::noncopyable
 {
 private:
+	/* TASK */
 	int _taskId;
+	TaskType _type;
+	void* _taskData;
+	int _dataSize;
+
+	/* RESULT */
 	void* _resultData;
 	int _resultSize;
-	TaskType _type;
 	char* _message;
 	bool _isSuccessfull;
 	bool _isDone;
+
+	/* MONITOR */
 	boost::condition_variable* _condResponseReady;
 	boost::mutex _mutex;
 
 public:
-	StoreTask(int taskId, boost::condition_variable* cond, TaskType type);
+	StoreTask(
+			int taskId,
+			TaskType type,
+			void* taskData,
+			int dataSize,
+			boost::condition_variable* cond);
+
 	virtual ~StoreTask();
 
 	void SetResult(

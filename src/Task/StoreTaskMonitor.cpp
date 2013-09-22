@@ -12,10 +12,9 @@ namespace ddj
 namespace store
 {
 
-StoreTaskMonitor::StoreTaskMonitor()
+StoreTaskMonitor::StoreTaskMonitor(boost::condition_variable* condResponseReady)
 {
-	// TODO Auto-generated constructor stub
-
+	this->_condResponseReady = condResponseReady;
 }
 
 StoreTaskMonitor::~StoreTaskMonitor()

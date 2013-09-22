@@ -4,26 +4,28 @@ OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
-./src/GpuUploader/GpuUploaderMonitor.o \
-./src/GpuUploader/GpuUploaderCore.o \
+./src/GpuUpload/GpuUploadMonitor.o \
+./src/GpuUpload/GpuUploadCore.o \
 ./src/Network/Server.o \
-./src/Store/StoreTask.o \
 ./src/Query/QueryMonitor.o \
 ./src/Query/QueryCore.o \
-./src/Store/TaskResult.o \
+./src/Task/TaskResult.d \
+./src/Task/StoreTask.d \
+./src/Task/StoreTaskMonitor.d \
 ./src/main.o 
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \
-./src/GpuUploader/GpuUploaderMonitor.d \
-./src/GpuUploader/GpuUploaderCore.d \
+./src/GpuUpload/GpuUploadMonitor.d \
+./src/GpuUpload/GpuUploadCore.d \
 ./src/Network/Server.d \
-./src/Store/StoreTask.d \
 ./src/Query/QueryMonitor.d \
 ./src/Query/QueryCore.d \
-./src/Store/TaskResult.d \
+./src/Task/TaskResult.d \
+./src/Task/StoreTask.d \
+./src/Task/StoreTaskMonitor.d \
 ./src/main.d
 
 
