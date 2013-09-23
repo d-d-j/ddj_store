@@ -53,7 +53,7 @@ class StoreController
         StoreController();
         virtual ~StoreController();
 
-        void CreateTask(int taskId, TaskType type, void* taskData, int dataSize);
+        void CreateTask(int taskId, TaskType type, void* taskData);
     private:
         void taskThreadFunction();
         void populateTaskFunctions();

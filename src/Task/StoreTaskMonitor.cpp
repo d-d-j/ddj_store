@@ -20,10 +20,10 @@ namespace store {
 	{
 	}
 
-	StoreTask* StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData, int dataSize)
+	StoreTask* StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
-		StoreTask* newTask = new StoreTask(taskId,type,taskData,dataSize,this->_condResponseReady);
+		StoreTask* newTask = new StoreTask(taskId, type, taskData, this->_condResponseReady);
 		this->_tasks.push_back(&newTask);
 		this->_taskCount++;
 		return newTask;

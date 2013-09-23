@@ -14,13 +14,11 @@ StoreTask::StoreTask(
 		int taskId,
 		TaskType type,
 		void* taskData,
-		int dataSize,
 		boost::condition_variable* cond)
 {
 	this->_taskId = taskId;
 	this->_type = type;
 	this->_taskData = taskData;
-	this->_dataSize = dataSize;
 	this->_condResponseReady = cond;
 	this->_isDone = false;
 	this->_isSuccessfull = false;
@@ -63,6 +61,17 @@ TaskResult* StoreTask::GetResult()
 			this->_resultSize
 			);
 }
+
+TaskType StoreTask::GetType()
+{
+	return this->_type;
+}
+
+void* StoreTask::GetData()
+{
+	return this->_taskData;
+}
+
 
 } /* namespace store */
 } /* namespace ddj */

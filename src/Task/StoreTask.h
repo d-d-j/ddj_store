@@ -20,7 +20,6 @@ private:
 	int _taskId;
 	TaskType _type;
 	void* _taskData;
-	int _dataSize;
 
 	/* RESULT */
 	void* _resultData;
@@ -38,7 +37,6 @@ public:
 			int taskId,
 			TaskType type,
 			void* taskData,
-			int dataSize,
 			boost::condition_variable* cond);
 
 	virtual ~StoreTask();
@@ -50,6 +48,10 @@ public:
 			int resultSize = 0);
 
 	TaskResult* GetResult();
+
+	/* GETTERS */
+	TaskType GetType();
+	void* GetData();
 };
 
 } /* namespace store */

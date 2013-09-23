@@ -28,7 +28,7 @@ namespace store {
 		public:
 			StoreTaskMonitor(boost::condition_variable* condResponseReady);
 			virtual ~StoreTaskMonitor();
-			StoreTask* AddTask(int taskId, TaskType type, void* taskData, int dataSize);
+			StoreTask* AddTask(int taskId, TaskType type, void* taskData);
 	};
 
 } /* namespace store */

@@ -18,7 +18,6 @@
  */
 
 #include "StoreController.h"
-#include <boost/mem_fn.hpp>
 
 namespace ddj {
 namespace store {
@@ -38,10 +37,6 @@ namespace store {
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
-		// TEST
-		StoreTask task(1, Insert, nullptr, 0, nullptr);
-		this->_taskFunctions[1](&task);
-
 		h_LogThreadDebug("StoreController constructor ended");
 	}
 
@@ -60,10 +55,10 @@ namespace store {
 		h_LogThreadDebug("StoreController destructor ended");
 	}
 
-	void StoreController::CreateTask(int taskId, TaskType type, void* taskData, int dataSize)
+	void StoreController::CreateTask(int taskId, TaskType type, void* taskData)
 	{
 		// Add a new task to task monitor
-		StoreTask* task = this->_storeTaskMonitor->AddTask(taskId, type, taskData, dataSize);
+		StoreTask* task = this->_storeTaskMonitor->AddTask(taskId, type, taskData);
 		// Fire a function from _TaskFunctions with this taskId
 		this->_taskFunctions[taskId](task);
 	}
@@ -91,13 +86,35 @@ namespace store {
 		pair.first = 1;
 		pair.second = boost::bind(&StoreController::insertTask, this, _1);
 		_taskFunctions.insert(pair);
-
-
 	}
 
 	void StoreController::insertTask(StoreTask* task)
 	{
-		h_LogThreadDebug("Insert task fired");
+		h_LogThreadDebug("Insert task function started");
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != Insert)
+		{
+			h_LogThreadError("Error in insertTask function - wrong argument");
+			throw std::runtime_error("Error in insertTask function - wrong argument");
+		}
+
+		// GET store element from task data
+		storeElement* element = (storeElement*)(task->GetData());
+
+		// GET buffer with element's tag or create one if not exists
+		if(this->_buffers->count(element->tag))	// if such a buffer exists
+		{
+			(*_buffers)[element->tag]->Insert(element);
+		}
+		else
+		{
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, &(this->_gpuUploadMonitor)));
+			this->_buffers->insert({element->tag, newBuf});
+
+		}
+
+		h_LogThreadDebug("Insert task function ended");
 	}
 
 } /* namespace store */
