@@ -7,20 +7,27 @@
 
 #include "StoreTaskMonitor.h"
 
-namespace ddj
-{
-namespace store
-{
+namespace ddj {
+namespace store {
 
-StoreTaskMonitor::StoreTaskMonitor(boost::condition_variable* condResponseReady)
-{
-	this->_condResponseReady = condResponseReady;
-}
+	StoreTaskMonitor::StoreTaskMonitor(boost::condition_variable* condResponseReady)
+	{
+		this->_condResponseReady = condResponseReady;
+		this->_taskCount = 0;
+	}
 
-StoreTaskMonitor::~StoreTaskMonitor()
-{
-	// TODO Auto-generated destructor stub
-}
+	StoreTaskMonitor::~StoreTaskMonitor()
+	{
+	}
+
+	StoreTask* StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData, int dataSize)
+	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+		StoreTask* newTask = new StoreTask(taskId,type,taskData,dataSize,this->_condResponseReady);
+		this->_tasks.push_back(&newTask);
+		this->_taskCount++;
+		return newTask;
+	}
 
 } /* namespace store */
 } /* namespace ddj */

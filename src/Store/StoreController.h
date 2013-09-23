@@ -41,9 +41,10 @@ class StoreController
     /* FIELDS */
     private:
     	GpuUploadMonitor _gpuUploadMonitor;
-    	StoreTaskMonitor _storeTaskMonitor;
+    	StoreTaskMonitor* _storeTaskMonitor;
         __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>* _buffers;
         std::unordered_map<int, taskFunc> _taskFunctions;
+        std::unordered_map<int, char*> _test;
 
         /* TASK */
         boost::thread* _taskThread;
@@ -60,6 +61,10 @@ class StoreController
     private:
         void taskThreadFunction();
         void populateTaskFunctions();
+
+	/* TASK FUNCTIONS */
+    private:
+        void insertTask(StoreTask* task);
 };
 
 } /* end namespace store */

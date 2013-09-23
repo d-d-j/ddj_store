@@ -31,6 +31,8 @@ StoreTask::StoreTask(
 
 StoreTask::~StoreTask()
 {
+	free(this->_taskData);
+	free(this->_resultData);
 }
 
 void StoreTask::SetResult(

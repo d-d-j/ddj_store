@@ -1,6 +1,8 @@
 #ifndef DDJ_STORELOGGER_H_
 #define DDJ_STORELOGGER_H_
 
+#include "StoreIncludes.h"
+
 inline void h_LogThreadInfo(const char* text)
 {
 	try

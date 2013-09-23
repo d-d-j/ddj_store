@@ -44,10 +44,6 @@ int main()
 	e3.tag = 5;
 	e3.time = 15;
 	e3.value = 3.3;
-
-	store->InsertValue(&e1);
-	store->InsertValue(&e2);
-	store->InsertValue(&e3);
 	
 	delete store;
 

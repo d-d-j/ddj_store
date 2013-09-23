@@ -28,6 +28,7 @@ namespace store {
 
 		this->_buffers = new __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>();
 		this->_taskBarrier = new boost::barrier(2);
+		this->_storeTaskMonitor = new StoreTaskMonitor(&(this->_taskCond));
 
 		// START TASK THRAED
 		this->_taskThread = new boost::thread(boost::bind(&StoreController::taskThreadFunction, this));
@@ -54,9 +55,9 @@ namespace store {
 	void StoreController::CreateTask(int taskId, TaskType type, void* taskData, int dataSize)
 	{
 		// Add a new task to task monitor
-
+		StoreTask* task = this->_storeTaskMonitor->AddTask(taskId, type, taskData, dataSize);
 		// Fire a function from _TaskFunctions with this taskId
-		//this->_taskFunctions[taskId]();
+		this->_taskFunctions[taskId](task);
 	}
 
 	void StoreController::taskThreadFunction()
@@ -74,23 +75,15 @@ namespace store {
 		}
 	}
 
-
-	/*
-	bool StoreController::InsertValue(storeElement* element)
+	void StoreController::populateTaskFunctions()
 	{
-		if(_buffers->count(element->tag) == 0)
-		{
-			std::shared_ptr<StoreBuffer> p(new StoreBuffer(element->tag));
-			_buffers->insert(store_hash_value_type( element->tag, p));
-		}
-		return (*_buffers)[element->tag]->InsertElement(element);
+
 	}
 
-	bool StoreController::InsertValue(int series, tag_type tag, ullint time, store_value_type value)
+	void StoreController::insertTask(StoreTask* task)
 	{
-		return this->InsertValue(new storeElement(series, tag, time, value));
+
 	}
-	*/
 
 } /* namespace store */
 } /* namespace ddj */
