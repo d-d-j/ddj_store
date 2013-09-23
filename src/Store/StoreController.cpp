@@ -18,6 +18,7 @@
  */
 
 #include "StoreController.h"
+#include <boost/mem_fn.hpp>
 
 namespace ddj {
 namespace store {
@@ -26,13 +27,20 @@ namespace store {
 	{
 		h_LogThreadDebug("StoreController constructor started");
 
-		this->_buffers = new __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>();
+		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
 		this->_taskBarrier = new boost::barrier(2);
 		this->_storeTaskMonitor = new StoreTaskMonitor(&(this->_taskCond));
 
 		// START TASK THRAED
 		this->_taskThread = new boost::thread(boost::bind(&StoreController::taskThreadFunction, this));
 		this->_taskBarrier->wait();
+
+		// PREPARE TASK FUNCTIONS DICTIONARY
+		this->populateTaskFunctions();
+
+		// TEST
+		StoreTask task(1, Insert, nullptr, 0, nullptr);
+		this->_taskFunctions[1](&task);
 
 		h_LogThreadDebug("StoreController constructor ended");
 	}
@@ -77,12 +85,19 @@ namespace store {
 
 	void StoreController::populateTaskFunctions()
 	{
+		std::pair<int, taskFunc> pair;
+
+		// INSERT
+		pair.first = 1;
+		pair.second = boost::bind(&StoreController::insertTask, this, _1);
+		_taskFunctions.insert(pair);
+
 
 	}
 
 	void StoreController::insertTask(StoreTask* task)
 	{
-
+		h_LogThreadDebug("Insert task fired");
 	}
 
 } /* namespace store */

@@ -20,7 +20,6 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-#include <c++/4.6/ext/hash_map>
 
 /* CUDA */
 #include <cuda.h>
@@ -34,6 +33,9 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/thread/barrier.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 
 /* PANTHEIOS */
 #include <pantheios/pantheios.hpp>

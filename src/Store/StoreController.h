@@ -25,8 +25,6 @@
 #include "../Task/StoreTask.h"
 #include "../Task/StoreTaskMonitor.h"
 #include "../GpuUpload/GpuUploadMonitor.h"
-#include <unordered_map>
-#include <boost/function.hpp>
 
 namespace ddj {
 namespace store {
@@ -34,17 +32,15 @@ namespace store {
 class StoreController
 {
     /* TYPEDEFS */
-    typedef std::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
-    typedef std::pair<tag_type, StoreBuffer_Pointer> store_hash_value_type;
     typedef boost::function<void (StoreTask* task)> taskFunc;
+    typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
 
     /* FIELDS */
     private:
     	GpuUploadMonitor _gpuUploadMonitor;
     	StoreTaskMonitor* _storeTaskMonitor;
-        __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>* _buffers;
-        std::unordered_map<int, taskFunc> _taskFunctions;
-        std::unordered_map<int, char*> _test;
+    	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
+        boost::unordered_map<int, taskFunc> _taskFunctions;
 
         /* TASK */
         boost::thread* _taskThread;
