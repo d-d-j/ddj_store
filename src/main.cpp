@@ -44,11 +44,14 @@ int main()
 	e3.tag = 5;
 	e3.time = 15;
 	e3.value = 3.3;
-	
-	delete store;
 
-	Server s(8080);
-	s.listen();
+	store->CreateTask(1, Insert, &e1);
+	store->CreateTask(2, Insert, &e2);
+	store->CreateTask(3, Insert, &e3);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+	delete store;
 
 	return EXIT_SUCCESS;
 }

@@ -47,14 +47,14 @@ endif
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) -c -o "$@" "$<"
+	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 	

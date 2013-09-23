@@ -45,7 +45,11 @@ namespace store {
 		h_LogThreadDebug("StoreController destructor started");
 
 		// STOP TASK THREAD
-		this->_taskThread->interrupt();
+		{
+			boost::mutex::scoped_lock lock(this->_taskMutex);
+			h_LogThreadDebug("StoreController locked task's mutex");
+			this->_taskThread->interrupt();
+		}
 		this->_taskThread->join();
 
 		delete this->_buffers;
@@ -60,7 +64,7 @@ namespace store {
 		// Add a new task to task monitor
 		StoreTask* task = this->_storeTaskMonitor->AddTask(taskId, type, taskData);
 		// Fire a function from _TaskFunctions with this taskId
-		this->_taskFunctions[taskId](task);
+		this->_taskFunctions[type](task);
 	}
 
 	void StoreController::taskThreadFunction()
@@ -69,12 +73,24 @@ namespace store {
 		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
 		h_LogThreadDebug("Task thread locked his mutex");
 		this->_taskBarrier->wait();
-		while(1)
+		try
 		{
-			h_LogThreadDebug("Task thread is waiting");
-			this->_taskCond.wait(lock);
-			h_LogThreadDebug("Task thread is doing his job");
-			// TODO: Implement taskThread real job...
+			while(1)
+			{
+				h_LogThreadDebug("Task thread is waiting");
+				this->_taskCond.wait(lock);
+				h_LogThreadDebug("Task thread is doing his job");
+				// TODO: Implement taskThread real job...
+			}
+		}
+		catch(boost::thread_interrupted& ex)
+		{
+			h_LogThreadDebug("TaskThread ended as interrupted [Success]");
+			return;
+		}
+		catch(...)
+		{
+			h_LogThreadDebug("TaskThread ended with error [Failure]");
 		}
 	}
 

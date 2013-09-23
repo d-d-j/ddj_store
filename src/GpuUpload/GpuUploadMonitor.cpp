@@ -26,7 +26,7 @@ namespace store {
 
 		// return result as infoElement*;
 
-		return NULL;
+		return new infoElement(1,1,1,1,1);
 	}
 
 } /* namespace store */

@@ -47,9 +47,10 @@ StoreBuffer::~StoreBuffer()
 	// STOP UPLOADER THREAD
 	{
 		boost::mutex::scoped_lock lock(this->_uploaderMutex);
+		h_LogThreadWithTagDebug("StoreBuffer locked uploader's mutex", this->_tag);
 		this->_uploaderThread->interrupt();
-		this->_uploaderThread->join();
 	}
+	this->_uploaderThread->join();
 
 	delete this->_bufferInfoTreeMonitor;
 	delete this->_uploaderBarrier;
@@ -60,6 +61,7 @@ StoreBuffer::~StoreBuffer()
 
 void StoreBuffer::Insert(storeElement* element)
 {
+	h_LogThreadWithTagDebug("Inserting element to buffer", this->_tag);
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
 	if(_bufferElementsCount == STORE_BUFFER_SIZE)
@@ -128,12 +130,15 @@ void StoreBuffer::uploaderThreadFunction()
 
 void StoreBuffer::switchBuffers()
 {
+	h_LogThreadWithTagDebug("Switching buffers start", this->_tag);
 	boost::mutex::scoped_lock lock(this->_uploaderMutex);
+	h_LogThreadWithTagDebug("Uploader mutex locked by switchBuffers", this->_tag);
 	this->_areBuffersSwitched = true;
 	this->_backBufferElementsCount = this->_bufferElementsCount;
 	this->_bufferElementsCount = 0;
 	this->_buffer.swap(this->_backBuffer);
 	this->_uploaderCond.notify_one();
+	h_LogThreadWithTagDebug("Switching buffers end", this->_tag);
 }
 
 } /* namespace store */
