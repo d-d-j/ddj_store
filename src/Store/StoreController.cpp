@@ -62,7 +62,7 @@ namespace store {
 	void StoreController::CreateTask(int taskId, TaskType type, void* taskData)
 	{
 		// Add a new task to task monitor
-		StoreTask* task = this->_storeTaskMonitor->AddTask(taskId, type, taskData);
+		StoreTask_Pointer task = this->_storeTaskMonitor->AddTask(taskId, type, taskData);
 		// Fire a function from _TaskFunctions with this taskId
 		this->_taskFunctions[type](task);
 	}
@@ -79,9 +79,17 @@ namespace store {
 			{
 				h_LogThreadDebug("Task thread is waiting");
 				this->_taskCond.wait(lock);
-				h_LogThreadDebug("Task thread is doing his job");
-				// TODO: Implement taskThread real job...
-			}
+				h_LogThreadDebug("Task thread starts his job");
+
+				// Get all compleated tasks
+				boost::container::vector<StoreTask_Pointer> compleatedTasks =
+						this->_storeTaskMonitor->PopCompleatedTasks();
+
+				// TODO: Send results of the tasks to master
+
+
+				h_LogThreadDebug("Task thread ends his job");
+}
 		}
 		catch(boost::thread_interrupted& ex)
 		{
@@ -104,7 +112,7 @@ namespace store {
 		_taskFunctions.insert(pair);
 	}
 
-	void StoreController::insertTask(StoreTask* task)
+	void StoreController::insertTask(StoreTask_Pointer task)
 	{
 		h_LogThreadDebug("Insert task function started");
 

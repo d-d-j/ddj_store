@@ -32,7 +32,7 @@ namespace store {
 class StoreController
 {
     /* TYPEDEFS */
-    typedef boost::function<void (StoreTask* task)> taskFunc;
+    typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
     typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
 
     /* FIELDS */
@@ -60,7 +60,7 @@ class StoreController
 
 	/* TASK FUNCTIONS */
     private:
-        void insertTask(StoreTask* task);
+        void insertTask(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

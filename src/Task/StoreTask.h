@@ -26,7 +26,7 @@ private:
 	int _resultSize;
 	char* _message;
 	bool _isSuccessfull;
-	bool _isDone;
+	bool _isCompleated;
 
 	/* MONITOR */
 	boost::condition_variable* _condResponseReady;
@@ -52,6 +52,7 @@ public:
 	/* GETTERS */
 	TaskType GetType();
 	void* GetData();
+	bool IsCompleated();
 };
 
 } /* namespace store */

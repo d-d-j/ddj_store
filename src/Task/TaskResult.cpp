@@ -12,12 +12,14 @@ namespace ddj {
 TaskResult::TaskResult
 				(
 					int taskId,
+					TaskType type,
 					bool isSuccessfull,
 					char* message,
 					void* resultData,
 					int resultSize
 				):
 			task_id(taskId),
+			type(type),
 			result_data(resultData),
 			result_size(resultSize),
 			is_successfull(isSuccessfull),

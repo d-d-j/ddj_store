@@ -20,13 +20,36 @@ namespace store {
 	{
 	}
 
-	StoreTask* StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
+	StoreTask_Pointer StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
-		StoreTask* newTask = new StoreTask(taskId, type, taskData, this->_condResponseReady);
-		this->_tasks.push_back(&newTask);
+		StoreTask_Pointer newTask(new StoreTask(taskId, type, taskData, this->_condResponseReady));
+		this->_tasks.push_back(newTask);
 		this->_taskCount++;
 		return newTask;
+	}
+
+	boost::container::vector<StoreTask_Pointer> StoreTaskMonitor::PopCompleatedTasks()
+	{
+		// Copy compleated tasks to result
+		boost::container::vector<StoreTask_Pointer> result(this->_tasks.size());
+		auto it = std::copy_if(
+				this->_tasks.begin(),
+				this->_tasks.end(),
+				result.begin(),
+				[](StoreTask_Pointer task){return task->IsCompleated();}
+				);
+		result.resize(std::distance(result.begin(),it));
+
+		// Remove compleated tasks from _tasks
+		std::remove_if(
+				this->_tasks.begin(),
+				this->_tasks.end(),
+				[](StoreTask_Pointer task){return task->IsCompleated();}
+				);
+
+		// Return result
+		return result;
 	}
 
 } /* namespace store */

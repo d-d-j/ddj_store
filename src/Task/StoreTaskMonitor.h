@@ -15,11 +15,15 @@
 namespace ddj {
 namespace store {
 
+	/* GLOBAL TYPEDEFS */
+	typedef boost::shared_ptr<StoreTask> StoreTask_Pointer;
+
+
 	class StoreTaskMonitor
 	{
 		/* FIELDS */
 		public:
-			boost::ptr_vector<StoreTask*> _tasks;
+			boost::container::vector<StoreTask_Pointer> _tasks;
 			boost::condition_variable* _condResponseReady;
 			boost::mutex _mutex;
 			volatile sig_atomic_t _taskCount;
@@ -28,7 +32,8 @@ namespace store {
 		public:
 			StoreTaskMonitor(boost::condition_variable* condResponseReady);
 			virtual ~StoreTaskMonitor();
-			StoreTask* AddTask(int taskId, TaskType type, void* taskData);
+			StoreTask_Pointer AddTask(int taskId, TaskType type, void* taskData);
+			boost::container::vector<StoreTask_Pointer> PopCompleatedTasks();
 	};
 
 } /* namespace store */

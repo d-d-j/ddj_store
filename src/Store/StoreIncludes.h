@@ -18,6 +18,7 @@
 #include <string.h>
 #include <signal.h>
 #include <iostream>
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 
@@ -31,6 +32,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/container/vector.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/function.hpp>
