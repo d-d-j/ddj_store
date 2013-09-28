@@ -37,6 +37,12 @@ namespace store {
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
+		// connect CreateTaskMethod to _newTaskSignal
+		this->_requestSignal.connect(boost::bind(&StoreController::CreateTask, this, _1));
+
+		// TODO: create network client (client constructor should wait until it connects to master)
+		// this->_client = new Client(boost::signals2::signal<void (taskRequest)>* _requestSignal);
+
 		h_LogThreadDebug("StoreController constructor ended");
 	}
 

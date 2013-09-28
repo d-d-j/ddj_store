@@ -21,6 +21,7 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
+#include "../Network/Client.h"
 #include "../Task/TaskType.h"
 #include "../Task/StoreTask.h"
 #include "../Task/StoreTaskMonitor.h"
@@ -48,6 +49,10 @@ class StoreController
         boost::condition_variable _taskCond;
         boost::mutex _taskMutex;
         boost::barrier* _taskBarrier;
+
+        /* NETWORK */
+        Client* _client;
+        boost::signals2::signal<void (taskRequest)> _requestSignal;
 
 	/* METHODS */
     public:
