@@ -13,11 +13,11 @@
 struct taskRequest
 {
 public:
-	int task_id;	/**< id nadane zadaniu przez mastera */
-	TaskType type;	/**< typ zadania np. insert */
-	void* data;		/**< dane dla zadania, np. parametry zapytania lub element jeśli np. typ == Insert */
+	int task_id;	/**< id set for a task by master */
+	TaskType type;	/**< task type, for example Insert */
+	// data is released in StoreTask
+	void* data;		/**< data for a task, for example Select data or elem to insert */
 	taskRequest(int id, TaskType type, void* data):task_id(id),type(type),data(data){}
-	~taskRequest(){ free(data); }
 	taskRequest(const taskRequest& request)
 	{
 		task_id = request.task_id;
