@@ -59,12 +59,12 @@ namespace store {
 		h_LogThreadDebug("StoreController destructor ended");
 	}
 
-	void StoreController::CreateTask(int taskId, TaskType type, void* taskData)
+	void StoreController::CreateTask(taskRequest request)
 	{
 		// Add a new task to task monitor
-		StoreTask_Pointer task = this->_storeTaskMonitor->AddTask(taskId, type, taskData);
+		StoreTask_Pointer task = this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
 		// Fire a function from _TaskFunctions with this taskId
-		this->_taskFunctions[type](task);
+		this->_taskFunctions[request.type](task);
 	}
 
 	void StoreController::taskThreadFunction()

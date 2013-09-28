@@ -45,9 +45,12 @@ int main()
 	e3.time = 15;
 	e3.value = 3.3;
 
-	store->CreateTask(1, Insert, &e1);
-	store->CreateTask(2, Insert, &e2);
-	store->CreateTask(3, Insert, &e3);
+	taskRequest req1(1, Insert, &e1);
+	taskRequest req2(2, Insert, &e2);
+	taskRequest req3(3, Insert, &e3);
+	store->CreateTask(req1);
+	store->CreateTask(req2);
+	store->CreateTask(req3);
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 

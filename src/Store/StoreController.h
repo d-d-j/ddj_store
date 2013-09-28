@@ -25,6 +25,7 @@
 #include "../Task/StoreTask.h"
 #include "../Task/StoreTaskMonitor.h"
 #include "../GpuUpload/GpuUploadMonitor.h"
+#include "../Task/TaskRequest.h"
 
 namespace ddj {
 namespace store {
@@ -53,7 +54,7 @@ class StoreController
         StoreController();
         virtual ~StoreController();
 
-        void CreateTask(int taskId, TaskType type, void* taskData);
+        void CreateTask(taskRequest request);
     private:
         void taskThreadFunction();
         void populateTaskFunctions();
