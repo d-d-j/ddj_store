@@ -10,24 +10,27 @@
 namespace ddj {
 namespace store {
 
-	infoElement* GpuUploadMonitor::Upload
-									(
-									boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
-									int elementsToUploadCount
-									)
-	{
-		boost::mutex::scoped_lock lock(this->_mutex);
 
-		// TODO: IMPLEMENT GpuUploadCore.Upload(...) - ergo uploading elements to GPU
+GpuUploadMonitor::GpuUploadMonitor() {
 
-		// Here is the place for:
+	this ->_core = GpuUploadCore(1);
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &this->devicePointer, STORE_BUFFER_SIZE * sizeof(storeElement)));
+	h_LogThreadDebug("Monitor device malloc");
+}
 
-		// some result = _core.Upload(...)
 
-		// return result as infoElement*;
+infoElement* GpuUploadMonitor::Upload(
+		boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
+		int elementsToUploadCount) {
 
-		return new infoElement(1,1,1,1,1);
-	}
+	h_LogThreadDebug("Monitor Upload starting");
+
+	boost::mutex::scoped_lock lock(this->_mutex);
+
+	_core.copyToGpu((storeElement*)elements, (storeElement*)this->devicePointer, elementsToUploadCount);
+
+	return new infoElement(1, 1, 1, 1, 1);
+}
 
 } /* namespace store */
 } /* namespace ddj */

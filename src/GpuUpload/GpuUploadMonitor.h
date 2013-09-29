@@ -21,8 +21,10 @@ namespace store {
 		private:
 			boost::mutex _mutex;
 			GpuUploadCore _core;
+			storeElement* devicePointer;
 
 		public:
+			GpuUploadMonitor();
 			infoElement* Upload
 							(
 							boost::array<storeElement, STORE_BUFFER_SIZE>* elements,

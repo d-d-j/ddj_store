@@ -8,13 +8,30 @@
 #ifndef GPUUPLOADCORE_H_
 #define GPUUPLOADCORE_H_
 
-namespace ddj {
-namespace store {
+#include "../Store/storeElement.h"
+#include "cuda_runtime.h"
+#include "../Store/LoggerHelper.h"
+#include "../CUDA/cudaIncludes.h"
+#include "../CUDA/GpuUpload.cuh"
+
+namespace ddj
+{
+namespace store
+{
 
 class GpuUploadCore
 {
+
+	cudaStream_t uploadStream;
+	int numUploadStreams;
+
 public:
+
+	void copyToGpu(storeElement* hostPointer, storeElement* devicePointer,
+			int numElements);
+
 	GpuUploadCore();
+	GpuUploadCore(int numUploadStreams);
 	virtual ~GpuUploadCore();
 };
 

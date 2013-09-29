@@ -12,7 +12,8 @@ OBJS += \
 ./src/Task/TaskResult.o \
 ./src/Task/StoreTask.o \
 ./src/Task/StoreTaskMonitor.o \
-./src/main.o 
+./src/main.o \
+
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
@@ -51,7 +52,7 @@ src/%.o: ./src/%.cpp
 	@echo 'Finished building: $<'
 	@echo ' '
 
-src/%.o: ./src/%.cu
+src/CUDA/%.o: .src/CUDA/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
 	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
