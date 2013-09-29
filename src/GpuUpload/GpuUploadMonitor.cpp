@@ -13,7 +13,7 @@ namespace store {
 
 GpuUploadMonitor::GpuUploadMonitor() {
 
-	this ->_core = GpuUploadCore(1);
+	this ->_core = GpuUploadCore(2);
 	CUDA_CHECK_RETURN(cudaMalloc((void**) &this->devicePointer, STORE_BUFFER_SIZE * sizeof(storeElement)));
 	h_LogThreadDebug("Monitor device malloc");
 }

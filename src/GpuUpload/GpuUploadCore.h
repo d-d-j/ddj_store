@@ -21,8 +21,7 @@ namespace store
 
 class GpuUploadCore
 {
-
-	cudaStream_t uploadStream;
+	cudaStream_t* uploadStreams;
 	int numUploadStreams;
 
 public:
