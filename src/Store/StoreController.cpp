@@ -22,10 +22,11 @@
 namespace ddj {
 namespace store {
 
-	StoreController::StoreController()
+	StoreController::StoreController(int gpuDeviceId)
 	{
 		h_LogThreadDebug("StoreController constructor started");
 
+		this->_gpuDeviceId = gpuDeviceId;
 		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
 		this->_taskBarrier = new boost::barrier(2);
 		this->_storeTaskMonitor = new StoreTaskMonitor(&(this->_taskCond));

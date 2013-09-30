@@ -16,13 +16,14 @@ namespace store {
 	typedef struct infoElement
 	{
 		public:
-			/* FIELDS */
+		/* FIELDS */
 			tag_type tag;
 			ullint startTime;
 			ullint endTime;
 			info_value_type startValue;
 			info_value_type endValue;
-			/* CONSTRUCTORS */
+
+		/* CONSTRUCTORS & DESTRUCTOR */
 			infoElement(){ tag = 0; startTime = 0; endTime = 0; startValue = 0; endValue = 0; }
 			infoElement(tag_type _tag, ullint _startTime, ullint _endTime, info_value_type _startValue, info_value_type _endValue)
 			: tag(_tag), startTime(_startTime), endTime(_endTime), startValue(_startValue), endValue(_endValue) {}

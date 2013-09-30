@@ -27,7 +27,7 @@ int main()
 {
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
-	StoreController* store = new StoreController();
+	StoreController* store = new StoreController(0);
 
 	storeElement e1,e2,e3;
 	e1.series = 1;
