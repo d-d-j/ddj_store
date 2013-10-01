@@ -21,13 +21,9 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
-#include "../Network/Client.h"
-#include "../Task/TaskType.h"
-#include "../Task/StoreTask.h"
-#include "../Task/StoreTaskMonitor.h"
 #include "../GpuUpload/GpuUploadMonitor.h"
-#include "../Task/TaskRequest.h"
 #include "../CUDA/GpuStore.cuh"
+#include "../Task/StoreTask.h"
 
 namespace ddj {
 namespace store {
@@ -42,33 +38,20 @@ class StoreController
     private:
     	int _gpuDeviceId;
     	GpuUploadMonitor _gpuUploadMonitor;
-    	StoreTaskMonitor* _storeTaskMonitor;
     	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
-
-        /* TASK */
-        boost::thread* _taskThread;
-        boost::condition_variable _taskCond;
-        boost::mutex _taskMutex;
-        boost::barrier* _taskBarrier;
-
-        /* NETWORK */
-        Client* _client;
-        boost::signals2::signal<void (taskRequest)> _requestSignal;
 
 	/* METHODS */
     public:
         StoreController(int gpuDeviceId);
         virtual ~StoreController();
-
-        void CreateTask(taskRequest request);
+        void ExecuteTask(StoreTask_Pointer task);
     private:
-        void taskThreadFunction();
         void populateTaskFunctions();
 
 	/* TASK FUNCTIONS */
     private:
-        void insertTask(StoreTask_Pointer task);
+        void insertTaskToDictionary(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

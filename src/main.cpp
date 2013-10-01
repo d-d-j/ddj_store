@@ -16,7 +16,8 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-#include "Store/StoreController.h"
+#include "Node.h"
+#include "Store/storeElement.h"
 #include "Network/Server.h"
 
 using namespace ddj::store;
@@ -27,7 +28,6 @@ int main()
 {
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
-	StoreController* store = new StoreController(0);
 
 	storeElement e1,e2,e3;
 	e1.series = 1;
@@ -48,14 +48,8 @@ int main()
 	taskRequest req1(1, Insert, &e1);
 	taskRequest req2(2, Insert, &e2);
 	taskRequest req3(3, Insert, &e3);
-	store->CreateTask(req1);
-	store->CreateTask(req2);
-	store->CreateTask(req3);
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	delete store;
-
+	pantheios::log_INFORMATIONAL("Main function ended! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 	return EXIT_SUCCESS;
 }
 

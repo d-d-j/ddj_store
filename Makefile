@@ -13,6 +13,7 @@ OBJS += \
 ./src/Task/StoreTask.o \
 ./src/Task/StoreTaskMonitor.o \
 ./src/CUDA/GpuStore.o \
+./src/Node.o \
 ./src/main.o 
 
 CPP_DEPS += \
@@ -27,6 +28,7 @@ CPP_DEPS += \
 ./src/Task/TaskResult.d \
 ./src/Task/StoreTask.d \
 ./src/Task/StoreTaskMonitor.d \
+./src/Node.d \
 ./src/main.d
 
 
