@@ -21,9 +21,15 @@ namespace ddj
 	class Node
 	{
 	private:
+		/* TYPEFEFS */
+		typedef boost::shared_ptr<store::StoreController> StoreController_Pointer;
+
         /* NETWORK */
         Client* _client;
         boost::signals2::signal<void (taskRequest)> _requestSignal;
+
+        /* STORE CONTROLLER */
+        boost::unordered_map<int, StoreController_Pointer> _controllers;
 
         /* TASK */
     	store::StoreTaskMonitor* _storeTaskMonitor;

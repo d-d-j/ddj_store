@@ -38,6 +38,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/container/container_fwd.hpp>
 
 /* PANTHEIOS */
 #include <pantheios/pantheios.hpp>
