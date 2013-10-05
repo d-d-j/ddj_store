@@ -29,6 +29,7 @@ namespace ddj
         boost::signals2::signal<void (taskRequest)> _requestSignal;
 
         /* STORE CONTROLLER */
+        int _cudaDevicesCount;
         boost::unordered_map<int, StoreController_Pointer> _controllers;
 
         /* TASK */

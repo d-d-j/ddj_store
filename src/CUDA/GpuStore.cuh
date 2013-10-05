@@ -8,5 +8,7 @@ extern "C"
 	int gpuAllocateMainArray(size_t size, void** array);
 
 	void gpuFreeMemory(void* devPtr);
+
+	int gpuGetCudaDevicesCount();
 } /* extern "C" */
 #endif /* GPUSTORE_CUH_ */

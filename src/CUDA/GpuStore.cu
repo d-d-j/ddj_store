@@ -17,6 +17,13 @@ inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
 
 extern "C"
 {
+	int gpuGetCudaDevicesCount()
+	{
+		int count = 0;
+		CHECK_CUDA_ERR( cudaGetDeviceCount(&count) );
+
+		return count;
+	}
 
 	void gpuGetMemoryUsage(size_t* freeMemory, size_t* totalMemory)
 	{

@@ -6,6 +6,7 @@
  */
 
 #include "Node.h"
+#include "CUDA/GpuStore.cuh"
 
 namespace ddj
 {
@@ -21,6 +22,17 @@ namespace ddj
 		// connect CreateTaskMethod to _newTaskSignal
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
+		this->_cudaDevicesCount = gpuGetCudaDevicesCount();
+		pantheios::log_INFORMATIONAL(PSTR("Found "), pantheios::integer(this->_cudaDevicesCount), PSTR(" cuda devices."));
+		StoreController_Pointer* controller;
+
+		for(int i=0; i<this->_cudaDevicesCount; i++)
+		{
+			controller = new StoreController_Pointer(new store::StoreController(i));
+			this->_controllers.insert({i,*controller});
+			delete controller;
+		}
+
 		// TODO: create network client (client constructor should wait until it connects to master)
 		// this->_client = new Client(boost::signals2::signal<void (taskRequest)>* _requestSignal);
 	}
@@ -30,7 +42,7 @@ namespace ddj
 		h_LogThreadDebug("Node destructor started");
 
 		// Disconnect and release client
-		delete this->_client;
+		//delete this->_client;
 
 		// Stop task thread and release it
 		{
@@ -86,5 +98,4 @@ namespace ddj
 			h_LogThreadDebug("TaskThread ended with error [Failure]");
 		}
 	}
-
 } /* namespace ddj */
