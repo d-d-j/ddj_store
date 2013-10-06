@@ -1,5 +1,8 @@
 RM := rm -rf
 
+#you can use g++ or clang or color-gcc
+COMPILER := g++
+
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
@@ -48,8 +51,8 @@ endif
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
-	@echo 'Invoking: GCC C++ Compiler'
-	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Invoking: $(COMPILER)'
+	$(COMPILER)  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
