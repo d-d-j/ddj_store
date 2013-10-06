@@ -51,6 +51,10 @@ int main()
 	taskRequest req2(2, Insert, &e2);
 	taskRequest req3(3, Insert, &e3);
 
+	node.CreateTask(req1);
+	node.CreateTask(req2);
+	node.CreateTask(req3);
+
 	pantheios::log_INFORMATIONAL("Main function ended! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 	return EXIT_SUCCESS;
 }

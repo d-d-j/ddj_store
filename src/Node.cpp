@@ -61,7 +61,11 @@ namespace ddj
 	void Node::CreateTask(taskRequest request)
 	{
 		// Add a new task to task monitor
-		store::StoreTask_Pointer task = this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
+		store::StoreTask_Pointer task =
+				this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
+
+		// Run tasks in store controllers TODO: Implement this properly
+		this->_controllers[0]->ExecuteTask(task);
 	}
 
 	void Node::taskThreadFunction()
