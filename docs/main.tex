@@ -150,9 +150,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     \subsection{Zapisywanie danych}
     Baza danych powinna pozwalać na przechowywanie danych (niekoniecznie w trwały sposób) napływających z różnych źródeł
     równolegle.
-    \subsection{Agregowanie i filtracja danych }
-    Baza danych będzie zwracała dane z zadanego okresu czasu dla wyspecyfikowanego kwalifikatora (tag, seria) oraz pozwalała
-    na agregację tych danych przy pomocy predefiniowanych funkcji.
+    \subsection{Agregowanie i filtracja danych}
+    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria), a także pozwalała na agregację tych danych przy pomocy predefiniowanych funkcji.
         \subsubsection{Funkcje agregujące}
         \begin{itemize}
             \item Sumowanie
@@ -197,12 +196,11 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     \subsection{Etapy projektu}
     Wyodrębniono następujące etapy projektu
         \subsubsection{Zapisywanie danych do pamięci karty graficznej}
-            System powinien być w stanie przyjąć dane z zewnątrz i zapisać je do pamięci karty graficznej.
+            System powinien być w stanie przyjąć dane z zewnątrz i zapisać je do pamięci jednej z kart graficznych na jednym z połączonych węzłów.
         \subsubsection{Ekstrakcja danych z bazy danych}
             System powinien móc odpowiedzieć na zadane przez użytkownika zapytania dotyczące przechowywanych danych
         \subsubsection{Poprawa wydajności}
-            Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Pop przez wykonanie testów wydajności
-            powinny zostać przygotowane wskazówki konfiguracji systemu.
+            Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy load balancing. Celem tego etapu będzie głównie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu.
 
     \subsection{Podział pracy}
     Przewiduje się poniższy podział pracy:
@@ -213,7 +211,11 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
                 \end{itemize}
             \item Karol Dzitkowski
                 \begin{itemize}
-                    \item ...
+                    \item stworzenie struktury systemu dla węzłów rozproszonej bazy danych
+                    \item obsługa wprowadzania danych (operacja Insert) dla węzłów
+                    \item obsługa zapytań przychodzących z serwera głównego i zarządzanie zadaniami na węzłach
+                    \item przetwarzanie/zbieranie i wstępna agregacja danych zwróconych z GPU na węzłach
+                    \item przygotowywanie odpowiedzi dla zadań
                 \end{itemize}
             \item Tomasz Janiszewski
                 \begin{itemize}
