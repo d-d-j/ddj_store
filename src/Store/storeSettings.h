@@ -1,0 +1,1 @@
+#define STORE_BUFFER_SIZE 2

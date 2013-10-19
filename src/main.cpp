@@ -16,19 +16,20 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-#include "DDJ_StoreController.h"
+#include "Node.h"
+#include "Store/storeElement.h"
+#include "Network/Server.h"
 
 using namespace ddj::store;
 
 const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
 
-int main(int argc, char** argv)
+int main()
 {
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
-	StoreController* store = new StoreController();
-	delete store;
-	StoreBuffer* buffer = new StoreBuffer(5);
+
+	ddj::Node node;
 
 	storeElement e1,e2,e3;
 	e1.series = 1;
@@ -46,11 +47,15 @@ int main(int argc, char** argv)
 	e3.time = 15;
 	e3.value = 3.3;
 
-	buffer->InsertElement(&e1);
-	buffer->InsertElement(&e2);
-	buffer->InsertElement(&e3);
+	taskRequest req1(1, Insert, &e1);
+	taskRequest req2(2, Insert, &e2);
+	taskRequest req3(3, Insert, &e3);
 
-	delete buffer;
+	node.CreateTask(req1);
+	node.CreateTask(req2);
+	node.CreateTask(req3);
+
+	pantheios::log_INFORMATIONAL("Main function ended! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 	return EXIT_SUCCESS;
 }
 

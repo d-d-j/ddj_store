@@ -1,2 +1,8 @@
 /RemoteSystemsTempFiles
 /.metadata
+/Debug
+/Release
+*.o
+*.d
+*.orig
+DDJ_Store
