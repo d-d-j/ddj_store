@@ -110,14 +110,14 @@
 \normalfont
 \textsc{Projekt Zespołowy}\\ [20pt]
 \horrule{1.5pt} \\[0.4cm] % Thin top horizontal rule
-\LARGE Projekt ???\\ % The assignment title
+\LARGE Baza danych szeregów czasowych implementowana na klastrze obliczeniowym procesorów graficznych
 \horrule{1.5pt} \\[0.1cm] % Thick bottom horizontal rule
 \normalsize
 \textsc{Specyfikacja Funkcjonalna} \\ [20pt]
 \vspace*{\fill}
 }
 
-\author{Tomasz Janiszewski \\Jakub Dutkowski \\Karol Dzitkowski} % Your name
+\author{Jakub Dutkowski \\ Karol Dzitkowski \\ Tomasz Janiszewski } % Your name
 
 \date{\normalsize\today} % Today's date or a custom date
 
@@ -134,34 +134,59 @@
 
 \clearpage
 
-\begin{tabularx}{\textwidth}{  l | X | X | X | X | X }
-	\textbf{Projekt} & \multicolumn{5}{ l }{\textbf{[project name]}} \\
-	\hline\hline
-	Tytuł& \multicolumn{5}{ l }{[document title]} \\
-	\hline
-	Temat & \multicolumn{5}{ l }{[document subject]} \\
-	\hline
-	Autorzy & \multicolumn{5}{ l }{[authors]} \\
-	\hline
-	File & \multicolumn{5}{ l }{[file]} \\
-	\hline
-	Wersja & [version] & Status & [status] & Data utworzenia & [date] \\
-	\hline
-	Abstrakt & \multicolumn{5}{ p{11cm} }{[Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract ]} \\
-	\hline
-	Acceptance?? & \multicolumn{3}{ l |}{[document subject]} & Last mod?? & [date] \\
-\end{tabularx}
-
 \vspace{4em}
 
 
-\begin{tabularx}{\textwidth}{   l | l | X | X  }
-	\multicolumn{4}{ l }{ \textbf{Change log}} \\
-	Wersja & Data & Imię & Opis \\
-	\hline\hline
-	0.1 & 2012-10-01 & Han Solo & Initial contract \\
-\end{tabularx}
+\section{Abstrakt}
+Nimniejsza dokumentacja przedstawia wstępne założenia dotyczące projektu zespołowego, którego efektem ma być praca inżynierska.
+Dokument zawiera opis przypadków użycia oraz wymagania funkcjonalne oraz proponowany podział prac.
 
+\section{Opis programu}
+Celem projektu jest stworzenie bazydanych szeregów czasowych efektywnie kożystającej z wydajności oferowanej przez współczesne
+procesory graficzne. Dane powinny być przechowywane i przetwarzane w pamięci kart graficznych. Bazadanych oprócz przechowywania
+danych powinna umożliwiać szybką ich agregację oraz filtorwanie.
 
+\section{Wymagania funkcjonalne}
+    \subsection{Zapisywanie danych}
+    Baza danych powinna pozwalać na przechowywanie danych (niekoniecznie w trwały sposób) napływających z różnych źródeł
+    równolegle.
+    \subsection{Aggregowanie i filtracja danych }
+    Baza danych będzie zwracała dane z zadanego okresu czasu dla wyspecyfikowanego kwalifikatora (tag, seria) oraz pozwalała
+    na agregację tych danych przy pomocy predefiniowanych funkcji
+    \subsection{Działanie w czasie rzeczywistym (on-line)}
+    Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym.
+    \subsection{Komunikacja}
+    Baza danych będzie eksponowała interfejs do komunikacji ze źródłem danych oparty na protokole HTTP i formacie JSON
+
+\section{Przypadki użycia}
+    Przedstawione poniżej przypadki użycia przedstawiają podstawowy przebieg operacji.
+    \begin{enumerate}
+        \item Konfiguracja systemu
+        \\Użytkownik chcąć zmienić postawowe ustawienia systemu korzysta z konfiguracyjnego pliku tekstowego w którym
+        zmienia żadane wartości
+        \item Uruchomienie/Restart systemu
+        \\Użytkownik chce uruchomić/zrestartować system korzystając z jednego polecenia na serwerze głównym
+        \item Wprowadzenie danych
+        \\Użytkownik chce wprowadzić nowe dane do systemu. W tym celu przygotowuje żądanie HTTP i wysyła je do
+        głównego serwera
+        \item Odczyt i agregacja danych
+        \\Użytkownik chce odczytać dane z systemu i zastosować na nich wybraną metodę agregacji. W tym celu przygotowuje
+        żądanie HTTP i wysyła je do głównego serwera. W odpowiedzi otrzymuje wynik zadanej operacji
+
+    \end{enumerate}
+
+\section{Harmonogram prac}
+    \subsection{Metodologia}
+    Projekt prowadzony będzie zgodnie z modelem przyrostowym. Na każdym punkcie kontrolnym przedstawiona będzie
+    aplikacja rozszerzona o nowe funkcjonalności stanowiące dodatkową wartość dla systemu.
+
+    \subsection{Etapy projektu}
+    Wyodrębniono następujące etapy projektu
+        \subsubsection{Zapisywanie danych do pamięci karty graficznej}
+        \subsubsection{Kompresowanie zapisanych danych}
+        \subsubsection{Wsparcie dla wielu kart graficznych w obrębie jednego węzła}
+        \subsubsection{Wsparcie dla wielu węzłów}
+        \subsubsection{Ekstrakcja danych z bazy danych}
+        \subsubsection{Agregacja danych}
 
 \end{document}
