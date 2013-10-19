@@ -170,7 +170,13 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym.
     \subsection{Komunikacja}
     Baza danych będzie eksponowała interfejs do komunikacji ze źródłem danych oparty na protokole HTTP i formacie JSON
-
+\section{Wymagania niefunkcjonalne}
+    \subsection{Skalowalność}
+    Program będzie dobrze skalowalny, tj. nie ma konkretnego limitu na ilość węzłów oraz ilości kart graficznych na węźle. Jedyną limitacją w tym przypadku może być tylko wydajność serwera głównego
+    \subsection{Ilość przechowywanych danych}
+    Górnym limitem na ilość danych przechowywanych na jednej karcie GPU będzie około 80\% pojemności pamęci wewnętrznej karty
+    \subsection{Wydajność}
+    Ponieważ jest to praca "poznawcza" program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań
 \section{Przypadki użycia}
     Przedstawione poniżej przypadki użycia przedstawiają podstawowy przebieg operacji.
     \begin{enumerate}
