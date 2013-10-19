@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOC%%UMENT CONFIGURATIONS
+%   PACKAGES AND OTHER DOC%%UMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
 \documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
@@ -58,7 +58,7 @@
 %\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
 
 %----------------------------------------------------------------------------------------
-%	CODE INCLUSION CONFIGURATION
+%   CODE INCLUSION CONFIGURATION
 %----------------------------------------------------------------------------------------
 
 \definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
@@ -83,7 +83,7 @@
         %
         % Put user defined functions here
         morekeywords=[3]{test},
-       	%
+        %
         morecomment=[l][\color{Blue}]{...}, % Line continuation (...) like blue comment
         numbers=left, % Line numbers on left
         firstnumber=1, % Line numbers start with line 1
@@ -100,7 +100,7 @@
 }
 
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
+%   TITLE SECTION
 %----------------------------------------------------------------------------------------
 
 \newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
@@ -151,7 +151,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     Baza danych powinna pozwalać na przechowywanie danych (niekoniecznie w trwały sposób) napływających z różnych źródeł
     równolegle.
     \subsection{Agregowanie i filtracja danych}
-    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria), a także pozwalała na agregację tych danych przy pomocy predefiniowanych funkcji.
+    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
         \subsubsection{Funkcje agregujące}
         \begin{itemize}
             \item Sumowanie
@@ -200,7 +200,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
         \subsubsection{Ekstrakcja danych z bazy danych}
             System powinien móc odpowiedzieć na zadane przez użytkownika zapytania dotyczące przechowywanych danych
         \subsubsection{Poprawa wydajności}
-            Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy load balancing. Celem tego etapu będzie głównie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu.
+            Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Nastąpi finalna integracja całego systemu
+            oraz wdrożenie na wydziałowy klaster obliczeniowy. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy "load balancing". Celem tego etapu będzie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu zarówno dla wdrożeń na systemy typu PC jak i serwerowe.
 
     \subsection{Podział pracy}
     Przewiduje się poniższy podział pracy:
