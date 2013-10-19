@@ -1,0 +1,167 @@
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOC%%UMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+%\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[polish]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage[usenames,dvipsnames]{color} % Required for custom colors
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings} % Required for insertion of code
+
+\usepackage{lastpage}
+\usepackage{tabularx}
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{ \normalfont\scshape} % Make all sections the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage \, z \pageref{LastPage}} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{6.6pt} % Customize the height of the header
+
+
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+%\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	CODE INCLUSION CONFIGURATION
+%----------------------------------------------------------------------------------------
+
+\definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
+\lstloadlanguages{C++} % Load Cpp syntax for listings, for a list of other languages supported see: ftp://ftp.tex.ac.uk/tex-archive/macros/latex/contrib/listings/listings.pdf
+\lstset{language=C++, % UseCpp
+        frame=single, % Single frame around code
+        basicstyle=\small\ttfamily, % Use small true type font
+        keywordstyle=[1]\color{Blue}\bf, % Perl functions bold and blue
+        keywordstyle=[2]\color{Purple}, % Perl function arguments purple
+        keywordstyle=[3]\color{Blue}\underbar, % Custom functions underlined and blue
+        identifierstyle=, % Nothing special about identifiers
+        commentstyle=\usefont{T1}{pcr}{m}{sl}\color{MyDarkGreen}\small, % Comments small dark green courier font
+        stringstyle=\color{Purple}, % Strings are purple
+        showstringspaces=false, % Don't put marks in string spaces
+        tabsize=5, % 5 spaces per tab
+        %
+        % Put standard Perl functions not included in the default language here
+        morekeywords={rand},
+        %
+        % Put Cppl function parameters here
+        morekeywords=[2]{on, off, interp},
+        %
+        % Put user defined functions here
+        morekeywords=[3]{test},
+       	%
+        morecomment=[l][\color{Blue}]{...}, % Line continuation (...) like blue comment
+        numbers=left, % Line numbers on left
+        firstnumber=1, % Line numbers start with line 1
+        numberstyle=\tiny\color{Blue}, % Line numbers are blue and small
+        stepnumber=5 % Line numbers go in steps of 5
+}
+
+% add new command to include cpp code
+\newcommand{\cppscript}[2]{
+\begin{itemize}
+\item[]\lstinputlisting[caption=#2,label=#1]{#1.cpp}
+\end{itemize}
+
+}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{
+\vspace*{\fill}
+\normalfont
+\textsc{Projekt Zespołowy}\\ [20pt]
+\horrule{1.5pt} \\[0.4cm] % Thin top horizontal rule
+\LARGE Projekt ???\\ % The assignment title
+\horrule{1.5pt} \\[0.1cm] % Thick bottom horizontal rule
+\normalsize
+\textsc{Specyfikacja Funkcjonalna} \\ [20pt]
+\vspace*{\fill}
+}
+
+\author{Tomasz Janiszewski \\Jakub Dutkowski \\Karol Dzitkowski} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\begin{document}
+\maketitle
+
+\thispagestyle{empty}
+\clearpage
+
+\tableofcontents
+\listoffigures
+
+\chapter{}
+
+\clearpage
+
+\begin{tabularx}{\textwidth}{  l | X | X | X | X | X }
+	\textbf{Projekt} & \multicolumn{5}{ l }{\textbf{[project name]}} \\
+	\hline\hline
+	Tytuł& \multicolumn{5}{ l }{[document title]} \\
+	\hline
+	Temat & \multicolumn{5}{ l }{[document subject]} \\
+	\hline
+	Autorzy & \multicolumn{5}{ l }{[authors]} \\
+	\hline
+	File & \multicolumn{5}{ l }{[file]} \\
+	\hline
+	Wersja & [version] & Status & [status] & Data utworzenia & [date] \\
+	\hline
+	Abstrakt & \multicolumn{5}{ p{11cm} }{[Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract Abstract ]} \\
+	\hline
+	Acceptance?? & \multicolumn{3}{ l |}{[document subject]} & Last mod?? & [date] \\
+\end{tabularx}
+
+\vspace{4em}
+
+
+\begin{tabularx}{\textwidth}{   l | l | X | X  }
+	\multicolumn{4}{ l }{ \textbf{Change log}} \\
+	Wersja & Data & Imię & Opis \\
+	\hline\hline
+	0.1 & 2012-10-01 & Han Solo & Initial contract \\
+\end{tabularx}
+
+
+
+\end{document}
