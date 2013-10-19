@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOC%%UMENT CONFIGURATIONS
+%   PACKAGES AND OTHER DOC%%UMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
 \documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
@@ -58,7 +58,7 @@
 %\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
 
 %----------------------------------------------------------------------------------------
-%	CODE INCLUSION CONFIGURATION
+%   CODE INCLUSION CONFIGURATION
 %----------------------------------------------------------------------------------------
 
 \definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
@@ -83,7 +83,7 @@
         %
         % Put user defined functions here
         morekeywords=[3]{test},
-       	%
+        %
         morecomment=[l][\color{Blue}]{...}, % Line continuation (...) like blue comment
         numbers=left, % Line numbers on left
         firstnumber=1, % Line numbers start with line 1
@@ -100,7 +100,7 @@
 }
 
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
+%   TITLE SECTION
 %----------------------------------------------------------------------------------------
 
 \newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
@@ -150,9 +150,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     \subsection{Zapisywanie danych}
     Baza danych powinna pozwalać na przechowywanie danych (niekoniecznie w trwały sposób) napływających z różnych źródeł
     równolegle.
-    \subsection{Agregowanie i filtracja danych }
-    Baza danych będzie zwracała dane z zadanych okresów czasów oraz dla zadanych tagów i serii jako listę danych w
-    formacie \texttt{[tag][seria][czas][liczba]} lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
+    \subsection{Agregowanie i filtracja danych}
+    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
         \subsubsection{Funkcje agregujące}
         \begin{itemize}
             \item Sumowanie
@@ -171,7 +170,13 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym.
     \subsection{Komunikacja}
     Baza danych będzie eksponowała interfejs do komunikacji ze źródłem danych oparty na protokole HTTP i formacie JSON
-
+\section{Wymagania niefunkcjonalne}
+    \subsection{Skalowalność}
+    Program będzie dobrze skalowalny, tj. nie ma konkretnego limitu na ilość węzłów oraz ilości kart graficznych na węźle. Jedyną limitacją w tym przypadku może być tylko wydajność serwera głównego
+    \subsection{Ilość przechowywanych danych}
+    Górnym limitem na ilość danych przechowywanych na jednej karcie GPU będzie około 80\% pojemności pamęci wewnętrznej karty
+    \subsection{Wydajność}
+    Ponieważ jest to praca "poznawcza" program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań
 \section{Przypadki użycia}
     Przedstawione poniżej przypadki użycia przedstawiają podstawowy przebieg operacji.
     \begin{enumerate}
@@ -197,14 +202,19 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     \subsection{Etapy projektu}
     Wyodrębniono następujące etapy projektu
         \subsubsection{Zapisywanie danych do pamięci karty graficznej}
-            System powinien być w stanie przyjąć dane z zewnątrz i zapisać je do pamięci karty graficznej.
+            System powinien być w stanie przyjąć dane z zewnątrz i zapisać je do pamięci jednej z kart graficznych na jednym z połączonych węzłów.
         \subsubsection{Ekstrakcja danych z bazy danych}
             System powinien móc odpowiedzieć na zadane przez użytkownika zapytania dotyczące przechowywanych danych
         \subsubsection{Poprawa wydajności}
             Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Nastąpi finalna integracja całego systemu
-            oraz wdrożenie na wydziałowy klaster obliczeniowy. Poprzez wykonanie testów wydajności powinny zostać
-            przygotowane wskazówki konfiguracji systemu zarówno dla wdrożeń na systemy typu PC jak i serwerowe.
-
+            oraz wdrożenie na wydziałowy klaster obliczeniowy. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy "load balancing". Celem tego etapu będzie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu zarówno dla wdrożeń na systemy typu PC jak i serwerowe.
+    \subsection{Terminarz}
+        \begin{enumerate}
+            \item 21-25.10.2013 - Specyfikacja funkcjonalna + stworzenie środowiska pracy, repozytoriów, uzgodnienie technologii i wstępnej architektury systemu
+            \item 11-15.11.2013 - Oddanie pierwszego prototypu oraz konkretnej (końcowej) specyfikacji technicznej
+            \item 9-13.12.2013 - Oddanie drugiego prototypu oraz testów jednostkowych
+            \item 6-10.01.2014 - Oddanie właściwego projektu, testów integracyjnych i wydajnościowych + dokumentacja końcowa
+        \end{enumerate}
     \subsection{Podział pracy}
     Przewiduje się poniższy podział pracy:
         \begin{enumerate}
@@ -214,7 +224,11 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
                 \end{itemize}
             \item Karol Dzitkowski
                 \begin{itemize}
-                    \item ...
+                    \item stworzenie struktury systemu dla węzłów rozproszonej bazy danych
+                    \item obsługa wprowadzania danych (operacja Insert) dla węzłów
+                    \item obsługa zapytań przychodzących z serwera głównego i zarządzanie zadaniami na węzłach
+                    \item przetwarzanie/zbieranie i wstępna agregacja danych zwróconych z GPU na węzłach
+                    \item przygotowywanie odpowiedzi dla zadań
                 \end{itemize}
             \item Tomasz Janiszewski
                 \begin{itemize}
