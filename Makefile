@@ -3,6 +3,9 @@ RM := rm -rf
 #you can use g++ or clang or color-gcc
 COMPILER := g++
 
+DOCS += \
+./docs/main.pdf
+
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
@@ -17,7 +20,7 @@ OBJS += \
 ./src/Task/StoreTaskMonitor.o \
 ./src/CUDA/GpuStore.o \
 ./src/Node.o \
-./src/main.o 
+./src/main.o
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
@@ -62,8 +65,8 @@ src/%.o: ./src/%.cu
 	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
-	
-all: DDJ_Store
+
+all: DDJ_Store documentation
 
 DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
@@ -72,8 +75,20 @@ DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+docs/%.pdf: ./docs/%.tex
+	@echo 'Building file: $<'
+	latexmk "$<" -pdf -quiet -jobname=$(@:%.pdf=%)
+	@echo 'Finished building: $<'
+	@echo ' '
+
+documentation: $(DOCS)
+	@echo 'Building target: $@'
+	@echo 'Invoking Latex'
+	@echo 'Finished building target: $@'
+
 clean:
 	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DDJ_Store
+	cd docs && latexmk -C
 	-@echo ' '
 
 .PHONY: all clean dependents
