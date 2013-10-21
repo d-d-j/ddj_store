@@ -216,28 +216,29 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
             \item 6-10.01.2014 - Oddanie właściwego projektu, testów integracyjnych i wydajnościowych + dokumentacja końcowa
         \end{enumerate}
     \subsection{Podział pracy}
-    Przewiduje się poniższy podział pracy:
+    Przewiduje się poniższy wstępny podział pracy:
         \begin{enumerate}
             \item Jakub Dutkowski
                 \begin{itemize}
                     \item kompresja danych na GPU
                     \item komunikacja pomiędzy GPU a CPU
-                    \item operacja redukcji dla funkcji agregujących
+                    \item operacja redukcji dla funkcji agregujących na GPU
                 \end{itemize}
             \item Karol Dzitkowski
                 \begin{itemize}
                     \item stworzenie struktury systemu dla węzłów rozproszonej bazy danych
                     \item obsługa wprowadzania danych (operacja Insert) dla węzłów
-                    \item obsługa zapytań przychodzących z serwera głównego i zarządzanie zadaniami na węzłach
                     \item przetwarzanie/zbieranie i wstępna agregacja danych zwróconych z GPU na węzłach
-                    \item przygotowywanie odpowiedzi dla zadań
+                    \item oprogramowanie głównej tablicy danych na GPU oraz operacje wstawiania oraz wyjmowania z niej kawałków danych (Chunks'ów)
+                    \item obsługa zapytań przychodzących z serwera głównego, zarządzanie zadaniami na węzłach oraz przygotowywanie odpowiedzi dla zadań
                 \end{itemize}
             \item Tomasz Janiszewski
                 \begin{itemize}
                     \item komunikacja pomiędzy bazą danych a klientem
                     \item komunikacja sieciową pomiędzy elementami systemu
                     \item zarządzanie węzłami po stronie głównego serwera
-                    \item przetwarzanie żądań do  serwera głównego
+                    \item przetwarzanie żądań do serwera głównego
+                    \item agregacja wyników po stronie serwera głównego
                 \end{itemize}
             \item Wspólna praca
                 \begin{itemize}
