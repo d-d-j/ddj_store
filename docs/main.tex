@@ -36,6 +36,8 @@
 \usepackage{lastpage}
 \usepackage{tabularx}
 
+\usepackage{todonotes}
+
 \usepackage{sectsty} % Allows customizing section commands
 \allsectionsfont{ \normalfont\scshape} % Make all sections the default font and small caps
 
@@ -151,7 +153,9 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     Baza danych powinna pozwalać na przechowywanie danych (niekoniecznie w trwały sposób) napływających z różnych źródeł
     równolegle.
     \subsection{Agregowanie i filtracja danych}
-    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
+    Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (tag, seria).
+    Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana
+    przy pomocy predefiniowanych funkcji.
         \subsubsection{Funkcje agregujące}
         \begin{itemize}
             \item Sumowanie
@@ -167,16 +171,21 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
             \item Histogram
         \end{itemize}
     \subsection{Działanie w czasie rzeczywistym (on-line)}
-    Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym.
+    Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna wstępna agregacja
+    danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU. Istnieje więc możliwość że
+    część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla użytkownika gdyż jeszcze nie zdążą być zapisane na
+    karcie pomimo że zostały przyjęte do systemu.
     \subsection{Komunikacja}
     Baza danych będzie eksponowała interfejs do komunikacji ze źródłem danych oparty na protokole HTTP i formacie JSON
 \section{Wymagania niefunkcjonalne}
     \subsection{Skalowalność}
-    Program będzie dobrze skalowalny, tj. nie ma konkretnego limitu na ilość węzłów oraz ilości kart graficznych na węźle. Jedyną limitacją w tym przypadku może być tylko wydajność serwera głównego
+    Program będzie dobrze skalowalny, tj. nie ma konkretnego limitu na ilość węzłów oraz ilości kart graficznych na węźle.
+     Jedyną limitacją w tym przypadku może być tylko wydajność serwera głównego
     \subsection{Ilość przechowywanych danych}
-    Górnym limitem na ilość danych przechowywanych na jednej karcie GPU będzie około 80\% pojemności pamęci wewnętrznej karty
+    Górnym limitem na ilość danych przechowywanych na jednej karcie GPU będzie około 80\% pojemności pamięci wewnętrznej karty
     \subsection{Wydajność}
-    Ponieważ jest to praca "poznawcza" program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań
+    Ponieważ jest to praca ``badawcza'' program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej
+     przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań
 \section{Przypadki użycia}
     Przedstawione poniżej przypadki użycia przedstawiają podstawowy przebieg operacji.
     \begin{enumerate}
@@ -194,6 +203,9 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 
     \end{enumerate}
 
+\section{Wizja systemu}
+    \missingfigure{Poprawiony diagram CUDA GPU Data Store }
+
 \section{Harmonogram prac}
     \subsection{Metodologia}
     Projekt prowadzony będzie zgodnie z modelem przyrostowym. Na każdym punkcie kontrolnym przedstawiona będzie
@@ -207,7 +219,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
             System powinien móc odpowiedzieć na zadane przez użytkownika zapytania dotyczące przechowywanych danych
         \subsubsection{Poprawa wydajności}
             Na tym etapie cała funkcjonalność powinna być już zaimplementowana. Nastąpi finalna integracja całego systemu
-            oraz wdrożenie na wydziałowy klaster obliczeniowy. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy "load balancing". Celem tego etapu będzie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu zarówno dla wdrożeń na systemy typu PC jak i serwerowe.
+            oraz wdrożenie na wydziałowy klaster obliczeniowy. Dodane zostaną testy integracyjne, zbieranie informacji o stanie węzłów oraz właściwy ``load balancing''. Celem tego etapu będzie eliminacja błędów oraz poprawa wydajności systemu. Poprzez wykonanie testów wydajności powinny zostać przygotowane wskazówki konfiguracji systemu zarówno dla wdrożeń na systemy typu PC jak i serwerowe.
     \subsection{Terminarz}
         \begin{enumerate}
             \item 21-25.10.2013 - Specyfikacja funkcjonalna + stworzenie środowiska pracy, repozytoriów, uzgodnienie technologii i wstępnej architektury systemu
