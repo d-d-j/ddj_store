@@ -20,14 +20,14 @@
 
 \documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
 
-
+\usepackage[final]{pdfpages}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 %\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
 \usepackage[polish]{babel} % English language/hyphenation
 \usepackage{amsmath,amsfonts,amsthm} % Math packages
 
-\usepackage[usenames,dvipsnames]{color} % Required for custom colors
+%\usepackage[usenames,dvipsnames]{color} % Required for custom colors
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -36,7 +36,7 @@
 \usepackage{lastpage}
 \usepackage{tabularx}
 
-\usepackage{todonotes}
+%\usepackage{todonotes}
 
 \usepackage{sectsty} % Allows customizing section commands
 \allsectionsfont{ \normalfont\scshape} % Make all sections the default font and small caps
@@ -163,8 +163,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
             \item Max
             \item Min
             \item Odchylenie standardowe
-            \item Liczba rekordów
-            \item Liczba rekordów o zadanej wartości
+            \item Liczba rekordów o wartościach z zadanego przedziału
             \item Wariancja
             \item Całka
             \item Różniczka
@@ -204,7 +203,9 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
     \end{enumerate}
 
 \section{Wizja systemu}
-    \missingfigure{Poprawiony diagram CUDA GPU Data Store }
+    \subsection{Komunikacja CPU - GPU}
+    \includegraphics[scale=0.2]{GpuCpu}
+    \includepdf[scale=1,pages=-,pagecommand=\subsection{Diagram systemu}]{DeploymentDiagram}
 
 \section{Harmonogram prac}
     \subsection{Metodologia}
