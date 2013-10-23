@@ -1,7 +1,7 @@
 RM := rm -rf
 
-#you can use g++ or clang or color-gcc
-COMPILER := g++
+#you can use g++ or clang or color-gcc or g++-mp-4.7
+COMPILER := g++-mp-4.7
 
 DOCS += \
 ./docs/main.pdf
@@ -37,12 +37,12 @@ CPP_DEPS += \
 ./src/Node.d \
 ./src/main.d
 
-
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
-INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
-WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
+LIBS := -L"/usr/local/cuda/lib64" -L"/usr/local/cuda/lib" -L"./libs/boost/stage/lib" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
+INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include" -I"./libs/boost"
+WARNINGS_ERRORS := 
+#-pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
 STANDART := -std=c++0x
-DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
+DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_NO_DEFAULTED_FUNCTIONS
 
 # CUDA code generation flags
 ifneq ($(OS_ARCH),armv7l)
@@ -62,7 +62,7 @@ src/%.o: ./src/%.cpp
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
+	nvcc -ccbin="/usr/bin/llvm-gcc-4.2" $(GENCODE_FLAGS) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
