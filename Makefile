@@ -3,9 +3,6 @@ RM := rm -rf
 #you can use g++ or clang or color-gcc or g++-mp-4.7
 COMPILER := g++-mp-4.7
 
-DOCS += \
-./docs/main.pdf
-
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
@@ -39,8 +36,7 @@ CPP_DEPS += \
 
 LIBS := -L"/usr/local/cuda/lib64" -L"/usr/local/cuda/lib" -L"./libs/boost/stage/lib" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
 INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include" -I"./libs/boost"
-WARNINGS_ERRORS := 
-#-pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
+WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
 STANDART := -std=c++0x
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_NO_DEFAULTED_FUNCTIONS
 
@@ -75,20 +71,8 @@ DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-docs/%.pdf: ./docs/%.tex
-	@echo 'Building file: $<'
-	latexmk "$<" -pdf -quiet -jobname=$(@:%.pdf=%)
-	@echo 'Finished building: $<'
-	@echo ' '
-
-documentation: $(DOCS)
-	@echo 'Building target: $@'
-	@echo 'Invoking Latex'
-	@echo 'Finished building target: $@'
-
 clean:
 	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DDJ_Store
-	cd docs && latexmk -C
 	-@echo ' '
 
 .PHONY: all clean dependents
