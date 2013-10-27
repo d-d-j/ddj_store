@@ -6,7 +6,11 @@
 3. build application with `make all`
 4. Run program
 
-There are some environmental variables needed for CUDA:
-	1. export PATH=/usr/local/cuda-5.5/bin:$PATH
-	2. export LD_LIBRARY_PATH=/usr/local/cuda-5.5/lib64:$LD_LIBRARY_PATH
 
+### Common Problems
+
+1. ` error while loading shared libraries: libcudart.so.5.5:`
+There are some environmental variables needed for CUDA:
+
+		export PATH=/usr/local/cuda-5.5/bin:$PATH
+		export LD_LIBRARY_PATH=/usr/local/cuda-5.5/lib64:$LD_LIBRARY_PATH

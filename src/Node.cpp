@@ -34,7 +34,7 @@ namespace ddj
 		}
 
 		// TODO: create network client (client constructor should wait until it connects to master)
-		// this->_client = new Client(boost::signals2::signal<void (taskRequest)>* _requestSignal);
+		this->_client = new Client(&_requestSignal);
 	}
 
 	Node::~Node()
