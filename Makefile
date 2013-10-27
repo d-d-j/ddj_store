@@ -40,7 +40,7 @@ CPP_DEPS += \
 LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
 INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
 WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
-STANDART := -std=c++0x -g
+STANDART := -std=c++0x
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 
 # CUDA code generation flags

@@ -19,6 +19,7 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <cstddef>
 #include <stdexcept>
 
 /* CUDA */
