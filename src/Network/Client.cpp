@@ -8,7 +8,7 @@
 #include "Client.h"
 #include "../Store/LoggerHelper.h"
 #include "../Store/StoreIncludes.h"
- #include <thread>
+#include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
 Client::Client(std::string ip, std::string port) {
@@ -25,8 +25,8 @@ Client::Client(boost::signals2::signal<void (taskRequest)> *_requestSignal)
 	h_LogThreadDebug("Introduce to server");
 	char msg[] = "Node #1";
 	write(msg, strlen(msg));
-	boost::asio::io_service *io = &io_service;
-	std::thread t([io](){ (*io).run(); });
+	boost::thread workerThread(&Client::do_read, this);
+
 }
 
 void Client::connect()
@@ -45,20 +45,14 @@ void Client::write(char* message, size_t length)
 
 void Client::do_read()
 {
-    boost::asio::async_read(*socket,
-        boost::asio::buffer(msg, 100),
-        [this](boost::system::error_code ec, std::size_t /*length*/)
-        {
-          if (!ec)
-          {
-            h_LogThreadDebug("Recived data: ");
-            h_LogThreadDebug(msg);
-          }
-          else
-          {
-            close();
-          }
-        });
+    const int LEN = 100;
+    char msg[LEN];
+
+    while (read(msg, LEN))
+    {
+    	h_LogThreadDebug("Input: ");
+    	h_LogThreadDebug(msg);
+    }
 }
 
 size_t Client::read(char* replay, size_t length)

@@ -32,6 +32,8 @@ int main()
 
 	ddj::Node n;
 
+	getchar();
+
 	return EXIT_SUCCESS;
 }
 
