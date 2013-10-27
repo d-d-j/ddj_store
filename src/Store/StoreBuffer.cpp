@@ -18,79 +18,131 @@
 
 #include "StoreBuffer.h"
 
-using namespace ddj::store;
+namespace ddj {
+namespace store {
 
-StoreBuffer::StoreBuffer(tag_type tag)
+StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 {
-	if(typeid(tag_type) == typeid(int))
-		pantheios::log_DEBUG("StoreBuffer with [Tag = ", pantheios::integer(tag), "] is being created");
+	h_LogThreadWithTagDebug("StoreBuffer constructor started", tag);
 
 	this->_tag = tag;
+	this->_areBuffersSwitched = false;
 	this->_bufferElementsCount = 0;
-	this->_bufferInfoTree = new tree();
-	this->_bufferInfoTreeMonitor = new BTreeMonitor(this->_bufferInfoTree);
-	this->_gpuUploader = new GpuUploaderMonitor(this->_bufferInfoTreeMonitor);
+	this->_backBufferElementsCount = 0;
+	this->_gpuUploadMonitor = gpuUploadMonitor;
+	this->_bufferInfoTreeMonitor = new BTreeMonitor(tag);
+	this->_uploaderBarrier = new boost::barrier(2);
+
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
+
+	// START UPLOADER THRAED
+	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
+	this->_uploaderBarrier->wait();
+
+	h_LogThreadWithTagDebug("StoreBuffer constructor ended", tag);
 }
 
 StoreBuffer::~StoreBuffer()
 {
-	if(typeid(tag_type) == typeid(int))
-		pantheios::log_DEBUG(PSTR("StoreBuffer [Tag = "), pantheios::integer(this->_tag), PSTR("] is being freed"));
+	h_LogThreadWithTagDebug("StoreBuffer destructor started", this->_tag);
 
-	delete this->_gpuUploader;
+	// STOP UPLOADER THREAD
+	{
+		boost::mutex::scoped_lock lock(this->_uploaderMutex);
+		h_LogThreadWithTagDebug("StoreBuffer locked uploader's mutex", this->_tag);
+		this->_uploaderThread->interrupt();
+	}
+	this->_uploaderThread->join();
+
 	delete this->_bufferInfoTreeMonitor;
-	delete this->_bufferInfoTree;
+	delete this->_uploaderBarrier;
+	delete this->_uploaderThread;
 
-	if(typeid(tag_type) == typeid(int))
-			pantheios::log_DEBUG(PSTR("StoreBuffer [Tag = "), pantheios::integer(this->_tag), PSTR("] has been freed"));
+	h_LogThreadWithTagDebug("StoreBuffer destructor ended", this->_tag);
 }
 
-infoElement* StoreBuffer::insertToBuffer(storeElement* element)
+void StoreBuffer::Insert(storeElement* element)
 {
-	this->_buffer[_bufferElementsCount] = *element;
+	h_LogThreadWithTagDebug("Inserting element to buffer", this->_tag);
+	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
-	if(this->_bufferElementsCount == STORE_BUFFER_SIZE)
+	if(_bufferElementsCount == STORE_BUFFER_SIZE)
 	{
 		this->switchBuffers();
-		return new infoElement(element->tag, this->_buffer[0].time, element->time, this->_buffer[0].value, element->value);
 	}
-	return NULL;
-}
-
-void StoreBuffer::switchBuffers()
-{
-	this->_bufferElementsCount = 0;
-	this->_buffer.swap(this->_backBuffer);
-}
-
-bool StoreBuffer::InsertElement(storeElement* element)
-{
-	// Firstly we want to insert received element to buffer, if buffer is full it is switched and info_element is returned
-	infoElement* result = this->insertToBuffer(element);
-	if(result != NULL)
-	{
-
-		// Buffers are now switched and it is time to upload back_buffer content to GPU memory
-		//
-		//	TODO: Uploading back_buffer to GPU memory
-		//
-
-		// After uploading back_buffer to GPU memory and result->startVAlue and result->endValue have been set
-		// There is time to Insert information about TRUNKS to buffer_tree
-
-		this->_bufferInfoTreeMonitor->Insert(result);
-		return true;
-	}
-	return false;
 }
 
 void StoreBuffer::Flush()
 {
-	// Switch the buffers
-	this->switchBuffers();
-	// Synchronized upload of back_buffer to GPU memory
-	//
-	// TODO: Synchronized upload to GPU memory
-	//
-	// OR waiting for memory upload to end
+	boost::mutex::scoped_lock lock(this->_uploaderMutex);
+	this->_backBufferElementsCount = this->_bufferElementsCount;
+	this->_bufferElementsCount = 0;
+	this->_buffer.swap(this->_backBuffer);
+
+	// UPLOAD BUFFER TO GPU
+	infoElement* elemToInsertToBTree =
+			this->_gpuUploadMonitor->Upload(&(this->_backBuffer), this->_backBufferElementsCount);
+
+	// INSERT INFO ELEMENT TO B+TREE
+	this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
+
+	this->_areBuffersSwitched = false;
 }
+
+void StoreBuffer::uploaderThreadFunction()
+{
+	infoElement* elemToInsertToBTree;
+	h_LogThreadWithTagDebug("UploaderThread started", this->_tag);
+	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
+	h_LogThreadWithTagDebug("UploaderThread locked his mutex", this->_tag);
+	this->_uploaderBarrier->wait();
+	try
+	{
+		while(1)
+		{
+			h_LogThreadWithTagDebug("UploaderThread waiting", this->_tag);
+			this->_uploaderCond.wait(lock);
+			h_LogThreadWithTagDebug("UploaderThread doing his job", this->_tag);
+
+			if(this->_areBuffersSwitched)
+			{
+				// UPLOAD BUFFER TO GPU
+				elemToInsertToBTree = this->_gpuUploadMonitor->Upload(
+																&(this->_backBuffer),
+																this->_backBufferElementsCount);
+
+				// INSERT INFO ELEMENT TO B+TREE
+				this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
+
+				// COMMUNICATE THAT BACK BUFFER WAS SUCCESSFULLY UPLOADED
+				this->_areBuffersSwitched = false;
+			}
+		}
+	}
+	catch(boost::thread_interrupted& ex)
+	{
+		h_LogThreadWithTagDebug("UploaderThread ended as interrupted [Success]", this->_tag);
+		return;
+	}
+	catch(...)
+	{
+		h_LogThreadWithTagDebug("UploaderThread ended with error [Failure]", this->_tag);
+	}
+}
+
+void StoreBuffer::switchBuffers()
+{
+	h_LogThreadWithTagDebug("Switching buffers start", this->_tag);
+	boost::mutex::scoped_lock lock(this->_uploaderMutex);
+	h_LogThreadWithTagDebug("Uploader mutex locked by switchBuffers", this->_tag);
+	this->_areBuffersSwitched = true;
+	this->_backBufferElementsCount = this->_bufferElementsCount;
+	this->_bufferElementsCount = 0;
+	this->_buffer.swap(this->_backBuffer);
+	this->_uploaderCond.notify_one();
+	h_LogThreadWithTagDebug("Switching buffers end", this->_tag);
+}
+
+} /* namespace store */
+} /* namespace ddj */

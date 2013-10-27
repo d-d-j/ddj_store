@@ -17,11 +17,13 @@
  * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
-
 #ifndef DDJ_Store_DDJ_StoreController_h
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
+#include "../GpuUpload/GpuUploadMonitor.h"
+#include "../CUDA/GpuStore.cuh"
+#include "../Task/StoreTask.h"
 
 namespace ddj {
 namespace store {
@@ -29,18 +31,27 @@ namespace store {
 class StoreController
 {
     /* TYPEDEFS */
-    typedef std::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
-    typedef std::pair<tag_type, StoreBuffer_Pointer> store_hash_value_type;
+    typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
+    typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
 
     /* FIELDS */
     private:
-        __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>* _buffers;
+    	int _gpuDeviceId;
+    	GpuUploadMonitor _gpuUploadMonitor;
+    	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
+        boost::unordered_map<int, taskFunc> _taskFunctions;
 
+	/* METHODS */
     public:
-        StoreController();
-        ~StoreController();
-        bool InsertValue(storeElement* element);
-        bool InsertValue(int series, tag_type tag, ullint time, store_value_type value);
+        StoreController(int gpuDeviceId);
+        virtual ~StoreController();
+        void ExecuteTask(StoreTask_Pointer task);
+    private:
+        void populateTaskFunctions();
+
+	/* TASK FUNCTIONS */
+    private:
+        void insertTaskToDictionary(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

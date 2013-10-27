@@ -22,32 +22,72 @@
 namespace ddj {
 namespace store {
 
-	StoreController::StoreController()
+	StoreController::StoreController(int gpuDeviceId)
 	{
-		pantheios::log_DEBUG("Initializing new StoreController - creating StoreBuffer hash map");
-		_buffers = new __gnu_cxx::hash_map<tag_type, StoreBuffer_Pointer>();
+		h_LogThreadDebug("StoreController constructor started");
+
+		this->_gpuDeviceId = gpuDeviceId;
+		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
+
+		// PREPARE TASK FUNCTIONS DICTIONARY
+		this->populateTaskFunctions();
+
+		h_LogThreadDebug("StoreController constructor ended");
 	}
 
 	StoreController::~StoreController()
 	{
-		pantheios::log_DEBUG("Removing StoreController - delete StoreBuffer hash map");
-		delete _buffers;
+		h_LogThreadDebug("StoreController destructor started");
+
+		delete this->_buffers;
+
+		h_LogThreadDebug("StoreController destructor ended");
 	}
 
-	bool StoreController::InsertValue(storeElement* element)
+	void StoreController::ExecuteTask(StoreTask_Pointer task)
 	{
-		if(_buffers->count(element->tag) == 0)
+		// Fire a function from _TaskFunctions with this taskId
+		this->_taskFunctions[task->GetType()](task);
+	}
+
+	void StoreController::populateTaskFunctions()
+	{
+		std::pair<int, taskFunc> pair;
+
+		// INSERT
+		pair.first = 1;
+		pair.second = boost::bind(&StoreController::insertTaskToDictionary, this, _1);
+		_taskFunctions.insert(pair);
+	}
+
+	void StoreController::insertTaskToDictionary(StoreTask_Pointer task)
+	{
+		h_LogThreadDebug("Insert task function started");
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != Insert)
 		{
-			std::shared_ptr<StoreBuffer> p(new StoreBuffer(element->tag));
-			_buffers->insert(store_hash_value_type( element->tag, p));
+			h_LogThreadError("Error in insertTask function - wrong argument");
+			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
-		return (*_buffers)[element->tag]->InsertElement(element);
+
+		// GET store element from task data
+		storeElement* element = (storeElement*)(task->GetData());
+
+		// GET buffer with element's tag or create one if not exists
+		if(this->_buffers->count(element->tag))	// if such a buffer exists
+		{
+			(*_buffers)[element->tag]->Insert(element);
+		}
+		else
+		{
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, &(this->_gpuUploadMonitor)));
+			this->_buffers->insert({element->tag, newBuf});
+
+		}
+
+		h_LogThreadDebug("Insert task function ended");
 	}
 
-	bool StoreController::InsertValue(int series, tag_type tag, ullint time, store_value_type value)
-	{
-		return this->InsertValue(new storeElement(series, tag, time, value));
-	}
-
-}
-}
+} /* namespace store */
+} /* namespace ddj */

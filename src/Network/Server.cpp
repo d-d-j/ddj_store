@@ -6,6 +6,7 @@
  */
 
 #include "Server.h"
+#include "../Store/LoggerHelper.h"
 #include "../Store/StoreIncludes.h"
 
 Server::Server(int port) {

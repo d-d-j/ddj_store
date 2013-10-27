@@ -1,28 +1,43 @@
 RM := rm -rf
 
+#you can use g++ or clang or color-gcc
+COMPILER := g++
+
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
-./src/GpuUploader/GpuUploaderMonitor.o \
-./src/GpuUploader/GpuUploaderCore.o \
+./src/GpuUpload/GpuUploadMonitor.o \
+./src/GpuUpload/GpuUploadCore.o \
 ./src/Network/Server.o \
+./src/Query/QueryMonitor.o \
+./src/Query/QueryCore.o \
+./src/Task/TaskResult.o \
+./src/Task/StoreTask.o \
+./src/Task/StoreTaskMonitor.o \
+./src/CUDA/GpuStore.o \
+./src/Node.o \
 ./src/main.o 
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \
-./src/GpuUploader/GpuUploaderMonitor.d \
-./src/GpuUploader/GpuUploaderCore.d \
+./src/GpuUpload/GpuUploadMonitor.d \
+./src/GpuUpload/GpuUploadCore.d \
 ./src/Network/Server.d \
+./src/Query/QueryMonitor.d \
+./src/Query/QueryCore.d \
+./src/Task/TaskResult.d \
+./src/Task/StoreTask.d \
+./src/Task/StoreTaskMonitor.d \
+./src/Node.d \
 ./src/main.d
 
 
 LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
-
 INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
-WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Werror
+WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
 STANDART := -std=c++0x
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 
@@ -36,15 +51,15 @@ endif
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
-	@echo 'Invoking: GCC C++ Compiler'
-	g++  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Invoking: $(COMPILER)'
+	$(COMPILER)  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) -c -o "$@" "$<"
+	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 	
