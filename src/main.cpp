@@ -19,6 +19,7 @@
 #include "Node.h"
 #include "Store/storeElement.h"
 #include "Network/Client.h"
+#include <cstdint>
 
 using namespace ddj::store;
 
@@ -29,18 +30,7 @@ int main()
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 
-	Client c("127.0.0.1", "8080");
-	c.connect();
-
-	const int LEN = 100;
-
-	char msg[LEN] = "Test message";
-
-	while (true) {
-		c.write(msg, LEN);
-		c.read(msg, LEN);
-		pantheios::log_INFORMATIONAL("Received message: ", msg );
-	}
+	ddj::Node n;
 
 	return EXIT_SUCCESS;
 }
