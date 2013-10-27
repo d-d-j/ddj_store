@@ -18,7 +18,7 @@
 
 #include "Node.h"
 #include "Store/storeElement.h"
-#include "Network/Server.h"
+#include "Network/Client.h"
 
 using namespace ddj::store;
 
@@ -29,33 +29,19 @@ int main()
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 
-	ddj::Node node;
+	Client c("127.0.0.1", "8080");
+	c.connect();
 
-	storeElement e1,e2,e3;
-	e1.series = 1;
-	e1.tag = 5;
-	e1.time = 10;
-	e1.value = 1.1;
+	const int LEN = 100;
 
-	e2.series = 1;
-	e2.tag = 5;
-	e2.time = 12;
-	e2.value = 2.2;
+	char msg[LEN] = "Test message";
 
-	e3.series = 1;
-	e3.tag = 5;
-	e3.time = 15;
-	e3.value = 3.3;
+	while (true) {
+		c.write(msg, LEN);
+		c.read(msg, LEN);
+		pantheios::log_INFORMATIONAL("Received message: ", msg );
+	}
 
-	taskRequest req1(1, Insert, &e1);
-	taskRequest req2(2, Insert, &e2);
-	taskRequest req3(3, Insert, &e3);
-
-	node.CreateTask(req1);
-	node.CreateTask(req2);
-	node.CreateTask(req3);
-
-	pantheios::log_INFORMATIONAL("Main function ended! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 	return EXIT_SUCCESS;
 }
 

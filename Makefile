@@ -17,7 +17,8 @@ OBJS += \
 ./src/Task/StoreTaskMonitor.o \
 ./src/CUDA/GpuStore.o \
 ./src/Node.o \
-./src/main.o 
+./src/Network/Client.o \
+./src/main.o
 
 CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
@@ -32,6 +33,7 @@ CPP_DEPS += \
 ./src/Task/StoreTask.d \
 ./src/Task/StoreTaskMonitor.d \
 ./src/Node.d \
+./src/Network/Client.d \
 ./src/main.d
 
 
@@ -62,7 +64,7 @@ src/%.o: ./src/%.cu
 	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
-	
+
 all: DDJ_Store
 
 DDJ_Store: $(OBJS) $(USER_OBJS)
