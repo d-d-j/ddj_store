@@ -1,6 +1,8 @@
 #ifndef GPUSTORE_CUH_
 #define GPUSTORE_CUH_
 
+#include "../Store/StoreIncludes.h"
+
 extern "C"
 {
 	void gpuGetMemoryUsage(size_t* freeMemory, size_t* totalMemory);

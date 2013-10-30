@@ -14,7 +14,7 @@ namespace store {
 	{
 		h_LogThreadDebug("Gpu upload monitor constructor started");
 		this->_core = new GpuUploadCore(cudaController);
-		this->_sem = new Semaphore(STREAMS_NUM_UPLOAD);
+		this->_sem = new Semaphore(STREAMS_NUM_UPLOAD-1);
 
 		// ALLOCATE GPU STORE BUFFERS
 		h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
@@ -47,10 +47,13 @@ namespace store {
 		int streamNum = this->_sem->Wait();
 
 		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
+
 		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum];
 
+		storeElement* elementsToUpload = elements->c_array();
+
 		// COPY BUFFER TO GPU
-		_core->CopyToGpu((storeElement*)elements, deviceBufferPointer, elementsToUploadCount, streamNum);
+		_core->CopyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, streamNum);
 
 		// TODO: NOW BUFFER CAN BE SWAPPED AGAIN...
 		void* compressedBufferPointer;

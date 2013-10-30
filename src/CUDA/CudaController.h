@@ -8,8 +8,8 @@
 #ifndef CUDACONTROLLER_H_
 #define CUDACONTROLLER_H_
 
-#include "../Store/StoreIncludes.h"
 #include "GpuStore.cuh"
+#include "../Store/StoreIncludes.h"
 
 namespace ddj {
 namespace store {
@@ -27,8 +27,8 @@ namespace store {
 		CudaController(int uploadStreamsNum, int queryStreamsNum);
 		virtual ~CudaController();
 
-		cudaStream_t* GetUploadStream(int num);
-		cudaStream_t* GetQueryStream(int num);
+		cudaStream_t GetUploadStream(int num);
+		cudaStream_t GetQueryStream(int num);
 		ullint GetMainMemoryOffset();
 		void SetMainMemoryOffset(ullint offset);
 		void* GetMainMemoryPointer();

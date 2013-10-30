@@ -13,15 +13,16 @@ namespace store {
 
 	void GpuUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, int streamNum)
 	{
+		cudaStream_t st = this->_cudaController->GetUploadStream(streamNum);
 		CUDA_CHECK_RETURN
 		(
 				cudaMemcpyAsync
 				(
-						(void*)&devicePointer,
-						(void*)&hostPointer,
+						(void*)devicePointer,
+						(void*)hostPointer,
 						(size_t) numElements * sizeof(storeElement),
 						cudaMemcpyHostToDevice,
-						*(this->_cudaController->GetUploadStream(streamNum))
+						st
 				)
 		);
 	}
@@ -37,7 +38,7 @@ namespace store {
 								devicePointer,
 								size,
 								cudaMemcpyDeviceToDevice,
-								*(this->_cudaController->GetUploadStream(0))
+								this->_cudaController->GetUploadStream(0)
 						)
 				);
 		info->endValue = info->startValue + size;

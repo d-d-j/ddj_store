@@ -26,7 +26,8 @@ namespace ddj
 		pantheios::log_INFORMATIONAL(PSTR("Found "), pantheios::integer(this->_cudaDevicesCount), PSTR(" cuda devices."));
 		StoreController_Pointer* controller;
 
-		for(int i=0; i<this->_cudaDevicesCount; i++)
+		//for(int i=0; i<this->_cudaDevicesCount; i++)
+		for(int i=0; i<1; i++)
 		{
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});
