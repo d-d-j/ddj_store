@@ -10,6 +10,8 @@
 
 #include "../CUDA/CudaController.h"
 #include "QueryCore.h"
+#include "../Store/storeElement.h"
+#include "../Helpers/Semaphore.h"
 
 namespace ddj {
 namespace store {
@@ -17,9 +19,11 @@ namespace store {
 class QueryMonitor
 {
 	QueryCore* _core;
+	Semaphore* _sem;
 public:
 	QueryMonitor(CudaController* cudaController);
 	virtual ~QueryMonitor();
+	storeElement* GetEverything(size_t& size);
 };
 
 } /* namespace store */

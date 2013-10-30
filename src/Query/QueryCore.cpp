@@ -17,5 +17,16 @@ QueryCore::QueryCore(CudaController* cudaController)
 
 QueryCore::~QueryCore(){}
 
+void* QueryCore::GetAllData(size_t &size)
+{
+	void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
+	ullint offset = this->_cudaController->GetMainMemoryOffset();
+	void* hostData;
+	CUDA_CHECK_RETURN( cudaMallocHost(&hostData,offset) );
+	CUDA_CHECK_RETURN( cudaMemcpy(hostData, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
+	size = offset;
+	return hostData;
+}
+
 } /* namespace store */
 } /* namespace ddj */

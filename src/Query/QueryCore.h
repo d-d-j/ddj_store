@@ -9,6 +9,8 @@
 #define QUERYCORE_H_
 
 #include "../CUDA/CudaController.h"
+#include "../Store/StoreIncludes.h"
+#include "../CUDA/cudaIncludes.h"
 
 namespace ddj {
 namespace store {
@@ -19,6 +21,8 @@ namespace store {
 	public:
 		QueryCore(CudaController* cudaController);
 		virtual ~QueryCore();
+
+		void* GetAllData(size_t &size);
 	};
 
 } /* namespace store */
