@@ -9,6 +9,13 @@ namespace store {
 		this->_numQueryStreams = queryStreamsNum;
 		_uploadStreams = new cudaStream_t[this->_numUploadStreams];
 		_queryStreams = new cudaStream_t[this->_numQueryStreams];
+
+		for(int k=0; k<this->_numUploadStreams; k++)
+			cudaStreamCreate(&(_uploadStreams[k]));
+
+		for(int l=0; l<this->_numQueryStreams; l++)
+					cudaStreamCreate(&(_queryStreams[l]));
+
 		_mainMemoryOffset = 0;
 
 		// ALLOCATE MAIN STORAGE ON GPU

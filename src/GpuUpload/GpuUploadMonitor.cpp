@@ -14,15 +14,15 @@ namespace store {
 	{
 		h_LogThreadDebug("Gpu upload monitor constructor started");
 		this->_core = new GpuUploadCore(cudaController);
-		this->_sem = new Semaphore(STREAMS_NUM_UPLOAD-1);
+		this->_sem = new Semaphore(DEVICE_BUFFERS_COUNT);
 
 		// ALLOCATE GPU STORE BUFFERS
 		h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
-		for(int i=0; i<STREAMS_NUM_UPLOAD; i++)
+		for(int i=0; i<DEVICE_BUFFERS_COUNT; i++)
 		{
 			CUDA_CHECK_RETURN
 					(
-					cudaMalloc((void**) &(this->_deviceBufferPointers[i]), STORE_BUFFER_SIZE * sizeof(storeElement))
+					cudaMalloc((void**) &(this->_deviceBufferPointers[i]), STORE_BUFFER_SIZE*sizeof(storeElement))
 					);
 		}
 
@@ -48,7 +48,7 @@ namespace store {
 
 		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
 
-		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum];
+		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum-1];
 
 		storeElement* elementsToUpload = elements->c_array();
 
