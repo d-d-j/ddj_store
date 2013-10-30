@@ -24,6 +24,9 @@
 #include "../GpuUpload/GpuUploadMonitor.h"
 #include "../CUDA/GpuStore.cuh"
 #include "../Task/StoreTask.h"
+#include "../CUDA/CudaController.h"
+#include "../Store/storeSettings.h"
+#include "../Query/QueryMonitor.h"
 
 namespace ddj {
 namespace store {
@@ -37,7 +40,10 @@ class StoreController
     /* FIELDS */
     private:
     	int _gpuDeviceId;
-    	GpuUploadMonitor _gpuUploadMonitor;
+    	GpuUploadMonitor* _gpuUploadMonitor;
+    	QueryMonitor* _queryMonitor;
+    	CudaController* _cudaController;
+
     	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
 

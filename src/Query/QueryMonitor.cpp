@@ -10,13 +10,14 @@
 namespace ddj {
 namespace store {
 
-QueryMonitor::QueryMonitor() {
-	// TODO Auto-generated constructor stub
-
+QueryMonitor::QueryMonitor(CudaController* cudaController)
+{
+	this->_core = new QueryCore(cudaController);
 }
 
-QueryMonitor::~QueryMonitor() {
-	// TODO Auto-generated destructor stub
+QueryMonitor::~QueryMonitor()
+{
+	delete this->_core;
 }
 
 } /* namespace store */

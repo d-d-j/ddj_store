@@ -33,6 +33,7 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	this->_bufferInfoTreeMonitor = new BTreeMonitor(tag);
 	this->_uploaderBarrier = new boost::barrier(2);
 
+	// ALLOCATE PINNED MEMORY FOR BUFFERS
 	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
 	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
 

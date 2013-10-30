@@ -33,7 +33,6 @@ namespace ddj
 			delete controller;
 		}
 
-		// TODO: create network client (client constructor should wait until it connects to master)
 		this->_client = new Client(&_requestSignal);
 	}
 
@@ -42,7 +41,7 @@ namespace ddj
 		h_LogThreadDebug("Node destructor started");
 
 		// Disconnect and release client
-		//delete this->_client;
+		delete this->_client;
 
 		// Stop task thread and release it
 		{

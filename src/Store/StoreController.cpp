@@ -32,6 +32,15 @@ namespace store {
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
+		// CREATE CUDA CONTROLLER (Controlls gpu store side)
+		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
+
+		// CREATE GPU UPLOAD MONITOR
+		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
+
+		// CREATE QUERY MONITOR
+		this->_queryMonitor = new QueryMonitor(this->_cudaController);
+
 		h_LogThreadDebug("StoreController constructor ended");
 	}
 
@@ -40,6 +49,8 @@ namespace store {
 		h_LogThreadDebug("StoreController destructor started");
 
 		delete this->_buffers;
+		delete this->_queryMonitor;
+		delete this->_gpuUploadMonitor;
 
 		h_LogThreadDebug("StoreController destructor ended");
 	}
@@ -81,7 +92,7 @@ namespace store {
 		}
 		else
 		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, &(this->_gpuUploadMonitor)));
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
 
 		}

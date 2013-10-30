@@ -8,12 +8,17 @@
 #ifndef QUERYMONITOR_H_
 #define QUERYMONITOR_H_
 
+#include "../CUDA/CudaController.h"
+#include "QueryCore.h"
+
 namespace ddj {
 namespace store {
 
-class QueryMonitor {
+class QueryMonitor
+{
+	QueryCore* _core;
 public:
-	QueryMonitor();
+	QueryMonitor(CudaController* cudaController);
 	virtual ~QueryMonitor();
 };
 

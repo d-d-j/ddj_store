@@ -8,14 +8,18 @@
 #ifndef QUERYCORE_H_
 #define QUERYCORE_H_
 
+#include "../CUDA/CudaController.h"
+
 namespace ddj {
 namespace store {
 
-class QueryCore {
-public:
-	QueryCore();
-	virtual ~QueryCore();
-};
+	class QueryCore
+	{
+		CudaController* _cudaController;
+	public:
+		QueryCore(CudaController* cudaController);
+		virtual ~QueryCore();
+	};
 
 } /* namespace store */
 } /* namespace ddj */

@@ -10,27 +10,63 @@
 namespace ddj {
 namespace store {
 
+	GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
+	{
+		h_LogThreadDebug("Gpu upload monitor constructor started");
+		this->_core = new GpuUploadCore(cudaController);
+		this->_sem = new Semaphore(STREAMS_NUM_UPLOAD);
 
-GpuUploadMonitor::GpuUploadMonitor() {
+		// ALLOCATE GPU STORE BUFFERS
+		h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
+		for(int i=0; i<STREAMS_NUM_UPLOAD; i++)
+		{
+			CUDA_CHECK_RETURN
+					(
+					cudaMalloc((void**) &(this->_deviceBufferPointers[i]), STORE_BUFFER_SIZE * sizeof(storeElement))
+					);
+		}
 
-	this ->_core = GpuUploadCore(2);
-	CUDA_CHECK_RETURN(cudaMalloc((void**) &this->devicePointer, STORE_BUFFER_SIZE * sizeof(storeElement)));
-	h_LogThreadDebug("Monitor device malloc");
-}
+		h_LogThreadDebug("Gpu upload monitor constructor ended");
+	}
 
+	GpuUploadMonitor::~GpuUploadMonitor()
+	{
+		delete this->_sem;
+		delete this->_core;
+	}
 
-infoElement* GpuUploadMonitor::Upload(
-		boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
-		int elementsToUploadCount) {
+	infoElement* GpuUploadMonitor::Upload
+			(
+			boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
+			int elementsToUploadCount
+			)
+	{
+		h_LogThreadDebug("GpuUploadMonitor::Upload [BEGIN]");
+		// TODO: HANDLE ERRORS HERE... How we will do that?
 
-	h_LogThreadDebug("Monitor Upload starting");
+		int streamNum = this->_sem->Wait();
 
-	boost::mutex::scoped_lock lock(this->_mutex);
+		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
+		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum];
 
-	_core.copyToGpu((storeElement*)elements, (storeElement*)this->devicePointer, elementsToUploadCount);
+		// COPY BUFFER TO GPU
+		_core->CopyToGpu((storeElement*)elements, deviceBufferPointer, elementsToUploadCount, streamNum);
 
-	return new infoElement(1, 1, 1, 1, 1);
-}
+		// TODO: NOW BUFFER CAN BE SWAPPED AGAIN...
+		void* compressedBufferPointer;
+		size_t size = _core->CompressGpuBuffer(deviceBufferPointer, elementsToUploadCount, streamNum, &compressedBufferPointer);
+
+		// AFTER GPU BUFFER COMPRESSION WE CAN REUSE STREAM
+		this->_sem->Release();
+
+		// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
+		_core->AppendToMainStore(compressedBufferPointer, size, result);
+
+		h_LogThreadDebug("GpuUploadMonitor::Upload [END]");
+
+		// RETURN INFORMATION ABOUT UPLOADED BUFFER LOCATION IN MAIN GPU STORE
+		return result;
+	}
 
 } /* namespace store */
 } /* namespace ddj */

@@ -1,6 +1,8 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 #include "../Store/storeElement.h"
+#include "../Store/infoElement.h"
+#include "../Store/LoggerHelper.h"
 
 #define DEBUG 1
 #define MB_SIZE 1048576
@@ -14,14 +16,12 @@ inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
    }
 }
 
-
 extern "C"
 {
 	int gpuGetCudaDevicesCount()
 	{
 		int count = 0;
 		CHECK_CUDA_ERR( cudaGetDeviceCount(&count) );
-
 		return count;
 	}
 

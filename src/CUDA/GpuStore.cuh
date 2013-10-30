@@ -10,5 +10,7 @@ extern "C"
 	void gpuFreeMemory(void* devPtr);
 
 	int gpuGetCudaDevicesCount();
+
+	int gpuAppendToMainStore(void* data, size_t dataSize, void* mainStorePointer, ullint mainStoreOffset);
 } /* extern "C" */
 #endif /* GPUSTORE_CUH_ */
