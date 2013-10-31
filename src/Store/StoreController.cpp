@@ -95,15 +95,21 @@ namespace store {
 			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
 		}
+
+		// CHWILOWE WYPISYWANIE WARTOSCI W BAZIE
 		size_t s;
 		storeElement* els = this->_queryMonitor->GetEverything(s);
+		int n = s / sizeof(storeElement);
 		if(s>0)
 		{
-			printf("\n\n%d %d %d %f\n\n", els[0].tag, els[0].series, (int)els[0].time, els[0].value);
-			h_LogThreadDebug("Insert Success");
+			printf("\nVALUES IN STORE:\n");
+			for(int i=0; i<n; i++)
+				printf("Record[%d] tag:%d series:%d time:%d value:%f\n", i, els[i].tag, els[i].series, (int)els[i].time, els[i].value);
+			printf("\n");
 			if(els!=NULL)
 				cudaFreeHost(els);
 		}
+
 		h_LogThreadDebug("Insert task function ended");
 	}
 
