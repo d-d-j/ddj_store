@@ -34,7 +34,7 @@ namespace store {
 				(
 						cudaMemcpyAsync
 						(
-								this->_cudaController->GetMainMemoryPointer(),
+								this->_cudaController->GetMainMemoryFirstFreeAddress(),
 								devicePointer,
 								size,
 								cudaMemcpyDeviceToDevice,

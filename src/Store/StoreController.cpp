@@ -101,8 +101,9 @@ namespace store {
 		{
 			printf("\n\n%d %d %d %f\n\n", els[0].tag, els[0].series, (int)els[0].time, els[0].value);
 			h_LogThreadDebug("Insert Success");
+			if(els!=NULL)
+				cudaFreeHost(els);
 		}
-
 		h_LogThreadDebug("Insert task function ended");
 	}
 

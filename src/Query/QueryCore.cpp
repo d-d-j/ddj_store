@@ -19,6 +19,7 @@ QueryCore::~QueryCore(){}
 
 void* QueryCore::GetAllData(size_t &size)
 {
+	if(size==0) return NULL;
 	void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
 	ullint offset = this->_cudaController->GetMainMemoryOffset();
 	void* hostData;

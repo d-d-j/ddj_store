@@ -16,7 +16,8 @@ namespace store {
 		for(int l=0; l<this->_numQueryStreams; l++)
 					cudaStreamCreate(&(_queryStreams[l]));
 
-		_mainMemoryOffset = 0;
+		this->_mainMemoryOffset = 0;
+		this->_mainMemoryPointer = NULL;
 
 		// ALLOCATE MAIN STORAGE ON GPU
 		int i = 1;
@@ -64,6 +65,12 @@ namespace store {
 	}
 
 	void* CudaController::GetMainMemoryPointer()
+	{
+		boost::mutex::scoped_lock lock(_offsetMutex);
+		return this->_mainMemoryPointer;
+	}
+
+	void* CudaController::GetMainMemoryFirstFreeAddress()
 	{
 		boost::mutex::scoped_lock lock(_offsetMutex);
 		return (char*)this->_mainMemoryPointer+this->_mainMemoryOffset;

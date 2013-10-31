@@ -32,6 +32,7 @@ namespace store {
 		ullint GetMainMemoryOffset();
 		void SetMainMemoryOffset(ullint offset);
 		void* GetMainMemoryPointer();
+		void* GetMainMemoryFirstFreeAddress();
 	};
 
 } /* namespace store */
