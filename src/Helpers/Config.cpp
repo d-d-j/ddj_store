@@ -18,14 +18,23 @@ Config* Config::GetInstance()
 	return _instance;
 }
 
+int Config::GetValue(string settingName)
+{
+	if (_configMap.count(settingName))
+	{
+		return _configMap[settingName].as<int>();
+	}
+	h_LogThreadError("value for the setting not found");
+	return -1;
+}
+
 void Config::ListAllSettings()
 {
 	po::variables_map::iterator it;
 	for (it = _configMap.begin(); it != _configMap.end(); ++it)
 	{
-		cout << it -> first << "\n";
+		cout << it->first << "\n";
 	}
-
 }
 
 Config::Config()
@@ -55,7 +64,6 @@ Config::Config()
 		po::options_description config_file_options;
 		config_file_options.add(hidden);
 
-
 		ifstream ifs(config_file.c_str());
 		if (!ifs)
 		{
@@ -77,8 +85,6 @@ Config::Config()
 	}
 	return;
 }
-
-
 
 Config::~Config()
 {

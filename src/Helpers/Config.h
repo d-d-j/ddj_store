@@ -14,7 +14,8 @@
 
 #include <boost/program_options.hpp>
 
-#include "Store/LoggerHelper.h"
+#include "../Store/StoreIncludes.h"
+#include "../Store/LoggerHelper.h"
 namespace po = boost::program_options;
 
 using namespace std;
@@ -29,6 +30,7 @@ private:
 	virtual ~Config();
 
 public:
+	int GetValue(string);
 	static Config* GetInstance();
 	void ListAllSettings();
 };

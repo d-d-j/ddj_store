@@ -4,7 +4,7 @@ RM := rm -rf
 COMPILER := g++
 
 OBJS += \
-./src/Config.o \
+./src/Helpers/Config.o \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
@@ -24,7 +24,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
-./src/Config.d \
+./src/Helpers/Config.d \
 ./src/BTree/BTreeMonitor.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \

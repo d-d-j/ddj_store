@@ -7,69 +7,74 @@
 
 #include "GpuUploadMonitor.h"
 
-namespace ddj {
-namespace store {
+namespace ddj
+{
+namespace store
+{
 
-	GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
+GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
+{
+	Config* config = Config::GetInstance();
+	h_LogThreadDebug("Gpu upload monitor constructor started");
+	this->_core = new GpuUploadCore(cudaController);
+	this->_sem = new Semaphore(config->GetValue("DEVICE_BUFFERS_COUNT"));
+
+	// ALLOCATE GPU STORE BUFFERS
+	h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
+	for (int i = 0; i < DEVICE_BUFFERS_COUNT; i++)
 	{
-		h_LogThreadDebug("Gpu upload monitor constructor started");
-		this->_core = new GpuUploadCore(cudaController);
-		this->_sem = new Semaphore(DEVICE_BUFFERS_COUNT);
-
-		// ALLOCATE GPU STORE BUFFERS
-		h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
-		for(int i=0; i<DEVICE_BUFFERS_COUNT; i++)
-		{
-			CUDA_CHECK_RETURN
-					(
-					cudaMalloc((void**) &(this->_deviceBufferPointers[i]), STORE_BUFFER_SIZE*sizeof(storeElement))
-					);
-		}
-
-		h_LogThreadDebug("Gpu upload monitor constructor ended");
+		CUDA_CHECK_RETURN(
+				cudaMalloc((void** ) &(this->_deviceBufferPointers[i]),
+						config->GetValue("STORE_BUFFER_SIZE")
+								* sizeof(storeElement)));
 	}
 
-	GpuUploadMonitor::~GpuUploadMonitor()
-	{
-		delete this->_sem;
-		delete this->_core;
-	}
+	h_LogThreadDebug("Gpu upload monitor constructor ended");
+}
 
-	infoElement* GpuUploadMonitor::Upload
-			(
-			boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
-			int elementsToUploadCount
-			)
-	{
-		h_LogThreadDebug("GpuUploadMonitor::Upload [BEGIN]");
-		// TODO: HANDLE ERRORS HERE... How we will do that?
+GpuUploadMonitor::~GpuUploadMonitor()
+{
+	delete this->_sem;
+	delete this->_core;
+}
 
-		int streamNum = this->_sem->Wait();
+infoElement* GpuUploadMonitor::Upload(
+		boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
+		int elementsToUploadCount)
+{
+	h_LogThreadDebug("GpuUploadMonitor::Upload [BEGIN]");
+	// TODO: HANDLE ERRORS HERE... How we will do that?
 
-		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
+	int streamNum = this->_sem->Wait();
 
-		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum-1];
+	infoElement* result = new infoElement(elements->front().tag,
+			elements->front().time, elements->back().time, 0, 0);
 
-		storeElement* elementsToUpload = elements->c_array();
+	storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum
+			- 1];
 
-		// COPY BUFFER TO GPU
-		_core->CopyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, streamNum);
+	storeElement* elementsToUpload = elements->c_array();
 
-		// TODO: NOW BUFFER CAN BE SWAPPED AGAIN...
-		void* compressedBufferPointer;
-		size_t size = _core->CompressGpuBuffer(deviceBufferPointer, elementsToUploadCount, streamNum, &compressedBufferPointer);
+	// COPY BUFFER TO GPU
+	_core->CopyToGpu(elementsToUpload, deviceBufferPointer,
+			elementsToUploadCount, streamNum);
 
-		// AFTER GPU BUFFER COMPRESSION WE CAN REUSE STREAM
-		this->_sem->Release();
+	// TODO: NOW BUFFER CAN BE SWAPPED AGAIN...
+	void* compressedBufferPointer;
+	size_t size = _core->CompressGpuBuffer(deviceBufferPointer,
+			elementsToUploadCount, streamNum, &compressedBufferPointer);
 
-		// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
-		_core->AppendToMainStore(compressedBufferPointer, size, result);
+	// AFTER GPU BUFFER COMPRESSION WE CAN REUSE STREAM
+	this->_sem->Release();
 
-		h_LogThreadDebug("GpuUploadMonitor::Upload [END]");
+	// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
+	_core->AppendToMainStore(compressedBufferPointer, size, result);
 
-		// RETURN INFORMATION ABOUT UPLOADED BUFFER LOCATION IN MAIN GPU STORE
-		return result;
-	}
+	h_LogThreadDebug("GpuUploadMonitor::Upload [END]");
+
+	// RETURN INFORMATION ABOUT UPLOADED BUFFER LOCATION IN MAIN GPU STORE
+	return result;
+}
 
 } /* namespace store */
 } /* namespace ddj */

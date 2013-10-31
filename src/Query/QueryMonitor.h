@@ -12,6 +12,7 @@
 #include "QueryCore.h"
 #include "../Store/storeElement.h"
 #include "../Helpers/Semaphore.h"
+#include "../Helpers/Config.h"
 
 namespace ddj {
 namespace store {

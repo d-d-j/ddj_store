@@ -27,6 +27,7 @@
 #include "../CUDA/CudaController.h"
 #include "../Store/storeSettings.h"
 #include "../Query/QueryMonitor.h"
+#include "../Helpers/Config.h"
 
 namespace ddj {
 namespace store {

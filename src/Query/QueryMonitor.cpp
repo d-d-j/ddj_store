@@ -12,8 +12,9 @@ namespace store {
 
 QueryMonitor::QueryMonitor(CudaController* cudaController)
 {
+	Config* config = Config::GetInstance();
 	this->_core = new QueryCore(cudaController);
-	this->_sem = new Semaphore(SIMUL_QUERY_COUNT);
+	this->_sem = new Semaphore(config->GetValue("SIMUL_QUERY_COUNT"));
 }
 
 QueryMonitor::~QueryMonitor()

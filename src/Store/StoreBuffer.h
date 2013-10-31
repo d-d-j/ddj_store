@@ -26,6 +26,7 @@
 #include "infoElement.h"
 #include "LoggerHelper.h"
 #include "../CUDA/cudaIncludes.h"
+#include "../Helpers/Config.h"
 
 namespace ddj {
 namespace store {

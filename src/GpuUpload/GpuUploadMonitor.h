@@ -15,6 +15,7 @@
 #include "../Store/storeSettings.h"
 #include "../Helpers/Semaphore.h"
 #include "../CUDA/CudaController.h"
+#include "../Helpers/Config.h"
 
 namespace ddj {
 namespace store {
