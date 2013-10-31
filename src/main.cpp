@@ -29,8 +29,11 @@ const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
 
 int main(int ac, char* av[])
 {
-	Config aa;
-	aa.ReadFromFile();
+	Config* a = Config::GetInstance();
+	a->ListAllSettings();
+
+	Config* b = Config::GetInstance();
+	b->ListAllSettings();
 
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
