@@ -23,7 +23,7 @@ class QueryMonitor
 public:
 	QueryMonitor(CudaController* cudaController);
 	virtual ~QueryMonitor();
-	storeElement* GetEverything(size_t& size);
+	size_t SelectAll(storeElement** queryResult);
 };
 
 } /* namespace store */

@@ -57,7 +57,8 @@ class StoreController
 
 	/* TASK FUNCTIONS */
     private:
-        void insertTaskToDictionary(StoreTask_Pointer task);
+        void insertTask(StoreTask_Pointer task);
+        void selectAllTask(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

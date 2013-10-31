@@ -66,12 +66,17 @@ namespace store {
 		std::pair<int, taskFunc> pair;
 
 		// INSERT
-		pair.first = 1;
-		pair.second = boost::bind(&StoreController::insertTaskToDictionary, this, _1);
+		pair.first = Insert;
+		pair.second = boost::bind(&StoreController::insertTask, this, _1);
+		_taskFunctions.insert(pair);
+
+		// SELECT ALL
+		pair.first = SelectAll;
+		pair.second = boost::bind(&StoreController::selectAllTask, this, _1);
 		_taskFunctions.insert(pair);
 	}
 
-	void StoreController::insertTaskToDictionary(StoreTask_Pointer task)
+	void StoreController::insertTask(StoreTask_Pointer task)
 	{
 		h_LogThreadDebug("Insert task function started");
 
@@ -96,21 +101,37 @@ namespace store {
 			this->_buffers->insert({element->tag, newBuf});
 		}
 
-		// CHWILOWE WYPISYWANIE WARTOSCI W BAZIE
-		size_t s;
-		storeElement* els = this->_queryMonitor->GetEverything(s);
-		int n = s / sizeof(storeElement);
-		if(s>0)
-		{
-			printf("\nVALUES IN STORE:\n");
-			for(int i=0; i<n; i++)
-				printf("Record[%d] tag:%d series:%d time:%d value:%f\n", i, els[i].tag, els[i].series, (int)els[i].time, els[i].value);
-			printf("\n");
-			if(els!=NULL)
-				cudaFreeHost(els);
-		}
+		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+		task->SetResult(true, nullptr, nullptr, 0);
 
 		h_LogThreadDebug("Insert task function ended");
+	}
+
+	void StoreController::selectAllTask(StoreTask_Pointer task)
+	{
+		h_LogThreadDebug("Insert task function started");
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != SelectAll)
+		{
+			h_LogThreadError("Error in selectAllTask function - wrong argument");
+			throw std::runtime_error("Error in selectAllTask function - wrong argument");
+		}
+
+		// Get all data from GPU store
+		storeElement* queryResult;
+
+		// TODO: Implement all possible exceptions catching from SelectAll function
+		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+		try
+		{
+			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
+			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+		}
 	}
 
 } /* namespace store */

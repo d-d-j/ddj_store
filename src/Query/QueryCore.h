@@ -22,7 +22,7 @@ namespace store {
 		QueryCore(CudaController* cudaController);
 		virtual ~QueryCore();
 
-		void* GetAllData(size_t &size);
+		size_t SelectAll(void** queryResult);
 	};
 
 } /* namespace store */
