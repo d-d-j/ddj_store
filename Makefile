@@ -4,6 +4,7 @@ RM := rm -rf
 COMPILER := g++
 
 OBJS += \
+./src/Config.o \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
@@ -23,6 +24,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
+./src/Config.d \
 ./src/BTree/BTreeMonitor.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \
@@ -41,7 +43,7 @@ CPP_DEPS += \
 ./src/main.d
 
 
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
+LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt -lboost_program_options
 INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
 WARNINGS_ERRORS := -pedantic -pedantic-errors -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -Werror
 STANDART := -std=c++0x

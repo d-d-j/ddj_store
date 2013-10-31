@@ -20,13 +20,18 @@
 #include "Store/storeElement.h"
 #include "Network/Client.h"
 #include <cstdint>
+#include "Config.h"
 
 using namespace ddj::store;
 
 const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
 
-int main()
+
+int main(int ac, char* av[])
 {
+	Config aa;
+	aa.ReadFromFile();
+
 	pantheios::init();
 	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
 
