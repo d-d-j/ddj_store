@@ -17,6 +17,7 @@ public:
 	TaskType type;	/**< task type, for example Insert */
 	// data is released in StoreTask
 	void* data;		/**< data for a task, for example Select data or elem to insert */
+
 	taskRequest(int id, TaskType type, void* data):task_id(id),type(type),data(data){}
 	taskRequest(const taskRequest& request)
 	{

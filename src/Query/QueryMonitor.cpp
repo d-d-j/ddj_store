@@ -10,13 +10,23 @@
 namespace ddj {
 namespace store {
 
-QueryMonitor::QueryMonitor() {
-	// TODO Auto-generated constructor stub
-
+QueryMonitor::QueryMonitor(CudaController* cudaController)
+{
+	this->_core = new QueryCore(cudaController);
+	this->_sem = new Semaphore(SIMUL_QUERY_COUNT);
 }
 
-QueryMonitor::~QueryMonitor() {
-	// TODO Auto-generated destructor stub
+QueryMonitor::~QueryMonitor()
+{
+	delete this->_core;
+}
+
+storeElement* QueryMonitor::GetEverything(size_t& size)
+{
+	this->_sem->Wait();
+	storeElement* result = (storeElement*)this->_core->GetAllData(size);
+	this->_sem->Release();
+	return result;
 }
 
 } /* namespace store */

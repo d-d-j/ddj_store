@@ -55,6 +55,8 @@ public:
 	bool IsCompleated();
 };
 
+typedef boost::shared_ptr<StoreTask> StoreTask_Pointer;
+
 } /* namespace store */
 } /* namespace ddj */
 #endif /* STORETASK_H_ */

@@ -15,10 +15,6 @@
 namespace ddj {
 namespace store {
 
-	/* GLOBAL TYPEDEFS */
-	typedef boost::shared_ptr<StoreTask> StoreTask_Pointer;
-
-
 	class StoreTaskMonitor
 	{
 		/* FIELDS */

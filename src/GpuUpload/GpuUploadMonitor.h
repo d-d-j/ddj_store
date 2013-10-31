@@ -12,6 +12,9 @@
 #include "../Store/storeElement.h"
 #include "../Store/infoElement.h"
 #include "../BTree/BTreeMonitor.h"
+#include "../Store/storeSettings.h"
+#include "../Helpers/Semaphore.h"
+#include "../CUDA/CudaController.h"
 
 namespace ddj {
 namespace store {
@@ -19,12 +22,13 @@ namespace store {
 	class GpuUploadMonitor
 	{
 		private:
-			boost::mutex _mutex;
-			GpuUploadCore _core;
-			storeElement* devicePointer;
+			GpuUploadCore* _core;
+			Semaphore* _sem;
+			boost::array<storeElement*, STREAMS_NUM_UPLOAD> _deviceBufferPointers;
 
 		public:
-			GpuUploadMonitor();
+			GpuUploadMonitor(CudaController* cudaController);
+			~GpuUploadMonitor();
 			infoElement* Upload
 							(
 							boost::array<storeElement, STORE_BUFFER_SIZE>* elements,

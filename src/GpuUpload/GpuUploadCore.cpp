@@ -8,49 +8,55 @@
 #include "GpuUploadCore.h"
 
 
-namespace ddj
-{
-namespace store
-{
+namespace ddj {
+namespace store {
 
-void GpuUploadCore::copyToGpu(storeElement* hostPointer, storeElement* devicePointer,
-		int numElements)
-{
-	int streamSize = numElements / this->numUploadStreams;
-
-	for (int i = 0; i < this->numUploadStreams; i++)
+	void GpuUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, int streamNum)
 	{
-		int offset = i * streamSize;
-
-		CUDA_CHECK_RETURN(cudaMemcpyAsync((void*)&devicePointer[offset], (void*)&hostPointer[offset],
-				(size_t) streamSize * sizeof(storeElement), cudaMemcpyHostToDevice,
-				this->uploadStreams[i]));
-
+		cudaStream_t st = this->_cudaController->GetUploadStream(streamNum);
+		CUDA_CHECK_RETURN
+		(
+				cudaMemcpyAsync
+				(
+						(void*)devicePointer,
+						(void*)hostPointer,
+						(size_t) numElements * sizeof(storeElement),
+						cudaMemcpyHostToDevice,
+						st
+				)
+		);
 	}
-	h_LogThreadDebug("copy to GPU finished");
-}
 
-GpuUploadCore::GpuUploadCore()
-{
-}
-
-GpuUploadCore::GpuUploadCore(int numUploadStreams)
-{
-	this->uploadStreams = new cudaStream_t[numUploadStreams];
-	this->numUploadStreams = numUploadStreams;
-
-
-	for (int i = 0; i < numUploadStreams; i++)
+	void GpuUploadCore::AppendToMainStore(void* devicePointer, size_t size, infoElement* info)
 	{
-		CUDA_CHECK_RETURN(cudaStreamCreate(&(this->uploadStreams[i])));
+		info->startValue = this->_cudaController->GetMainMemoryOffset();
+		CUDA_CHECK_RETURN
+				(
+						cudaMemcpyAsync
+						(
+								this->_cudaController->GetMainMemoryFirstFreeAddress(),
+								devicePointer,
+								size,
+								cudaMemcpyDeviceToDevice,
+								this->_cudaController->GetUploadStream(0)
+						)
+				);
+		info->endValue = info->startValue + size;
+		this->_cudaController->SetMainMemoryOffset(info->endValue);
 	}
-	h_LogThreadDebug("GpuUploadCore constructor finished");
-}
 
-GpuUploadCore::~GpuUploadCore()
-{
+	size_t GpuUploadCore::CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, int streamNum, void** result)
+	{
+		*result = deviceBufferPointer;
+		return elemToUploadCount * sizeof(storeElement);
+	}
 
-}
+	GpuUploadCore::GpuUploadCore(CudaController* cudaController)
+	{
+		this->_cudaController = cudaController;
+	}
+
+	GpuUploadCore::~GpuUploadCore(){}
 
 } /* namespace store */
 } /* namespace ddj */

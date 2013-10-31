@@ -22,26 +22,24 @@
 namespace ddj {
 namespace store {
 
-	StoreController::StoreController()
+	StoreController::StoreController(int gpuDeviceId)
 	{
 		h_LogThreadDebug("StoreController constructor started");
 
+		this->_gpuDeviceId = gpuDeviceId;
 		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
-		this->_taskBarrier = new boost::barrier(2);
-		this->_storeTaskMonitor = new StoreTaskMonitor(&(this->_taskCond));
-
-		// START TASK THRAED
-		this->_taskThread = new boost::thread(boost::bind(&StoreController::taskThreadFunction, this));
-		this->_taskBarrier->wait();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
-		// connect CreateTaskMethod to _newTaskSignal
-		this->_requestSignal.connect(boost::bind(&StoreController::CreateTask, this, _1));
+		// CREATE CUDA CONTROLLER (Controlls gpu store side)
+		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
 
-		// TODO: create network client (client constructor should wait until it connects to master)
-		// this->_client = new Client(boost::signals2::signal<void (taskRequest)>* _requestSignal);
+		// CREATE GPU UPLOAD MONITOR
+		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
+
+		// CREATE QUERY MONITOR
+		this->_queryMonitor = new QueryMonitor(this->_cudaController);
 
 		h_LogThreadDebug("StoreController constructor ended");
 	}
@@ -50,62 +48,17 @@ namespace store {
 	{
 		h_LogThreadDebug("StoreController destructor started");
 
-		// STOP TASK THREAD
-		{
-			boost::mutex::scoped_lock lock(this->_taskMutex);
-			h_LogThreadDebug("StoreController locked task's mutex");
-			this->_taskThread->interrupt();
-		}
-		this->_taskThread->join();
-
 		delete this->_buffers;
-		delete this->_taskBarrier;
-		delete this->_taskThread;
+		delete this->_queryMonitor;
+		delete this->_gpuUploadMonitor;
 
 		h_LogThreadDebug("StoreController destructor ended");
 	}
 
-	void StoreController::CreateTask(taskRequest request)
+	void StoreController::ExecuteTask(StoreTask_Pointer task)
 	{
-		// Add a new task to task monitor
-		StoreTask_Pointer task = this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
 		// Fire a function from _TaskFunctions with this taskId
-		this->_taskFunctions[request.type](task);
-	}
-
-	void StoreController::taskThreadFunction()
-	{
-		h_LogThreadDebug("Task thread started");
-		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
-		h_LogThreadDebug("Task thread locked his mutex");
-		this->_taskBarrier->wait();
-		try
-		{
-			while(1)
-			{
-				h_LogThreadDebug("Task thread is waiting");
-				this->_taskCond.wait(lock);
-				h_LogThreadDebug("Task thread starts his job");
-
-				// Get all compleated tasks
-				boost::container::vector<StoreTask_Pointer> compleatedTasks =
-						this->_storeTaskMonitor->PopCompleatedTasks();
-
-				// TODO: Send results of the tasks to master
-
-
-				h_LogThreadDebug("Task thread ends his job");
-}
-		}
-		catch(boost::thread_interrupted& ex)
-		{
-			h_LogThreadDebug("TaskThread ended as interrupted [Success]");
-			return;
-		}
-		catch(...)
-		{
-			h_LogThreadDebug("TaskThread ended with error [Failure]");
-		}
+		this->_taskFunctions[task->GetType()](task);
 	}
 
 	void StoreController::populateTaskFunctions()
@@ -114,11 +67,11 @@ namespace store {
 
 		// INSERT
 		pair.first = 1;
-		pair.second = boost::bind(&StoreController::insertTask, this, _1);
+		pair.second = boost::bind(&StoreController::insertTaskToDictionary, this, _1);
 		_taskFunctions.insert(pair);
 	}
 
-	void StoreController::insertTask(StoreTask_Pointer task)
+	void StoreController::insertTaskToDictionary(StoreTask_Pointer task)
 	{
 		h_LogThreadDebug("Insert task function started");
 
@@ -139,9 +92,22 @@ namespace store {
 		}
 		else
 		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, &(this->_gpuUploadMonitor)));
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
+		}
 
+		// CHWILOWE WYPISYWANIE WARTOSCI W BAZIE
+		size_t s;
+		storeElement* els = this->_queryMonitor->GetEverything(s);
+		int n = s / sizeof(storeElement);
+		if(s>0)
+		{
+			printf("\nVALUES IN STORE:\n");
+			for(int i=0; i<n; i++)
+				printf("Record[%d] tag:%d series:%d time:%d value:%f\n", i, els[i].tag, els[i].series, (int)els[i].time, els[i].value);
+			printf("\n");
+			if(els!=NULL)
+				cudaFreeHost(els);
 		}
 
 		h_LogThreadDebug("Insert task function ended");

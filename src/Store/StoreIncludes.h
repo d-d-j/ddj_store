@@ -5,8 +5,7 @@
  *      Author: Karol Dzitkowski
  *
  *  This file includes all required headers from outside libs like pantheios or boost
- *  It also contains global inline helper functions and common used typedefs. Helper
- *  macros also should be stored here.
+ *  It also contains macros and additional typedefs.
  */
 
 #ifndef DDJ_STOREINCLUDES_H_
@@ -20,6 +19,7 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <cstddef>
 #include <stdexcept>
 
 /* CUDA */
@@ -39,6 +39,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/container/container_fwd.hpp>
 
 /* PANTHEIOS */
 #include <pantheios/pantheios.hpp>
@@ -50,9 +51,10 @@
 
 /* OTHER */
 #include "../BTree/btree.h"
+#include "storeTypedefs.h"
+#include "storeSettings.h"
 
-/* DEFINES */
-#define STORE_BUFFER_SIZE 2
+/* MACROS */
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
 #ifndef ERROR_WHEN_FALSE
 #define ERROR_WHEN_FALSE(expression) \
@@ -64,12 +66,8 @@
 })
 #endif
 
-/* TYPEDEFS */
-typedef unsigned long long int ullint;
+/* ADDITIONAL TYPEDEFS */
 typedef stx::btree<ullint, int> tree;
 typedef tree* tree_pointer;
-typedef int tag_type;
-typedef float store_value_type;
-typedef float info_value_type;
 
 #endif /* DDJ_STOREINCLUDES_H_ */

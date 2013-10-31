@@ -1,7 +1,7 @@
 #ifndef STOREELEMENT_H_
 #define STOREELEMENT_H_
 
-#include "../Store/StoreIncludes.h"
+#include "storeTypedefs.h"
 
 namespace ddj {
 namespace store {
