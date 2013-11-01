@@ -30,7 +30,7 @@ private:
 	virtual ~Config();
 
 public:
-	int GetValue(string);
+	int GetIntValue(string);
 	static Config* GetInstance();
 	void ListAllSettings();
 };

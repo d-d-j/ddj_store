@@ -18,7 +18,7 @@ Config* Config::GetInstance()
 	return _instance;
 }
 
-int Config::GetValue(string settingName)
+int Config::GetIntValue(string settingName)
 {
 	if (_configMap.count(settingName))
 	{

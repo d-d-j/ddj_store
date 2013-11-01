@@ -17,7 +17,7 @@ GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
 	Config* config = Config::GetInstance();
 	h_LogThreadDebug("Gpu upload monitor constructor started");
 	this->_core = new GpuUploadCore(cudaController);
-	this->_sem = new Semaphore(config->GetValue("DEVICE_BUFFERS_COUNT"));
+	this->_sem = new Semaphore(config->GetIntValue("DEVICE_BUFFERS_COUNT"));
 
 	// ALLOCATE GPU STORE BUFFERS
 	h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
@@ -25,7 +25,7 @@ GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
 	{
 		CUDA_CHECK_RETURN(
 				cudaMalloc((void** ) &(this->_deviceBufferPointers[i]),
-						config->GetValue("STORE_BUFFER_SIZE")
+						config->GetIntValue("STORE_BUFFER_SIZE")
 								* sizeof(storeElement)));
 	}
 

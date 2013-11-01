@@ -36,8 +36,8 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	Config* config = Config::GetInstance();
 
 	// ALLOCATE PINNED MEMORY FOR BUFFERS
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), config->GetValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), config->GetValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), config->GetIntValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), config->GetIntValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
 
 	// START UPLOADER THRAED
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
@@ -72,7 +72,7 @@ void StoreBuffer::Insert(storeElement* element)
 	h_LogThreadWithTagDebug("Inserting element to buffer", this->_tag);
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
-	if(_bufferElementsCount == config->GetValue("STORE_BUFFER_SIZE"))
+	if(_bufferElementsCount == config->GetIntValue("STORE_BUFFER_SIZE"))
 	{
 		this->switchBuffers();
 	}

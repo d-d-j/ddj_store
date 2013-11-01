@@ -10,6 +10,7 @@
 
 #include "GpuStore.cuh"
 #include "../Store/StoreIncludes.h"
+#include "../Helpers/Config.h"
 
 namespace ddj {
 namespace store {
