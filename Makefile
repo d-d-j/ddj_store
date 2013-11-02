@@ -15,6 +15,8 @@ OBJS += \
 ./src/Task/TaskResult.o \
 ./src/Task/StoreTask.o \
 ./src/Task/StoreTaskMonitor.o \
+./src/CUDA/CudaController.o \
+./src/Helpers/Semaphore.o \
 ./src/CUDA/GpuStore.o \
 ./src/Node.o \
 ./src/Network/Client.o \
@@ -32,6 +34,8 @@ CPP_DEPS += \
 ./src/Task/TaskResult.d \
 ./src/Task/StoreTask.d \
 ./src/Task/StoreTaskMonitor.d \
+./src/CUDA/CudaController.d \
+./src/Helpers/Semaphore.d \
 ./src/Node.d \
 ./src/Network/Client.d \
 ./src/main.d
@@ -61,7 +65,7 @@ src/%.o: ./src/%.cpp
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) -c -g -o "$@" "$<"
+	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

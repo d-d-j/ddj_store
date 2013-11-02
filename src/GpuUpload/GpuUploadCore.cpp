@@ -11,47 +11,52 @@
 namespace ddj {
 namespace store {
 
-	void GpuUploadCore::copyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements)
+	void GpuUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, int streamNum)
 	{
-		int streamSize = numElements / this->numUploadStreams;
-
-		for (int i = 0; i < this->numUploadStreams; i++)
-		{
-			int offset = i * streamSize;
-
-			CUDA_CHECK_RETURN( cudaMemcpyAsync(	(void*)&devicePointer[offset],
-												(void*)&hostPointer[offset],
-												(size_t) streamSize * sizeof(storeElement),
-												cudaMemcpyHostToDevice,
-												this->uploadStreams[i]));
-
-		}
-		// TODO: Wait for cuda mem copy to end
-
-		h_LogThreadDebug("Copy trunk to GPU scheduled");
+		cudaStream_t st = this->_cudaController->GetUploadStream(streamNum);
+		CUDA_CHECK_RETURN
+		(
+				cudaMemcpyAsync
+				(
+						(void*)devicePointer,
+						(void*)hostPointer,
+						(size_t) numElements * sizeof(storeElement),
+						cudaMemcpyHostToDevice,
+						st
+				)
+		);
 	}
 
-	GpuUploadCore::GpuUploadCore()
+	void GpuUploadCore::AppendToMainStore(void* devicePointer, size_t size, infoElement* info)
 	{
+		info->startValue = this->_cudaController->GetMainMemoryOffset();
+		CUDA_CHECK_RETURN
+				(
+						cudaMemcpyAsync
+						(
+								this->_cudaController->GetMainMemoryFirstFreeAddress(),
+								devicePointer,
+								size,
+								cudaMemcpyDeviceToDevice,
+								this->_cudaController->GetUploadStream(0)
+						)
+				);
+		info->endValue = info->startValue + size;
+		this->_cudaController->SetMainMemoryOffset(info->endValue);
 	}
 
-	GpuUploadCore::GpuUploadCore(int numUploadStreams)
+	size_t GpuUploadCore::CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, int streamNum, void** result)
 	{
-		this->uploadStreams = new cudaStream_t[numUploadStreams];
-		this->numUploadStreams = numUploadStreams;
-
-
-		for (int i = 0; i < numUploadStreams; i++)
-		{
-			CUDA_CHECK_RETURN(cudaStreamCreate(&(this->uploadStreams[i])));
-		}
-		h_LogThreadDebug("GpuUploadCore constructor finished");
+		*result = deviceBufferPointer;
+		return elemToUploadCount * sizeof(storeElement);
 	}
 
-	GpuUploadCore::~GpuUploadCore()
+	GpuUploadCore::GpuUploadCore(CudaController* cudaController)
 	{
-
+		this->_cudaController = cudaController;
 	}
+
+	GpuUploadCore::~GpuUploadCore(){}
 
 } /* namespace store */
 } /* namespace ddj */

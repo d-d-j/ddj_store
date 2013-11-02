@@ -11,7 +11,7 @@
 enum TaskType
 {
 	Insert = 1,
-	Select = 2
+	SelectAll = 2
 };
 
 #endif /* TASKTYPE_H_ */

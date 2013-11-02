@@ -32,6 +32,15 @@ namespace store {
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
+		// CREATE CUDA CONTROLLER (Controlls gpu store side)
+		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
+
+		// CREATE GPU UPLOAD MONITOR
+		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
+
+		// CREATE QUERY MONITOR
+		this->_queryMonitor = new QueryMonitor(this->_cudaController);
+
 		h_LogThreadDebug("StoreController constructor ended");
 	}
 
@@ -40,6 +49,8 @@ namespace store {
 		h_LogThreadDebug("StoreController destructor started");
 
 		delete this->_buffers;
+		delete this->_queryMonitor;
+		delete this->_gpuUploadMonitor;
 
 		h_LogThreadDebug("StoreController destructor ended");
 	}
@@ -55,12 +66,17 @@ namespace store {
 		std::pair<int, taskFunc> pair;
 
 		// INSERT
-		pair.first = 1;
-		pair.second = boost::bind(&StoreController::insertTaskToDictionary, this, _1);
+		pair.first = Insert;
+		pair.second = boost::bind(&StoreController::insertTask, this, _1);
+		_taskFunctions.insert(pair);
+
+		// SELECT ALL
+		pair.first = SelectAll;
+		pair.second = boost::bind(&StoreController::selectAllTask, this, _1);
 		_taskFunctions.insert(pair);
 	}
 
-	void StoreController::insertTaskToDictionary(StoreTask_Pointer task)
+	void StoreController::insertTask(StoreTask_Pointer task)
 	{
 		h_LogThreadDebug("Insert task function started");
 
@@ -81,12 +97,41 @@ namespace store {
 		}
 		else
 		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, &(this->_gpuUploadMonitor)));
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
-
 		}
 
+		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+		task->SetResult(true, nullptr, nullptr, 0);
+
 		h_LogThreadDebug("Insert task function ended");
+	}
+
+	void StoreController::selectAllTask(StoreTask_Pointer task)
+	{
+		h_LogThreadDebug("Insert task function started");
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != SelectAll)
+		{
+			h_LogThreadError("Error in selectAllTask function - wrong argument");
+			throw std::runtime_error("Error in selectAllTask function - wrong argument");
+		}
+
+		// Get all data from GPU store
+		storeElement* queryResult;
+
+		// TODO: Implement all possible exceptions catching from SelectAll function
+		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+		try
+		{
+			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
+			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+		}
 	}
 
 } /* namespace store */

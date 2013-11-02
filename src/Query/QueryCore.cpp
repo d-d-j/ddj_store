@@ -10,13 +10,20 @@
 namespace ddj {
 namespace store {
 
-QueryCore::QueryCore() {
-	// TODO Auto-generated constructor stub
-
+QueryCore::QueryCore(CudaController* cudaController)
+{
+	this->_cudaController = cudaController;
 }
 
-QueryCore::~QueryCore() {
-	// TODO Auto-generated destructor stub
+QueryCore::~QueryCore(){}
+
+size_t QueryCore::SelectAll(void** queryResult)
+{
+	void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
+	ullint offset = this->_cudaController->GetMainMemoryOffset();
+	CUDA_CHECK_RETURN( cudaMallocHost(queryResult, offset) );
+	CUDA_CHECK_RETURN( cudaMemcpy(*queryResult, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
+	return offset;
 }
 
 } /* namespace store */

@@ -15,6 +15,7 @@
 #include "Task/TaskRequest.h"
 #include "Task/TaskResult.h"
 #include "Store/StoreController.h"
+#include "Store/storeElement.h"
 
 namespace ddj
 {

@@ -26,14 +26,14 @@ namespace ddj
 		pantheios::log_INFORMATIONAL(PSTR("Found "), pantheios::integer(this->_cudaDevicesCount), PSTR(" cuda devices."));
 		StoreController_Pointer* controller;
 
-		for(int i=0; i<this->_cudaDevicesCount; i++)
+		//for(int i=0; i<this->_cudaDevicesCount; i++)
+		for(int i=0; i<1; i++)
 		{
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});
 			delete controller;
 		}
 
-		// TODO: create network client (client constructor should wait until it connects to master)
 		this->_client = new Client(&_requestSignal);
 	}
 
@@ -42,7 +42,7 @@ namespace ddj
 		h_LogThreadDebug("Node destructor started");
 
 		// Disconnect and release client
-		//delete this->_client;
+		delete this->_client;
 
 		// Stop task thread and release it
 		{
@@ -64,7 +64,7 @@ namespace ddj
 		store::StoreTask_Pointer task =
 				this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
 
-		// Run tasks in store controllers TODO: Implement this properly
+		// TODO: Run this task in one selected StoreController when Insert or in all StoreControllers otherwise
 		this->_controllers[0]->ExecuteTask(task);
 	}
 
@@ -85,6 +85,26 @@ namespace ddj
 				// Get all compleated tasks
 				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
 						this->_storeTaskMonitor->PopCompleatedTasks();
+
+				// FOR TESTING PURPOSES - SHOULD BE REMOVED
+				int compleatedTaskCount = compleatedTasks.size();
+				TaskResult* result;
+				store::storeElement* data;
+				size_t size;
+				int count;
+				for(int i=0; i<compleatedTaskCount; i++)
+				{
+					if(compleatedTasks[i]->GetType() == SelectAll)
+					{
+						result = compleatedTasks[i]->GetResult();
+						data = (store::storeElement*)result->result_data;
+						size = result->result_size;
+						count = size / sizeof(store::storeElement);
+						for(int j=0; j<count; j++)
+							printf("SelectAll result[%d]: t:%d s:%d time:%d value:%f",
+									j, data[j].tag, data[j].series, (int)data[j].time, data[j].value);
+					}
+				}
 
 				// TODO: Send results of the tasks to master
 

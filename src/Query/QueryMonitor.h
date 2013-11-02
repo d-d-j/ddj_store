@@ -8,13 +8,22 @@
 #ifndef QUERYMONITOR_H_
 #define QUERYMONITOR_H_
 
+#include "../CUDA/CudaController.h"
+#include "QueryCore.h"
+#include "../Store/storeElement.h"
+#include "../Helpers/Semaphore.h"
+
 namespace ddj {
 namespace store {
 
-class QueryMonitor {
+class QueryMonitor
+{
+	QueryCore* _core;
+	Semaphore* _sem;
 public:
-	QueryMonitor();
+	QueryMonitor(CudaController* cudaController);
 	virtual ~QueryMonitor();
+	size_t SelectAll(storeElement** queryResult);
 };
 
 } /* namespace store */
