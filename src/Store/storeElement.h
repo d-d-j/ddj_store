@@ -2,6 +2,8 @@
 #define STOREELEMENT_H_
 
 #include "storeTypedefs.h"
+#include <string>
+#include <sstream>
 
 namespace ddj {
 namespace store {
@@ -34,9 +36,16 @@ namespace store {
 				this->value = elem.value;
 			}
 			~storeElement(){}
+
+			std::string toString()
+			{
+				 std::ostringstream stream;
+			     stream << "["<<series<<", "<<tag<<", "<<time<<", "<<value<<"]";
+			     return  stream.str();
+			}
 	} storeElement;
-	
+
 } /* namespace ddj */
 } /* namespace store */
-	
+
 #endif /* defined( STOREELEMENT_H_) */

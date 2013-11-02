@@ -53,26 +53,16 @@ void Client::do_read()
     const int LEN = 100;
     char msg[LEN];
 
-    while (read(msg, LEN))
+    while (int n = read(msg, LEN))
     {
         id++;
         h_LogThreadDebug("Input: ");
-        h_LogThreadDebug(msg);
+        //h_LogThreadDebug(msg);
         ddj::store::storeElement se;
 
-        char *pch = strtok (msg, " #[]");
-        h_LogThreadDebug(pch);
-        se.series = atoi(pch);
-        pch = strtok (NULL, " #[]");
-        h_LogThreadDebug(pch);
-        se.tag = atoi(pch);
-        pch = strtok (NULL, " #[]");
-        h_LogThreadDebug(pch);
-        se.time = atoi(pch);
-        pch = strtok (NULL, " #[]");
-        h_LogThreadDebug(pch);
-        se.value = atof(pch);
+        memcpy(&se, msg, sizeof(se));
 
+        h_LogThreadDebug(se.toString().c_str());
         taskRequest request(id, Insert, &se);
         (*requestSignal)(request);
     }
