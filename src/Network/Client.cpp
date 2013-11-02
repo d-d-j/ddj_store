@@ -53,18 +53,23 @@ void Client::do_read()
     const int LEN = 100;
     char msg[LEN];
 
+    //TODO: Split reading to read header first and then data
+    //TODO: Think about alignment
     while (int n = read(msg, LEN))
     {
         id++;
         h_LogThreadDebug("Input: ");
-        //h_LogThreadDebug(msg);
+
+        taskRequest tr;
         ddj::store::storeElement se;
 
-        memcpy(&se, msg, sizeof(se));
-
+        memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
+        tr.data = nullptr;
+        h_LogThreadDebug(tr.toString().c_str());
+        memcpy(&se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
+        tr.data = &se;
         h_LogThreadDebug(se.toString().c_str());
-        taskRequest request(id, Insert, &se);
-        (*requestSignal)(request);
+        (*requestSignal)(tr);
     }
 }
 
