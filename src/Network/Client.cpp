@@ -63,14 +63,12 @@ void Client::do_read()
         taskRequest tr;
         ddj::store::storeElement se;
 
-        memcpy(&tr.task_id, msg, sizeof(tr) - sizeof(void*));
-        memcpy(&se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
-
-        tr.data = &se;
-
+        memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
+        tr.data = nullptr;
         h_LogThreadDebug(tr.toString().c_str());
+        memcpy(&se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
+        tr.data = &se;
         h_LogThreadDebug(se.toString().c_str());
-        taskRequest request(id, Insert, &se);
         (*requestSignal)(tr);
     }
 }
