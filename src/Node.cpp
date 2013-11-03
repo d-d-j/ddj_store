@@ -86,28 +86,34 @@ namespace ddj
 				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
 						this->_storeTaskMonitor->PopCompleatedTasks();
 
-				// FOR TESTING PURPOSES - SHOULD BE REMOVED
+				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
 				TaskResult* result;
-				store::storeElement* data;
-				size_t size;
-				int count;
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
 					if(compleatedTasks[i]->GetType() == SelectAll)
 					{
+						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
+
+						/*	FOR TESTING - SHOULD BE REMOVED
+ 						store::storeElement* data;
+						size_t size;
+						int count;
 						data = (store::storeElement*)result->result_data;
 						size = result->result_size;
 						count = size / sizeof(store::storeElement);
 						for(int j=0; j<count; j++)
 							printf("SelectAll result[%d]: t:%d s:%d time:%d value:%f",
 									j, data[j].tag, data[j].series, (int)data[j].time, data[j].value);
+						 */
+
+						// Send result
+						this->_client->SendTaskResult(result);
+						// Destroy Task and TaskResult
+						delete result;
 					}
 				}
-
-				// TODO: Send results of the tasks to master
-
 
 				h_LogThreadDebug("Task thread ends his job");
 	}

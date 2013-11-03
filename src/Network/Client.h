@@ -32,7 +32,7 @@ public:
 	Client(std::string ip, std::string port);
 	Client(boost::signals2::signal<void (taskRequest)>* _requestSignal);
 	virtual ~Client();
-	void SendTaskResult(ddj::TaskResult taskResult);
+	void SendTaskResult(ddj::TaskResult* taskResult);
 	void connect();
 	void write(char* message, size_t length);
 	size_t read(char* replay, size_t length);
