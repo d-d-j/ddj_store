@@ -41,7 +41,7 @@ void Client::SendTaskResult(ddj::TaskResult* taskResult)
 
     h_LogThreadDebug("Serializing taskResult");
 
-    int len = sizeof(ddj::TaskResult) + taskResult->result_size;
+    int len = 3*sizeof(int) + taskResult->result_size;
     char* msg = new char[len];
 
     //memcpy(msg, taskResult, sizeof(ddj::TaskResult)); THIS IS NOT WORKING!!!
