@@ -36,8 +36,7 @@ StoreController::StoreController(int gpuDeviceId)
 
 	Config* config = Config::GetInstance();
 	// CREATE CUDA CONTROLLER (Controlls gpu store side)
-	this->_cudaController = new CudaController(
-			config->GetIntValue("STREAMS_NUM_UPLOAD"),
+	this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD,
 			config->GetIntValue("STREAMS_NUM_QUERY"));
 
 	// CREATE GPU UPLOAD MONITOR

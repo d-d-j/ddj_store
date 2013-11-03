@@ -46,20 +46,13 @@ Config::Config()
 		_configMap = po::variables_map();
 
 		po::options_description hidden("Hidden options");
-		hidden.add_options()("MB_SIZE_IN_BYTES",
-				po::value<int>()->default_value(1048576), "size in bytes")(
-				"STORE_BUFFER_SIZE", po::value<int>()->default_value(2),
-				"store buffer size")("MAIN_STORE_SIZE",
-				po::value<int>()->default_value(536870912), "main store size")(
-				"GPU_MEMORY_ALLOC_ATTEMPTS", po::value<int>()->default_value(4),
-				"number of GPU memory allocation attempts")(
-				"STREAMS_NUM_UPLOAD", po::value<int>()->default_value(2),
-				"number of upload streams")("STREAMS_NUM_QUERY",
-				po::value<int>()->default_value(2), "number of query streams")(
-				"DEVICE_BUFFERS_COUNT", po::value<int>()->default_value(1),
-				"number of device buffers")("SIMUL_QUERY_COUNT",
-				po::value<int>()->default_value(3),
-				"number of simultaneous queries");
+		hidden.add_options()
+				("MB_SIZE_IN_BYTES", po::value<int>()->default_value(1048576), "size in bytes")
+				("MAIN_STORE_SIZE", po::value<int>()->default_value(536870912), "main store size")
+				("GPU_MEMORY_ALLOC_ATTEMPTS", po::value<int>()->default_value(4), "number of GPU memory allocation attempts")
+				("STREAMS_NUM_QUERY", po::value<int>()->default_value(2), "number of query streams")
+				("DEVICE_BUFFERS_COUNT", po::value<int>()->default_value(1), "number of device buffers")
+				("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries");
 
 		po::options_description config_file_options;
 		config_file_options.add(hidden);
@@ -67,7 +60,9 @@ Config::Config()
 		ifstream ifs(config_file.c_str());
 		if (!ifs)
 		{
-			cout << "can not open config file: " << config_file << "\n";
+			string msg = "can not open config file: ";
+			msg.append(config_file);
+			h_LogThreadError(msg.c_str());
 			return;
 		}
 		else
@@ -80,7 +75,7 @@ Config::Config()
 
 	} catch (exception& e)
 	{
-		cout << e.what() << "\n";
+		h_LogThreadError(e.what());
 		return;
 	}
 	return;

@@ -33,11 +33,9 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	this->_bufferInfoTreeMonitor = new BTreeMonitor(tag);
 	this->_uploaderBarrier = new boost::barrier(2);
 
-	Config* config = Config::GetInstance();
-
 	// ALLOCATE PINNED MEMORY FOR BUFFERS
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), config->GetIntValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), config->GetIntValue("STORE_BUFFER_SIZE") * sizeof(storeElement)));
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
+	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
 
 	// START UPLOADER THRAED
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
@@ -67,12 +65,10 @@ StoreBuffer::~StoreBuffer()
 
 void StoreBuffer::Insert(storeElement* element)
 {
-	Config* config = Config::GetInstance();
-
 	h_LogThreadWithTagDebug("Inserting element to buffer", this->_tag);
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
-	if(_bufferElementsCount == config->GetIntValue("STORE_BUFFER_SIZE"))
+	if(_bufferElementsCount == STORE_BUFFER_SIZE)
 	{
 		this->switchBuffers();
 	}

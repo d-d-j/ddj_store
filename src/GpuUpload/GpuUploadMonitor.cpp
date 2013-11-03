@@ -25,7 +25,7 @@ GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
 	{
 		CUDA_CHECK_RETURN(
 				cudaMalloc((void** ) &(this->_deviceBufferPointers[i]),
-						config->GetIntValue("STORE_BUFFER_SIZE")
+						STORE_BUFFER_SIZE
 								* sizeof(storeElement)));
 	}
 
