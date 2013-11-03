@@ -25,11 +25,7 @@ Client::Client(boost::signals2::signal<void (taskRequest)> *_requestSignal)
 {
     connect();
     requestSignal = _requestSignal;
-    h_LogThreadDebug("Introduce to server");
-    char msg[] = "Node #1";
-    write(msg, strlen(msg));
     boost::thread workerThread(&Client::do_read, this);
-
 }
 
 void Client::connect()
@@ -40,9 +36,28 @@ void Client::connect()
     h_LogThreadDebug("Connection established");
 }
 
+void Client::SendTaskResult(ddj::TaskResult taskResult)
+{
+
+    h_LogThreadDebug("Serializing taskResult");
+
+    int len = sizeof(ddj::TaskResult) + taskResult.result_size;
+    char* msg = new char[len];
+
+    //memcpy(msg, taskResult, sizeof(ddj::TaskResult)); THIS IS NOT WORKING!!!
+    memcpy(msg, &taskResult.task_id, sizeof(int));
+    memcpy(msg + sizeof(int), &taskResult.type, sizeof(int));
+    memcpy(msg + 2*sizeof(int), &taskResult.result_size, sizeof(int));
+    memcpy(msg + 3*sizeof(int), taskResult.result_data , taskResult.result_size);
+
+    write(msg, len);
+}
+
 void Client::write(char *message, size_t length)
 {
+
     h_LogThreadDebug("Sending message...");
+
     boost::asio::write(*socket, boost::asio::buffer(message, length));
 }
 

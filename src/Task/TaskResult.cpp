@@ -24,6 +24,7 @@ TaskResult::TaskResult
 TaskResult::~TaskResult()
 {
 	free(this->result_data);
+	this->result_data = nullptr;
 }
 
 } /* namespace ddj */

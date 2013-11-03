@@ -4,6 +4,7 @@
 #include "storeTypedefs.h"
 #include <string>
 #include <sstream>
+#include <cstring>
 
 namespace ddj {
 namespace store {
