@@ -48,7 +48,7 @@ void Client::SendTaskResult(ddj::TaskResult* taskResult)
     memcpy(msg, &(taskResult->task_id), sizeof(int));
     memcpy(msg + sizeof(int), &(taskResult->type), sizeof(int));
     memcpy(msg + 2*sizeof(int), &(taskResult->result_size), sizeof(int));
-    memcpy(msg + 3*sizeof(int), &(taskResult->result_data) , taskResult->result_size);
+    memcpy(msg + 3*sizeof(int), taskResult->result_data, taskResult->result_size);
 
     write(msg, len);
 }

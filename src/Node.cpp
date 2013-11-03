@@ -89,6 +89,11 @@ namespace ddj
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
 				TaskResult* result;
+				/*	FOR TESTING - SHOULD BE REMOVED
+				 * store::storeElement* data;
+				size_t size;
+				int count;
+				*/
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
 					if(compleatedTasks[i]->GetType() == SelectAll)
@@ -97,14 +102,12 @@ namespace ddj
 						result = compleatedTasks[i]->GetResult();
 
 						/*	FOR TESTING - SHOULD BE REMOVED
- 						store::storeElement* data;
-						size_t size;
-						int count;
+
 						data = (store::storeElement*)result->result_data;
 						size = result->result_size;
 						count = size / sizeof(store::storeElement);
 						for(int j=0; j<count; j++)
-							printf("SelectAll result[%d]: t:%d s:%d time:%d value:%f",
+							printf("\n SelectAll result[%d]: t:%d s:%d time:%d value:%f \n",
 									j, data[j].tag, data[j].series, (int)data[j].time, data[j].value);
 						 */
 
