@@ -10,6 +10,7 @@
 
 enum TaskType
 {
+	Error = 0,
 	Insert = 1,
 	SelectAll = 2
 };

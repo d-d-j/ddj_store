@@ -56,8 +56,6 @@ namespace store {
 		return new TaskResult(
 				this->_taskId,
 				this->_type,
-				this->_isSuccessfull,
-				this->_message,
 				this->_resultData,
 				this->_resultSize
 				);

@@ -18,16 +18,12 @@ namespace ddj {
 	public:
 		int task_id;
 		TaskType type;
-		void* result_data;
 		int result_size;
-		bool is_successfull;
-		char* message;
+		void* result_data;
 
 		TaskResult(
 				int taskId,
 				TaskType type,
-				bool isSuccessfull,
-				char* message = nullptr,
 				void* resultData = nullptr,
 				int resultSize = 0);
 
