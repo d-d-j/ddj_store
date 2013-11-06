@@ -134,3 +134,8 @@ out of memory
 3122 [140737353979712] INFO root <> - Free memory: 1001.99 MB Total memory: 1023.81 MB
 3123 [140737353979712] INFO root <> - Main gpu array allocated successfully
 3123 [140737353979712] INFO root <> - Free memory: 489.961 MB Total memory: 1023.81 MB
+2422 [140737353979712] INFO root <> - Node main application started
+2893 [140737353979712] INFO root <> - Attempt to allocate 512 MB memory on GPU 
+2893 [140737353979712] INFO root <> - Free memory: 1001.99 MB Total memory: 1023.81 MB
+2894 [140737353979712] INFO root <> - Main gpu array allocated successfully
+2894 [140737353979712] INFO root <> - Free memory: 489.961 MB Total memory: 1023.81 MB
