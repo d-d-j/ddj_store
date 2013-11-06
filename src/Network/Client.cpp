@@ -69,7 +69,7 @@ void Client::do_read()
 
         memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
         tr.data = nullptr;
-        memcpy(se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
+        memcpy(se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(*se));
         tr.data = se;
         (*requestSignal)(tr);
     }
