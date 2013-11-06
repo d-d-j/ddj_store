@@ -39,7 +39,7 @@ CPP_DEPS += \
 ./src/main.d
 
 
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt
+LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -llog4cplus
 INCLUDES := -I"/usr/local/cuda/include"
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 STANDART := -std=c++0x -g

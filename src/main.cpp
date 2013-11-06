@@ -20,11 +20,24 @@
 #include "Store/storeElement.h"
 #include "Network/Client.h"
 #include <cstdint>
+#include "Helpers/Logger.h"
 
 using namespace ddj::store;
 
+void InitializeLogger()
+{
+    log4cplus::initialize();
+    LogLog::getLogLog()->setInternalDebugging(true);
+	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
+}
+
 int main()
 {
+	InitializeLogger();
+	Logger logger = Logger::getRoot();
+
+	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
+
 	ddj::Node n;
 
 	getchar();
