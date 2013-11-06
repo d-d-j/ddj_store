@@ -38,7 +38,6 @@ void Client::SendTaskResult(ddj::TaskResult* taskResult)
     int len = 3*sizeof(int) + taskResult->result_size;
     char* msg = new char[len];
 
-    //memcpy(msg, taskResult, sizeof(ddj::TaskResult)); THIS IS NOT WORKING!!!
     memcpy(msg, &(taskResult->task_id), sizeof(int));
     memcpy(msg + sizeof(int), &(taskResult->type), sizeof(int));
     memcpy(msg + 2*sizeof(int), &(taskResult->result_size), sizeof(int));
@@ -66,12 +65,12 @@ void Client::do_read()
         id++;
 
         taskRequest tr;
-        ddj::store::storeElement se;
+        ddj::store::storeElement* se = new ddj::store::storeElement();
 
         memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
         tr.data = nullptr;
-        memcpy(&se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
-        tr.data = &se;
+        memcpy(se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(se));
+        tr.data = se;
         (*requestSignal)(tr);
     }
 }

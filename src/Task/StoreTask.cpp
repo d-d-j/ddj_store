@@ -29,8 +29,10 @@ namespace store {
 
 	StoreTask::~StoreTask()
 	{
-		free(this->_taskData);
-		free(this->_resultData);
+		if(this->_taskData != nullptr)
+			free(this->_taskData);
+		if(this->_resultData != nullptr)
+			free(this->_resultData);
 	}
 
 	void StoreTask::SetResult(

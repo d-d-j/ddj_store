@@ -21,10 +21,4 @@ TaskResult::TaskResult
 			result_data(resultData),
 			result_size(resultSize) {}
 
-TaskResult::~TaskResult()
-{
-	//free(this->result_data);
-	//this->result_data = nullptr;
-}
-
 } /* namespace ddj */
