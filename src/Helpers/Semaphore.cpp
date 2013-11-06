@@ -20,9 +20,11 @@ namespace ddj {
 	int Semaphore::Wait()
 	{
 		boost::mutex::scoped_lock lock(_mutex);
-		if(_value > _max) _cond.wait(lock);
+		if(_value > _max)
+			_cond.wait(lock);
 		_value++;
-		return _value;
+		int result = _value;
+		return result;
 	}
 
 	void Semaphore::Release()
