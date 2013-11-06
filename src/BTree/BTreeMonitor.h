@@ -10,7 +10,6 @@
 
 #include "../Store/StoreIncludes.h"
 #include "../Store/infoElement.h"
-#include "../Store/LoggerHelper.h"
 
 namespace ddj {
 namespace store {

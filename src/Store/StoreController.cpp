@@ -24,8 +24,6 @@ namespace store {
 
 	StoreController::StoreController(int gpuDeviceId)
 	{
-		h_LogThreadDebug("StoreController constructor started");
-
 		this->_gpuDeviceId = gpuDeviceId;
 		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
 
@@ -40,19 +38,13 @@ namespace store {
 
 		// CREATE QUERY MONITOR
 		this->_queryMonitor = new QueryMonitor(this->_cudaController);
-
-		h_LogThreadDebug("StoreController constructor ended");
 	}
 
 	StoreController::~StoreController()
 	{
-		h_LogThreadDebug("StoreController destructor started");
-
 		delete this->_buffers;
 		delete this->_queryMonitor;
 		delete this->_gpuUploadMonitor;
-
-		h_LogThreadDebug("StoreController destructor ended");
 	}
 
 	void StoreController::ExecuteTask(StoreTask_Pointer task)
@@ -78,12 +70,9 @@ namespace store {
 
 	void StoreController::insertTask(StoreTask_Pointer task)
 	{
-		h_LogThreadDebug("Insert task function started");
-
 		// Check possible errors
 		if(task == nullptr || task->GetType() != Insert)
 		{
-			h_LogThreadError("Error in insertTask function - wrong argument");
 			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
 
@@ -103,18 +92,13 @@ namespace store {
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		task->SetResult(true, nullptr, nullptr, 0);
-
-		h_LogThreadDebug("Insert task function ended");
 	}
 
 	void StoreController::selectAllTask(StoreTask_Pointer task)
 	{
-		h_LogThreadDebug("Insert task function started");
-
 		// Check possible errors
 		if(task == nullptr || task->GetType() != SelectAll)
 		{
-			h_LogThreadError("Error in selectAllTask function - wrong argument");
 			throw std::runtime_error("Error in selectAllTask function - wrong argument");
 		}
 

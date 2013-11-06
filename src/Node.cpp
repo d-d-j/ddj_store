@@ -23,7 +23,6 @@ namespace ddj
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
 		this->_cudaDevicesCount = gpuGetCudaDevicesCount();
-		pantheios::log_INFORMATIONAL(PSTR("Found "), pantheios::integer(this->_cudaDevicesCount), PSTR(" cuda devices."));
 		StoreController_Pointer* controller;
 
 		//for(int i=0; i<this->_cudaDevicesCount; i++)
@@ -39,23 +38,18 @@ namespace ddj
 
 	Node::~Node()
 	{
-		h_LogThreadDebug("Node destructor started");
-
 		// Disconnect and release client
 		delete this->_client;
 
 		// Stop task thread and release it
 		{
 			boost::mutex::scoped_lock lock(this->_taskMutex);
-			h_LogThreadDebug("StoreController locked task's mutex");
 			this->_taskThread->interrupt();
 		}
 		this->_taskThread->join();
 
 		delete this->_taskBarrier;
 		delete this->_taskThread;
-
-		h_LogThreadDebug("Node destructor ended");
 	}
 
 	void Node::CreateTask(taskRequest request)
@@ -70,17 +64,13 @@ namespace ddj
 
 	void Node::taskThreadFunction()
 	{
-		h_LogThreadDebug("Task thread started");
 		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
-		h_LogThreadDebug("Task thread locked his mutex");
 		this->_taskBarrier->wait();
 		try
 		{
 			while(1)
 			{
-				h_LogThreadDebug("Task thread is waiting");
 				this->_taskCond.wait(lock);
-				h_LogThreadDebug("Task thread starts his job");
 
 				// Get all compleated tasks
 				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
@@ -117,18 +107,14 @@ namespace ddj
 						delete result;
 					}
 				}
-
-				h_LogThreadDebug("Task thread ends his job");
-	}
+			}
 		}
 		catch(boost::thread_interrupted& ex)
 		{
-			h_LogThreadDebug("TaskThread ended as interrupted [Success]");
 			return;
 		}
 		catch(...)
 		{
-			h_LogThreadDebug("TaskThread ended with error [Failure]");
 		}
 	}
 } /* namespace ddj */

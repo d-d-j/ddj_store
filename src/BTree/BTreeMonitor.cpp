@@ -23,9 +23,7 @@ namespace store {
 
 	void BTreeMonitor::Insert(infoElement* element)
 	{
-		h_LogThreadWithTagDebug("Attempt to lock BTreeMonitor mutex", this->_tag);
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
-		h_LogThreadWithTagDebug("BTreeMonitor mutex locked", this->_tag);
 		this->insertToTree(element);
 	}
 
@@ -36,11 +34,9 @@ namespace store {
 			if(this->_bufferInfoTree == NULL) throw;
 			this->_bufferInfoTree->insert(element->startTime, element->startValue);
 			this->_bufferInfoTree->insert(element->endTime, element->endValue);
-			h_LogThreadDebug("Insert an infoElement to B+Tree [success]");
 		}
 		catch(...)
 		{
-			h_LogThreadError("Insert an infoElement to B+Tree [Failure]");
 		}
 	}
 

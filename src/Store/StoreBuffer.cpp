@@ -23,8 +23,6 @@ namespace store {
 
 StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 {
-	h_LogThreadWithTagDebug("StoreBuffer constructor started", tag);
-
 	this->_tag = tag;
 	this->_areBuffersSwitched = false;
 	this->_bufferElementsCount = 0;
@@ -40,18 +38,13 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	// START UPLOADER THRAED
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
 	this->_uploaderBarrier->wait();
-
-	h_LogThreadWithTagDebug("StoreBuffer constructor ended", tag);
 }
 
 StoreBuffer::~StoreBuffer()
 {
-	h_LogThreadWithTagDebug("StoreBuffer destructor started", this->_tag);
-
 	// STOP UPLOADER THREAD
 	{
 		boost::mutex::scoped_lock lock(this->_uploaderMutex);
-		h_LogThreadWithTagDebug("StoreBuffer locked uploader's mutex", this->_tag);
 		this->_uploaderThread->interrupt();
 	}
 	this->_uploaderThread->join();
@@ -59,13 +52,10 @@ StoreBuffer::~StoreBuffer()
 	delete this->_bufferInfoTreeMonitor;
 	delete this->_uploaderBarrier;
 	delete this->_uploaderThread;
-
-	h_LogThreadWithTagDebug("StoreBuffer destructor ended", this->_tag);
 }
 
 void StoreBuffer::Insert(storeElement* element)
 {
-	h_LogThreadWithTagDebug("Inserting element to buffer", this->_tag);
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
 	if(_bufferElementsCount == STORE_BUFFER_SIZE)
@@ -94,18 +84,13 @@ void StoreBuffer::Flush()
 void StoreBuffer::uploaderThreadFunction()
 {
 	infoElement* elemToInsertToBTree;
-	h_LogThreadWithTagDebug("UploaderThread started", this->_tag);
 	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
-	h_LogThreadWithTagDebug("UploaderThread locked his mutex", this->_tag);
 	this->_uploaderBarrier->wait();
 	try
 	{
 		while(1)
 		{
-			h_LogThreadWithTagDebug("UploaderThread waiting", this->_tag);
 			this->_uploaderCond.wait(lock);
-			h_LogThreadWithTagDebug("UploaderThread doing his job", this->_tag);
-
 			if(this->_areBuffersSwitched)
 			{
 				// UPLOAD BUFFER TO GPU
@@ -123,26 +108,21 @@ void StoreBuffer::uploaderThreadFunction()
 	}
 	catch(boost::thread_interrupted& ex)
 	{
-		h_LogThreadWithTagDebug("UploaderThread ended as interrupted [Success]", this->_tag);
 		return;
 	}
 	catch(...)
 	{
-		h_LogThreadWithTagDebug("UploaderThread ended with error [Failure]", this->_tag);
 	}
 }
 
 void StoreBuffer::switchBuffers()
 {
-	h_LogThreadWithTagDebug("Switching buffers start", this->_tag);
 	boost::mutex::scoped_lock lock(this->_uploaderMutex);
-	h_LogThreadWithTagDebug("Uploader mutex locked by switchBuffers", this->_tag);
 	this->_areBuffersSwitched = true;
 	this->_backBufferElementsCount = this->_bufferElementsCount;
 	this->_bufferElementsCount = 0;
 	this->_buffer.swap(this->_backBuffer);
 	this->_uploaderCond.notify_one();
-	h_LogThreadWithTagDebug("Switching buffers end", this->_tag);
 }
 
 } /* namespace store */

@@ -11,7 +11,6 @@
 #include "../Store/storeElement.h"
 #include "../Store/infoElement.h"
 #include "cuda_runtime.h"
-#include "../Store/LoggerHelper.h"
 #include "../CUDA/cudaIncludes.h"
 #include "../CUDA/CudaController.h"
 

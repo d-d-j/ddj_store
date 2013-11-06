@@ -12,12 +12,10 @@ namespace store {
 
 	GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
 	{
-		h_LogThreadDebug("Gpu upload monitor constructor started");
 		this->_core = new GpuUploadCore(cudaController);
 		this->_sem = new Semaphore(DEVICE_BUFFERS_COUNT);
 
 		// ALLOCATE GPU STORE BUFFERS
-		h_LogThreadDebug("Gpu upload monitor allocates store buffer on GPU");
 		for(int i=0; i<DEVICE_BUFFERS_COUNT; i++)
 		{
 			CUDA_CHECK_RETURN
@@ -26,7 +24,6 @@ namespace store {
 					);
 		}
 
-		h_LogThreadDebug("Gpu upload monitor constructor ended");
 	}
 
 	GpuUploadMonitor::~GpuUploadMonitor()
@@ -41,7 +38,6 @@ namespace store {
 			int elementsToUploadCount
 			)
 	{
-		h_LogThreadDebug("GpuUploadMonitor::Upload [BEGIN]");
 		// TODO: HANDLE ERRORS HERE... How we will do that?
 
 		int streamNum = this->_sem->Wait();
@@ -64,8 +60,6 @@ namespace store {
 
 		// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
 		_core->AppendToMainStore(compressedBufferPointer, size, result);
-
-		h_LogThreadDebug("GpuUploadMonitor::Upload [END]");
 
 		// RETURN INFORMATION ABOUT UPLOADED BUFFER LOCATION IN MAIN GPU STORE
 		return result;

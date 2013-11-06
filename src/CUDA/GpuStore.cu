@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "../Store/storeElement.h"
 #include "../Store/infoElement.h"
-#include "../Store/LoggerHelper.h"
 
 #define DEBUG 1
 #define MB_SIZE 1048576
