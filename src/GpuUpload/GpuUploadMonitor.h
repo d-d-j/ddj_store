@@ -24,7 +24,7 @@ namespace store {
 		private:
 			GpuUploadCore* _core;
 			Semaphore* _sem;
-			boost::array<storeElement*, STREAMS_NUM_UPLOAD> _deviceBufferPointers;
+			boost::array<storeElement*, DEVICE_BUFFERS_COUNT> _deviceBufferPointers;
 
 		public:
 			GpuUploadMonitor(CudaController* cudaController);

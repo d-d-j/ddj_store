@@ -6,3 +6,4 @@
 *.d
 *.orig
 DDJ_Store
+/ddj_store.log

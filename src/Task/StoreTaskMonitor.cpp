@@ -40,7 +40,7 @@ namespace store {
 				this->_tasks.begin(),
 				this->_tasks.end(),
 				result.begin(),
-				[](StoreTask_Pointer task){return task->IsCompleated();}
+				[](StoreTask_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
 				);
 		result.resize(std::distance(result.begin(),it));
 
@@ -48,7 +48,7 @@ namespace store {
 		std::remove_if(
 				this->_tasks.begin(),
 				this->_tasks.end(),
-				[](StoreTask_Pointer task){return task->IsCompleated();}
+				[](StoreTask_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
 				);
 
 		// Return result
