@@ -27,6 +27,7 @@
 #include "../CUDA/CudaController.h"
 #include "../Store/storeSettings.h"
 #include "../Query/QueryMonitor.h"
+#include "../Helpers/Logger.h"
 
 namespace ddj {
 namespace store {
@@ -39,6 +40,9 @@ class StoreController
 
     /* FIELDS */
     private:
+		/* LOGGER */
+		Logger _logger = Logger::getRoot();
+
     	int _gpuDeviceId;
     	GpuUploadMonitor* _gpuUploadMonitor;
     	QueryMonitor* _queryMonitor;

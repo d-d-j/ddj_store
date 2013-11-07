@@ -6,5 +6,4 @@
 *.d
 *.orig
 DDJ_Store
-ddj_store.log
-*.log
+/ddj_store.log

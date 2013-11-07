@@ -79,6 +79,7 @@ namespace store {
 		// GET store element from task data
 		storeElement* element = (storeElement*)(task->GetData());
 
+		LOG4CPLUS_INFO(_logger, "Insert: t=" << element->tag << " s=" << element->series << " t=" << element->time << "v=" << element->value);
 		// GET buffer with element's tag or create one if not exists
 		if(this->_buffers->count(element->tag))	// if such a buffer exists
 		{
