@@ -5,6 +5,8 @@ namespace store {
 
 	CudaController::CudaController(int uploadStreamsNum, int queryStreamsNum)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [BEGIN]"));
+
 		this->_numUploadStreams = uploadStreamsNum;
 		this->_numQueryStreams = queryStreamsNum;
 		_uploadStreams = new cudaStream_t[this->_numUploadStreams];
@@ -24,10 +26,14 @@ namespace store {
 		while(gpuAllocateMainArray(MAIN_STORE_SIZE / i, &(this->_mainMemoryPointer)) != cudaSuccess)
 			if(i <= GPU_MEMORY_ALLOC_ATTEMPTS) i++;
 			else throw std::runtime_error("Cannot allocate main GPU memory in storeController");
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [END]"));
 	}
 
 	CudaController::~CudaController()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [BEGIN]"));
+
 		// RELEASE UPLOAD STREAMS
 		for(int i = 0; i < this->_numUploadStreams; i++)
 			cudaStreamDestroy(this->_uploadStreams[i]);
@@ -40,6 +46,8 @@ namespace store {
 
 		// RELEASE MAIN GPU STORE MEMORY
 		gpuFreeMemory(this->_mainMemoryPointer);
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [END]"));
 	}
 
 	ullint CudaController::GetMainMemoryOffset()
@@ -51,6 +59,7 @@ namespace store {
 	void CudaController::SetMainMemoryOffset(ullint offset)
 	{
 		boost::mutex::scoped_lock lock(_offsetMutex);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Setting main memory offset to: %llu", offset);
 		this->_mainMemoryOffset = offset;
 	}
 

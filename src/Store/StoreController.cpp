@@ -92,7 +92,7 @@ namespace store {
 		storeElement* element = (storeElement*)(task->GetData());
 
 		// Log element to insert
-		LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
+		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
 
 		// GET buffer with element's tag or create one if not exists
 		if(this->_buffers->count(element->tag))	// if such a buffer exists
@@ -138,7 +138,7 @@ namespace store {
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
 		}
 	}
 

@@ -23,7 +23,7 @@ namespace store {
 
 StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [BEGIN]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [BEGIN]", tag);
 
 	this->_tag = tag;
 	this->_areBuffersSwitched = false;
@@ -41,7 +41,7 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
 	this->_uploaderBarrier->wait();
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [END]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [END]", tag);
 }
 
 StoreBuffer::~StoreBuffer()

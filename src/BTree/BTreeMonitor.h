@@ -10,6 +10,7 @@
 
 #include "../Store/StoreIncludes.h"
 #include "../Store/infoElement.h"
+#include "../Helpers/Logger.h"
 
 namespace ddj {
 namespace store {
@@ -24,6 +25,8 @@ namespace store {
 			boost::mutex _mutex;	/**< Mutex used to protect access to b+tree */
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
+			/* LOGGER */
+			Logger _logger = Logger::getRoot();
 		public:
 			//! BTreeMonitor constructor.
 			/*!
