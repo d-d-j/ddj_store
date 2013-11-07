@@ -60,6 +60,8 @@ namespace store {
 			bool _areBuffersSwitched;	/**< true if _backBuffer is ready to upload and haven't been yet */
 			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;	/**< main buffer where data is inserted */
 			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;	/**< buffer to upload as trunk */
+			boost::mutex _bufferMutex;
+			boost::condition_variable _bufferCond;
 
 		/* METHODS */
 		public:

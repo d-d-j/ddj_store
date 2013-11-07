@@ -94,16 +94,13 @@ namespace store {
 		// Log element to insert
 		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
 
-		// GET buffer with element's tag or create one if not exists
-		if(this->_buffers->count(element->tag))	// if such a buffer exists
-		{
-			(*_buffers)[element->tag]->Insert(element);
-		}
-		else
+		// Create buffer with element's metric if not exists
+		if(!this->_buffers->count(element->tag))
 		{
 			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
 		}
+		(*_buffers)[element->tag]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		task->SetResult(true, nullptr, nullptr, 0);

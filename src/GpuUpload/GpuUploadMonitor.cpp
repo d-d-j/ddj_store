@@ -12,6 +12,8 @@ namespace store {
 
 	GpuUploadMonitor::GpuUploadMonitor(CudaController* cudaController)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Gpu upload monitor constructor [BEGIN]"));
+
 		this->_core = new GpuUploadCore(cudaController);
 		this->_sem = new Semaphore(DEVICE_BUFFERS_COUNT);
 
@@ -24,12 +26,17 @@ namespace store {
 					);
 		}
 
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Gpu upload monitor constructor [END]"));
 	}
 
 	GpuUploadMonitor::~GpuUploadMonitor()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Gpu upload monitor destructor [BEGIN]"));
+
 		delete this->_sem;
 		delete this->_core;
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Gpu upload monitor destructor [END]"));
 	}
 
 	infoElement* GpuUploadMonitor::Upload
@@ -38,7 +45,7 @@ namespace store {
 			int elementsToUploadCount
 			)
 	{
-		// TODO: HANDLE ERRORS HERE... How we will do that?
+		// TODO: HANDLE ERRORS HERE
 
 		int streamNum = this->_sem->Wait();
 

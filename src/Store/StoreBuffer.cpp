@@ -23,7 +23,7 @@ namespace store {
 
 StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [BEGIN]", tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [BEGIN]", tag);
 
 	this->_tag = tag;
 	this->_areBuffersSwitched = false;
@@ -41,12 +41,12 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
 	this->_uploaderBarrier->wait();
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [END]", tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [END]", tag);
 }
 
 StoreBuffer::~StoreBuffer()
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] destructor [BEGIN]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [BEGIN]", this->_tag);
 
 	// STOP UPLOADER THREAD
 	{
@@ -59,22 +59,32 @@ StoreBuffer::~StoreBuffer()
 	delete this->_uploaderBarrier;
 	delete this->_uploaderThread;
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] destructor [END]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [END]", this->_tag);
 }
 
 void StoreBuffer::Insert(storeElement* element)
 {
+	boost::mutex::scoped_lock lock(this->_bufferMutex);
+
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
 	if(_bufferElementsCount == STORE_BUFFER_SIZE)
 	{
+		while(this->_areBuffersSwitched)
+			this->_bufferCond.wait(lock);
 		this->switchBuffers();
 	}
 }
 
 void StoreBuffer::Flush()
 {
-	boost::mutex::scoped_lock lock(this->_uploaderMutex);
+	boost::mutex::scoped_lock lock(this->_bufferMutex);
+
+	// Wait for back buffer to be uploaded to GPU
+	while(this->_areBuffersSwitched)
+			this->_bufferCond.wait(lock);
+
+	// Swap buffers
 	this->_backBufferElementsCount = this->_bufferElementsCount;
 	this->_bufferElementsCount = 0;
 	this->_buffer.swap(this->_backBuffer);
@@ -85,8 +95,6 @@ void StoreBuffer::Flush()
 
 	// INSERT INFO ELEMENT TO B+TREE
 	this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
-
-	this->_areBuffersSwitched = false;
 }
 
 void StoreBuffer::uploaderThreadFunction()
@@ -101,8 +109,9 @@ void StoreBuffer::uploaderThreadFunction()
 		while(1)
 		{
 			this->_uploaderCond.wait(lock);
-			if(this->_areBuffersSwitched)
 			{
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread is doing his JOB:) [tag=%d] [BEGIN]", this->_tag);
+
 				// UPLOAD BUFFER TO GPU
 				elemToInsertToBTree = this->_gpuUploadMonitor->Upload(
 																&(this->_backBuffer),
@@ -112,7 +121,11 @@ void StoreBuffer::uploaderThreadFunction()
 				this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
 
 				// COMMUNICATE THAT BACK BUFFER WAS SUCCESSFULLY UPLOADED
+				boost::mutex::scoped_lock bufferLock(this->_bufferMutex);
 				this->_areBuffersSwitched = false;
+				this->_bufferCond.notify_one();
+
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread ended his JOB:) [tag=%d] [END]", this->_tag);
 			}
 		}
 	}
@@ -134,8 +147,6 @@ void StoreBuffer::uploaderThreadFunction()
 
 void StoreBuffer::switchBuffers()
 {
-	boost::mutex::scoped_lock lock(this->_uploaderMutex);
-
 	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [BEGIN]", this->_tag);
 
 	this->_areBuffersSwitched = true;

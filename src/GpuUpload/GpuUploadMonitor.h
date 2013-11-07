@@ -26,6 +26,8 @@ namespace store {
 			Semaphore* _sem;
 			boost::array<storeElement*, DEVICE_BUFFERS_COUNT> _deviceBufferPointers;
 
+			/* LOGGER */
+			Logger _logger = Logger::getRoot();
 		public:
 			GpuUploadMonitor(CudaController* cudaController);
 			~GpuUploadMonitor();
