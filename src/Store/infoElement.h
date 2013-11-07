@@ -11,7 +11,7 @@ namespace store {
 
 	 InfoElement structs are stored in B+Tree structure. They contains start and end times of
 	 elements from single trunk and it's position in GPU structure array. It is also signed
-	 by tag of elements from trunk.
+	 by metric of elements from trunk.
 	*/
 	typedef struct infoElement
 	{

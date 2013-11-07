@@ -12,12 +12,12 @@ namespace store {
 
 	BTreeMonitor::BTreeMonitor(metric_type metric)
 	{
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [BEGIN]", metric);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [metric=%d] constructor [BEGIN]", metric);
 
 		this->_metric = metric;
 		this->_bufferInfoTree = new tree();
 
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [END]", metric);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [metric=%d] constructor [END]", metric);
 	}
 
 	BTreeMonitor::~BTreeMonitor()
