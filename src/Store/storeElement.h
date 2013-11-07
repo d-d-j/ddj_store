@@ -20,19 +20,19 @@ namespace store {
 	{
 		public:
 			/* FIELDS */
-			int series;
-			tag_type tag;
+			int tag;
+			metric_type metric;
 			ullint time;
 			store_value_type value;
 
 			/* CONSTRUCTORS */
-			storeElement(){ series = 0; tag = 0; time = 0; value = 0; }
-			storeElement(int _series, tag_type _tag, ullint _time, store_value_type _value)
-			: series(_series), tag(_tag), time(_time), value(_value) {}
+			storeElement(){ tag = 0; metric = 0; time = 0; value = 0; }
+			storeElement(int _tag, metric_type _metric, ullint _time, store_value_type _value)
+			: tag(_tag), metric(_metric), time(_time), value(_value) {}
 			storeElement(const storeElement& elem)
 			{
-				this->series = elem.series;
 				this->tag = elem.tag;
+				this->metric = elem.metric;
 				this->time = elem.time;
 				this->value = elem.value;
 			}
@@ -41,7 +41,7 @@ namespace store {
 			std::string toString()
 			{
 				 std::ostringstream stream;
-			     stream << "["<<series<<", "<<tag<<", "<<time<<", "<<value<<"]";
+				 stream << "[" << tag << ", " << metric << ", " << time << ", " << value << "]";
 			     return  stream.str();
 			}
 	} storeElement;

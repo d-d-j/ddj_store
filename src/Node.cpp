@@ -102,7 +102,7 @@ namespace ddj
 						int n = result->result_size / sizeof(store::storeElement);
 						store::storeElement* elements = (store::storeElement*)result->result_data;
 						for(int k=0; k<n; k++)
-							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].tag, elements[k].series, elements[k].time, elements[k].value);
+							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].metric, elements[k].tag, elements[k].time, elements[k].value);
 
 						// Send result
 						this->_client->SendTaskResult(result);

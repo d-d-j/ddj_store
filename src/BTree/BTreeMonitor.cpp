@@ -10,14 +10,14 @@
 namespace ddj {
 namespace store {
 
-	BTreeMonitor::BTreeMonitor(tag_type tag)
+	BTreeMonitor::BTreeMonitor(metric_type metric)
 	{
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [BEGIN]", tag);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [BEGIN]", metric);
 
-		this->_tag = tag;
+		this->_metric = metric;
 		this->_bufferInfoTree = new tree();
 
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [END]", tag);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [END]", metric);
 	}
 
 	BTreeMonitor::~BTreeMonitor()

@@ -21,16 +21,16 @@
 namespace ddj {
 namespace store {
 
-StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
+StoreBuffer::StoreBuffer(metric_type metric, GpuUploadMonitor* gpuUploadMonitor)
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [BEGIN]", tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [BEGIN]", metric);
 
-	this->_tag = tag;
+	this->_metric = metric;
 	this->_areBuffersSwitched = false;
 	this->_bufferElementsCount = 0;
 	this->_backBufferElementsCount = 0;
 	this->_gpuUploadMonitor = gpuUploadMonitor;
-	this->_bufferInfoTreeMonitor = new BTreeMonitor(tag);
+	this->_bufferInfoTreeMonitor = new BTreeMonitor(metric);
 	this->_uploaderBarrier = new boost::barrier(2);
 
 	// ALLOCATE PINNED MEMORY FOR BUFFERS
@@ -41,12 +41,12 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
 	this->_uploaderBarrier->wait();
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [END]", tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [END]", metric);
 }
 
 StoreBuffer::~StoreBuffer()
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [BEGIN]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [BEGIN]", this->_metric);
 
 	// STOP UPLOADER THREAD
 	{
@@ -59,7 +59,7 @@ StoreBuffer::~StoreBuffer()
 	delete this->_uploaderBarrier;
 	delete this->_uploaderThread;
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [END]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [END]", this->_metric);
 }
 
 void StoreBuffer::Insert(storeElement* element)
@@ -99,7 +99,7 @@ void StoreBuffer::Flush()
 
 void StoreBuffer::uploaderThreadFunction()
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [BEGIN]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [BEGIN]", this->_metric);
 
 	infoElement* elemToInsertToBTree;
 	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
@@ -110,7 +110,7 @@ void StoreBuffer::uploaderThreadFunction()
 		{
 			this->_uploaderCond.wait(lock);
 			{
-				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread is doing his JOB:) [tag=%d] [BEGIN]", this->_tag);
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread is doing his JOB:) [tag=%d] [BEGIN]", this->_metric);
 
 				// UPLOAD BUFFER TO GPU
 				elemToInsertToBTree = this->_gpuUploadMonitor->Upload(
@@ -125,29 +125,29 @@ void StoreBuffer::uploaderThreadFunction()
 				this->_areBuffersSwitched = false;
 				this->_bufferCond.notify_one();
 
-				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread ended his JOB:) [tag=%d] [END]", this->_tag);
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread ended his JOB:) [tag=%d] [END]", this->_metric);
 			}
 		}
 	}
 	catch(boost::thread_interrupted& ex)
 	{
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [END]", this->_tag);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [END]", this->_metric);
 		return;
 	}
 	catch(std::exception& ex)
 	{
-		LOG4CPLUS_ERROR_FMT(this->_logger, "Uploader thread [tag=%d] failed with exception - [%s] [FAILED]", this->_tag, ex.what());
+		LOG4CPLUS_ERROR_FMT(this->_logger, "Uploader thread [tag=%d] failed with exception - [%s] [FAILED]", this->_metric, ex.what());
 	}
 	catch(...)
 	{
-		LOG4CPLUS_FATAL_FMT(this->_logger, "Uploader thread [tag=%d] error with unknown reason [FAILED]", this->_tag);
+		LOG4CPLUS_FATAL_FMT(this->_logger, "Uploader thread [tag=%d] error with unknown reason [FAILED]", this->_metric);
 		throw;
 	}
 }
 
 void StoreBuffer::switchBuffers()
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [BEGIN]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [BEGIN]", this->_metric);
 
 	this->_areBuffersSwitched = true;
 	this->_backBufferElementsCount = this->_bufferElementsCount;
@@ -155,7 +155,7 @@ void StoreBuffer::switchBuffers()
 	this->_buffer.swap(this->_backBuffer);
 	this->_uploaderCond.notify_one();
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [END]", this->_tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [END]", this->_metric);
 }
 
 } /* namespace store */

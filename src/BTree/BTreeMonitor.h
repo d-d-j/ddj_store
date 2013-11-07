@@ -21,7 +21,7 @@ namespace store {
 	class BTreeMonitor
 	{
 		private:
-			tag_type _tag;	/**< A tag of elements which locations are stored in B+Tree */
+			metric_type _metric;	/**< A tag of elements which locations are stored in B+Tree */
 			boost::mutex _mutex;	/**< Mutex used to protect access to b+tree */
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
@@ -33,7 +33,7 @@ namespace store {
 			  It sets creates a new instance of B+Tree structure in order to store there
 			  additional info about trunk's location in GPU's store array
 			*/
-			BTreeMonitor(tag_type tag);
+			BTreeMonitor(metric_type metric);
 
 			//! BTreeMonitor destructor.
 			/*!

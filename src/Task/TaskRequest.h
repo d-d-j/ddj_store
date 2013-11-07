@@ -35,7 +35,7 @@ public:
 	std::string toString()
 	{
 		 std::ostringstream stream;
-	     stream << "["<<task_id<<", "<<type<<", "<<size<<"]";
+		stream << "[" << task_id << ", " << type << ", " << size << "]";
 	     return  stream.str();
 	}
 };

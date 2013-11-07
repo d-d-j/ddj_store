@@ -48,7 +48,7 @@ class StoreController
     	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
 
-    	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
+    	boost::unordered_map<metric_type, StoreBuffer_Pointer>* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
 
 	/* METHODS */

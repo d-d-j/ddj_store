@@ -27,7 +27,7 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
-		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
+		this->_buffers = new boost::unordered_map<metric_type, StoreBuffer_Pointer>();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
@@ -92,15 +92,15 @@ namespace store {
 		storeElement* element = (storeElement*)(task->GetData());
 
 		// Log element to insert
-		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
+		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
 
 		// Create buffer with element's metric if not exists
-		if(!this->_buffers->count(element->tag))
+		if(!this->_buffers->count(element->metric))
 		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
-			this->_buffers->insert({element->tag, newBuf});
+			StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_gpuUploadMonitor));
+			this->_buffers->insert({element->metric, newBuf});
 		}
-		(*_buffers)[element->tag]->Insert(element);
+		(*_buffers)[element->metric]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		task->SetResult(true, nullptr, nullptr, 0);

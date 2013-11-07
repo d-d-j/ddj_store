@@ -49,7 +49,7 @@ namespace store {
 
 		int streamNum = this->_sem->Wait();
 
-		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
+		infoElement* result = new infoElement(elements->front().metric, elements->front().time, elements->back().time, 0, 0);
 
 		storeElement* deviceBufferPointer = this->_deviceBufferPointers[streamNum-1];
 
