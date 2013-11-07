@@ -25,6 +25,7 @@
 #include "storeElement.h"
 #include "infoElement.h"
 #include "../CUDA/cudaIncludes.h"
+#include "../Helpers/Logger.h"
 
 namespace ddj {
 namespace store {
@@ -43,6 +44,9 @@ namespace store {
 			tag_type _tag;	/**< This buffer coordinates data only with this tag */
 			BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
 			GpuUploadMonitor* _gpuUploadMonitor;	/**< protects access to GpuUploadCore class */
+
+			/* LOGGER */
+			Logger _logger = Logger::getRoot();
 
 			/* UPLOADER THREAD */
 			boost::thread* _uploaderThread;	/**< uploads _backBuffer to GPU and stores info in B+Tree */

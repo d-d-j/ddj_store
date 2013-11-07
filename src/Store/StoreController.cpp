@@ -111,11 +111,12 @@ namespace store {
 
 	void StoreController::selectAllTask(StoreTask_Pointer task)
 	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [BEGIN]"));
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
 
 		// Check possible errors
 		if(task == nullptr || task->GetType() != SelectAll)
 		{
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in selectAllTask function - wrong argument");
 		}
 
@@ -123,17 +124,21 @@ namespace store {
 		storeElement* queryResult;
 
 		// TODO: Implement all possible exceptions catching from SelectAll function
-		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		try
 		{
 			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
 			task->SetResult(true, nullptr, queryResult, sizeOfResult);
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [END SUCCESS]"));
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [END]"));
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "SelectAll task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
 		}
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [FAILED]"));
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
 		}
 	}
 

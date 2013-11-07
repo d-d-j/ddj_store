@@ -37,7 +37,7 @@ namespace store {
 
 	void StoreTask::SetResult(
 			bool isSuccessfull,
-			char* message,
+			const char* message,
 			void* resultData,
 			int resultSize)
 	{
@@ -47,7 +47,7 @@ namespace store {
 			throw std::runtime_error("StoreTask::SetResult cannot set new result if another still exists");
 		this->_isCompleated = true;
 		this->_isSuccessfull = isSuccessfull;
-		this->_message = message;
+		this->_message = (char*)message;
 		this->_resultData = resultData;
 		this->_resultSize = resultSize;
 		this->_condResponseReady->notify_one();

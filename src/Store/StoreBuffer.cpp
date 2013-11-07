@@ -23,6 +23,8 @@ namespace store {
 
 StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 {
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [BEGIN]", this->_tag);
+
 	this->_tag = tag;
 	this->_areBuffersSwitched = false;
 	this->_bufferElementsCount = 0;
@@ -38,10 +40,14 @@ StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
 	// START UPLOADER THRAED
 	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
 	this->_uploaderBarrier->wait();
+
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] constructor [END]", this->_tag);
 }
 
 StoreBuffer::~StoreBuffer()
 {
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] destructor [BEGIN]", this->_tag);
+
 	// STOP UPLOADER THREAD
 	{
 		boost::mutex::scoped_lock lock(this->_uploaderMutex);
@@ -52,6 +58,8 @@ StoreBuffer::~StoreBuffer()
 	delete this->_bufferInfoTreeMonitor;
 	delete this->_uploaderBarrier;
 	delete this->_uploaderThread;
+
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store controller [tag=%d] destructor [END]", this->_tag);
 }
 
 void StoreBuffer::Insert(storeElement* element)
@@ -83,6 +91,8 @@ void StoreBuffer::Flush()
 
 void StoreBuffer::uploaderThreadFunction()
 {
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [BEGIN]", this->_tag);
+
 	infoElement* elemToInsertToBTree;
 	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
 	this->_uploaderBarrier->wait();
@@ -108,21 +118,33 @@ void StoreBuffer::uploaderThreadFunction()
 	}
 	catch(boost::thread_interrupted& ex)
 	{
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [END]", this->_tag);
 		return;
+	}
+	catch(std::exception& ex)
+	{
+		LOG4CPLUS_ERROR_FMT(this->_logger, "Uploader thread [tag=%d] failed with exception - [%s] [FAILED]", this->_tag, ex.what());
 	}
 	catch(...)
 	{
+		LOG4CPLUS_FATAL_FMT(this->_logger, "Uploader thread [tag=%d] error with unknown reason [FAILED]", this->_tag);
+		throw;
 	}
 }
 
 void StoreBuffer::switchBuffers()
 {
 	boost::mutex::scoped_lock lock(this->_uploaderMutex);
+
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [BEGIN]", this->_tag);
+
 	this->_areBuffersSwitched = true;
 	this->_backBufferElementsCount = this->_bufferElementsCount;
 	this->_bufferElementsCount = 0;
 	this->_buffer.swap(this->_backBuffer);
 	this->_uploaderCond.notify_one();
+
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [END]", this->_tag);
 }
 
 } /* namespace store */
