@@ -24,6 +24,8 @@ namespace store {
 
 	StoreController::StoreController(int gpuDeviceId)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
+
 		this->_gpuDeviceId = gpuDeviceId;
 		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
 
@@ -38,13 +40,19 @@ namespace store {
 
 		// CREATE QUERY MONITOR
 		this->_queryMonitor = new QueryMonitor(this->_cudaController);
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
 
 	StoreController::~StoreController()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
+
 		delete this->_buffers;
 		delete this->_queryMonitor;
 		delete this->_gpuUploadMonitor;
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}
 
 	void StoreController::ExecuteTask(StoreTask_Pointer task)
@@ -55,6 +63,8 @@ namespace store {
 
 	void StoreController::populateTaskFunctions()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
+
 		std::pair<int, taskFunc> pair;
 
 		// INSERT
@@ -66,7 +76,9 @@ namespace store {
 		pair.first = SelectAll;
 		pair.second = boost::bind(&StoreController::selectAllTask, this, _1);
 		_taskFunctions.insert(pair);
-	}
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
+}
 
 	void StoreController::insertTask(StoreTask_Pointer task)
 	{
@@ -79,7 +91,9 @@ namespace store {
 		// GET store element from task data
 		storeElement* element = (storeElement*)(task->GetData());
 
-		LOG4CPLUS_INFO(_logger, "Insert: t=" << element->tag << " s=" << element->series << " t=" << element->time << "v=" << element->value);
+		// Log element to insert
+		LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
+
 		// GET buffer with element's tag or create one if not exists
 		if(this->_buffers->count(element->tag))	// if such a buffer exists
 		{
@@ -97,6 +111,8 @@ namespace store {
 
 	void StoreController::selectAllTask(StoreTask_Pointer task)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [BEGIN]"));
+
 		// Check possible errors
 		if(task == nullptr || task->GetType() != SelectAll)
 		{
@@ -112,10 +128,12 @@ namespace store {
 		{
 			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
 			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [END SUCCESS]"));
 		}
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select all task [FAILED]"));
 		}
 	}
 

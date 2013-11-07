@@ -27,7 +27,7 @@ namespace ddj
 		typedef boost::shared_ptr<store::StoreController> StoreController_Pointer;
 
 		/* LOGGER */
-		Logger logger = Logger::getRoot();
+		Logger _logger = Logger::getRoot();
 
         /* NETWORK */
         Client* _client;

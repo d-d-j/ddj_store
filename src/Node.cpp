@@ -12,6 +12,8 @@ namespace ddj
 {
 	Node::Node()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [BEGIN]"));
+
 		this->_storeTaskMonitor = new store::StoreTaskMonitor(&(this->_taskCond));
 		this->_taskBarrier = new boost::barrier(2);
 
@@ -34,10 +36,14 @@ namespace ddj
 		}
 
 		this->_client = new Client(&_requestSignal);
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}
 
 	Node::~Node()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [BEGIN]"));
+
 		// Disconnect and release client
 		delete this->_client;
 
@@ -50,6 +56,8 @@ namespace ddj
 
 		delete this->_taskBarrier;
 		delete this->_taskThread;
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [END]"));
 	}
 
 	void Node::CreateTask(taskRequest request)
@@ -64,7 +72,10 @@ namespace ddj
 
 	void Node::taskThreadFunction()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Task thread [BEGIN]"));
+
 		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
+
 		this->_taskBarrier->wait();
 		try
 		{
@@ -72,7 +83,7 @@ namespace ddj
 			{
 				this->_taskCond.wait(lock);
 
-				// Get all compleated tasks
+				// Get all completed tasks
 				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
 						this->_storeTaskMonitor->PopCompleatedTasks();
 
@@ -87,8 +98,15 @@ namespace ddj
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
 
+						// TODO: only for testing purposes - should be removed
+						int n = result->result_size / sizeof(store::storeElement);
+						store::storeElement* elements = (store::storeElement*)result->result_data;
+						for(int k=0; k<n; k++)
+							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].tag, elements[k].series, elements[k].time, elements[k].value);
+
 						// Send result
 						this->_client->SendTaskResult(result);
+
 						// Destroy Task and TaskResult
 						delete result;
 					}
@@ -97,10 +115,17 @@ namespace ddj
 		}
 		catch(boost::thread_interrupted& ex)
 		{
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Task thread interrupted [END SUCCESS]"));
 			return;
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Task thread failed with exception - [%s] [FAILED]", ex.what());
 		}
 		catch(...)
 		{
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Task thread error with unknown reason [FAILED]"));
+			throw;
 		}
 	}
 } /* namespace ddj */
