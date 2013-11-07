@@ -38,7 +38,7 @@ namespace store {
 			this->_bufferInfoTree->insert(element->startTime, element->startValue);
 			this->_bufferInfoTree->insert(element->endTime, element->endValue);
 			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%d, endV=%d}",
-					element->tag, element->startTime, element->endTime, element->startValue, element->endValue);
+					element->metric, element->startTime, element->endTime, element->startValue, element->endValue);
 		}
 		catch(std::exception& ex)
 		{

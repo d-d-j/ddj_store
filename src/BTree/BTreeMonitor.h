@@ -21,7 +21,7 @@ namespace store {
 	class BTreeMonitor
 	{
 		private:
-			metric_type _metric;	/**< A tag of elements which locations are stored in B+Tree */
+			metric_type _metric;	/**< A metric of elements which locations are stored in B+Tree */
 			boost::mutex _mutex;	/**< Mutex used to protect access to b+tree */
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
