@@ -24,15 +24,26 @@ namespace ddj
 		// connect CreateTaskMethod to _newTaskSignal
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
-		this->_cudaDevicesCount = gpuGetCudaDevicesCount();
+		this->_cudaDevicesCount = gpuGetCudaDevicesCountAndPrint();
+
 		StoreController_Pointer* controller;
 
 		//for(int i=0; i<this->_cudaDevicesCount; i++)
 		for(int i=0; i<1; i++)
 		{
+			// Check if GPU i satisfies ddj_store requirements
+			if(!gpuCheckCudaDevice(i)) continue;
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});
 			delete controller;
+		}
+
+		//throw exception if suitable cuda gpu devices count == 0
+		if(this->_controllers.empty())
+		{
+			std::string errString = "!! NO CUDA DEVICE !!";
+			errString.append(" - there is no cuda device connected or it does not satisfy ddj_store requirements...");
+			throw std::runtime_error(errString);
 		}
 
 		this->_client = new Client(&_requestSignal);
