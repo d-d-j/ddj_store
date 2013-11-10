@@ -1,7 +1,7 @@
 RM := rm -rf
 
 #you can use g++ or clang or color-gcc
-COMPILER := g++
+COMPILER := clang++
 
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
@@ -39,10 +39,10 @@ CPP_DEPS += \
 ./src/main.d
 
 
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -llog4cplus
+LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
 INCLUDES := -I"/usr/local/cuda/include"
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
-STANDART := -std=c++0x -g
+STANDART := -std=c++11 -stdlib=libc++
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 
 # CUDA code generation flags
@@ -72,7 +72,7 @@ all: DDJ_Store
 DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(COMPILER) -std=c++11 -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

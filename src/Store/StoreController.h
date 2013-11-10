@@ -37,6 +37,7 @@ class StoreController
     /* TYPEDEFS */
     typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
     typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
+    typedef boost::unordered_map<tag_type, StoreBuffer_Pointer> Buffers_Map;
 
     /* FIELDS */
     private:
@@ -48,7 +49,7 @@ class StoreController
     	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
 
-    	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
+    	Buffers_Map* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
 
 	/* METHODS */
@@ -63,6 +64,7 @@ class StoreController
     private:
         void insertTask(StoreTask_Pointer task);
         void selectAllTask(StoreTask_Pointer task);
+        void flushTask(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

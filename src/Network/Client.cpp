@@ -54,13 +54,12 @@ void Client::write(char *message, size_t length)
 void Client::do_read()
 {
     static int id = 0;
-
     const int LEN = 100;
     char msg[LEN];
 
     //TODO: Split reading to read header first and then data
     //TODO: Think about alignment
-    while (int n = read(msg, LEN))
+    while (read(msg, LEN))
     {
         id++;
 

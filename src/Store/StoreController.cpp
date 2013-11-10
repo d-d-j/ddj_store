@@ -27,7 +27,7 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
-		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
+		this->_buffers = new Buffers_Map();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
@@ -65,17 +65,14 @@ namespace store {
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
 
-		std::pair<int, taskFunc> pair;
-
 		// INSERT
-		pair.first = Insert;
-		pair.second = boost::bind(&StoreController::insertTask, this, _1);
-		_taskFunctions.insert(pair);
+		_taskFunctions.insert({ Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
 		// SELECT ALL
-		pair.first = SelectAll;
-		pair.second = boost::bind(&StoreController::selectAllTask, this, _1);
-		_taskFunctions.insert(pair);
+		_taskFunctions.insert({ SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
+
+		// FLUSH
+		_taskFunctions.insert({ Flush, boost::bind(&StoreController::flushTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
 }
@@ -139,5 +136,38 @@ namespace store {
 		}
 	}
 
+	void StoreController::flushTask(StoreTask_Pointer task)
+	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [BEGIN]"));
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != Flush)
+		{
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
+			throw std::runtime_error("Error in flushTask function - wrong argument");
+		}
+
+		try
+		{
+			// Iterate through store buffers and flush them to GPU memory (Sync)
+			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
+			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); it++)
+			{
+				it-> second->Flush();
+			}
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Flush task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
+		}
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
+	}
 } /* namespace store */
 } /* namespace ddj */
