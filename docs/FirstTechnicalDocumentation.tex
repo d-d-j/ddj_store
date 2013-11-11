@@ -191,19 +191,41 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	Program głównego serwera napisany jest w języku programowania The Go Programming Language (http://www.golang.org). 
 	Program korzysta między innymi z takich pakietów jak: ``log4go'' - do logowania, ``gorest'' - wspomagający Restowe API czy ``gcfg'' - do konfiguracji.
 	\subsection{Struktura}
+		
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Struktura serwera głównego}
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Master}}
 			\end{center}
 		\end{figure}
+		\clearpage
+
 	\subsection{Przepływ danych}
+		Przetwarzanie zapytania restowego wysłanego od klienta:
+		\begin{enumerate}
+			\item Serwer wystawiający restowe api otrzymuje zapytanie select lub insert które kieryje jako request to Task Manager'a
+			\item Task Manager tworzy zadanie dla danego zapytania i przekazuje go do wykonania Task Executorowi
+			\item Ten odpala wykonanie zapytania w wątku (GO rutine)
+			\item Go rutine przetwarzający dane zapytanie zleca wysłanie utworzonego obiektu TaskRequest do odpowiedniego węzła 
+				(wyznaczeniem odpowiedniego węsła zajmować się będzie LoadBalancer)
+			\item Następnie w zależności od ustawień buforowania TaskRequest wysyłany jest do wskazanego węzła 
+				(informacje o adresie węzła pobierane są z obiektu Node Managera w postaci obiektu NodeInfo)
+		\end{enumerate}
+		Przetwarzanie rezultatu zapytania odebranego od węzła:
+		\begin{enumerate}
+			\item Node communication serwer odbiera obiekt TaskResponse który kieryje to Task Executora
+			\item Task Executor przekazuje odpowiedź do odpowiedniego wątku obsługującego dane zapytanie
+			\item Jeśli wszystkie węzły na które zostało wysłane zapytanie odpowiedziały, zapytanie jest agregowane jeśli to 
+				potrzebne i zadanie jest zaznaczane jako ukończone
+			\item Task Manager zbiera wszystkie ukończone zadania, pobiera ich rezultaty i wysyła poprzez serwer (Master Server) do klienta
+		\end{enumerate}
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Przepływ danych dla serwera głównego}
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Master}}
 			\end{center}
 		\end{figure}
+		\clearpage
 
 \section{Node}
 	Program węzła napisany jest w języku programowania C++ w wersji C++11 z użyciem bibliotek BOOST i LOG4CPLUS. Do obsługi kart 
@@ -261,6 +283,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Node}}
 			\end{center}
 		\end{figure}
+		\clearpage
 
 	\subsection{Przepływ danych}
 		Przepływ danych w węźle przy wykonywaniu operacji Insert (wkładania danych do bazy danych):
@@ -296,6 +319,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Node}}
 			\end{center}
 		\end{figure}
+		\clearpage
 
 	\subsection{System od strony GPU}
 		W tym przypadku również rozpatrywać będziemy działanie systemu osobno pod względem wrzucania danych do bazy i pod względem zapytań typu Select. \\ \\
@@ -319,6 +343,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Cuda_Store_Structure}}
 			\end{center}
 		\end{figure}
+		\clearpage
+
 	\subsection{Strumienie CUDA dla operacji Insert}
 		Do zarządzania strumieniami CUDA zarówno dla operacji Insert jak i Select wydzielona została klasa CudaController. Zarządzanie strumieniami zostało zaimplementowane tak aby:
 		\begin{itemize}
@@ -329,9 +355,10 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Zarządzanie strumieniami CUDA przy operacji Insert}
- 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Cuda_Upload_Streams}}
+ 				\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{Cuda_Upload_Streams}}
 			\end{center}
 		\end{figure}
+		\clearpage
 
 \section{Map-Reduce}
 Zaletą systemu będzie implementacja uproszczonego stylu programowania ``Map-Reduce'', jako że jest to rozproszona baza danych.
@@ -357,6 +384,8 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania ``Map-Re
 			\end{center}
 		\end{figure}
 \end{itemize}
+\clearpage
+
 Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na ``zarezerwawanej'' dla niego 
 karcie graficznej (jeśli okaże się to korzystne).
 
