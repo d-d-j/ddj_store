@@ -283,8 +283,9 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a który przekazuje TaskRequest do Task Monitora ten tworzy 
 				obiekt zadania (StoreTask)
 			\item StoreTask przekazywany jest do wszystkich StoreControllerów
-			\item Store Controller przekazuje do swojego wątku odpowiedzialnego za zapytania zadanie do wykonania. Ten tworzy obiekt QueryRequest do Query Monitora, który
-				wykonuje operację query i zwraca mu QueryResult
+			\item Store Controller przekazuje do swojego wątku odpowiedzialnego za zapytania zadanie do wykonania nazwijmy go queryThread. 
+			\item queryThread prosi odpowiednie obiekty Store Bufferów o informacje na temat położenia danych w pamięci GPU i dostaje je pobrane z B+drzew w postaci listy infoElementów
+			\item queryThread tworzy obiekt QueryRequest na podstawie zapytania i infoElementów i przekazuje go do Query Monitora, który wykonuje operację query i zwraca mu QueryResult. 
 			\item Wątek wykonujący zapytania na podstawie QueryResult wywołuje operację SetResult na zadaniu które może być następnie uznane za wykonane
 			\item Wątek w obiekcie Node odpowiedzialny za zarządzanie ukończonymi zadaniami orzyma takie zadanie z Task Monitora po wykonaniu na nim funkcji PopCompletedTasks
 				i może pobrać resultat z danego zadania oraz wysłać go do Mastera 
@@ -295,7 +296,23 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Node}}
 			\end{center}
 		\end{figure}
+
 	\subsection{System od strony GPU}
+		W tym przypadku również rozpatrywać będziemy działanie systemu osobno pod względem wrzucania danych do bazy i pod względem zapytań typu Select. \\ \\
+		Insert: \\
+		\begin{enumerate}
+			\item Upload Monitor kopiuje bufor otrzymany od StoreBuffera do bufora po stronie GPU. Dopiero po tym kroku bufor w StoreBufferze może być ponownie zamieniony.
+			\item Następnie Upload Monitor wywołuje Compressor aby ten skompresował bufor znajdujący się na GPU i zwrócił mu wskaźnik na skompresowane dane.
+			\item Skompresowane dane są kopiowane w odpowiednie miejsce w głównej tablicy GPU po czym informacja o położeniu tych danych zwracana jest w postaci 
+				obiektu infoElement
+		\end{enumerate}
+		Select: \\
+		\begin{enumerate}
+			\item Query Monitor po otrzymaniu QueryRequest od Store Controllera wywołuje Compressor aby ten rozkompresował dane na które wskazują struktury infoElement zawarte w zapytaniu
+			\item Następnie QueryMonitor wywołuje odpowiedni dla danego zapytania kernel wykonujący się na GPU przekazując mu wskaźnik do rozkompresowanych danych 
+			\item Dane mogą być odpowiednio filtrowane w zależności od zapytania przez funkcję filtrującą wywołaną z kernela
+			\item Wskaźnik na rezultat zapytania zwracany jest do QueryMonitora który ściąga dane z GPU i przesyła z powrotem do StoreControllera
+		\end{enumerate}
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Działanie bazy od strony karty graficznej}
@@ -303,6 +320,12 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 			\end{center}
 		\end{figure}
 	\subsection{Strumienie CUDA dla operacji Insert}
+		Do zarządzania strumieniami CUDA zarówno dla operacji Insert jak i Select wydzielona została klasa CudaController. Zarządzanie strumieniami zostało zaimplementowane tak aby:
+		\begin{itemize}
+			\item Ilość strumieni przeznaczona dla operacji Insert jak również Select była łatwo konfigurowalna. 
+			\item Dla konkretnego bufora operacje kopiowania bufora na GPU oraz późniejszej kompresji załadowanego bufora wykonywały się w jednym strumieniu
+			\item Dla operacji kopiowania skompresowanych buforów do głównej tabeli GPU wyróżniony był jeden strumień i wszystkie takie kopiowania były wykonywane tylko w nim.
+		\end{itemize}
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Zarządzanie strumieniami CUDA przy operacji Insert}
