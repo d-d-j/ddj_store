@@ -214,7 +214,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		wiele kart graficznych, które będą używane przez program jeśli spełniają wymagania. Dane będziemy wkładać na karty oraz wykonywać na nich zapytania
 		niezależnie od siebie, tj. na poziomie obsługi karty nie mamy pojęcia o istnieniu innych. Wymyślona struktura programu ma na celu zapewnienie dużej 
 		równoległości wykonywania zadań oraz modułowości komponentów. \\
-		Opis elementów struktury:
+		Opis wybranych elementów struktury:
 		\begin{itemize}
 			\item Node - "Korzeń" całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
 				Funkcjonalność: 
@@ -238,7 +238,22 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Zamienia bufory jeśli główny się napełnił i zleca załadowanie przechowywanych w buforze danych na GPU
 					\item Składuje informacje o położeniu danych w pamięci GPU w B+ drzewie poprzez obiekt BTreeMonitor
 				\end{itemize}
-
+			\item Network Client (Node communication Client) - odpowiada za komunikację z Masterem \\ \\
+				Funkcjonalność: 
+				\begin{itemize}
+					\item Loguje węzeł do serwera głównego
+					\item Odbiera zlecenia wykonania zadań od Mastera
+					\item Wysyła rezultat wykonanego zadania do Mastera
+				\end{itemize}
+			\item Node Controller (Resource Controller) - nadzoruje wykorzystanie zasobów na węźle i przesyła ja do Mastera \\ \\
+				Funkcjonalność: 
+				\begin{itemize}
+					\item Pobiera dane o wykorzystaniu CPU, RAM, GPU
+					\item Pobiera dane o ilości wolnego i zajętego miejsca w głównej tablicy danych na GPU
+					\item Wysyła statystyki do Mastera
+				\end{itemize}
+			\item Inne moduły nazwane X Monitor mają za zadanie zabezpieczyć dostęp do pewnego zasobu związanego z X przed dostępem w wielu wątków. 
+				Taki obiekt monitora używa najczęściej Mutexa albo Semafora oraz Condition Variable do zarządzania dostępem do ochranianego zasobu.
 		\end{itemize}
 		\begin{figure}[t]
 			\begin{center}
@@ -246,7 +261,34 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
  				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Node}}
 			\end{center}
 		\end{figure}
+
 	\subsection{Przepływ danych}
+		Przepływ danych w węźle przy wykonywaniu operacji Insert (wkładania danych do bazy danych):
+		\begin{enumerate}
+			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania (INSERT), identyfikator mówiący 
+				na którą kartę dane mają być wsadzone oraz element do załadowania do bazy.
+			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a który przekazuje TaskRequest do Task Monitora ten tworzy 
+				obiekt zadania (StoreTask)
+			\item StoreTask przekazywany jest po identyfikatorze do odpowiedniego StoreControllera odpowiadającego za kartę w której umieszczone mają być dane
+			\item StoreController wykonuje zadanie przekazując element do załadowania do bazy do bufora (StoreBuffer)
+			\item StoreController wykonuje na zadaniu SetResult z pozytywnym wynikiem więc zadanie będzie mogło być zakończone i usunięte
+			\item Jeśli bufor w danym obiekcie StoreBuffer  stanie się pełny bufor zostaje zamieniony na pusty, a pełny trafia do Upload Monitora który załaduje dane na GPU
+			\item Po udanym załadowaniu danych na GPU informacje o położeniu danychna karcie zwrócone przez UploadMonitor w postaci struktury infoElement przekazywane są do
+				BTree Monitora w celu umieszczenia ich w B+Drzewie 
+			\item Dopiero po ukończeniu tych wszystkich kroków można uznać daną za włożoną do bazy danych
+		\end{enumerate}
+		Przepływ danych w węźle przy wykonywaniu zapytania typu Select (pobieranie danych z bazy danych):
+		\begin{enumerate}
+			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania $(SELECT_ABC)$ oraz dane do zapytania (np. filtry)
+			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a który przekazuje TaskRequest do Task Monitora ten tworzy 
+				obiekt zadania (StoreTask)
+			\item StoreTask przekazywany jest do wszystkich StoreControllerów
+			\item Store Controller przekazuje do swojego wątku odpowiedzialnego za zapytania zadanie do wykonania. Ten tworzy obiekt QueryRequest do Query Monitora, który
+				wykonuje operację query i zwraca mu QueryResult
+			\item Wątek wykonujący zapytania na podstawie QueryResult wywołuje operację SetResult na zadaniu które może być następnie uznane za wykonane
+			\item Wątek w obiekcie Node odpowiedzialny za zarządzanie ukończonymi zadaniami orzyma takie zadanie z Task Monitora po wykonaniu na nim funkcji PopCompletedTasks
+				i może pobrać resultat z danego zadania oraz wysłać go do Mastera 
+		\end{enumerate}
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Przepływ danych dla węzła}
