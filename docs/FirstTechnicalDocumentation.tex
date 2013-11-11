@@ -178,72 +178,31 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		zadania (przez Mastera) wrzucając dane na odpowiednią kartę lub wykonując zapytanie na danych znajdujących się już na karcie. Takie dane mogą 
 		być agregowane, sortowane oraz filtrowane na sposoby wymienione w "Specyfikacji Technicznej". W tym momencie kożystać będziemy z wydajności 
 		kart graficznych. Węzeł komunikuje się tylko i wyłącznie z Masterem.
-	
 \end{itemize}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\begin{figure}
+\begin{figure}[t]
 	\begin{center}
 		\caption{Ogólna struktura systemu}
  		\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Deployment_Diagram}}
+	\end{center}
+\end{figure}
+\clearpage
+\section{Master}
+Opis mastera
+\section{Node}
+Opis nodea
+\section{Map-Reduce}
+Dużą zaletą systemu będzie implementacja nieco zmodyfikowanego stylu programowania "Map-Reduce": \\
+\begin{figure}[t]
+	\begin{center}
+		\caption{Ogólny schemat Map-Reduce w systemie}
+ 		\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce}}
+	\end{center}
+\end{figure}
+
+\begin{figure}[t]
+	\begin{center}
+		\caption{Schemat działania Map-Reduce w węźle}
+ 		\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce_Node}}
 	\end{center}
 \end{figure}
 
