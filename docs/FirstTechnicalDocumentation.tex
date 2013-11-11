@@ -191,19 +191,32 @@ Opis mastera
 \section{Node}
 Opis nodea
 \section{Map-Reduce}
-Dużą zaletą systemu będzie implementacja nieco zmodyfikowanego stylu programowania "Map-Reduce": \\
-\begin{figure}[t]
-	\begin{center}
-		\caption{Ogólny schemat Map-Reduce w systemie}
- 		\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce}}
-	\end{center}
-\end{figure}
+Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Reduce", jako że jest to rozproszona baza danych.
+\begin{itemize}
+	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych wykonuje operację "Map" tj. filtruje dane pod kątem pewnych 
+		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja "Map" per węzeł dla danego zapytania.
+		Dane uzyskane poprzez wykonanie operacji map są parami klucz-wartość, gdzie kluczem jest id danego zadania, a wartościami wyniki zapytania. Wyniki
+		operacji "Map" z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Ogólny schemat Map-Reduce w systemie}
+ 				\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce}}
+			\end{center}
+		\end{figure}
+	\item Każdy z węzłów poprzez użycie Mappera który korzystając z wiedzy o położeniu danych w pamięci na karcie graficznej przechowywanej w B+ drzewie filtruje dane tworzy
+		pary taskId - record. W ten sposób Mapper wykonuje operację map. Dane te mogą być dodatkowo zagregowane jeszcze na karcie przez Composer'a. Wykonuje on na zmapowanych
+		parach operację Compose - nazywaną przez nas operacją Reduce ponieważ jest ona analogiczna do tej którą ma wykonać na końcu Master. Tutaj mamy zamiar wykorzystać
+		moc obliczeniową kart graficznych. Uzyskane dane z wielu kart graficznych mogą być wstępnie zagregowane już na węźle jeśli pozwala na to rodzaj operacji Reduce - musi być łączna i przemienna.
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Schemat działania Map-Reduce w węźle}
+		 		\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce_Node}}
+			\end{center}
+		\end{figure}
+\end{itemize}
+Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na "zarezerwawanej" dla niego 
+karcie graficznej (jeśli okaże się to korzystne).
 
-\begin{figure}[t]
-	\begin{center}
-		\caption{Schemat działania Map-Reduce w węźle}
- 		\makebox[\textwidth]{\includegraphics[width=0.9\textwidth, height=0.7\textwidth]{MapReduce_Node}}
-	\end{center}
-\end{figure}
+
 
 \end{document}
