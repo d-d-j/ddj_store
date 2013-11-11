@@ -186,10 +186,54 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	\end{center}
 \end{figure}
 \clearpage
+
 \section{Master}
-Opis mastera
+
+	\subsection{Struktura}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Struktura serwera głównego}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Master}}
+			\end{center}
+		\end{figure}
+	\subsection{Przepływ danych}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Przepływ danych dla serwera głównego}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Master}}
+			\end{center}
+		\end{figure}
+
 \section{Node}
-Opis nodea
+	\subsection{Struktura}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Struktura węzła}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Node}}
+			\end{center}
+		\end{figure}
+	\subsection{Przepływ danych}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Przepływ danych dla węzła}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Node}}
+			\end{center}
+		\end{figure}
+	\subsection{System od strony GPU}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Działanie bazy od strony karty graficznej}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Cuda_Store_Structure}}
+			\end{center}
+		\end{figure}
+	\subsection{Strumienie CUDA dla operacji Insert}
+		\begin{figure}[t]
+			\begin{center}
+				\caption{Zarządzanie strumieniami CUDA przy operacji Insert}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Cuda_Upload_Streams}}
+			\end{center}
+		\end{figure}
+
 \section{Map-Reduce}
 Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Reduce", jako że jest to rozproszona baza danych.
 \begin{itemize}
