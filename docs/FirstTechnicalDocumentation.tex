@@ -149,6 +149,97 @@ procesory graficzne. Dane powinny być przechowywane i przetwarzane w pamięci k
 danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 
 \section{Ogólna wizja struktury systemu}
+\begin{itemize}
+	\item System będzie składał się z dwóch podsystemów:
+		\begin{enumerate}
+			\item Systemu serwera głównego zwanego Master
+			\item Systemu działającego na serwerach bazodanowych - węzłach (Nodes)
+		\end{enumerate}
+	\item Komunikacja pomiędzy Masterem a węzłami odbywa się za pomocą tcp/ip po sieci wewnętrznej, gdzie informacje przesyłane są za pomocą 
+		zserializowanych binarnie struktur danych. Klienci komunikują się tylko z Masterem który oferuje im Restowe api. 
+	\item Dla klientów utworzone są serwisy:
+		\begin{enumerate}
+			\item Serwis danych (insertService)
+				\begin{itemize}
+					\item Insert (możliwe rozszerzenie o InsertMany)
+					\item Flush
+				\end{itemize}
+			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w "Specyfikacji Technicznej"
+			\item Serwis statusu (statusService)
+				\begin{itemize}
+					\item GetLastError
+				\end{itemize}
+		\end{enumerate}
+	\item Master zajmuje się odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły. Zarządza oraz monitoruje 
+		węzły sprawdzając ich parametry, np. zajętość miejsca na karcie lub obciążenie. Nadzoruje wykonanie wszystkich zapytań oraz zbiera ich wyniki 
+		wykonując na nich ostatni etap operacji Reduce (agregując wyniki). Gotowa odpowiedź na zapytanie kierowana jest z powrotem do klienta.
+	\item Węzeł loguje się do Mastera jako gotowy do pracy węzeł. Zalogowany węzeł otrzymuje tyle identyfikatorów ile ma odpowiednich dla naszego systemu 
+		(Cuda capability >= 2.0) kart graficznych NVIDIA. Główną rolą każdego węzła jest składowanie danych na kartach graficznych. Wykonują zlecane im 
+		zadania (przez Mastera) wrzucając dane na odpowiednią kartę lub wykonując zapytanie na danych znajdujących się już na karcie. Takie dane mogą 
+		być agregowane, sortowane oraz filtrowane na sposoby wymienione w "Specyfikacji Technicznej". W tym momencie kożystać będziemy z wydajności 
+		kart graficznych. Węzeł komunikuje się tylko i wyłącznie z Masterem.
+	
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \begin{figure}
 	\begin{center}
 		\caption{Ogólna struktura systemu}
