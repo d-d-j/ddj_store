@@ -164,7 +164,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Insert (możliwe rozszerzenie o InsertMany)
 					\item Flush
 				\end{itemize}
-			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w "Specyfikacji Technicznej"
+			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w ''Specyfikacji Technicznej``
 			\item Serwis statusu (statusService)
 				\begin{itemize}
 					\item GetLastError
@@ -188,7 +188,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 \clearpage
 
 \section{Master}
-
+	Program głównego serwera napisany jest w języku programowania The Go Programming Language (http://www.golang.org). 
+	Program korzysta między innymi z takich pakietów jak: ``log4go'' - do logowania, ``gorest'' - wspomagający Restowe API czy ``gcfg'' - do konfiguracji.
 	\subsection{Struktura}
 		\begin{figure}[t]
 			\begin{center}
@@ -205,7 +206,40 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		\end{figure}
 
 \section{Node}
+	Program węzła napisany jest w języku programowania C++ w wersji C++11 z użyciem bibliotek BOOST i LOG4CPLUS. Do obsługi kart 
+	graficznych używane są: Cuda runtime api oraz Thrust. Program pisany jest w oparciu o CUDA toolkit 5.5 wraz z najnowszymi sterownikami. 
+	Program używa kart graficznych o CUDA compute capability $>= 2.0$ i aby program działał niezbędna jest przynajmniej jedna taka karta na węźle.   
 	\subsection{Struktura}
+		Program węzła składa się z wielu współpracujących ze sobą "modułów" którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
+		wiele kart graficznych, które będą używane przez program jeśli spełniają wymagania. Dane będziemy wkładać na karty oraz wykonywać na nich zapytania
+		niezależnie od siebie, tj. na poziomie obsługi karty nie mamy pojęcia o istnieniu innych. Wymyślona struktura programu ma na celu zapewnienie dużej 
+		równoległości wykonywania zadań oraz modułowości komponentów. \\
+		Opis elementów struktury:
+		\begin{itemize}
+			\item Node - "Korzeń" całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
+				Funkcjonalność: 
+				\begin{itemize}
+					\item Odpowiada za uruchomienie i zatrzymianie systemu, w tym tworzy instancję klasy StoreController dla każdej odpowiedniej karty
+						graficznej, którą dany StoreController będzie obsługiwał.
+					\item Przyjmuje zadania przychodzące od Mastera i zleca je odpowiednim StoreControllerom
+					\item W ramach tej klasy działa wątek "zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
+				\end{itemize}
+			\item Store Controller - odpowiada za obsługę jednej karty graficznej o podanym numerze. \\ \\
+				Funkcjonalność: 
+				\begin{itemize}
+					\item Alokuje główną tablicę na dane na karcie graficznej w której przechowywane będą dane
+					\item Wykonuje zadania przydzielone mu przez Node'a
+					\item Zarządza strukturami do wykonywania zadań: wieloma obiektami Store Buffer (jeden dla każdej metryki) oraz obiektem Query Monitor
+				\end{itemize}
+			\item Store Buffer - obsługuje wpływające rekordy z jedną metryką \\ \\
+				Funkcjonalność: 
+				\begin{itemize}
+					\item Buforuje przychodzące dane w specjalnym buforze
+					\item Zamienia bufory jeśli główny się napełnił i zleca załadowanie przechowywanych w buforze danych na GPU
+					\item Składuje informacje o położeniu danych w pamięci GPU w B+ drzewie poprzez obiekt BTreeMonitor
+				\end{itemize}
+
+		\end{itemize}
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Struktura węzła}
@@ -235,12 +269,12 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		\end{figure}
 
 \section{Map-Reduce}
-Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Reduce", jako że jest to rozproszona baza danych.
+Zaletą systemu będzie implementacja uproszczonego stylu programowania ``Map-Reduce'', jako że jest to rozproszona baza danych.
 \begin{itemize}
-	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych wykonuje operację "Map" tj. filtruje dane pod kątem pewnych 
-		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja "Map" per węzeł dla danego zapytania.
+	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych wykonuje operację Map tj. filtruje dane pod kątem pewnych 
+		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja Map per węzeł dla danego zapytania.
 		Dane uzyskane poprzez wykonanie operacji map są parami klucz-wartość, gdzie kluczem jest id danego zadania, a wartościami wyniki zapytania. Wyniki
-		operacji "Map" z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
+		operacji Map z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Ogólny schemat Map-Reduce w systemie}
@@ -258,9 +292,13 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Red
 			\end{center}
 		\end{figure}
 \end{itemize}
-Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na "zarezerwawanej" dla niego 
+Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na ``zarezerwawanej'' dla niego 
 karcie graficznej (jeśli okaże się to korzystne).
 
+\section{Pierwszy prototyp programu}
+	\subsection{Opis funkcjonalności}
+	\subsection{Przeprowadzone testy}
 
+\section{Przyszłość}
 
 \end{document}
