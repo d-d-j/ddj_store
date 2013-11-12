@@ -11,9 +11,8 @@
 namespace ddj {
 namespace store {
 
-	void GpuUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, int streamNum)
+	void GpuUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream)
 	{
-		cudaStream_t st = this->_cudaController->GetUploadStream(streamNum);
 		CUDA_CHECK_RETURN
 		(
 				cudaMemcpyAsync
@@ -22,13 +21,14 @@ namespace store {
 						(void*)hostPointer,
 						(size_t) numElements * sizeof(storeElement),
 						cudaMemcpyHostToDevice,
-						st
+						stream
 				)
 		);
 	}
 
 	void GpuUploadCore::AppendToMainStore(void* devicePointer, size_t size, infoElement* info)
 	{
+		cudaStream_t stream = this->_cudaController->GetSyncStream();
 		info->startValue = this->_cudaController->GetMainMemoryOffset();
 		CUDA_CHECK_RETURN
 				(
@@ -38,17 +38,30 @@ namespace store {
 								devicePointer,
 								size,
 								cudaMemcpyDeviceToDevice,
-								this->_cudaController->GetUploadStream(0)
+								stream
 						)
 				);
 		info->endValue = info->startValue + size;
 		this->_cudaController->SetMainMemoryOffset(info->endValue);
+		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
 	}
 
-	size_t GpuUploadCore::CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, int streamNum, void** result)
+	size_t GpuUploadCore::CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream)
 	{
-		*result = deviceBufferPointer;
-		return elemToUploadCount * sizeof(storeElement);
+		size_t size = sizeof(storeElement)*elemToUploadCount;
+		CUDA_CHECK_RETURN( cudaMalloc(result, size) );
+		CUDA_CHECK_RETURN
+						(
+								cudaMemcpyAsync
+								(
+										*result,
+										deviceBufferPointer,
+										size,
+										cudaMemcpyDeviceToDevice,
+										stream
+								)
+						);
+		return size;
 	}
 
 	GpuUploadCore::GpuUploadCore(CudaController* cudaController)

@@ -26,8 +26,8 @@ namespace store
 		GpuUploadCore(CudaController* cudaController);
 		virtual ~GpuUploadCore();
 
-		void CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, int streamNum);
-		size_t CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, int streamNum, void** result);
+		void CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream);
+		size_t CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream);
 		void AppendToMainStore(void* devicePointer, size_t size, infoElement* info);
 	};
 

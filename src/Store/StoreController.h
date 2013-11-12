@@ -54,7 +54,8 @@ class StoreController
 
     	/* TASKS */
         boost::unordered_map<int, taskFunc> _taskFunctions;
-        boost::threadpool::fifo_pool _taskThreadPool;
+        boost::threadpool::fifo_pool _queryTaskThreadPool;
+        boost::threadpool::fifo_pool _insertTaskThreadPool;
 
 		/* LOGGER */
 		Logger _logger = Logger::getRoot();

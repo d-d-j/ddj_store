@@ -3,26 +3,38 @@
 namespace ddj {
 namespace store {
 
-	CudaController::CudaController(int uploadStreamsNum, int queryStreamsNum)
+	CudaController::CudaController(int uploadStreamsCount, int queryStreamsCount)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [BEGIN]"));
 
-		this->_numUploadStreams = uploadStreamsNum;
-		this->_numQueryStreams = queryStreamsNum;
-		_uploadStreams = new cudaStream_t[this->_numUploadStreams];
-		_queryStreams = new cudaStream_t[this->_numQueryStreams];
+		this->_uploadStreamsSemaphore = new Semaphore(queryStreamsCount);
+		this->_queryStreamsSemaphore = new Semaphore(uploadStreamsCount);
+		this->_uploadStreams = new boost::lockfree::queue<cudaStream_t>(uploadStreamsCount);
+		this->_queryStreams = new boost::lockfree::queue<cudaStream_t>(queryStreamsCount);
 
-		for(int k=0; k<this->_numUploadStreams; k++)
-			cudaStreamCreate(&(_uploadStreams[k]));
+		int i;
+		cudaStream_t stream;
 
-		for(int l=0; l<this->_numQueryStreams; l++)
-					cudaStreamCreate(&(_queryStreams[l]));
+		CUDA_CHECK_RETURN( cudaStreamCreate(&stream) );
+		this->_syncStream = stream;
+
+		for(i = 0; i < uploadStreamsCount; i++)
+		{
+			CUDA_CHECK_RETURN( cudaStreamCreate(&stream) );
+			this->_uploadStreams->push(stream);
+		}
+
+		for(i=0; i < queryStreamsCount; i++)
+		{
+			CUDA_CHECK_RETURN( cudaStreamCreate(&stream) );
+			this->_queryStreams->push(stream);
+		}
 
 		this->_mainMemoryOffset = 0;
 		this->_mainMemoryPointer = NULL;
 
 		// ALLOCATE MAIN STORAGE ON GPU
-		int i = 1;
+		i = 1;
 		while(gpuAllocateMainArray(MAIN_STORE_SIZE / i, &(this->_mainMemoryPointer)) != cudaSuccess)
 			if(i <= GPU_MEMORY_ALLOC_ATTEMPTS) i++;
 			else throw std::runtime_error("Cannot allocate main GPU memory in storeController");
@@ -34,21 +46,60 @@ namespace store {
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [BEGIN]"));
 
+		cudaStream_t stream;
+
 		// RELEASE UPLOAD STREAMS
-		for(int i = 0; i < this->_numUploadStreams; i++)
-			cudaStreamDestroy(this->_uploadStreams[i]);
-		delete [] this->_uploadStreams;
+		while(this->_uploadStreams->pop(stream))
+			CUDA_CHECK_RETURN( cudaStreamDestroy(stream) );
+		delete this->_uploadStreams;
 
 		// RELEASE QUERY STREAMS
-		for(int i = 0; i < this->_numQueryStreams; i++)
-				cudaStreamDestroy(this->_queryStreams[i]);
-			delete [] this->_queryStreams;
+		while(this->_queryStreams->pop(stream))
+			CUDA_CHECK_RETURN( cudaStreamDestroy(stream) );
+		delete this->_queryStreams;
 
 		// RELEASE MAIN GPU STORE MEMORY
 		gpuFreeMemory(this->_mainMemoryPointer);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [END]"));
 	}
+
+	/* STREAMS */
+
+	cudaStream_t CudaController::GetSyncStream()
+	{
+		return this->_syncStream;
+	}
+
+	cudaStream_t CudaController::GetUploadStream()
+	{
+		this->_uploadStreamsSemaphore->Wait();
+		cudaStream_t stream;
+		this->_uploadStreams->pop(stream);
+		return stream;
+	}
+
+	cudaStream_t CudaController::GetQueryStream()
+	{
+		this->_queryStreamsSemaphore->Wait();
+		cudaStream_t stream;
+		this->_queryStreams->pop(stream);
+		return stream;
+	}
+
+	void CudaController::ReleaseUploadStream(cudaStream_t stream)
+	{
+		this->_uploadStreams->push(stream);
+		this->_uploadStreamsSemaphore->Release();
+	}
+
+	void CudaController::ReleaseQueryStream(cudaStream_t stream)
+	{
+		this->_queryStreams->push(stream);
+		this->_queryStreamsSemaphore->Release();
+	}
+
+	/* MAIN MEMORY */
 
 	ullint CudaController::GetMainMemoryOffset()
 	{
@@ -61,16 +112,6 @@ namespace store {
 		boost::mutex::scoped_lock lock(_offsetMutex);
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Setting main memory offset to: %llu", offset);
 		this->_mainMemoryOffset = offset;
-	}
-
-	cudaStream_t CudaController::GetUploadStream(int num)
-	{
-		return this->_uploadStreams[num];
-	}
-
-	cudaStream_t CudaController::GetQueryStream(int num)
-	{
-		return this->_queryStreams[num];
 	}
 
 	void* CudaController::GetMainMemoryPointer()

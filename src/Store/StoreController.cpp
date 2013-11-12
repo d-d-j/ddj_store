@@ -41,6 +41,10 @@ namespace store {
 		// CREATE QUERY MONITOR
 		this->_queryMonitor = new QueryMonitor(this->_cudaController);
 
+		// SET THREAD POOL SIZES
+		this->_queryTaskThreadPool.size_controller().resize(QUERY_THRED_POOL_SIZE);
+		this->_insertTaskThreadPool.size_controller().resize(INSERT_THRED_POOL_SIZE);
+
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
 
@@ -57,8 +61,14 @@ namespace store {
 
 	void StoreController::ExecuteTask(StoreTask_Pointer task)
 	{
-		// Fire a function from _TaskFunctions with this taskId
-		this->_taskFunctions[task->GetType()](task);
+		// Sechedule a function from _TaskFunctions with this taskId
+		TaskType type = task->GetType();
+		if(type == Insert)
+		{
+			this->_insertTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
+		} else {
+			this->_queryTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
+		}
 	}
 
 	void StoreController::populateTaskFunctions()
@@ -92,12 +102,14 @@ namespace store {
 		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
 
 		// Create buffer with element's metric if not exists
-		if(!this->_buffers->count(element->tag))
 		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
-			this->_buffers->insert({element->tag, newBuf});
+			boost::mutex::scoped_lock lock(this->_buffersMutex);
+			if(!this->_buffers->count(element->tag))
+			{
+				StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
+				this->_buffers->insert({element->tag, newBuf});
+			}
 		}
-
 		(*_buffers)[element->tag]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed

@@ -17,13 +17,12 @@ namespace ddj {
 
 	Semaphore::~Semaphore(){}
 
-	int Semaphore::Wait()
+	void Semaphore::Wait()
 	{
 		boost::mutex::scoped_lock lock(_mutex);
 		if(_value >= _max)
 			_cond.wait(lock);
 		_value++;
-		return _value;
 	}
 
 	void Semaphore::Release()

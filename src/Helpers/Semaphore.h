@@ -22,7 +22,7 @@ namespace ddj {
 		Semaphore(unsigned int max);
 		virtual ~Semaphore();
 
-		int Wait();
+		void Wait();
 		void Release();
 	};
 

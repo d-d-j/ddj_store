@@ -11,16 +11,23 @@
 #include "GpuStore.cuh"
 #include "../Store/StoreIncludes.h"
 #include "../Helpers/Logger.h"
+#include <boost/lockfree/queue.hpp>
+#include "cudaIncludes.h"
+#include "../Helpers/Semaphore.h"
 
 namespace ddj {
 namespace store {
 
 	class CudaController : public boost::noncopyable
 	{
-		cudaStream_t* _uploadStreams;
-		int _numUploadStreams;
-		cudaStream_t* _queryStreams;
-		int _numQueryStreams;
+		/* STREAMS */
+		Semaphore* _uploadStreamsSemaphore;
+		Semaphore* _queryStreamsSemaphore;
+		boost::lockfree::queue<cudaStream_t>* _uploadStreams;
+		boost::lockfree::queue<cudaStream_t>* _queryStreams;
+		cudaStream_t _syncStream;
+
+		/* MAIN STORE MEMORY (on GPU) */
 		ullint _mainMemoryOffset;
 		boost::mutex _offsetMutex;
 		void* _mainMemoryPointer;
@@ -31,8 +38,14 @@ namespace store {
 		CudaController(int uploadStreamsNum, int queryStreamsNum);
 		virtual ~CudaController();
 
-		cudaStream_t GetUploadStream(int num);
-		cudaStream_t GetQueryStream(int num);
+		/* STREAMS */
+		cudaStream_t GetUploadStream();
+		cudaStream_t GetQueryStream();
+		void ReleaseUploadStream(cudaStream_t st);
+		void ReleaseQueryStream(cudaStream_t st);
+		cudaStream_t GetSyncStream();
+
+		/* MAIN STORE MEMORY (on GPU) */
 		ullint GetMainMemoryOffset();
 		void SetMainMemoryOffset(ullint offset);
 		void* GetMainMemoryPointer();

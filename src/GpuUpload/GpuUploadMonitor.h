@@ -23,8 +23,8 @@ namespace store {
 	{
 		private:
 			GpuUploadCore* _core;
-			Semaphore* _sem;
-			boost::array<storeElement*, DEVICE_BUFFERS_COUNT> _deviceBufferPointers;
+			CudaController* _cudaController;
+			boost::mutex _mutex;
 
 			/* LOGGER */
 			Logger _logger = Logger::getRoot();
