@@ -4,8 +4,12 @@
 		sudo apt-get install libstdc++6-4.6-dev libboost-all-dev
 3. Download log4cplus-1.1.2 from SourceForge and follow instructions in INSTALL file
 4. export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-5. build application with `make all`
-6. Run program
+
+5. Download boost threadpool from https://github.com/AlexMarlo/boost-threadpool/blob/master/boost/threadpool/task_adaptors.hpp
+6. copy /boost/threadpool to your boost includes path
+
+7. build application with `make all`
+8. Run program
 
 
 ### Common Problems

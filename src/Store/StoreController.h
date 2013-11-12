@@ -28,6 +28,8 @@
 #include "../Store/storeSettings.h"
 #include "../Query/QueryMonitor.h"
 #include "../Helpers/Logger.h"
+#include "../Query/QueryRequest.h"
+#include <boost/threadpool.hpp>
 
 namespace ddj {
 namespace store {
@@ -41,16 +43,21 @@ class StoreController
 
     /* FIELDS */
     private:
-		/* LOGGER */
-		Logger _logger = Logger::getRoot();
-
     	int _gpuDeviceId;
     	GpuUploadMonitor* _gpuUploadMonitor;
     	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
 
+    	/* BUFFERS */
     	Buffers_Map* _buffers;
+    	boost::mutex _buffersMutex;
+
+    	/* TASKS */
         boost::unordered_map<int, taskFunc> _taskFunctions;
+        boost::threadpool::fifo_pool _taskThreadPool;
+
+		/* LOGGER */
+		Logger _logger = Logger::getRoot();
 
 	/* METHODS */
     public:
@@ -65,6 +72,7 @@ class StoreController
         void insertTask(StoreTask_Pointer task);
         void selectAllTask(StoreTask_Pointer task);
         void flushTask(StoreTask_Pointer task);
+
 };
 
 } /* end namespace store */

@@ -97,6 +97,7 @@ namespace store {
 			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
 		}
+
 		(*_buffers)[element->tag]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
