@@ -33,7 +33,7 @@ namespace store {
 		this->populateTaskFunctions();
 
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
-		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
+		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"));
 
 		// CREATE GPU UPLOAD MONITOR
 		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);

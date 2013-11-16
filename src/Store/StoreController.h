@@ -46,6 +46,8 @@ class StoreController
 		/* LOGGER */
 		Logger _logger = Logger::getRoot();
 
+		Config* _config = Config::GetInstance();
+
     	int _gpuDeviceId;
     	GpuUploadMonitor* _gpuUploadMonitor;
     	QueryMonitor* _queryMonitor;
