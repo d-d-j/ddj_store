@@ -21,12 +21,12 @@ namespace store {
 		this->_mainMemoryOffset = 0;
 		this->_mainMemoryPointer = NULL;
 
-		Config* config = Config::GetInstance();
+
 
 		// ALLOCATE MAIN STORAGE ON GPU
 		int i = 1;
-		while(gpuAllocateMainArray(config->GetIntValue("MAIN_STORE_SIZE") / i, &(this->_mainMemoryPointer)) != cudaSuccess)
-			if(i <= config->GetIntValue("GPU_MEMORY_ALLOC_ATTEMPTS")) i++;
+		while(gpuAllocateMainArray(_config->GetIntValue("MAIN_STORE_SIZE") / i, &(this->_mainMemoryPointer)) != cudaSuccess)
+			if(i <= _config->GetIntValue("GPU_MEMORY_ALLOC_ATTEMPTS")) i++;
 			else throw std::runtime_error("Cannot allocate main GPU memory in storeController");
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [END]"));

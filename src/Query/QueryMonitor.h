@@ -21,6 +21,8 @@ class QueryMonitor
 {
 	QueryCore* _core;
 	Semaphore* _sem;
+
+	Config* _config = Config::GetInstance();
 public:
 	QueryMonitor(CudaController* cudaController);
 	virtual ~QueryMonitor();

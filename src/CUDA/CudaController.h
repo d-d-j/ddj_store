@@ -29,6 +29,8 @@ namespace store {
 
 		/* LOGGER */
 		Logger _logger = Logger::getRoot();
+
+		Config* _config = Config::GetInstance();
 	public:
 		CudaController(int uploadStreamsNum, int queryStreamsNum);
 		virtual ~CudaController();
