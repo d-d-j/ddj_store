@@ -24,7 +24,7 @@ int Config::GetIntValue(string settingName)
 	{
 		return _configMap[settingName].as<int>();
 	}
-	h_LogThreadError("value for the setting not found");
+//	h_LogThreadError("value for the setting not found");
 	return -1;
 }
 
@@ -62,7 +62,7 @@ Config::Config()
 		{
 			string msg = "can not open config file: ";
 			msg.append(config_file);
-			h_LogThreadError(msg.c_str());
+//			h_LogThreadError(msg.c_str());
 			return;
 		}
 		else
@@ -71,11 +71,11 @@ Config::Config()
 			notify(_configMap);
 		}
 
-		h_LogThreadDebug("Finished loading settings from file");
+//		h_LogThreadDebug("Finished loading settings from file");
 
 	} catch (exception& e)
 	{
-		h_LogThreadError(e.what());
+//		h_LogThreadError(e.what());
 		return;
 	}
 	return;

@@ -13,22 +13,17 @@ TaskResult::TaskResult
 				(
 					int taskId,
 					TaskType type,
-					bool isSuccessfull,
-					char* message,
 					void* resultData,
 					int resultSize
 				):
 			task_id(taskId),
 			type(type),
-			result_data(resultData),
 			result_size(resultSize),
-			is_successfull(isSuccessfull),
-			message(message) {}
+			result_data(resultData){}
 
 TaskResult::~TaskResult()
 {
-	free(this->message);
-	free(this->result_data);
+
 }
 
 } /* namespace ddj */

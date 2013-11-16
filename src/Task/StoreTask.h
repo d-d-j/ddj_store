@@ -43,7 +43,7 @@ public:
 
 	void SetResult(
 			bool isSuccessfull,
-			char* message = nullptr,
+			const char* message = nullptr,
 			void* resultData = nullptr,
 			int resultSize = 0);
 

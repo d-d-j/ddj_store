@@ -15,6 +15,8 @@
 #include "Task/TaskRequest.h"
 #include "Task/TaskResult.h"
 #include "Store/StoreController.h"
+#include "Store/storeElement.h"
+#include "Helpers/Logger.h"
 
 namespace ddj
 {
@@ -23,6 +25,9 @@ namespace ddj
 	private:
 		/* TYPEFEFS */
 		typedef boost::shared_ptr<store::StoreController> StoreController_Pointer;
+
+		/* LOGGER */
+		Logger _logger = Logger::getRoot();
 
         /* NETWORK */
         Client* _client;

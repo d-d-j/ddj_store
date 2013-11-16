@@ -17,16 +17,13 @@ QueryCore::QueryCore(CudaController* cudaController)
 
 QueryCore::~QueryCore(){}
 
-void* QueryCore::GetAllData(size_t &size)
+size_t QueryCore::SelectAll(void** queryResult)
 {
-	if(size==0) return NULL;
 	void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
 	ullint offset = this->_cudaController->GetMainMemoryOffset();
-	void* hostData;
-	CUDA_CHECK_RETURN( cudaMallocHost(&hostData,offset) );
-	CUDA_CHECK_RETURN( cudaMemcpy(hostData, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
-	size = offset;
-	return hostData;
+	CUDA_CHECK_RETURN( cudaMallocHost(queryResult, offset) );
+	CUDA_CHECK_RETURN( cudaMemcpy(*queryResult, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
+	return offset;
 }
 
 } /* namespace store */

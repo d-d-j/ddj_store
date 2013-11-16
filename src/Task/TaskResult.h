@@ -18,22 +18,31 @@ namespace ddj {
 	public:
 		int task_id;
 		TaskType type;
-		void* result_data;
 		int result_size;
-		bool is_successfull;
-		char* message;
+		void* result_data;
 
 		TaskResult(
 				int taskId,
 				TaskType type,
-				bool isSuccessfull,
-				char* message = nullptr,
 				void* resultData = nullptr,
 				int resultSize = 0);
 
-		TaskResult(const TaskResult & result);
+		TaskResult(const TaskResult & result)
+		{
+			task_id = result.task_id;
+			type = result.type;
+			result_size = result.result_size;
+			result_data = result.result_data;
+		}
 
 		virtual ~TaskResult();
+
+		std::string toString()
+		{
+			 std::ostringstream stream;
+		     stream << "["<<task_id<<", "<<type<<", "<<result_size<<"]";
+		     return  stream.str();
+		}
 	};
 
 } /* namespace ddj */

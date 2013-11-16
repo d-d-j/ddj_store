@@ -11,6 +11,8 @@
 #include "GpuStore.cuh"
 #include "../Store/StoreIncludes.h"
 #include "../Helpers/Config.h"
+#include "../Helpers/Logger.h"
+
 
 namespace ddj {
 namespace store {
@@ -24,6 +26,9 @@ namespace store {
 		ullint _mainMemoryOffset;
 		boost::mutex _offsetMutex;
 		void* _mainMemoryPointer;
+
+		/* LOGGER */
+		Logger _logger = Logger::getRoot();
 	public:
 		CudaController(int uploadStreamsNum, int queryStreamsNum);
 		virtual ~CudaController();

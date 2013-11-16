@@ -22,12 +22,12 @@ QueryMonitor::~QueryMonitor()
 	delete this->_core;
 }
 
-storeElement* QueryMonitor::GetEverything(size_t& size)
+size_t QueryMonitor::SelectAll(storeElement** queryResult)
 {
 	this->_sem->Wait();
-	storeElement* result = (storeElement*)this->_core->GetAllData(size);
+	size_t size = this->_core->SelectAll((void**)queryResult);
 	this->_sem->Release();
-	return result;
+	return size;
 }
 
 } /* namespace store */

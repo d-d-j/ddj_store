@@ -41,14 +41,6 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/container/container_fwd.hpp>
 
-/* PANTHEIOS */
-#include <pantheios/pantheios.hpp>
-#include <pantheios/frontends/stock.h>
-#include <pantheios/inserters/args.hpp>
-#include <pantheios/backend.h>
-#include <pantheios/inserters/threadid.hpp>
-#include <pantheios/inserters/integer.hpp>
-
 /* OTHER */
 #include "../BTree/btree.h"
 #include "storeTypedefs.h"

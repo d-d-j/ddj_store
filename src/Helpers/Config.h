@@ -15,7 +15,6 @@
 #include <boost/program_options.hpp>
 
 #include "../Store/StoreIncludes.h"
-#include "../Store/LoggerHelper.h"
 namespace po = boost::program_options;
 
 using namespace std;

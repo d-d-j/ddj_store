@@ -20,20 +20,28 @@
 #include "Store/storeElement.h"
 #include "Network/Client.h"
 #include <cstdint>
+#include "Helpers/Logger.h"
 
 #include "Helpers/Config.h"
 
 using namespace ddj::store;
 
-const PAN_CHAR_T PANTHEIOS_FE_PROCESS_IDENTITY[] = "DDJ_Store";
+void InitializeLogger()
+{
+    log4cplus::initialize();
+    LogLog::getLogLog()->setInternalDebugging(true);
+	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
+}
 
 
 int main(int ac, char* av[])
 {
 	Config::GetInstance();
 
-	pantheios::init();
-	pantheios::log_INFORMATIONAL("Main function started! ", "[Thread id = ", boost::lexical_cast<std::string>(boost::this_thread::get_id()), "]");
+	InitializeLogger();
+	Logger logger = Logger::getRoot();
+
+	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
 
 	ddj::Node n;
 
