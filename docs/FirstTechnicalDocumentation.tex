@@ -449,20 +449,28 @@ Zaletą systemu będzie implementacja uproszczonego modelu programowania Map-Red
 Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na zarezerwowanej dla niego karcie graficznej (jeśli okaże się to korzystne).
 
 \section{Pierwszy prototyp programu}
-	\subsection{Opis funkcjonalności}
+%	\subsection{Opis funkcjonalności}
+
 	\subsection{Przeprowadzone testy}
 	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu JMeter. Jako że do tej pory aplikacja była uruchamiana jedynie w ramach jednej maszyny (komunikacja node-master po localhost), z użyciem jednej karty graficznej testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu, a także pomóc nam zaznajomić się z narzędziem JMeter, którego użycie będzie ważnym składnikiem badania wydajności na kolejnych etapach wykonania pracy.
 	
 	\subsubsection{Test badający wydajność samego Mastera}
 	Pierwszy przeprowadzony test realizował zapytania OPTIONS do serwera - bez podłączonego węzła po to, by sprawdzić jakie obciążenie będzie w stanie wytrzymać. W kolejnych przebiegach uruchamiano $1, 10,	20,	50,	100, 150, 250, 400, 500, 700$ wątków, z których każdy starał się wysłać 1000 zapytań. 
-	\begin{figure}
+
+	\begin{figure}[ht!]
 	\centering
 	\caption{Test wytrzymałości serwera}
-		\includegraphics[width=0.5\textwidth]{img/TestsMasterOptions.png}
+		\includegraphics[width=0.5\textwidth]{img/TestMasterOptions.png}
 	\end{figure}
 	
-		\subsubsection{Test badający wydajność samego Mastera}
-	Pierwszy przeprowadzony test realizował zapytania OPTIONS do serwera - bez podłączonego węzła po to, by sprawdzić jakie obciążenie będzie w stanie wytrzymać. W kolejnych przebiegach uruchamiano $1, 10,	20,	50,	100, 150, 250, 400, 500, 700$ wątków, z których każdy starał się wysłać 1000 zapytań. 
+		\subsubsection{Test wydajności umieszczania danych na karcie}
+	Kolejna próba miała na celu sprawdzenie szybkości obsługiwania zapytań dodania rekordu do bazy danych. Przeprowadzono podobne testy jak w punkcie poprzednim, tym razem z podłączonym węzłem wysyłając zapytania POST. 
+		\begin{figure}[ht!]
+	\centering
+	\caption{Test szybkości dodawania rekordów}
+		\includegraphics[width=0.5\textwidth]{img/TestSimpleInserts.png}
+	\end{figure}
+
 	
  
 
