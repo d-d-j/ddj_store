@@ -156,7 +156,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 			\item Systemu działającego na serwerach bazodanowych - węzłach (Nodes)
 		\end{enumerate}
 	\item Komunikacja pomiędzy Masterem a węzłami odbywa się za pomocą TCP/IP po sieci wewnętrznej, gdzie informacje przesyłane są pod postacią
-		serializowanych binarnie struktur danych. Klienci komunikują się tylko z Masterem który wystawia im RESTowe API. 
+		serializowanych binarnie struktur danych. Klienci komunikują się tylko z Masterem, który wystawia im RESTowe API. 
 	\item Dla klientów utworzone są serwisy:
 		\begin{enumerate}
 			\item Serwis danych (insertService)
@@ -164,7 +164,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Insert (możliwe rozszerzenie o InsertMultiple)
 					\item Flush
 				\end{itemize}
-			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w "Specyfikacji Technicznej"
+			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w ,,Specyfikacji Technicznej''
 			\item Serwis statusu (statusService)
 				\begin{itemize}
 					\item GetLastError
@@ -175,7 +175,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		wykonując na nich ostatni etap operacji Reduce (agregując wyniki). Gotowa odpowiedź na zapytanie kierowana jest z powrotem do klienta.
 	\item Węzeł loguje się do Mastera jako gotowy do pracy. Zalogowany węzeł otrzymuje tyle identyfikatorów ile ma odpowiednich dla naszego systemu 
 		(Compute Capability $\geq$ 2.0) kart graficznych NVIDIA. Główną rolą każdego węzła jest składowanie danych na kartach graficznych. Wykonują zlecane im przez Mastera
-		zadania wrzucając dane na odpowiednią kartę lub wykonując zapytanie na danych znajdujących się już na karcie. Dane będą agregowane, sortowane oraz filtrowane na sposoby wymienione w "Specyfikacji Technicznej" tak, aby wykorzystać wydajność kart graficznych. Węzeł będzie komunikował się tylko i wyłącznie z Masterem.
+		zadania wrzucając dane na odpowiednią kartę lub wykonując zapytanie na danych znajdujących się już na karcie. Dane będą agregowane, sortowane oraz filtrowane na sposoby wymienione w ,,Specyfikacji Technicznej'' tak, aby wykorzystać wydajność kart graficznych. Węzeł będzie komunikował się tylko i wyłącznie z Masterem.
 \end{itemize}
 \begin{figure}[t]
 	\begin{center}
@@ -197,10 +197,10 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	
 	\subsection{Struktura}
 		W obecnej implemntacji skupiono się na poprawnej implementacji komunikacji pomiędzy Masterem a jednym Nodem.
-		Obiekty przesyłane przez sieć są serializowane binarnie i poprzedzane 12 bitowym nagłówkiem który zawiera informacje
+		Obiekty przesyłane przez sieć są serializowane binarnie i poprzedzane 12 bitowym nagłówkiem, który zawiera informacje
 		o typie i rozmiarze zadania. Kod programu podzielono na następujące pakiety
 		\begin{description}
-			\item[dto] Zbiór wszystkich obiektów które są przsyłanie pomiędzy poszczególnymi elementami systemu
+			\item[dto] Zbiór wszystkich obiektów, które są przsyłanie pomiędzy poszczególnymi elementami systemu
 			\item[rest] Definicja i implementacja elementów zewnętrznego API
 			\item[node] Kod odpowiedzialny za komunikację z Nodem oraz funkcja \texttt{IOHandler}
 			\item[config] Metody odpowiedzialne za ładowanie konfiguracji do globalnej struktury
@@ -211,15 +211,15 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	\subsection{Obecny Przepływ danych}
 		Przetwarzanie zapytania RESTowego wysłanego od klienta:
 		\begin{enumerate}
-			\item Serwer wystawiający RESTowe API otrzymuje zapytanie select lub insert które kieruje jako request to IOHandlera
-			\item Towrzony jest nowe zapytanie (Query) które jest przesyłane do Noda
+			\item Serwer wystawiający RESTowe API otrzymuje zapytanie select lub insert, które kieruje jako request to IOHandlera
+			\item Towrzony jest nowe zapytanie (Query), które jest przesyłane do Noda
 			\item Przed wysłaniem do Noda identyfikator zapytania jeśli jest to select zostaje zapisany w słowniku wraz z kanałem 
 			wynikowym na kótrym słucha API
 			\item NodeSender wysyła zapytania do opdowiadającego mu Noda
 		\end{enumerate}
 		Przetwarzanie rezultatu zapytania odebranego od węzła:
 		\begin{enumerate}
-			\item NodeReciviewr odbiera obiekt TaskResponse który kieruje do IOHandlera
+			\item NodeReciviewr odbiera obiekt TaskResponse, który kieruje do IOHandlera
 			\item IOHandler sprawdza identyfikator zadania i przesyła jego wynik do czekającego na odpowiedź API
 			\item API przesyła wynik do klienta
 		\end{enumerate}
@@ -249,7 +249,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
 			\item Worker odbiera Taska (jest to insert) 
 			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
-			\item Worker pobiera z NodeBalancera do którego Noda ma go wysłać. 
+			\item Worker pobiera z NodeBalancera do, którego Noda ma go wysłać. 
 			\item Następnie serializuje Taska i wysyła. 
 			\item Nie czeka na odpowiedź tylko od razu wysyła na kanał zwrotny że zadanie zostało przesłane do Noda
 		\end{enumerate}
@@ -260,52 +260,51 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 			\item Worker odbiera Taska (jest to select) 		
 			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
 			\item Worker pobiera z NodeBalancera listę nodów
-			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID które czeka na liczbę odpowiedzi rółną liczbie aktywnych nodów
-			oraz kanał zwrotny na którym czeka na wyniki. 
+			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID, które czeka na liczbę odpowiedzi rółną liczbie aktywnych nodów
+			oraz kanał zwrotny, na którym czeka na wyniki. 
 			\item Worker zleca wysłanie zadania do nodów z listy
 			\item Każdy Node obiera zadanie i procesuje je
 			\item Każdy Node zwraca wynik opakowany w header z ID jest to odebrane przez NodeReciviera 
 			\item NodeRecivier deserializuje wiadomość 
-			\item NodeRecivier odczytuje z TaskManagera do którego Workera przesłać otrzymany wynik
-			\item W trakcie tego sprawdzania zminiejszamy liczbę odpowiedzi na które czeka dane zadanie
+			\item NodeRecivier odczytuje z TaskManagera, do którego Workera przesłać otrzymany wynik
+			\item W trakcie tego sprawdzania zminiejszamy liczbę odpowiedzi, na które czeka dane zadanie
 			\item Worker odebrał już wyniki od wszystkich nodów 
 			\item Worker wykonuje redukcję otrzymanych wyników
-			\item Worker wysyła zredukowany wynik na kanał który dostał razem z zadaniem
+			\item Worker wysyła zredukowany wynik na kanał, który dostał razem z zadaniem
 			\item Na tym kanale słucha API i zwraca wynik działania do klienta
 		\end{enumerate}
 	\subsubsection{Komponenty}
 		\begin{description}
-		    \item[NodeBalancer] struktura która zarządza do którego z Nodów przesłać dany Insert oraz przechowująca listę wszystkich Nodów.
-		    Powinna ona umożliwiać odświerzanie infrormacji o nodach które będą przychodzić razem z cyklicznymi statusami i na tej podstawie
-		    wybierać kolejnego Noda do którego zostaną wysłane dane. 
-		    \item[WorkerPool] pula Workerów któ¶e obsługują pojedyncze zapytanie. Każdy worker słucha na buforowanym kanale kolejnych zadań i 
+		    \item[NodeBalancer] struktura, która zarządza, do którego z Nodów przesłać dany Insert oraz przechowująca listę wszystkich Nodów.
+		    Powinna ona umożliwiać odświerzanie infrormacji o nodach, które będą przychodzić razem z cyklicznymi statusami i na tej podstawie
+		    wybierać kolejnego Noda, do którego zostaną wysłane dane. 
+		    \item[WorkerPool] pula Workerów, które obsługują pojedyncze zapytanie. Każdy worker słucha na buforowanym kanale kolejnych zadań i 
 		    procesuje je od początku aż do zwrócenia wyniku. Z uwagi na to że stan workerów może się bardzo szybko zmieniać jak i też ż racji tego
 		    że będzie i duża liczba nie może być to kolejka priorytetowa odświeżana co ukończone zapytanie. Najelpiej gdy będdzie to lista cyklicza
 		    i zadania będą przydzielane kolejnym workerom z listy. Liczba workerół i rozmiar buforowanego kanału zostaną dobrane w sposób eksperymentalny
-		    \item[TaskManager] słownik wszystkich trwających zadań w którym kluczem jest identyfikator a wartością ilość oczekiwanych odpowiedzi 
+		    \item[TaskManager] słownik wszystkich trwających zadań, w którym kluczem jest identyfikator a wartością ilość oczekiwanych odpowiedzi 
 		    oraz kanał obsługującego  Workera.
 		\end{description}					
 
 \section{Node}
 	Program węzła napisany jest w języku programowania C++ w wersji C++11 z użyciem bibliotek BOOST i LOG4CPLUS. Do obsługi kart 
-	graficznych używane są: Cuda runtime API oraz biblioteka Thrust. Program pisany jest w oparciu o CUDA Toolkit 5.5 wraz z najnowszymi sterownikami. 
+	graficznych używane są: CUDA runtime API oraz biblioteka Thrust. Program pisany jest w oparciu o CUDA Toolkit 5.5 wraz z najnowszymi sterownikami. 
 	Program używa kart graficznych o CUDA compute capability $\geq 2.0$. Do działania systemu niezbędna jest przynajmniej jedna taka karta na każdym węźle.   
 
 	\subsection{Struktura}
-		Program węzła składa się z wielu współpracujących ze sobą "modułów", którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
+		Program węzła składa się z wielu współpracujących ze sobą ,,modułów'', którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
 		wiele kart graficznych, które będą używane przez program jeśli spełniają wymagania. Dane będziemy wkładać na karty oraz wykonywać na nich zapytania
 		niezależnie od siebie, tj. na poziomie obsługi karty nie mamy pojęcia o istnieniu innych. Architektura systemu ma na celu zapewnienie dużej 
 		równoległości wykonywania zadań oraz modularności komponentów. \\
 		Opis wybranych elementów struktury:
 		\begin{itemize}
-			\item Node - "Korzeń" całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
+			\item Node - ,,Korzeń'' całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
 				Funkcjonalność: 
 				\begin{itemize}
 					\item Odpowiada za uruchomienie i zatrzymanie systemu, tworzy instancję klasy StoreController dla każdej odpowiedniej karty
 						graficznej, którą dany StoreController będzie obsługiwał.
 					\item Przyjmuje zadania przychodzące od Mastera i zleca je odpowiednim StoreControllerom
-					\item W ramach tej klasy działa wątek 
-zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
+					\item W ramach tej klasy działa wątek zbierający ukończone zadania i wysyłający ich rezultaty do Mastera
 				\end{itemize}
 			\item Store Controller - odpowiada za obsługę jednej karty graficznej o podanym numerze. \\ \\
 				Funkcjonalność: 
@@ -350,12 +349,12 @@ zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
 		\begin{enumerate}
 			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania (INSERT), identyfikator mówiący 
 				na której karcie dane mają być umieszczone oraz element do załadowania do bazy.
-			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a który przekazuje TaskRequest do Task Monitora. Ten tworzy 
+			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a, który przekazuje TaskRequest do Task Monitora. Ten tworzy 
 				obiekt zadania (StoreTask)
-			\item StoreTask przekazywany jest po identyfikatorze do odpowiedniego StoreControllera odpowiadającego za kartę w której umieszczone mają być dane
+			\item StoreTask przekazywany jest po identyfikatorze do odpowiedniego StoreControllera odpowiadającego za kartę, w której umieszczone mają być dane
 			\item StoreController wykonuje zadanie przekazując element do załadowania do bazy do bufora (StoreBuffer)
 			\item StoreController wykonuje na zadaniu SetResult z pozytywnym wynikiem. Wtedy zadanie może być zakończone i usunięte
-			\item Jeśli bufor w danym obiekcie StoreBuffer stanie się pełny bufor zostaje zamieniony na pusty, a pełny trafia do Upload Monitora który załaduje dane na GPU
+			\item Jeśli bufor w danym obiekcie StoreBuffer stanie się pełny bufor zostaje zamieniony na pusty, a pełny trafia do Upload Monitora, który załaduje dane na GPU
 			\item Po udanym załadowaniu danych na GPU informacje o położeniu danych na karcie zwrócone przez UploadMonitor w postaci struktury infoElement, która przekazywana jest do
 				BTree Monitora w celu umieszczenia jej w B+Drzewie 
 			\item Dopiero po ukończeniu tych wszystkich kroków można uznać daną za włożoną do bazy danych
@@ -363,13 +362,13 @@ zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
 		Przepływ danych w węźle przy wykonywaniu zapytania typu Select (pobieranie danych z bazy danych):
 		\begin{enumerate}
 			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania $(SELECT_ABC)$ oraz dane do zapytania (np. filtry)
-			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a który przekazuje TaskRequest do Task Monitora. Ten tworzy 
+			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a, który przekazuje TaskRequest do Task Monitora. Ten tworzy 
 				obiekt zadania (StoreTask)
 			\item StoreTask przekazywany jest do wszystkich StoreControllerów
 			\item Store Controller przekazuje do swojego wątku odpowiedzialnego za zapytania zadanie do wykonania (ten wątek nazywać będziemy queryThread). 
 			\item queryThread prosi odpowiednie obiekty Store Bufferów o informacje na temat położenia danych w pamięci GPU i dostaje je pobrane z B+drzew w postaci listy infoElementów
 			\item queryThread tworzy obiekt QueryRequest na podstawie zapytania i infoElementów i przekazuje go do Query Monitora, który wykonuje operację query i zwraca mu QueryResult. 
-			\item Wątek wykonujący zapytania na podstawie QueryResult wywołuje operację SetResult na zadaniu które może być następnie uznane za wykonane
+			\item Wątek wykonujący zapytania na podstawie QueryResult wywołuje operację SetResult na zadaniu, które może być następnie uznane za wykonane
 			\item Wątek w obiekcie Node odpowiedzialny za zarządzanie ukończonymi zadaniami orzyma takie zadanie z Task Monitora po wykonaniu na nim funkcji PopCompletedTasks
 				i może pobrać wynik danego zadania oraz wysłać go do Mastera 
 		\end{enumerate}
@@ -395,7 +394,7 @@ zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
 			\item Query Monitor po otrzymaniu QueryRequest od Store Controllera wywołuje Compressor aby ten rozkompresował dane, na które wskazują struktury infoElement zawarte w zapytaniu
 			\item Następnie QueryMonitor wywołuje odpowiedni dla danego zapytania kernel wykonujący się na GPU przekazując mu wskaźnik do rozkompresowanych danych 
 			\item Dane mogą być odpowiednio filtrowane w zależności od zapytania przez funkcję wywołaną z kernela
-			\item Wskaźnik na rezultat zapytania zwracany jest do QueryMonitora który pobiera dane z GPU i przesyła z powrotem do StoreControllera
+			\item Wskaźnik na rezultat zapytania zwracany jest do QueryMonitora, który pobiera dane z GPU i przesyła z powrotem do StoreControllera
 		\end{enumerate}
 		\begin{figure}[t]
 			\begin{center}
@@ -421,13 +420,13 @@ zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
 		\clearpage
 
 \section{Map-Reduce}
-Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Reduce", jako że jest to rozproszona baza danych.
+Zaletą systemu będzie implementacja uproszczonego modelu programowania Map-Reduce, jako że jest to rozproszona baza danych.
 
 \begin{itemize}
 	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych i wykonuje na nich operację Map tj. filtruje dane pod kątem pewnych 
 		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja Map per węzeł dla danego zapytania.
 		Dane uzyskane poprzez wykonanie operacji map są parami klucz-wartość, gdzie kluczem jest id danego zadania, a wartościami wyniki zapytania. Wyniki
-		operacji Map z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
+		operacji Map z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce, która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Ogólny schemat Map-Reduce w systemie}
@@ -436,7 +435,7 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Red
 		\end{figure}
 	\item Każdy z węzłów poprzez użycie Mappera, który korzystając z wiedzy o położeniu danych w pamięci na karcie graficznej przechowywanej w B+ drzewie filtruje dane tworzy
 		pary taskId - record. W ten sposób Mapper wykonuje operację map. Dane te mogą być dodatkowo zagregowane na karcie przez Composer'a. Wykonuje on na zmapowanych
-		parach operację Compose - nazywaną przez nas operacją Reduce ponieważ jest ona analogiczna do tej którą ma wykonać na końcu Master. Tutaj mamy zamiar wykorzystać
+		parach operację Compose - nazywaną przez nas operacją Reduce ponieważ jest ona analogiczna do tej, którą ma wykonać na końcu Master. Tutaj mamy zamiar wykorzystać
 		moc obliczeniową kart graficznych. Uzyskane dane z wielu kart graficznych mogą być wstępnie zagregowane już na węźle jeśli pozwala na to rodzaj operacji Reduce - musi być łączna i przemienna.
 		\begin{figure}[t]
 			\begin{center}
@@ -447,7 +446,7 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Red
 \end{itemize}
 \clearpage
 
-Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na "zarezerwawanej" dla niego karcie graficznej (jeśli okaże się to korzystne).
+Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na zarezerwowanej dla niego karcie graficznej (jeśli okaże się to korzystne).
 
 \section{Pierwszy prototyp programu}
 	\subsection{Opis funkcjonalności}
