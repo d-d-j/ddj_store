@@ -164,7 +164,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Insert (możliwe rozszerzenie o InsertMany)
 					\item Flush
 				\end{itemize}
-			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w ''Specyfikacji Technicznej``
+			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w ,,Specyfikacji Technicznej''
 			\item Serwis statusu (statusService)
 				\begin{itemize}
 					\item GetLastError
@@ -174,9 +174,9 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		węzły sprawdzając ich parametry, np. zajętość miejsca na karcie lub obciążenie. Nadzoruje wykonanie wszystkich zapytań oraz zbiera ich wyniki 
 		wykonując na nich ostatni etap operacji Reduce (agregując wyniki). Gotowa odpowiedź na zapytanie kierowana jest z powrotem do klienta.
 	\item Węzeł loguje się do Mastera jako gotowy do pracy węzeł. Zalogowany węzeł otrzymuje tyle identyfikatorów ile ma odpowiednich dla naszego systemu 
-		(Cuda capability >= 2.0) kart graficznych NVIDIA. Główną rolą każdego węzła jest składowanie danych na kartach graficznych. Wykonują zlecane im 
+		(Cuda capability $\geq 2.0$) kart graficznych NVIDIA. Główną rolą każdego węzła jest składowanie danych na kartach graficznych. Wykonują zlecane im 
 		zadania (przez Mastera) wrzucając dane na odpowiednią kartę lub wykonując zapytanie na danych znajdujących się już na karcie. Takie dane mogą 
-		być agregowane, sortowane oraz filtrowane na sposoby wymienione w "Specyfikacji Technicznej". W tym momencie kożystać będziemy z wydajności 
+		być agregowane, sortowane oraz filtrowane na sposoby wymienione w ,,Specyfikacji Techniczne''. W tym momencie kożystać będziemy z wydajności 
 		kart graficznych. Węzeł komunikuje się tylko i wyłącznie z Masterem.
 \end{itemize}
 \begin{figure}[t]
@@ -189,7 +189,13 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 
 \section{Master}
 	Program głównego serwera napisany jest w języku programowania The Go Programming Language (http://www.golang.org). 
-	Program korzysta między innymi z takich pakietów jak: ``log4go'' - do logowania, ``gorest'' - wspomagający Restowe API czy ``gcfg'' - do konfiguracji.
+	Program korzysta między innymi z takich pakietów jak:
+	\begin{description}
+		 \item[log4go] do logowania
+		 \item[gorest] wspomagający Restowe API 
+		 \item[gcfg] do konfiguracji.
+	\end{description}		
+	
 	\subsection{Struktura}
 		
 		\begin{figure}[t]
@@ -230,21 +236,21 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 \section{Node}
 	Program węzła napisany jest w języku programowania C++ w wersji C++11 z użyciem bibliotek BOOST i LOG4CPLUS. Do obsługi kart 
 	graficznych używane są: Cuda runtime api oraz Thrust. Program pisany jest w oparciu o CUDA toolkit 5.5 wraz z najnowszymi sterownikami. 
-	Program używa kart graficznych o CUDA compute capability $>= 2.0$ i aby program działał niezbędna jest przynajmniej jedna taka karta na węźle.   
+	Program używa kart graficznych o CUDA compute capability $\geq 2.0$ i aby program działał niezbędna jest przynajmniej jedna taka karta na węźle.   
 	\subsection{Struktura}
-		Program węzła składa się z wielu współpracujących ze sobą "modułów" którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
+		Program węzła składa się z wielu współpracujących ze sobą ,,modułów'' którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
 		wiele kart graficznych, które będą używane przez program jeśli spełniają wymagania. Dane będziemy wkładać na karty oraz wykonywać na nich zapytania
 		niezależnie od siebie, tj. na poziomie obsługi karty nie mamy pojęcia o istnieniu innych. Wymyślona struktura programu ma na celu zapewnienie dużej 
 		równoległości wykonywania zadań oraz modułowości komponentów. \\
 		Opis wybranych elementów struktury:
 		\begin{itemize}
-			\item Node - "Korzeń" całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
+			\item Node - ,,Korzeń'' całego programu dla węzła. Stworzenie instancji tej klasy spowoduje rozpoczęcie działania węzła. \\ \\
 				Funkcjonalność: 
 				\begin{itemize}
 					\item Odpowiada za uruchomienie i zatrzymianie systemu, w tym tworzy instancję klasy StoreController dla każdej odpowiedniej karty
 						graficznej, którą dany StoreController będzie obsługiwał.
 					\item Przyjmuje zadania przychodzące od Mastera i zleca je odpowiednim StoreControllerom
-					\item W ramach tej klasy działa wątek "zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
+					\item W ramach tej klasy działa wątek ,,zbierający'' ukończone zadania i wysyłający ich rezultaty do Mastera
 				\end{itemize}
 			\item Store Controller - odpowiada za obsługę jednej karty graficznej o podanym numerze. \\ \\
 				Funkcjonalność: 
@@ -361,7 +367,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		\clearpage
 
 \section{Map-Reduce}
-Zaletą systemu będzie implementacja uproszczonego stylu programowania ``Map-Reduce'', jako że jest to rozproszona baza danych.
+Zaletą systemu będzie implementacja uproszczonego stylu programowania ,,Map-Reduce'', jako że jest to rozproszona baza danych.
 \begin{itemize}
 	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych wykonuje operację Map tj. filtruje dane pod kątem pewnych 
 		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja Map per węzeł dla danego zapytania.
@@ -386,7 +392,7 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania ``Map-Re
 \end{itemize}
 \clearpage
 
-Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na ``zarezerwawanej'' dla niego 
+Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na ,,zarezerwawanej'' dla niego 
 karcie graficznej (jeśli okaże się to korzystne).
 
 \section{Pierwszy prototyp programu}
