@@ -451,7 +451,10 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 \section{Pierwszy prototyp programu}
 	\subsection{Opis funkcjonalności}
 	\subsection{Przeprowadzone testy}
+	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu JMeter. Jako że do tej pory aplikacja była uruchamiana jedynie w ramach jednej maszyny (komunikacja node-master jedynie po localhost), z użyciem jednej karty graficznej testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu, a także pomóc nam zaznajomić się z narzędziem JMeter, którego użycie będzie ważnym składnikiem badania wydajności na kolejnych etapach wykonania pracy.
+	
+	\subsubsection{Test badający wydajność samego Mastera}
 
 \section{Przyszłość}
-
+W kolejnym etapie prac priorytetem będzie obsługa zapytań select wraz z agregacją danych. Równolegle będziemy prowadzić prace nad uruchomieniem systemu na wielu urządzeniach oraz docelowo na klastrze z wieloma kartami graficznymi tak, aby móc dokładniej przetestować wydajność systemu.
 \end{document}
