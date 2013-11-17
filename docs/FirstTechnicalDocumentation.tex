@@ -451,9 +451,20 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 \section{Pierwszy prototyp programu}
 	\subsection{Opis funkcjonalności}
 	\subsection{Przeprowadzone testy}
-	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu JMeter. Jako że do tej pory aplikacja była uruchamiana jedynie w ramach jednej maszyny (komunikacja node-master jedynie po localhost), z użyciem jednej karty graficznej testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu, a także pomóc nam zaznajomić się z narzędziem JMeter, którego użycie będzie ważnym składnikiem badania wydajności na kolejnych etapach wykonania pracy.
+	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu JMeter. Jako że do tej pory aplikacja była uruchamiana jedynie w ramach jednej maszyny (komunikacja node-master po localhost), z użyciem jednej karty graficznej testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu, a także pomóc nam zaznajomić się z narzędziem JMeter, którego użycie będzie ważnym składnikiem badania wydajności na kolejnych etapach wykonania pracy.
 	
 	\subsubsection{Test badający wydajność samego Mastera}
+	Pierwszy przeprowadzony test realizował zapytania OPTIONS do serwera - bez podłączonego węzła po to, by sprawdzić jakie obciążenie będzie w stanie wytrzymać. W kolejnych przebiegach uruchamiano $1, 10,	20,	50,	100, 150, 250, 400, 500, 700$ wątków, z których każdy starał się wysłać 1000 zapytań. 
+	\begin{figure}
+	\centering
+	\caption{Test wytrzymałości serwera}
+		\includegraphics[width=0.5\textwidth]{img/TestsMasterOptions.png}
+	\end{figure}
+	
+		\subsubsection{Test badający wydajność samego Mastera}
+	Pierwszy przeprowadzony test realizował zapytania OPTIONS do serwera - bez podłączonego węzła po to, by sprawdzić jakie obciążenie będzie w stanie wytrzymać. W kolejnych przebiegach uruchamiano $1, 10,	20,	50,	100, 150, 250, 400, 500, 700$ wątków, z których każdy starał się wysłać 1000 zapytań. 
+	
+ 
 
 \section{Przyszłość}
 W kolejnym etapie prac priorytetem będzie obsługa zapytań select wraz z agregacją danych. Równolegle będziemy prowadzić prace nad uruchomieniem systemu na wielu urządzeniach oraz docelowo na klastrze z wieloma kartami graficznymi tak, aby móc dokładniej przetestować wydajność systemu.
