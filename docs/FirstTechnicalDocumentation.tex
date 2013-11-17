@@ -197,7 +197,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	
 	\subsection{Struktura}
 		W obecnej implemntacji skupiono się na poprawnej implementacji komunikacji pomiędzy Masterem a jednym Nodem.
-		Obiekty przesyłane przez sieć są serializowane binarnie i poprzedzane 12 bitowym nagłówkiem, który zawiera informacje
+		Obiekty przesyłane przez sieć są serializowane binarnie i poprzedzane nagłówkiem, który zawiera informacje
 		o typie i rozmiarze zadania. Kod programu podzielono na następujące pakiety
 		\begin{description}
 			\item[dto] Zbiór wszystkich obiektów, które są przsyłanie pomiędzy poszczególnymi elementami systemu
@@ -361,7 +361,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 		\end{enumerate}
 		Przepływ danych w węźle przy wykonywaniu zapytania typu Select (pobieranie danych z bazy danych):
 		\begin{enumerate}
-			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania $(SELECT_ABC)$ oraz dane do zapytania (np. filtry)
+			\item Node Communication Client otrzymuje TaskRequest od Mastera zawierający typ zadania (SELECT) oraz dane do zapytania (np. filtry)
 			\item TaskRequest poprzez sygnał (boost.Signals) przekazywany jest do Node'a, który przekazuje TaskRequest do Task Monitora. Ten tworzy 
 				obiekt zadania (StoreTask)
 			\item StoreTask przekazywany jest do wszystkich StoreControllerów
