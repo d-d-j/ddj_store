@@ -246,40 +246,45 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	\clearpage
 	\subsubsection{Insert}
 		\begin{enumerate}
-			\item Po przez RESTA dostajemy request od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie go w Taska.
-			\item Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera.
-			\item Worker bierze tego Taska (jest to insert) pobiera z NodeBalancera do którego Noda ma go wysłać. 
+			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Task.
+			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
+			\item Worker odbiera Taska (jest to insert) 
+			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
+			\item Worker pobiera z NodeBalancera do którego Noda ma go wysłać. 
 			\item Następnie serializuje Taska i wysyła. 
-			\item Nie czeka na odpowiedź tylko od razu wysyła że jest ok. 
-			\item I tu kończy się przetwarzanie inserta 
+			\item Nie czeka na odpowiedź tylko od razu wysyła na kanał zwrotny że zadanie zostało przesłane do Noda
 		\end{enumerate}
 	\subsubsection{Select}
 		\begin{enumerate}
-			\item Po przez RESTA dostajemy request od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie go w Taska. 
-			\item Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera.
+			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Taska. 
+			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
+			\item Worker odbiera Taska (jest to select) 		
 			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
-			\item Rejestruje w TaskManagerze że jest task o takim ID który czeka na tyle odpowiedzi i jego kanał zwrotny na którym słucha. 
-			\item Worker bierze tego Taska (był to select) pobiera z NodeBalancera listę nodów i wysyła do nich to żądanie. 
-			\item Node odebrał już taska i zrobił z nim co trzeba. 
-			\item Node zwraca wynik opakowany w header z ID jest to odebrane przez NodeReciviera 
+			\item Worker pobiera z NodeBalancera listę nodów
+			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID które czeka na liczbę odpowiedzi rółną liczbie aktywnych nodów
+			oraz kanał zwrotny na którym czeka na wyniki. 
+			\item Worker zleca wysłanie zadania do nodów z listy
+			\item Każdy Node obiera zadanie i procesuje je
+			\item Każdy Node zwraca wynik opakowany w header z ID jest to odebrane przez NodeReciviera 
 			\item NodeRecivier deserializuje wiadomość 
-			\item NodeRecivier odczytuje z TaskManagera do którego Workera wysłać to co odebrał 
-			\item W trakcie tego sprawdzania zminiejszamy liczbę odpowiedzi na które czeka Master dla danego taska
-			i jeśli jest = 0 to kasujemy go z managera albo oznaczamy jako zakonczony czy jak tam chcemy. 
+			\item NodeRecivier odczytuje z TaskManagera do którego Workera przesłać otrzymany wynik
+			\item W trakcie tego sprawdzania zminiejszamy liczbę odpowiedzi na które czeka dane zadanie
 			\item Worker odebrał już wyniki od wszystkich nodów 
-			\item Worker robi redukcję 12 Worker wysyła wynik na kanał który dostał razem z Taskiem 
-			\item Na tym kanale słucha API i zwraca wynik działania
+			\item Worker wykonuje redukcję otrzymanych wyników
+			\item Worker wysyła zredukowany wynik na kanał który dostał razem z zadaniem
+			\item Na tym kanale słucha API i zwraca wynik działania do klienta
 		\end{enumerate}
 	\subsubsection{Komponenty}
 		\begin{description}
-		    \item[NodeBalancer] tutaj chyba powinna być lista nodów albo kolejka priorytetowa. Nie wiem jak ona powinna być odświrzana ale jakoś musi być.
-		    NodeBalancer musi pobierać jakieś informacje o stanie nodów i na tej podstawie zmieniać noda na którego wrzucimy dane
-		    \item[WorkerPool] ja bym tu dał liste cykliczną bo nasze zapytania powinny działać szybciej niż to zmiana priorytetu. 
-		    Nie wiem jeszcze jak oni w tym przykładzie robili to że na jednym kanale wisiało 10 tasków. Można to osiągnąć przez buforowany kanał 
-		    i tu trzeba by przetestować jaka konfiguracja jest najlepsza w sensie workerzy / rozmiar bufora (potrzebne dobre testy!)
-		    \item[TaskManager] to musi być jakiś słownik ale thread safe. Nie mam pomysłu jak to dobrze ogarnąć żeby nasze taski nie czekały w tym miejscu
-		    Dobrze by było gdyby TaskManager trzymał info o wszystkich taskach żeby w każdej chwili można było poejrzeć co sie dzieje
-		    kiedy dane zlecenie zostało zakończone itp.
+		    \item[NodeBalancer] struktura która zarządza do którego z Nodów przesłać dany Insert oraz przechowująca listę wszystkich Nodów.
+		    Powinna ona umożliwiać odświerzanie infrormacji o nodach które będą przychodzić razem z cyklicznymi statusami i na tej podstawie
+		    wybierać kolejnego Noda do którego zostaną wysłane dane. 
+		    \item[WorkerPool] pula Workerów któ¶e obsługują pojedyncze zapytanie. Każdy worker słucha na buforowanym kanale kolejnych zadań i 
+		    procesuje je od początku aż do zwrócenia wyniku. Z uwagi na to że stan workerów może się bardzo szybko zmieniać jak i też ż racji tego
+		    że będzie i duża liczba nie może być to kolejka priorytetowa odświeżana co ukończone zapytanie. Najelpiej gdy będdzie to lista cyklicza
+		    i zadania będą przydzielane kolejnym workerom z listy. Liczba workerół i rozmiar buforowanego kanału zostaną dobrane w sposób eksperymentalny
+		    \item[TaskManager] słownik wszystkich trwających zadań w którym kluczem jest identyfikator a wartością ilość oczekiwanych odpowiedzi 
+		    oraz kanał obsługującego  Workera.
 		\end{description}					
 
 \section{Node}
