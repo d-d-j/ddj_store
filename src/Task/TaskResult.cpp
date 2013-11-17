@@ -18,13 +18,12 @@ TaskResult::TaskResult
 				):
 			task_id(taskId),
 			type(type),
-			result_data(resultData),
-			result_size(resultSize) {}
+			result_size(resultSize),
+			result_data(resultData){}
 
 TaskResult::~TaskResult()
 {
-	//free(this->result_data);
-	//this->result_data = nullptr;
+
 }
 
 } /* namespace ddj */

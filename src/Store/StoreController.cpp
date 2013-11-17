@@ -24,10 +24,10 @@ namespace store {
 
 	StoreController::StoreController(int gpuDeviceId)
 	{
-		h_LogThreadDebug("StoreController constructor started");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
-		this->_buffers = new boost::unordered_map<tag_type, StoreBuffer_Pointer>();
+		this->_buffers = new Buffers_Map();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
@@ -41,18 +41,18 @@ namespace store {
 		// CREATE QUERY MONITOR
 		this->_queryMonitor = new QueryMonitor(this->_cudaController);
 
-		h_LogThreadDebug("StoreController constructor ended");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
 
 	StoreController::~StoreController()
 	{
-		h_LogThreadDebug("StoreController destructor started");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
 		delete this->_buffers;
 		delete this->_queryMonitor;
 		delete this->_gpuUploadMonitor;
 
-		h_LogThreadDebug("StoreController destructor ended");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}
 
 	void StoreController::ExecuteTask(StoreTask_Pointer task)
@@ -63,58 +63,54 @@ namespace store {
 
 	void StoreController::populateTaskFunctions()
 	{
-		std::pair<int, taskFunc> pair;
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
 
 		// INSERT
-		pair.first = Insert;
-		pair.second = boost::bind(&StoreController::insertTask, this, _1);
-		_taskFunctions.insert(pair);
+		_taskFunctions.insert({ Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
 		// SELECT ALL
-		pair.first = SelectAll;
-		pair.second = boost::bind(&StoreController::selectAllTask, this, _1);
-		_taskFunctions.insert(pair);
-	}
+		_taskFunctions.insert({ SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
+
+		// FLUSH
+		_taskFunctions.insert({ Flush, boost::bind(&StoreController::flushTask, this, _1) });
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
+}
 
 	void StoreController::insertTask(StoreTask_Pointer task)
 	{
-		h_LogThreadDebug("Insert task function started");
-
 		// Check possible errors
 		if(task == nullptr || task->GetType() != Insert)
 		{
-			h_LogThreadError("Error in insertTask function - wrong argument");
 			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
 
 		// GET store element from task data
 		storeElement* element = (storeElement*)(task->GetData());
 
-		// GET buffer with element's tag or create one if not exists
-		if(this->_buffers->count(element->tag))	// if such a buffer exists
-		{
-			(*_buffers)[element->tag]->Insert(element);
-		}
-		else
+		// Log element to insert
+		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
+
+		// Create buffer with element's metric if not exists
+		if(!this->_buffers->count(element->tag))
 		{
 			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
 			this->_buffers->insert({element->tag, newBuf});
 		}
+		(*_buffers)[element->tag]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		task->SetResult(true, nullptr, nullptr, 0);
-
-		h_LogThreadDebug("Insert task function ended");
 	}
 
 	void StoreController::selectAllTask(StoreTask_Pointer task)
 	{
-		h_LogThreadDebug("Insert task function started");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
 
 		// Check possible errors
 		if(task == nullptr || task->GetType() != SelectAll)
 		{
-			h_LogThreadError("Error in selectAllTask function - wrong argument");
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in selectAllTask function - wrong argument");
 		}
 
@@ -122,17 +118,56 @@ namespace store {
 		storeElement* queryResult;
 
 		// TODO: Implement all possible exceptions catching from SelectAll function
-		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		try
 		{
 			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
 			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [END]"));
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "SelectAll task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
 		}
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
 		}
 	}
 
+	void StoreController::flushTask(StoreTask_Pointer task)
+	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [BEGIN]"));
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != Flush)
+		{
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
+			throw std::runtime_error("Error in flushTask function - wrong argument");
+		}
+
+		try
+		{
+			// Iterate through store buffers and flush them to GPU memory (Sync)
+			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
+			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); it++)
+			{
+				it-> second->Flush();
+			}
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Flush task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
+		}
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
+	}
 } /* namespace store */
 } /* namespace ddj */

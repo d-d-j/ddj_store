@@ -12,6 +12,8 @@ namespace ddj
 {
 	Node::Node()
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [BEGIN]"));
+
 		this->_storeTaskMonitor = new store::StoreTaskMonitor(&(this->_taskCond));
 		this->_taskBarrier = new boost::barrier(2);
 
@@ -22,24 +24,36 @@ namespace ddj
 		// connect CreateTaskMethod to _newTaskSignal
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
-		this->_cudaDevicesCount = gpuGetCudaDevicesCount();
-		pantheios::log_INFORMATIONAL(PSTR("Found "), pantheios::integer(this->_cudaDevicesCount), PSTR(" cuda devices."));
+		this->_cudaDevicesCount = gpuGetCudaDevicesCountAndPrint();
+
 		StoreController_Pointer* controller;
 
 		//for(int i=0; i<this->_cudaDevicesCount; i++)
 		for(int i=0; i<1; i++)
 		{
+			// Check if GPU i satisfies ddj_store requirements
+			if(!gpuCheckCudaDevice(i)) continue;
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});
 			delete controller;
 		}
 
+		//throw exception if suitable cuda gpu devices count == 0
+		if(this->_controllers.empty())
+		{
+			std::string errString = "!! NO CUDA DEVICE !!";
+			errString.append(" - there is no cuda device connected or it does not satisfy ddj_store requirements...");
+			throw std::runtime_error(errString);
+		}
+
 		this->_client = new Client(&_requestSignal);
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}
 
 	Node::~Node()
 	{
-		h_LogThreadDebug("Node destructor started");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [BEGIN]"));
 
 		// Disconnect and release client
 		delete this->_client;
@@ -47,7 +61,6 @@ namespace ddj
 		// Stop task thread and release it
 		{
 			boost::mutex::scoped_lock lock(this->_taskMutex);
-			h_LogThreadDebug("StoreController locked task's mutex");
 			this->_taskThread->interrupt();
 		}
 		this->_taskThread->join();
@@ -55,7 +68,7 @@ namespace ddj
 		delete this->_taskBarrier;
 		delete this->_taskThread;
 
-		h_LogThreadDebug("Node destructor ended");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [END]"));
 	}
 
 	void Node::CreateTask(taskRequest request)
@@ -70,30 +83,25 @@ namespace ddj
 
 	void Node::taskThreadFunction()
 	{
-		h_LogThreadDebug("Task thread started");
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Task thread [BEGIN]"));
+
 		boost::unique_lock<boost::mutex> lock(this->_taskMutex);
-		h_LogThreadDebug("Task thread locked his mutex");
+
 		this->_taskBarrier->wait();
 		try
 		{
 			while(1)
 			{
-				h_LogThreadDebug("Task thread is waiting");
 				this->_taskCond.wait(lock);
-				h_LogThreadDebug("Task thread starts his job");
 
-				// Get all compleated tasks
+				// Get all completed tasks
 				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
 						this->_storeTaskMonitor->PopCompleatedTasks();
 
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
 				TaskResult* result;
-				/*	FOR TESTING - SHOULD BE REMOVED
-				 * store::storeElement* data;
-				size_t size;
-				int count;
-				*/
+
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
 					if(compleatedTasks[i]->GetType() == SelectAll)
@@ -101,34 +109,34 @@ namespace ddj
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
 
-						/*	FOR TESTING - SHOULD BE REMOVED
-
-						data = (store::storeElement*)result->result_data;
-						size = result->result_size;
-						count = size / sizeof(store::storeElement);
-						for(int j=0; j<count; j++)
-							printf("\n SelectAll result[%d]: t:%d s:%d time:%d value:%f \n",
-									j, data[j].tag, data[j].series, (int)data[j].time, data[j].value);
-						 */
+						// TODO: only for testing purposes - should be removed
+						int n = result->result_size / sizeof(store::storeElement);
+						store::storeElement* elements = (store::storeElement*)result->result_data;
+						for(int k=0; k<n; k++)
+							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].tag, elements[k].series, elements[k].time, elements[k].value);
 
 						// Send result
 						this->_client->SendTaskResult(result);
+
 						// Destroy Task and TaskResult
 						delete result;
 					}
 				}
-
-				h_LogThreadDebug("Task thread ends his job");
-	}
+			}
 		}
 		catch(boost::thread_interrupted& ex)
 		{
-			h_LogThreadDebug("TaskThread ended as interrupted [Success]");
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Task thread interrupted [END SUCCESS]"));
 			return;
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Task thread failed with exception - [%s] [FAILED]", ex.what());
 		}
 		catch(...)
 		{
-			h_LogThreadDebug("TaskThread ended with error [Failure]");
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Task thread error with unknown reason [FAILED]"));
+			throw;
 		}
 	}
 } /* namespace ddj */

@@ -25,7 +25,6 @@ private:
 	std::string port;
 	boost::asio::io_service io_service;
 	tcp::socket *socket;
-	char msg[100];
 	boost::signals2::signal<void (taskRequest)> *requestSignal;
 	void do_read();
 public:

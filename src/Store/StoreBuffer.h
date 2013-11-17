@@ -24,8 +24,8 @@
 #include "../GpuUpload/GpuUploadMonitor.h"
 #include "storeElement.h"
 #include "infoElement.h"
-#include "LoggerHelper.h"
 #include "../CUDA/cudaIncludes.h"
+#include "../Helpers/Logger.h"
 
 namespace ddj {
 namespace store {
@@ -45,6 +45,9 @@ namespace store {
 			BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
 			GpuUploadMonitor* _gpuUploadMonitor;	/**< protects access to GpuUploadCore class */
 
+			/* LOGGER */
+			Logger _logger = Logger::getRoot();
+
 			/* UPLOADER THREAD */
 			boost::thread* _uploaderThread;	/**< uploads _backBuffer to GPU and stores info in B+Tree */
 			boost::mutex _uploaderMutex;
@@ -57,6 +60,8 @@ namespace store {
 			bool _areBuffersSwitched;	/**< true if _backBuffer is ready to upload and haven't been yet */
 			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;	/**< main buffer where data is inserted */
 			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;	/**< buffer to upload as trunk */
+			boost::mutex _bufferMutex;
+			boost::condition_variable _bufferCond;
 
 		/* METHODS */
 		public:

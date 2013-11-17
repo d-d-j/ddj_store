@@ -1,7 +1,20 @@
 RM := rm -rf
+OS := $(shell uname)
 
-#you can use g++ or clang or color-gcc
-COMPILER := g++
+ifeq ($(OS),Darwin)
+	COMPILER := clang++
+	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
+	STANDART := -std=c++11 -stdlib=libc++
+else
+	#you can use g++ or clang or color-gcc
+	COMPILER := g++
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -llog4cplus
+	STANDART := -std=c++0x
+endif
+
+INCLUDES := -I"/usr/local/cuda/include"
+DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
+WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
 OBJS += \
 ./src/BTree/BTreeMonitor.o \
@@ -9,7 +22,6 @@ OBJS += \
 ./src/Store/StoreController.o \
 ./src/GpuUpload/GpuUploadMonitor.o \
 ./src/GpuUpload/GpuUploadCore.o \
-./src/Network/Server.o \
 ./src/Query/QueryMonitor.o \
 ./src/Query/QueryCore.o \
 ./src/Task/TaskResult.o \
@@ -28,7 +40,6 @@ CPP_DEPS += \
 ./src/Store/StoreController.d \
 ./src/GpuUpload/GpuUploadMonitor.d \
 ./src/GpuUpload/GpuUploadCore.d \
-./src/Network/Server.d \
 ./src/Query/QueryMonitor.d \
 ./src/Query/QueryCore.d \
 ./src/Task/TaskResult.d \
@@ -39,13 +50,6 @@ CPP_DEPS += \
 ./src/Node.d \
 ./src/Network/Client.d \
 ./src/main.d
-
-
-LIBS := -L"/usr/local/cuda/lib64" -lcudart -L"./libs/pantheios/lib" -lpantheios.1.core.gcc46 -lpantheios.1.be.fprintf.gcc46 -lpantheios.1.bec.fprintf.gcc46 -lpantheios.1.fe.all.gcc46 -lpantheios.1.util.gcc46 -lboost_system -lboost_thread -lpthread -lboost_thread-mt
-INCLUDES := -I"/usr/local/cuda/include" -I"./libs/pantheios/include" -I"./libs/stlsoft/include"
-WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
-STANDART := -std=c++0x -g
-DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 
 # CUDA code generation flags
 ifneq ($(OS_ARCH),armv7l)
@@ -74,7 +78,7 @@ all: DDJ_Store
 DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(COMPILER) -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

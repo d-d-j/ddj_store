@@ -27,6 +27,7 @@
 #include "../CUDA/CudaController.h"
 #include "../Store/storeSettings.h"
 #include "../Query/QueryMonitor.h"
+#include "../Helpers/Logger.h"
 
 namespace ddj {
 namespace store {
@@ -36,15 +37,19 @@ class StoreController
     /* TYPEDEFS */
     typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
     typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
+    typedef boost::unordered_map<tag_type, StoreBuffer_Pointer> Buffers_Map;
 
     /* FIELDS */
     private:
+		/* LOGGER */
+		Logger _logger = Logger::getRoot();
+
     	int _gpuDeviceId;
     	GpuUploadMonitor* _gpuUploadMonitor;
     	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
 
-    	boost::unordered_map<tag_type, StoreBuffer_Pointer>* _buffers;
+    	Buffers_Map* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
 
 	/* METHODS */
@@ -59,6 +64,7 @@ class StoreController
     private:
         void insertTask(StoreTask_Pointer task);
         void selectAllTask(StoreTask_Pointer task);
+        void flushTask(StoreTask_Pointer task);
 };
 
 } /* end namespace store */

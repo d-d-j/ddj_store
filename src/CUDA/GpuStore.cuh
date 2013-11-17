@@ -14,5 +14,9 @@ extern "C"
 	int gpuGetCudaDevicesCount();
 
 	int gpuAppendToMainStore(void* data, size_t dataSize, void* mainStorePointer, ullint mainStoreOffset);
+
+	int gpuGetCudaDevicesCountAndPrint();
+
+	bool gpuCheckCudaDevice(int n);
 } /* extern "C" */
 #endif /* GPUSTORE_CUH_ */

@@ -12,7 +12,8 @@ enum TaskType
 {
 	Error = 0,
 	Insert = 1,
-	SelectAll = 2
+	SelectAll = 2,
+	Flush = 3
 };
 
 #endif /* TASKTYPE_H_ */
