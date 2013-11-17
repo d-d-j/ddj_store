@@ -164,6 +164,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Insert (możliwe rozszerzenie o InsertMultiple)
 					\item Flush
 				\end{itemize}
+
 			\item Serwis zapytań (queryService) - zawiera wszystkie zapytania typu select zawarte w "Specyfikacji Technicznej"
 			\item Serwis statusu (statusService)
 				\begin{itemize}
@@ -186,51 +187,113 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 \clearpage
 
 \section{Master}
-	Program głównego serwera napisany jest w języku programowania The Go Programming Language (http://www.golang.org). 
-	Program korzysta między innymi z takich pakietów jak: "log4go" - do logowania, "gorest" - wspomagający RESTowe API czy "gcfg" - do konfiguracji.
-	\subsection{Struktura}
-		
-		\begin{figure}[t]
-			\begin{center}
-				\caption{Struktura serwera głównego}
- 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{Component_Master}}
-			\end{center}
-		\end{figure}
-		\clearpage
 
-	\subsection{Przepływ danych}
+	Program głównego serwera napisany jest w języku Go\footnote{http://www.golang.org}. 
+	Program korzysta między innymi z takich pakietów jak:
+	\begin{description}
+		 \item[log4go] do logowania
+		 \item[gorest] wspomagający RESTowe API 
+		 \item[gcfg] do konfiguracji.
+	\end{description}		
+	
+	\subsection{Struktura}
+		W obecnej implemntacji skupiono się na poprawnej implementacji komunikacji pomiędzy Masterem a jednym Nodem.
+		Obiekty przesyłane przez sieć są serializowane binarnie i poprzedzane 12 bitowym nagłówkiem który zawiera informacje
+		o typie i rozmiarze zadania. Kod programu podzielono na następujące pakiety
+		\begin{description}
+			\item[dto] Zbiór wszystkich obiektów które są przsyłanie pomiędzy poszczególnymi elementami systemu
+			\item[rest] Definicja i implementacja elementów zewnętrznego API
+			\item[node] Kod odpowiedzialny za komunikację z Nodem oraz funkcja \texttt{IOHandler}
+			\item[config] Metody odpowiedzialne za ładowanie konfiguracji do globalnej struktury
+			\item[constants] Stałe używane w programie
+			\item[DDJ Master] Plik main programu w kórym powoływane są wszystkie potrzebne serwisy
+		\end{description}
+
+	\subsection{Obecny Przepływ danych}
 		Przetwarzanie zapytania RESTowego wysłanego od klienta:
 		\begin{enumerate}
-			\item Serwer wystawiający RESTowe API otrzymuje zapytanie select lub insert które kieruje jako request to Task Manager'a
-			\item Task Manager tworzy zadanie dla danego zapytania i przekazuje go do wykonania Task Executorowi
-			\item Ten odpala wykonanie zapytania w wątku (GO routine)
-			\item Go routine przetwarzający dane zapytanie zleca wysłanie utworzonego obiektu TaskRequest do odpowiedniego węzła 
-				(wyznaczeniem odpowiedniego węzła zajmować się będzie LoadBalancer)
-			\item Następnie w zależności od ustawień buforowania TaskRequest wysyłany jest do wskazanego węzła 
-				(informacje o adresie węzła pobierane są z obiektu Node Managera w postaci obiektu NodeInfo)
+			\item Serwer wystawiający RESTowe API otrzymuje zapytanie select lub insert które kieruje jako request to IOHandlera
+			\item Towrzony jest nowe zapytanie (Query) które jest przesyłane do Noda
+			\item Przed wysłaniem do Noda identyfikator zapytania jeśli jest to select zostaje zapisany w słowniku wraz z kanałem 
+			wynikowym na kótrym słucha API
+			\item NodeSender wysyła zapytania do opdowiadającego mu Noda
 		\end{enumerate}
 		Przetwarzanie rezultatu zapytania odebranego od węzła:
 		\begin{enumerate}
-			\item Node communication server odbiera obiekt TaskResponse który kieruje go Task Executora
-			\item Task Executor przekazuje odpowiedź do odpowiedniego wątku obsługującego dane zapytanie
-			\item Jeśli wszystkie węzły na które zostało wysłane zapytanie odpowiedziały, zapytanie jest agregowane (jeśli to 
-				potrzebne) a zadanie jest oznaczane jako ukończone
-			\item Task Manager zbiera wszystkie ukończone zadania, pobiera ich rezultaty i wysyła poprzez serwer (Master Server) do klienta
+			\item NodeReciviewr odbiera obiekt TaskResponse który kieruje do IOHandlera
+			\item IOHandler sprawdza identyfikator zadania i przesyła jego wynik do czekającego na odpowiedź API
+			\item API przesyła wynik do klienta
 		\end{enumerate}
+	\subsection{Problemy}
+	
+	Podczas testów okazało się, że zaproponowana implementacja jest niewystarczająca ze względu na wydajność systemu. Główny ciężar procesowania
+	zadań był bowiem przeniesiony na funkcję \texttt{IOHandler} co powodowało że zapytania wywoływane były de facto sekwencyjnie gdyż w tej właśnie
+	funkcji odbywała się serializacja binarna i zlecenie wysłania do Noda. Była ona również odpowiedzialna za implementację TaskManager (implementowanego
+	jako słownik) i odbieranie wyników zapytań od Noda i przesyłania ich do API. Z powyższego opisu jasno wynika, że \texttt{IOHandler} przepuszczał przez
+	siebie całą komunikację i blokował wszystkie inne wątki w czasie gdy sam procesował dane. 
+	
+	\subsection{Nowa struktura}
+	
+	Jeśli system ma wspierać obsługę wielu Nodów to wydajność Mastera musi być zdecydowanie większa. Niestety obecna struktura nie pozwala na drastyczne
+	zwiększenie wydajności systemu. Poniżej prezentujemy nową (poprawioną) wersję przepływu danych.
+	
 		\begin{figure}[t]
 			\begin{center}
-				\caption{Przepływ danych dla serwera głównego}
- 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{DataFlow_Master}}
+				\caption{Planowany przepływ serwera głównego}
+ 				\makebox[\textwidth]{\includegraphics[width=\paperwidth]{img/Master_New_Structure}}
 			\end{center}
 		\end{figure}
-		\clearpage
+	\clearpage
+	\subsubsection{Insert}
+		\begin{enumerate}
+			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Task.
+			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
+			\item Worker odbiera Taska (jest to insert) 
+			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
+			\item Worker pobiera z NodeBalancera do którego Noda ma go wysłać. 
+			\item Następnie serializuje Taska i wysyła. 
+			\item Nie czeka na odpowiedź tylko od razu wysyła na kanał zwrotny że zadanie zostało przesłane do Noda
+		\end{enumerate}
+	\subsubsection{Select}
+		\begin{enumerate}
+			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Taska. 
+			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
+			\item Worker odbiera Taska (jest to select) 		
+			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
+			\item Worker pobiera z NodeBalancera listę nodów
+			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID które czeka na liczbę odpowiedzi rółną liczbie aktywnych nodów
+			oraz kanał zwrotny na którym czeka na wyniki. 
+			\item Worker zleca wysłanie zadania do nodów z listy
+			\item Każdy Node obiera zadanie i procesuje je
+			\item Każdy Node zwraca wynik opakowany w header z ID jest to odebrane przez NodeReciviera 
+			\item NodeRecivier deserializuje wiadomość 
+			\item NodeRecivier odczytuje z TaskManagera do którego Workera przesłać otrzymany wynik
+			\item W trakcie tego sprawdzania zminiejszamy liczbę odpowiedzi na które czeka dane zadanie
+			\item Worker odebrał już wyniki od wszystkich nodów 
+			\item Worker wykonuje redukcję otrzymanych wyników
+			\item Worker wysyła zredukowany wynik na kanał który dostał razem z zadaniem
+			\item Na tym kanale słucha API i zwraca wynik działania do klienta
+		\end{enumerate}
+	\subsubsection{Komponenty}
+		\begin{description}
+		    \item[NodeBalancer] struktura która zarządza do którego z Nodów przesłać dany Insert oraz przechowująca listę wszystkich Nodów.
+		    Powinna ona umożliwiać odświerzanie infrormacji o nodach które będą przychodzić razem z cyklicznymi statusami i na tej podstawie
+		    wybierać kolejnego Noda do którego zostaną wysłane dane. 
+		    \item[WorkerPool] pula Workerów któ¶e obsługują pojedyncze zapytanie. Każdy worker słucha na buforowanym kanale kolejnych zadań i 
+		    procesuje je od początku aż do zwrócenia wyniku. Z uwagi na to że stan workerów może się bardzo szybko zmieniać jak i też ż racji tego
+		    że będzie i duża liczba nie może być to kolejka priorytetowa odświeżana co ukończone zapytanie. Najelpiej gdy będdzie to lista cyklicza
+		    i zadania będą przydzielane kolejnym workerom z listy. Liczba workerół i rozmiar buforowanego kanału zostaną dobrane w sposób eksperymentalny
+		    \item[TaskManager] słownik wszystkich trwających zadań w którym kluczem jest identyfikator a wartością ilość oczekiwanych odpowiedzi 
+		    oraz kanał obsługującego  Workera.
+		\end{description}					
 
 \section{Node}
 	Program węzła napisany jest w języku programowania C++ w wersji C++11 z użyciem bibliotek BOOST i LOG4CPLUS. Do obsługi kart 
 	graficznych używane są: Cuda runtime API oraz biblioteka Thrust. Program pisany jest w oparciu o CUDA Toolkit 5.5 wraz z najnowszymi sterownikami. 
 	Program używa kart graficznych o CUDA compute capability $\geq 2.0$. Do działania systemu niezbędna jest przynajmniej jedna taka karta na każdym węźle.   
+
 	\subsection{Struktura}
-		Program węzła składa się z wielu współpracujących ze sobą "modułów" którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
+		Program węzła składa się z wielu współpracujących ze sobą "modułów", którym odpowiadają klasy w programie. Na każdym węźle może znajdować się
 		wiele kart graficznych, które będą używane przez program jeśli spełniają wymagania. Dane będziemy wkładać na karty oraz wykonywać na nich zapytania
 		niezależnie od siebie, tj. na poziomie obsługi karty nie mamy pojęcia o istnieniu innych. Architektura systemu ma na celu zapewnienie dużej 
 		równoległości wykonywania zadań oraz modularności komponentów. \\
@@ -242,7 +305,8 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Odpowiada za uruchomienie i zatrzymanie systemu, tworzy instancję klasy StoreController dla każdej odpowiedniej karty
 						graficznej, którą dany StoreController będzie obsługiwał.
 					\item Przyjmuje zadania przychodzące od Mastera i zleca je odpowiednim StoreControllerom
-					\item W ramach tej klasy działa wątek "zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
+					\item W ramach tej klasy działa wątek 
+zbierający" ukończone zadania i wysyłający ich rezultaty do Mastera
 				\end{itemize}
 			\item Store Controller - odpowiada za obsługę jednej karty graficznej o podanym numerze. \\ \\
 				Funkcjonalność: 
@@ -359,6 +423,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 
 \section{Map-Reduce}
 Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Reduce", jako że jest to rozproszona baza danych.
+
 \begin{itemize}
 	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych i wykonuje na nich operację Map tj. filtruje dane pod kątem pewnych 
 		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja Map per węzeł dla danego zapytania.
@@ -383,8 +448,7 @@ Zaletą systemu będzie implementacja uproszczonego stylu programowania "Map-Red
 \end{itemize}
 \clearpage
 
-Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na "zarezerwawanej" dla niego 
-karcie graficznej (jeśli okaże się to korzystne).
+Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłości operacje Reduce Mastera będą mogły być wykonywane również na "zarezerwawanej" dla niego karcie graficznej (jeśli okaże się to korzystne).
 
 \section{Pierwszy prototyp programu}
 	\subsection{Opis funkcjonalności}
