@@ -24,7 +24,7 @@ int Config::GetIntValue(string settingName)
 	{
 		return _configMap[settingName].as<int>();
 	}
-	LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("value for the setting not found"));
+	//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("value for the setting not found"));
 	return -1;
 }
 
@@ -63,7 +63,7 @@ Config::Config()
 		{
 			string msg = "can not open config file: ";
 			msg.append(config_file);
-			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(msg.c_str()));
+			//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(msg.c_str()));
 			return;
 		}
 		else
@@ -72,11 +72,11 @@ Config::Config()
 			notify(_configMap);
 		}
 
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Finished loading settings from file"));
+		//LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Finished loading settings from file"));
 
 	} catch (exception& e)
 	{
-		LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(e.what()));
+		//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(e.what()));
 		return;
 	}
 	return;

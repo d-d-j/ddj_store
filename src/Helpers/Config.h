@@ -27,7 +27,7 @@ private:
 
 	po::variables_map _configMap;
 
-	Logger _logger = Logger::getRoot();
+	//Logger _logger = Logger::getRoot();
 	Config();
 	virtual ~Config();
 
