@@ -16,18 +16,19 @@ namespace store {
 	int CudaCommons::CudaGetDevicesCount()
 	{
 		int count = 0;
-		cudaGetDeviceCount(&count);
+		cudaError_t error = cudaGetDeviceCount(&count);
+		if(cudaSuccess != error)
+			LOG4CPLUS_ERROR_FMT(this->_logger, "CUDA ERROR - (in CudaCommons::CudaGetDevicesCount()) - %s", cudaGetErrorString(error));
 		return count;
 	}
 
 	int CudaCommons::CudaGetDevicesCountAndPrint()
 	{
-		int nDevices;
-		cudaGetDeviceCount(&nDevices);
+		int nDevices = this->CudaGetDevicesCount();
 		cudaDeviceProp prop;
 		int driverVersion = 0, runtimeVersion = 0;
 
-		printf("[File:%s][Line:%d] ==> CUDA : Found %d CUDA devices: \n\n", __FILE__, __LINE__, nDevices);
+		LOG4CPLUS_INFO_FMT(this->_logger, "CUDA : Found %d CUDA devices: \n\n", nDevices);
 		for (int i = 0; i < nDevices; i++)
 		{
 			cudaSetDevice(i);
@@ -36,13 +37,14 @@ namespace store {
 			cudaGetDeviceProperties(&prop, i);
 
 			// Log device query
-			printf("	Device Number: %d\n", i);
-			printf("	Device name: %s\n", prop.name);
-			printf("	CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
-			printf("	CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, (driverVersion%100)/10, runtimeVersion/1000, (runtimeVersion%100)/10);
-			printf("	Memory Clock Rate (KHz): %d\n", prop.memoryClockRate);
-			printf("	Memory Bus Width (bits): %d\n", prop.memoryBusWidth);
-			printf("	Peak Memory Bandwidth (GB/s): %f\n\n", 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	Device Number: %d\n", i);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	Device name: %s\n", prop.name);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n",
+					driverVersion/1000, (driverVersion%100)/10, runtimeVersion/1000, (runtimeVersion%100)/10);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	Memory Clock Rate (KHz): %d\n", prop.memoryClockRate);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	Memory Bus Width (bits): %d\n", prop.memoryBusWidth);
+			LOG4CPLUS_INFO_FMT(this->_logger, "	Peak Memory Bandwidth (GB/s): %f\n\n", 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
 		}
 		return nDevices;
 	}
@@ -62,10 +64,12 @@ namespace store {
 		return true;
 	}
 
-	int CudaCommons::CudaAllocateArray(size_t size, void** array)
+	cudaError_t CudaCommons::CudaAllocateArray(size_t size, void** array)
 	{
 		size_t freeMemory, totalMemory;
 		cudaMemGetInfo(&freeMemory, &totalMemory);
+
+
 
 		cudaError_t result = cudaSuccess;
 		if(totalMemory <= size)
@@ -82,7 +86,9 @@ namespace store {
 	void CudaCommons::CudaFreeMemory(void* devPtr)
 	{
 		size_t freeMemory, totalMemory;
-		cudaFree(devPtr);
+		cudaError_t error = cudaFree(devPtr);
+		if(cudaSuccess != error)
+			LOG4CPLUS_ERROR_FMT(this->_logger, "CUDA ERROR - (in CudaCommons::CudaFreeMemory) - %s", cudaGetErrorString(error));
 		cudaMemGetInfo(&freeMemory, &totalMemory);
 	}
 

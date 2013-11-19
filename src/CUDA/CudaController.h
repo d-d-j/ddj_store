@@ -44,6 +44,9 @@ namespace store {
 		void SetMainMemoryOffset(ullint offset);
 		void* GetMainMemoryPointer();
 		void* GetMainMemoryFirstFreeAddress();
+
+	private:
+		void allocateMainGpuStorage();
 	};
 
 } /* namespace store */

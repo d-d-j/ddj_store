@@ -30,7 +30,7 @@ public:
 	int CudaGetDevicesCountAndPrint();
 
 	/* CUDA MALLOC */
-	int CudaAllocateArray(size_t size, void** array);
+	cudaError_t CudaAllocateArray(size_t size, void** array);
 	void CudaFreeMemory(void* devPtr);
 };
 
