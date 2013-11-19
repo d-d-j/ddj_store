@@ -452,24 +452,26 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 %	\subsection{Opis funkcjonalności}
 
 	\subsection{Przeprowadzone testy}
-	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu JMeter. Jako że do tej pory aplikacja była uruchamiana jedynie w ramach jednej maszyny (komunikacja node-master po localhost), z użyciem jednej karty graficznej testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu, a także pomóc nam zaznajomić się z narzędziem JMeter, którego użycie będzie ważnym składnikiem badania wydajności na kolejnych etapach wykonania pracy.
-	
-	\subsubsection{Test badający wydajność samego Mastera}
-	Pierwszy przeprowadzony test realizował zapytania OPTIONS do serwera - bez podłączonego węzła po to, by sprawdzić jakie obciążenie będzie w stanie wytrzymać. W kolejnych przebiegach uruchamiano $1, 10,	20,	50,	100, 150, 250, 400, 500, 700$ wątków, z których każdy starał się wysłać 1000 zapytań. 
-
-	\begin{figure}[ht!]
-	\centering
-	\caption{Test wytrzymałości serwera}
-		\includegraphics[width=0.5\textwidth]{img/TestMasterOptions.png}
-	\end{figure}
+	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu Apache Benchmark. Jako że do tej pory aplikacja była uruchamiana jedynie z użyciem jednej maszyny z jedną karta graficzną, testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu. Testy przeprowadzane po kolejnych etapach implementacji będą ważnym składnikiem oceny wydajności projektu
 	
 		\subsubsection{Test wydajności umieszczania danych na karcie}
-	Kolejna próba miała na celu sprawdzenie szybkości obsługiwania zapytań dodania rekordu do bazy danych. Przeprowadzono podobne testy jak w punkcie poprzednim, tym razem z podłączonym węzłem wysyłając zapytania POST. 
+		W tym teście wykonywano $20000$ zapytań typu Insert przez kolejno $1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 30, 40$ równoległych wątków. Dane z tego testu przedstawione są na wykresach \ref{fig:concurrency} i \ref{fig:concurrencyPerThread}. 
 		\begin{figure}[ht!]
 	\centering
-	\caption{Test szybkości dodawania rekordów}
-		\includegraphics[width=0.5\textwidth]{img/TestSimpleInserts.png}
+	\caption{Liczba zapytań na sekundę}
+	\label{fig:concurrency}
+		\includegraphics[width=0.8\textwidth]{img/concurrencyTest.png}
 	\end{figure}
+	
+	 
+		\begin{figure}[ht!]
+	\centering
+	\caption{Liczba zapytań na sekundę w przeliczeniu na wątek}
+		\label{fig:concurrencyPerThread}
+		\includegraphics[width=0.8\textwidth]{img/concurrencyTestPerThread.png}
+	\end{figure}
+	
+Rysunek \ref{fig:concurrency} pokazuje, że liczba zapytań obsłużonych w ciągu sekundy przestaje rosnąć, gdy osiągnie wartość ok 12000.   
 
 	
  
