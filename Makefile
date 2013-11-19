@@ -30,7 +30,7 @@ OBJS += \
 ./src/Task/StoreTaskMonitor.o \
 ./src/CUDA/CudaController.o \
 ./src/Helpers/Semaphore.o \
-./src/CUDA/GpuStore.o \
+./src/CUDA/CudaCommons.o \
 ./src/Node.o \
 ./src/Network/Client.o \
 ./src/main.o
@@ -48,6 +48,7 @@ CPP_DEPS += \
 ./src/Task/StoreTask.d \
 ./src/Task/StoreTaskMonitor.d \
 ./src/CUDA/CudaController.d \
+./src/CUDA/CudaCommons.d \
 ./src/Helpers/Semaphore.d \
 ./src/Node.d \
 ./src/Network/Client.d \

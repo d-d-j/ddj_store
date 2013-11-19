@@ -22,7 +22,6 @@
 
 #include "StoreBuffer.h"
 #include "../GpuUpload/GpuUploadMonitor.h"
-#include "../CUDA/GpuStore.cuh"
 #include "../Task/StoreTask.h"
 #include "../CUDA/CudaController.h"
 #include "../Store/storeSettings.h"
@@ -39,15 +38,10 @@ class StoreController
     /* TYPEDEFS */
     typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
     typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
-    typedef boost::unordered_map<tag_type, StoreBuffer_Pointer> Buffers_Map;
+    typedef boost::unordered_map<metric_type, StoreBuffer_Pointer> Buffers_Map;
 
     /* FIELDS */
     private:
-		/* LOGGER */
-		Logger _logger = Logger::getRoot();
-
-		Config* _config = Config::GetInstance();
-
     	int _gpuDeviceId;
     	GpuUploadMonitor* _gpuUploadMonitor;
     	QueryMonitor* _queryMonitor;
@@ -55,6 +49,10 @@ class StoreController
 
     	Buffers_Map* _buffers;
         boost::unordered_map<int, taskFunc> _taskFunctions;
+
+        /* LOGGER & CONFIG */
+		Logger _logger = Logger::getRoot();
+		Config* _config = Config::GetInstance();
 
 	/* METHODS */
     public:

@@ -26,10 +26,9 @@
 
 using namespace ddj::store;
 
-void InitializeLogger()
-{
-    log4cplus::initialize();
-    LogLog::getLogLog()->setInternalDebugging(true);
+void InitializeLogger() {
+	log4cplus::initialize();
+	LogLog::getLogLog()->setInternalDebugging(true);
 	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
 }
 
@@ -49,5 +48,4 @@ int main(int ac, char* av[])
 
 	return EXIT_SUCCESS;
 }
-
 

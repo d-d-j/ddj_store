@@ -1,9 +1,0 @@
-#ifndef DDJ_STORESETTINGS_H_
-#define DDJ_STORESETTINGS_H_
-
-#define STORE_BUFFER_SIZE				256
-#define DEVICE_BUFFERS_COUNT 			1
-#define MIN_CUDA_MAJOR_VER				2
-#define MIN_CUDA_MINOR_VER				0
-
-#endif

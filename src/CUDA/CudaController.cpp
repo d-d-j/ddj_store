@@ -21,11 +21,9 @@ namespace store {
 		this->_mainMemoryOffset = 0;
 		this->_mainMemoryPointer = NULL;
 
-
-
 		// ALLOCATE MAIN STORAGE ON GPU
 		int i = 1;
-		while(gpuAllocateMainArray(_config->GetIntValue("MAIN_STORE_SIZE") / i, &(this->_mainMemoryPointer)) != cudaSuccess)
+		while(_cudaCommons.CudaAllocateArray(_config->GetIntValue("MAIN_STORE_SIZE") / i, &(this->_mainMemoryPointer)) != cudaSuccess)
 			if(i <= _config->GetIntValue("GPU_MEMORY_ALLOC_ATTEMPTS")) i++;
 			else throw std::runtime_error("Cannot allocate main GPU memory in storeController");
 
@@ -47,7 +45,7 @@ namespace store {
 			delete [] this->_queryStreams;
 
 		// RELEASE MAIN GPU STORE MEMORY
-		gpuFreeMemory(this->_mainMemoryPointer);
+		_cudaCommons.CudaFreeMemory(this->_mainMemoryPointer);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [END]"));
 	}
