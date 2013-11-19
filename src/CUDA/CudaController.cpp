@@ -85,20 +85,21 @@ namespace store {
 	{
 		int maxAttempts = _config->GetIntValue("GPU_MEMORY_ALLOC_ATTEMPTS");
 		int memorySize = _config->GetIntValue("MAIN_STORE_SIZE");
+		size_t mbSize = this->_config->GetIntValue("MB_SIZE_IN_BYTES");
 		cudaError_t error = cudaSuccess;
 		while(maxAttempts)
 		{
-			LOG4CPLUS_INFO(this->_logger, "Allocating " << memorySize << " of memory...");
+			LOG4CPLUS_INFO(this->_logger, "Allocating " << (float)memorySize/mbSize << " MB of memory...");
 
 			error = _cudaCommons.CudaAllocateArray(memorySize, &(this->_mainMemoryPointer));
 
 			if(error != cudaSuccess)
 			{
-				LOG4CPLUS_ERROR(this->_logger, "CUDA ERROR - Can't allocate " << memorySize << " B of GPU memory - " << cudaGetErrorString(error));
+				LOG4CPLUS_ERROR(this->_logger, "CUDA ERROR - Can't allocate " << (float)memorySize/mbSize << " MB of GPU memory - " << cudaGetErrorString(error));
 			}
 			else
 			{
-				LOG4CPLUS_INFO(this->_logger, "CUDA SUCCESS - allocated " << memorySize << " B of GPU memory");
+				LOG4CPLUS_INFO(this->_logger, "CUDA SUCCESS - allocated " << (float)memorySize/mbSize << " MB of GPU memory");
 				break;
 			}
 			maxAttempts--;
