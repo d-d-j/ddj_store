@@ -37,7 +37,7 @@ namespace store {
 	{
 		cudaStream_t stream = this->_cudaController->GetUploadStream();
 
-		infoElement* result = new infoElement(elements->front().tag, elements->front().time, elements->back().time, 0, 0);
+		infoElement* result = new infoElement(elements->front().metric, elements->front().time, elements->back().time, 0, 0);
 
 		storeElement* deviceBufferPointer;
 

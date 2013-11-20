@@ -44,7 +44,6 @@
 /* OTHER */
 #include "../BTree/btree.h"
 #include "storeTypedefs.h"
-#include "storeSettings.h"
 
 /* MACROS */
 #define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)

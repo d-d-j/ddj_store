@@ -3,12 +3,12 @@ OS := $(shell uname)
 
 ifeq ($(OS),Darwin)
 	COMPILER := clang++
-	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus
 	STANDART := -std=c++11 -stdlib=libc++
 else
 	#you can use g++ or clang or color-gcc
 	COMPILER := g++
-	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -lboost_program_options -llog4cplus
 	STANDART := -std=c++0x
 endif
 
@@ -17,6 +17,7 @@ DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
 OBJS += \
+./src/Helpers/Config.o \
 ./src/BTree/BTreeMonitor.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
@@ -29,12 +30,13 @@ OBJS += \
 ./src/Task/StoreTaskMonitor.o \
 ./src/CUDA/CudaController.o \
 ./src/Helpers/Semaphore.o \
-./src/CUDA/GpuStore.o \
+./src/CUDA/CudaCommons.o \
 ./src/Node.o \
 ./src/Network/Client.o \
 ./src/main.o
 
 CPP_DEPS += \
+./src/Helpers/Config.d \
 ./src/BTree/BTreeMonitor.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \
@@ -46,6 +48,7 @@ CPP_DEPS += \
 ./src/Task/StoreTask.d \
 ./src/Task/StoreTaskMonitor.d \
 ./src/CUDA/CudaController.d \
+./src/CUDA/CudaCommons.d \
 ./src/Helpers/Semaphore.d \
 ./src/Node.d \
 ./src/Network/Client.d \

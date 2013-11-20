@@ -17,6 +17,8 @@
 #include "Store/StoreController.h"
 #include "Store/storeElement.h"
 #include "Helpers/Logger.h"
+#include "Helpers/Config.h"
+#include "CUDA/CudaCommons.h"
 
 namespace ddj
 {
@@ -26,8 +28,10 @@ namespace ddj
 		/* TYPEFEFS */
 		typedef boost::shared_ptr<store::StoreController> StoreController_Pointer;
 
-		/* LOGGER */
+		/* LOGGER & CONFIG & CUDA_COMMONS */
+		store::CudaCommons _cudaCommons;
 		Logger _logger = Logger::getRoot();
+		Config* _config = Config::GetInstance();
 
         /* NETWORK */
         Client* _client;

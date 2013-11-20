@@ -6,7 +6,6 @@
  */
 
 #include "Node.h"
-#include "CUDA/GpuStore.cuh"
 
 namespace ddj
 {
@@ -24,7 +23,7 @@ namespace ddj
 		// connect CreateTaskMethod to _newTaskSignal
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
-		this->_cudaDevicesCount = gpuGetCudaDevicesCountAndPrint();
+		this->_cudaDevicesCount = _cudaCommons.CudaGetDevicesCountAndPrint();
 
 		StoreController_Pointer* controller;
 
@@ -32,7 +31,7 @@ namespace ddj
 		for(int i=0; i<1; i++)
 		{
 			// Check if GPU i satisfies ddj_store requirements
-			if(!gpuCheckCudaDevice(i)) continue;
+			if(!_cudaCommons.CudaCheckDeviceForRequirements(i)) continue;
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});
 			delete controller;
@@ -113,7 +112,7 @@ namespace ddj
 						int n = result->result_size / sizeof(store::storeElement);
 						store::storeElement* elements = (store::storeElement*)result->result_data;
 						for(int k=0; k<n; k++)
-							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].tag, elements[k].series, elements[k].time, elements[k].value);
+							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {metric=%d, tag=%d, time=%llu, value=%f}", k, elements[k].metric, elements[k].tag, elements[k].time, elements[k].value);
 
 						// Send result
 						this->_client->SendTaskResult(result);

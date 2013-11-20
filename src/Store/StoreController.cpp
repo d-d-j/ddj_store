@@ -6,15 +6,15 @@
  *  Copyright (c) 2013 Karol Dzitkowski. All rights reserved.
  *
  *      NAZEWNICTWO
- * 1. nazwy klas:  CamelStyle z dużej litery np. StoreController
- * 2. nazwy struktur camelStyle z małej litery np. storeElement
- * 3. nazwy pól prywatnych camelStyle z małej litery z podkreśleniem _backBuffer
- * 4. nazwy pól publicznych i zmiennych globalnych słowa rozdzielamy _ i z małych liter np. memory_available
- * 5. define z dużych liter i rozdzielamy _ np. BUFFER_SIZE
- * 6. nazwy metod publicznych z dużej litery CamelStyle np. InsertValue() oraz parametry funkcji z małych liter camelStyle np. InsertValue(int valToInsert);
- * 7. nazwy metod prywatnych z małej litery camelStyle
- * 8. nazwy funkcji "prywatnych" w plikach cpp z małej litery z _ czyli, insert_value(int val_to_insert);
- * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
+ * 1. nazwy klas:  CamelStyle z duÅ¼ej litery np. StoreController
+ * 2. nazwy struktur camelStyle z maÅ‚ej litery np. storeElement
+ * 3. nazwy pÃ³l prywatnych camelStyle z maÅ‚ej litery z podkreÅ›leniem _backBuffer
+ * 4. nazwy pÃ³l publicznych i zmiennych globalnych sÅ‚owa rozdzielamy _ i z maÅ‚ych liter np. memory_available
+ * 5. define z duÅ¼ych liter i rozdzielamy _ np. BUFFER_SIZE
+ * 6. nazwy metod publicznych z duÅ¼ej litery CamelStyle np. InsertValue() oraz parametry funkcji z maÅ‚ych liter camelStyle np. InsertValue(int valToInsert);
+ * 7. nazwy metod prywatnych z maÅ‚ej litery camelStyle
+ * 8. nazwy funkcji "prywatnych" w plikach cpp z maÅ‚ej litery z _ czyli, insert_value(int val_to_insert);
+ * 9. nazwy funkcji globalnych czyli w plikach .h najczÄ™Å›ciej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
 #include "StoreController.h"
@@ -27,13 +27,14 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
+
 		this->_buffers = new Buffers_Map();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
-		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
+		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"));
 
 		// CREATE GPU UPLOAD MONITOR
 		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
@@ -99,18 +100,18 @@ namespace store {
 		storeElement* element = (storeElement*)(task->GetData());
 
 		// Log element to insert
-		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
+		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
 
 		// Create buffer with element's metric if not exists
 		{
 			boost::mutex::scoped_lock lock(this->_buffersMutex);
-			if(!this->_buffers->count(element->tag))
+			if(!this->_buffers->count(element->metric))
 			{
-				StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
-				this->_buffers->insert({element->tag, newBuf});
+				StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_gpuUploadMonitor));
+				this->_buffers->insert({element->metric, newBuf});
 			}
 		}
-		(*_buffers)[element->tag]->Insert(element);
+		(*_buffers)[element->metric]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
 		task->SetResult(true, nullptr, nullptr, 0);

@@ -25,6 +25,7 @@
 #include "storeElement.h"
 #include "infoElement.h"
 #include "../CUDA/cudaIncludes.h"
+#include "../Helpers/Config.h"
 #include "../Helpers/Logger.h"
 
 namespace ddj {
@@ -41,7 +42,7 @@ namespace store {
     {
 		/* FIELDS */
 		private:
-			tag_type _tag;	/**< This buffer coordinates data only with this tag */
+			metric_type _metric;	/**< This buffer coordinates data only with this tag */
 			BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
 			GpuUploadMonitor* _gpuUploadMonitor;	/**< protects access to GpuUploadCore class */
 
@@ -69,7 +70,7 @@ namespace store {
 			/*!
 			  It creates a new instance of BTreeMonitor class and starts Upload thread
 			*/
-			StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor);
+			StoreBuffer(metric_type metric, GpuUploadMonitor* gpuUploadMonitor);
 
 			//! BTreeMonitor destructor.
 			/*!

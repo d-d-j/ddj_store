@@ -33,11 +33,7 @@ namespace store {
 		this->_mainMemoryOffset = 0;
 		this->_mainMemoryPointer = NULL;
 
-		// ALLOCATE MAIN STORAGE ON GPU
-		i = 1;
-		while(gpuAllocateMainArray(MAIN_STORE_SIZE / i, &(this->_mainMemoryPointer)) != cudaSuccess)
-			if(i <= GPU_MEMORY_ALLOC_ATTEMPTS) i++;
-			else throw std::runtime_error("Cannot allocate main GPU memory in storeController");
+		this->allocateMainGpuStorage();
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [END]"));
 	}
@@ -59,7 +55,7 @@ namespace store {
 		delete this->_queryStreams;
 
 		// RELEASE MAIN GPU STORE MEMORY
-		gpuFreeMemory(this->_mainMemoryPointer);
+		_cudaCommons.CudaFreeMemory(this->_mainMemoryPointer);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [END]"));
 	}
@@ -124,6 +120,37 @@ namespace store {
 	{
 		boost::mutex::scoped_lock lock(_offsetMutex);
 		return (char*)this->_mainMemoryPointer+this->_mainMemoryOffset;
+	}
+
+	void CudaController::allocateMainGpuStorage()
+	{
+		int maxAttempts = _config->GetIntValue("GPU_MEMORY_ALLOC_ATTEMPTS");
+		int memorySize = _config->GetIntValue("MAIN_STORE_SIZE");
+		size_t mbSize = this->_config->GetIntValue("MB_SIZE_IN_BYTES");
+		cudaError_t error = cudaSuccess;
+		while(maxAttempts)
+		{
+			LOG4CPLUS_INFO(this->_logger, "Allocating " << (float)memorySize/mbSize << " MB of memory...");
+
+			error = _cudaCommons.CudaAllocateArray(memorySize, &(this->_mainMemoryPointer));
+
+			if(error != cudaSuccess)
+			{
+				LOG4CPLUS_ERROR(this->_logger, "CUDA ERROR - Can't allocate " << (float)memorySize/mbSize << " MB of GPU memory - " << cudaGetErrorString(error));
+			}
+			else
+			{
+				LOG4CPLUS_INFO(this->_logger, "CUDA SUCCESS - allocated " << (float)memorySize/mbSize << " MB of GPU memory");
+				break;
+			}
+			maxAttempts--;
+			memorySize /= 2;
+		}
+		if(!maxAttempts)	// if memory cannot be allocated throw an exception
+		{
+			LOG4CPLUS_FATAL_FMT(this->_logger, "CUDA FATAL ERROR MAIN MEMORY ALLOCATION - %s", cudaGetErrorString(error));
+			throw std::runtime_error("Cannot allocate main GPU memory in storeController");
+		}
 	}
 
 } /* namespace store */
