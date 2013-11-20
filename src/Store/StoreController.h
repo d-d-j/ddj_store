@@ -57,9 +57,6 @@ class StoreController
         boost::threadpool::fifo_pool _queryTaskThreadPool;
         boost::threadpool::fifo_pool _insertTaskThreadPool;
 
-		/* LOGGER */
-		Logger _logger = Logger::getRoot();
-
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
 		Config* _config = Config::GetInstance();
