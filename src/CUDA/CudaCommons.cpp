@@ -70,7 +70,7 @@ namespace store {
 		size_t freeMemory, totalMemory;
 		cudaMemGetInfo(&freeMemory, &totalMemory);
 
-		LOG4CPLUS_INFO_FMT(this->_logger, "CUDA INFO - free memory => %d MB, total memory => %d MB", freeMemory/mbSize, totalMemory/mbSize);
+		LOG4CPLUS_INFO_FMT(this->_logger, "CUDA INFO - free memory => %f MB, total memory => %f MB", (float)freeMemory/mbSize, (float)totalMemory/mbSize);
 
 		cudaError_t result = cudaSuccess;
 		if(totalMemory <= size)
@@ -81,7 +81,7 @@ namespace store {
 		result = cudaMalloc((void**)array, size);
 
 		cudaMemGetInfo(&freeMemory, &totalMemory);
-		LOG4CPLUS_INFO_FMT(this->_logger, "CUDA INFO - free memory => %d MB, total memory => %d MB", freeMemory/mbSize, totalMemory/mbSize);
+		LOG4CPLUS_INFO_FMT(this->_logger, "CUDA INFO - free memory => %f MB, total memory => %f MB", (float)freeMemory/mbSize, (float)totalMemory/mbSize);
 		return result;
 	}
 

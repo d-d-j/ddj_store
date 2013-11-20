@@ -19,9 +19,8 @@
 #include "Node.h"
 #include "Store/storeElement.h"
 #include "Network/Client.h"
-#include <cstdint>
 #include "Helpers/Logger.h"
-
+#include <stdio.h>
 #include "Helpers/Config.h"
 
 using namespace ddj::store;
@@ -35,9 +34,16 @@ void InitializeLogger() {
 
 int main(int ac, char* av[])
 {
-	Config::GetInstance();
+	try
+	{
+		Config::GetInstance();
+		InitializeLogger();
+	}
+	catch(std::exception& ex)
+	{
+		fprintf(stderr, "Config or Logger initialization exception - %s", ex.what());
+	}
 
-	InitializeLogger();
 	Logger logger = Logger::getRoot();
 
 	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));

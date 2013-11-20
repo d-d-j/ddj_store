@@ -16,15 +16,14 @@
 
 #include "../Store/StoreIncludes.h"
 #include "Logger.h"
-namespace po = boost::program_options;
 
+namespace po = boost::program_options;
 using namespace std;
 
 class Config
 {
 private:
 	static Config* _instance;
-
 	po::variables_map _configMap;
 
 	//Logger _logger = Logger::getRoot();
