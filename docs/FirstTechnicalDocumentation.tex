@@ -458,7 +458,7 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 	\centering
 	\caption{Liczba zapytań na sekundę}
 	\label{fig:concurrency}
-		\includegraphics[width=0.8\textwidth]{img/concurrencyTest.png}
+		\includegraphics[width=0.7\textwidth]{img/concurrencyTest.png}
 	\end{figure}
 	
 	 
@@ -466,7 +466,7 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 	\centering
 	\caption{Liczba zapytań na sekundę w przeliczeniu na wątek}
 		\label{fig:concurrencyPerThread}
-		\includegraphics[width=0.8\textwidth]{img/concurrencyTestPerThread.png}
+		\includegraphics[width=0.7\textwidth]{img/concurrencyTestPerThread.png}
 	\end{figure}
 	
 Rysunek \ref{fig:concurrency} pokazuje, że liczba zapytań obsłużonych w ciągu sekundy przestaje rosnąć, gdy osiągnie wartość ok 12000. Jest to w pewnym przybliżeniu maksymalna liczba zapytań jaką system jest w stanie obsłużyć w ciągu sekundy. Oczywiście należy wziąć pod uwagę, że wyniki mogą różnić się w zależności od mocy sprzętu, na którym uruchamiany jest program. 
@@ -476,10 +476,13 @@ Na wykresie \ref{fig:threads} przedstawiony jest wynik testu, w którym wysyłan
 
 		\begin{figure}[ht!]
 	\centering
-	\caption{Czas odpowiedzi dla różnej liczby wątków}
+	\caption{Czas odpowiedzi dla różnej liczby klientów}
 		\label{fig:threads}
-		\includegraphics[width=0.9\textwidth]{img/threadsTest.png}
+		\includegraphics[width=0.7\textwidth]{img/threadsTest.png}
 	\end{figure}
+	
+\clearpage 
+Rysunek \ref{fig:threads} pokazuje jak rozkłada się czas odpowiedzi na zapytania dla różnej liczby klientów. Wyniki testów dla różnej liczności klientów przedstawione są na wykresie jako serie. 
 	
  
 
