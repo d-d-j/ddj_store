@@ -245,22 +245,22 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 	\clearpage
 	\subsubsection{Insert}
 		\begin{enumerate}
-			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSON'a na wewnętrzne DTO i opakowanie w strukturę Task.
+			\item Poprzez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSON'a na wewnętrzne DTO i opakowanie w strukturę Task.
 			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
 			\item Worker odbiera Taska (jest to insert) 
 			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
 			\item Worker pobiera z NodeBalancera do, którego Node'a ma go wysłać. 
 			\item Następnie serializuje Taska i wysyła. 
-			\item Nie czeka na odpowiedź tylko od razu wysyła na kanał zwrotny że zadanie zostało przesłane do Node'a
+			\item Nie czeka na odpowiedź tylko od razu wysyła na kanał zwrotny, że zadanie zostało przesłane do Node'a
 		\end{enumerate}
 	\subsubsection{Select}
 		\begin{enumerate}
-			\item Po przez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Taska. 
+			\item Poprzez API zadanie jest przyjmowane od użytkownika. Wewnątrz metody obsługującej odbywa się parsowanie JSONa na wewnętrzne DTO i opakowanie w strukturę Taska. 
 			\item Utworzony Task zostaje wysłany do WorkerBalancera gdzie zostaje przesłany do odpowiedniego Workera z puli.
 			\item Worker odbiera Taska (jest to select) 		
 			\item Worker nadaje zadaniu identyfikator z dostępnej mu puli
 			\item Worker pobiera z NodeBalancera listę Node'ów
-			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID, które czeka na liczbę odpowiedzi różną liczbie aktywnych Node'ów
+			\item Worker rejestruje w TaskManagerze zadanie o nadanym wcześniej ID, które czeka na liczbę odpowiedzi równą liczbie aktywnych Node'ów
 			oraz kanał zwrotny, na którym czeka na wyniki. 
 			\item Worker zleca wysłanie zadania do Node'ów z listy
 			\item Każdy Node obiera zadanie i procesuje je
@@ -324,6 +324,7 @@ danych powinna umożliwiać szybką ich agregację oraz filtrowanie.
 					\item Odbiera zlecenia wykonania zadań od Mastera
 					\item Wysyła rezultat wykonanego zadania do Mastera
 				\end{itemize}
+				\clearpage
 			\item Node Controller (Resource Controller) - nadzoruje wykorzystanie zasobów na węźle i przesyła ja do Mastera \\ \\
 				Funkcjonalność: 
 				\begin{itemize}
@@ -423,7 +424,7 @@ Zaletą systemu będzie implementacja uproszczonego modelu programowania Map-Red
 	\item Każdy z węzłów wyszukuje w swojej bazie odpowiednie fragmenty danych i wykonuje na nich operację Map tj. filtruje dane pod kątem pewnych 
 		kryteriów, przy czym jeśli ilość dostępnej pamięci na karcie na to pozwala wykonywać się będzie tylko jedna operacja Map per węzeł dla danego zapytania.
 		Dane uzyskane poprzez wykonanie operacji map są parami klucz-wartość, gdzie kluczem jest id danego zadania, a wartościami wyniki zapytania. Wyniki
-		operacji Map z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce, która wszystkie agreguje dane zwrócone dla konkretnego zadania. 
+		operacji Map z każdego węzła przekazywane są do Mastera w celu wykonania na nich operacji Reduce, która agreguje wszystkie dane zwrócone dla konkretnego zadania. 
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Ogólny schemat Map-Reduce w systemie}
@@ -433,7 +434,7 @@ Zaletą systemu będzie implementacja uproszczonego modelu programowania Map-Red
 	\item Każdy z węzłów poprzez użycie Mappera, który korzystając z wiedzy o położeniu danych w pamięci na karcie graficznej przechowywanej w B+ drzewie filtruje dane tworzy
 		pary taskId - record. W ten sposób Mapper wykonuje operację map. Dane te mogą być dodatkowo zagregowane na karcie przez Composer'a. Wykonuje on na zmapowanych
 		parach operację Compose - nazywaną przez nas operacją Reduce ponieważ jest ona analogiczna do tej, którą ma wykonać na końcu Master. Tutaj mamy zamiar wykorzystać
-		moc obliczeniową kart graficznych. Uzyskane dane z wielu kart graficznych mogą być wstępnie zagregowane już na węźle jeśli pozwala na to rodzaj operacji Reduce - musi być łączna i przemienna.
+		moc obliczeniową kart graficznych. Uzyskane dane z wielu kart graficznych mogą być wstępnie zagregowane już na węźle, jeśli pozwala na to rodzaj operacji Reduce - musi być łączna i przemienna.
 		\begin{figure}[t]
 			\begin{center}
 				\caption{Schemat działania Map-Reduce w węźle}
@@ -475,7 +476,7 @@ Na wykresie \ref{fig:threads} przedstawiony jest wynik testu, w którym wysyłan
 
 		\begin{figure}[ht!]
 	\centering
-	\caption{Czas odpowiedzi w zależności od liczby wątków}
+	\caption{Czas odpowiedzi dla różnej liczby wątków}
 		\label{fig:threads}
 		\includegraphics[width=0.9\textwidth]{img/threadsTest.png}
 	\end{figure}
