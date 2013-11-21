@@ -452,7 +452,7 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 	Po pierwszym etapie implementacji podjęliśmy pierwszą próbę zmierzenia wydajności systemu. Testy wydajności zostały przeprowadzone za pomocą programu Apache Benchmark. Jako że do tej pory aplikacja była uruchamiana jedynie z użyciem jednej maszyny z jedną karta graficzną, testy zostały przeprowadzone w takim samym środowisku. Testy zostały przeprowadzone po to, by dać nam podstawowe pojęcie o ograniczeniach obecnej implementacji systemu. Testy przeprowadzane po kolejnych etapach implementacji będą ważnym składnikiem oceny wydajności projektu
 	
 		\subsubsection{Test wydajności umieszczania danych na karcie}
-		W tym teście wykonywano $20000$ zapytań typu Insert przez kolejno $1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 30, 40$ równoległych wątków. Dane z tego testu przedstawione są na wykresach \ref{fig:concurrency} i \ref{fig:concurrencyPerThread}. 
+		W tym teście wykonywano $20000$ zapytań typu Insert przez kolejno $1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 30, 40$ wątków klienta. Dane z tego testu przedstawione są na wykresach \ref{fig:concurrency} i \ref{fig:concurrencyPerThread}. 
 		\begin{figure}[ht!]
 	\centering
 	\caption{Liczba zapytań na sekundę}
@@ -471,7 +471,7 @@ Taki model systemu może zapewnić dużą skalowalność systemu. W przyszłośc
 Rysunek \ref{fig:concurrency} pokazuje, że liczba zapytań obsłużonych w ciągu sekundy przestaje rosnąć, gdy osiągnie wartość ok 12000. Jest to w pewnym przybliżeniu maksymalna liczba zapytań jaką system jest w stanie obsłużyć w ciągu sekundy. Oczywiście należy wziąć pod uwagę, że wyniki mogą różnić się w zależności od mocy sprzętu, na którym uruchamiany jest program. 
 
 
-Na wykresie \ref{fig:threads} przedstawiony jest wynik testu, w którym wysyłano $100000$ zapytań za pomocą kolejno $1, 20, 50, 100$ równoległych wątków. Czas odpowiedzi na zapytania dla każdej serii umieszczono na jednym wykresie. Pokazuje to różnicę w czasie przetwarzania żądania w zależności od liczby równoległych zapytań.
+Na wykresie \ref{fig:threads} przedstawiony jest wynik testu, w którym wysyłano $100000$ zapytań przez kolejno $1, 20, 50, 100$ wątków klienta. Czas odpowiedzi na zapytania dla każdej serii umieszczono na jednym wykresie. Pokazuje to różnicę w czasie przetwarzania żądania w zależności od liczby równoległych zapytań.
 
 		\begin{figure}[ht!]
 	\centering
