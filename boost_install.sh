@@ -24,7 +24,7 @@ echo "Available CPU cores: "$cpuCores
 sudo ./b2 --with=all -j $cpuCores install
 
 #Install boost-thread-pool
-wget https://github.com/AlexMarlo/boost-threadpool/blob/master/boost/threadpool/task_adaptors.hpp
-mv task_adaptors.hpp /usr/local/include/boost/task_adaptors.hpp
+wget https://raw.github.com/AlexMarlo/boost-threadpool/master/boost/threadpool/task_adaptors.hpp
+sudo mv task_adaptors.hpp /usr/local/include/boost/task_adaptors.hpp
 
 
