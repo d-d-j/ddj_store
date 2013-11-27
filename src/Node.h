@@ -34,7 +34,7 @@ namespace ddj
 		Config* _config = Config::GetInstance();
 
         /* NETWORK */
-        Client* _client;
+        NetworkClient* _client;
         boost::signals2::signal<void (taskRequest)> _requestSignal;
 
         /* STORE CONTROLLER */

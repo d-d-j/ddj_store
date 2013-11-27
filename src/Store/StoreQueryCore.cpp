@@ -10,14 +10,14 @@
 namespace ddj {
 namespace store {
 
-QueryCore::QueryCore(CudaController* cudaController)
+StoreQueryCore::StoreQueryCore(CudaController* cudaController)
 {
 	this->_cudaController = cudaController;
 }
 
-QueryCore::~QueryCore(){}
+StoreQueryCore::~StoreQueryCore(){}
 
-size_t QueryCore::SelectAll(void** queryResult)
+size_t StoreQueryCore::SelectAll(void** queryResult)
 {
 	void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
 	ullint offset = this->_cudaController->GetMainMemoryOffset();

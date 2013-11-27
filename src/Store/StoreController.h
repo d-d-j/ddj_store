@@ -25,7 +25,6 @@
 #include "../Task/StoreTask.h"
 #include "../CUDA/CudaController.h"
 #include "../Store/storeSettings.h"
-#include "../Query/QueryMonitor.h"
 #include "../Helpers/Config.h"
 #include "../Helpers/Logger.h"
 #include "../Query/QueryRequest.h"
@@ -44,8 +43,6 @@ class StoreController
     /* FIELDS */
     private:
     	int _gpuDeviceId;
-    	GpuUploadMonitor* _gpuUploadMonitor;
-    	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
 
     	/* BUFFERS */

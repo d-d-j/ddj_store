@@ -95,8 +95,8 @@ namespace store {
 			void Flush();
 
 		private:
-			infoElement* uploadBuffer();
-			void insertToBtree(infoElement* element);
+			storeTrunkInfo* uploadBuffer();
+			void insertToBtree(storeTrunkInfo* element);
 			void switchBuffers();
 			void uploaderThreadFunction();
     };

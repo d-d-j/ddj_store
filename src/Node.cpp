@@ -45,7 +45,7 @@ namespace ddj
 			throw std::runtime_error(errString);
 		}
 
-		this->_client = new Client(&_requestSignal);
+		this->_client = new NetworkClient(&_requestSignal);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}

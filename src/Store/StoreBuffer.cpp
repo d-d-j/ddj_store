@@ -90,7 +90,7 @@ void StoreBuffer::Flush()
 	this->_buffer.swap(this->_backBuffer);
 
 	// UPLOAD BUFFER TO GPU
-	infoElement* elemToInsertToBTree =
+	storeTrunkInfo* elemToInsertToBTree =
 			this->_gpuUploadMonitor->Upload(&(this->_backBuffer), this->_backBufferElementsCount);
 
 	// INSERT INFO ELEMENT TO B+TREE
@@ -101,7 +101,7 @@ void StoreBuffer::uploaderThreadFunction()
 {
 	LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [metric=%d] [BEGIN]", this->_metric);
 
-	infoElement* elemToInsertToBTree;
+	storeTrunkInfo* elemToInsertToBTree;
 	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
 	this->_uploaderBarrier->wait();
 	try

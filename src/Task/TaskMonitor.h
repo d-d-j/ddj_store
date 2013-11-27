@@ -13,9 +13,9 @@
 #include "TaskType.h"
 
 namespace ddj {
-namespace store {
+namespace task {
 
-	class StoreTaskMonitor
+	class TaskMonitor
 	{
 		/* FIELDS */
 		public:
@@ -26,8 +26,8 @@ namespace store {
 
 		/* METHODS */
 		public:
-			StoreTaskMonitor(boost::condition_variable* condResponseReady);
-			virtual ~StoreTaskMonitor();
+			TaskMonitor(boost::condition_variable* condResponseReady);
+			virtual ~TaskMonitor();
 			StoreTask_Pointer AddTask(int taskId, TaskType type, void* taskData);
 			boost::container::vector<StoreTask_Pointer> PopCompleatedTasks();
 	};

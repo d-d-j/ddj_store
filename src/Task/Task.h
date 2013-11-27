@@ -11,9 +11,9 @@
 #include "TaskResult.h"
 
 namespace ddj {
-namespace store {
+namespace task {
 
-class StoreTask : public boost::noncopyable
+class Task : public boost::noncopyable
 {
 private:
 	/* TASK */
@@ -33,13 +33,13 @@ private:
 	boost::mutex _mutex;
 
 public:
-	StoreTask(
+	Task(
 			int taskId,
 			TaskType type,
 			void* taskData,
 			boost::condition_variable* cond);
 
-	virtual ~StoreTask();
+	virtual ~Task();
 
 	void SetResult(
 			bool isSuccessfull,
@@ -55,7 +55,7 @@ public:
 	bool IsCompleated();
 };
 
-typedef boost::shared_ptr<StoreTask> StoreTask_Pointer;
+typedef boost::shared_ptr<Task> StoreTask_Pointer;
 
 } /* namespace store */
 } /* namespace ddj */

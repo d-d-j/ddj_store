@@ -8,29 +8,29 @@
 #include "StoreTaskMonitor.h"
 
 namespace ddj {
-namespace store {
+namespace task {
 
-	StoreTaskMonitor::StoreTaskMonitor(boost::condition_variable* condResponseReady)
+	TaskMonitor::TaskMonitor(boost::condition_variable* condResponseReady)
 	{
 		this->_condResponseReady = condResponseReady;
 		this->_taskCount = 0;
 	}
 
-	StoreTaskMonitor::~StoreTaskMonitor()
+	TaskMonitor::~TaskMonitor()
 	{
 	}
 
-	StoreTask_Pointer StoreTaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
+	StoreTask_Pointer TaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
-		StoreTask_Pointer newTask(new StoreTask(taskId, type, taskData, this->_condResponseReady));
+		StoreTask_Pointer newTask(new Task(taskId, type, taskData, this->_condResponseReady));
 		this->_tasks.push_back(newTask);
 		this->_taskCount++;
 		return newTask;
 	}
 
-	boost::container::vector<StoreTask_Pointer> StoreTaskMonitor::PopCompleatedTasks()
+	boost::container::vector<StoreTask_Pointer> TaskMonitor::PopCompleatedTasks()
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 

@@ -8,6 +8,9 @@
 #ifndef TASKTYPE_H_
 #define TASKTYPE_H_
 
+namespace ddj {
+namespace task {
+
 enum TaskType
 {
 	Error = 0,
@@ -15,5 +18,8 @@ enum TaskType
 	SelectAll = 2,
 	Flush = 3
 };
+
+} /* namespace store */
+} /* namespace ddj */
 
 #endif /* TASKTYPE_H_ */

@@ -18,11 +18,6 @@
 
 #include "Node.h"
 #include "Store/storeElement.h"
-#include "Network/Client.h"
-#include <cstdint>
-#include "Helpers/Logger.h"
-
-#include "Helpers/Config.h"
 
 using namespace ddj::store;
 

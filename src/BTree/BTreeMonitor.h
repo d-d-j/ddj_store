@@ -45,10 +45,10 @@ namespace store {
 			 * \brief Function inserts infoElement to B+Tree structure
 			 * \param infoElement* a pointer to infoElement to insert to B+Tree structure
 			 */
-			void Insert(infoElement* element);
+			void Insert(storeTrunkInfo* element);
 
 		private:
-			void insertToTree(infoElement* element);
+			void insertToTree(storeTrunkInfo* element);
 	};
 
 } /* namespace store */

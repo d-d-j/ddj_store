@@ -15,12 +15,12 @@
 namespace ddj {
 namespace store {
 
-	class QueryCore
+	class StoreQueryCore
 	{
 		CudaController* _cudaController;
 	public:
-		QueryCore(CudaController* cudaController);
-		virtual ~QueryCore();
+		StoreQueryCore(CudaController* cudaController);
+		virtual ~StoreQueryCore();
 
 		size_t SelectAll(void** queryResult);
 	};

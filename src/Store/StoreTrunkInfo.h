@@ -1,19 +1,17 @@
 #ifndef INFOELEMENT_H_
 #define INFOELEMENT_H_
 
-#include "../Store/StoreIncludes.h"
-
 namespace ddj {
 namespace store {
 
-	/*! \struct infoElement
+	/*! \struct storeTrunkInfo
 	 \brief A structure containing the indexes of element trunks in the GPU store array
 
-	 InfoElement structs are stored in B+Tree structure. They contains start and end times of
+	 storeTrunkInfo structs are stored in B+Tree structure. They contains start and end times of
 	 elements from single trunk and it's position in GPU structure array. It is also signed
 	 by metric of elements from trunk.
 	*/
-	typedef struct infoElement
+	typedef struct storeTrunkInfo
 	{
 		public:
 		/* FIELDS */
@@ -24,11 +22,11 @@ namespace store {
 			info_value_type endValue;
 
 		/* CONSTRUCTORS & DESTRUCTOR */
-			infoElement(){ metric = 0; startTime = 0; endTime = 0; startValue = 0; endValue = 0; }
-			infoElement(metric_type _metric, ullint _startTime, ullint _endTime, info_value_type _startValue, info_value_type _endValue)
+			storeTrunkInfo(){ metric = 0; startTime = 0; endTime = 0; startValue = 0; endValue = 0; }
+			storeTrunkInfo(metric_type _metric, ullint _startTime, ullint _endTime, info_value_type _startValue, info_value_type _endValue)
 			: metric(_metric), startTime(_startTime), endTime(_endTime), startValue(_startValue), endValue(_endValue) {}
-			~infoElement() {}
-	} infoElement;
+			~storeTrunkInfo() {}
+	} storeTrunkInfo;
 	
 } /* namespace ddj */
 } /* namespace store */

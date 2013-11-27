@@ -14,6 +14,7 @@
 #include <log4cplus/helpers/stringhelper.h>
 #include <log4cplus/loggingmacros.h>
 
+
 using namespace log4cplus;
 using namespace log4cplus::helpers;
 

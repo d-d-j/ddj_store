@@ -8,9 +8,9 @@
 #include "StoreTask.h"
 
 namespace ddj {
-namespace store {
+namespace task {
 
-	StoreTask::StoreTask(
+	Task::Task(
 			int taskId,
 			TaskType type,
 			void* taskData,
@@ -27,7 +27,7 @@ namespace store {
 		this->_resultSize = 0;
 	}
 
-	StoreTask::~StoreTask()
+	Task::~Task()
 	{
 		if(this->_taskData != nullptr)
 			free(this->_taskData);
@@ -35,7 +35,7 @@ namespace store {
 			free(this->_resultData);
 	}
 
-	void StoreTask::SetResult(
+	void Task::SetResult(
 			bool isSuccessfull,
 			const char* message,
 			void* resultData,
@@ -53,7 +53,7 @@ namespace store {
 		this->_condResponseReady->notify_one();
 	}
 
-	TaskResult* StoreTask::GetResult()
+	TaskResult* Task::GetResult()
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
@@ -65,21 +65,21 @@ namespace store {
 				);
 	}
 
-	TaskType StoreTask::GetType()
+	TaskType Task::GetType()
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
 		return this->_type;
 	}
 
-	void* StoreTask::GetData()
+	void* Task::GetData()
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
 		return this->_taskData;
 	}
 
-	bool StoreTask::IsCompleated()
+	bool Task::IsCompleated()
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 

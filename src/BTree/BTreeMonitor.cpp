@@ -25,13 +25,13 @@ namespace store {
 		delete this->_bufferInfoTree;
 	}
 
-	void BTreeMonitor::Insert(infoElement* element)
+	void BTreeMonitor::Insert(storeTrunkInfo* element)
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 		this->insertToTree(element);
 	}
 
-	void BTreeMonitor::insertToTree(infoElement* element)
+	void BTreeMonitor::insertToTree(storeTrunkInfo* element)
 	{
 		try
 		{

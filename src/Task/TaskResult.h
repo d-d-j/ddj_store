@@ -12,8 +12,9 @@
 #define TASKRESULT_H_
 
 namespace ddj {
+namespace task {
 
-	struct TaskResult
+	struct taskResult
 	{
 	public:
 		int task_id;
@@ -21,13 +22,17 @@ namespace ddj {
 		int result_size;
 		void* result_data;
 
-		TaskResult(
+		taskResult(
 				int taskId,
 				TaskType type,
 				void* resultData = nullptr,
-				int resultSize = 0);
+				int resultSize = 0):
+					task_id(taskId),
+					type(type),
+					result_size(resultSize),
+					result_data(resultData){}
 
-		TaskResult(const TaskResult & result)
+		taskResult(const taskResult & result)
 		{
 			task_id = result.task_id;
 			type = result.type;
@@ -35,7 +40,7 @@ namespace ddj {
 			result_data = result.result_data;
 		}
 
-		virtual ~TaskResult();
+		virtual ~taskResult();
 
 		std::string toString()
 		{
@@ -45,5 +50,7 @@ namespace ddj {
 		}
 	};
 
+} /* namespace store */
 } /* namespace ddj */
+
 #endif /* TASKRESULT_H_ */
