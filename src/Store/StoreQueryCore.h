@@ -8,8 +8,8 @@
 #ifndef QUERYCORE_H_
 #define QUERYCORE_H_
 
-#include "../CUDA/CudaController.h"
-#include "../CUDA/CudaIncludes.h"
+#include "../Cuda/CudaController.h"
+#include "../Cuda/CudaIncludes.h"
 
 namespace ddj {
 namespace store {
