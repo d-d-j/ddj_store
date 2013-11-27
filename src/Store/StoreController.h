@@ -23,7 +23,7 @@
 #include "StoreBuffer.h"
 #include "StoreElement.h"
 #include "StoreQueryCore.h"
-#include "../CUDA/CudaController.h"
+#include "../Cuda/CudaController.h"
 #include "../Task/Task.h"
 #include "../Core/Logger.h"
 #include "../Core/Config.h"
