@@ -14,7 +14,7 @@
 #include "Task/TaskMonitor.h"
 #include "Store/StoreController.h"
 #include "Store/StoreElement.h"
-#include "CUDA/CudaCommons.h"
+#include "Cuda/CudaCommons.h"
 #include "Core/Logger.h"
 #include "Core/Config.h"
 #include "Network/NetworkClient.h"
