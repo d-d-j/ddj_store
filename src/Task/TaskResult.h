@@ -1,15 +1,9 @@
-/*
- * TaskResult.h
- *
- *  Created on: 21-09-2013
- *      Author: ghashd
- */
-
-#include "../Store/StoreIncludes.h"
-#include "TaskType.h"
-
 #ifndef TASKRESULT_H_
 #define TASKRESULT_H_
+
+#include "TaskType.h"
+#include <string>
+#include <sstream>
 
 namespace ddj {
 namespace task {
@@ -40,8 +34,6 @@ namespace task {
 			result_data = result.result_data;
 		}
 
-		virtual ~taskResult();
-
 		std::string toString()
 		{
 			 std::ostringstream stream;
@@ -50,7 +42,7 @@ namespace task {
 		}
 	};
 
-} /* namespace store */
+} /* namespace task */
 } /* namespace ddj */
 
 #endif /* TASKRESULT_H_ */

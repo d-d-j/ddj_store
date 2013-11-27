@@ -11,15 +11,15 @@
 namespace ddj {
 namespace task {
 
-enum TaskType
-{
-	Error = 0,
-	Insert = 1,
-	SelectAll = 2,
-	Flush = 3
-};
+	enum TaskType
+	{
+		Error = 0,
+		Insert = 1,
+		SelectAll = 2,
+		Flush = 3
+	};
 
-} /* namespace store */
+} /* namespace task */
 } /* namespace ddj */
 
 #endif /* TASKTYPE_H_ */

@@ -30,4 +30,6 @@ using namespace log4cplus::helpers;
  *  LOG4CPLUS_INFO(_logger, "Insert: t=" << element->tag << " s=" << element->series << " t=" << element->time << "v=" << element->value);
  */
 
+#define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
+
 #endif /* LOGGER_H_ */

@@ -5,36 +5,45 @@
  *      Author: ghashd
  */
 
-#include "GpuUploadCore.h"
+#include "StoreUploadCore.h"
 
 
 namespace ddj {
 namespace store {
 
-	storeTrunkInfo* GpuUploadMonitor::Upload
-			(
-			boost::array<storeElement, STORE_BUFFER_SIZE>* elements,
-			int elementsToUploadCount
-			)
+	StoreUploadCore::StoreUploadCore(CudaController* cudaController)
 	{
+		this->_cudaController = cudaController;
+	}
+
+	StoreUploadCore::~StoreUploadCore(){}
+
+
+
+	storeTrunkInfo* StoreUploadCore::Upload(storeElement* elementsToUpload, int elementsToUploadCount)
+	{
+		// GET CUDA STREAM
 		cudaStream_t stream = this->_cudaController->GetUploadStream();
 
-		storeTrunkInfo* result = new storeTrunkInfo(elements->front().metric, elements->front().time, elements->back().time, 0, 0);
+		storeTrunkInfo* result = new storeTrunkInfo(
+				elementsToUpload[0].metric,
+				elementsToUpload[0].time,
+				elementsToUpload[elementsToUploadCount-1].time,
+				0,
+				0);
 
+		// ALLOC DEVICE BUFFER
 		storeElement* deviceBufferPointer;
-
-		CUDA_CHECK_RETURN( cudaMalloc((void**) &(deviceBufferPointer), STORE_BUFFER_SIZE*sizeof(storeElement)) );
-
-		storeElement* elementsToUpload = elements->c_array();
+		CUDA_CHECK_RETURN( cudaMalloc((void**) &(deviceBufferPointer), elementsToUploadCount*sizeof(storeElement)) );
 
 		// COPY BUFFER TO GPU
-		_core->CopyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, stream);
+		copyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, stream);
 
-		// TODO: NOW BUFFER CAN BE SWAPPED AGAIN...
+		// TODO: SORT ARRAY ON GPU AND RETURN PROPER storeTrunkInfo (because this one above has wrong start/end time)
 
 		// COMPRESSION (returns pointer to new memory)
 		void* compressedBufferPointer;
-		size_t size = _core->CompressGpuBuffer(deviceBufferPointer, elementsToUploadCount, &compressedBufferPointer, stream);
+		size_t size = compressGpuBuffer(deviceBufferPointer, elementsToUploadCount, &compressedBufferPointer, stream);
 
 		// AFTER GPU BUFFER COMPRESSION WE CAN REUSE STREAM AND RELEASE DEVICE BUFFER
 		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
@@ -44,7 +53,7 @@ namespace store {
 		// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
 		{
 			boost::mutex::scoped_lock lock(this->_mutex);
-			_core->AppendToMainStore(compressedBufferPointer, size, result);
+			appendToMainStore(compressedBufferPointer, size, result);
 		}
 
 		// RELEASE COMPRESSED DEVICE BUFFER
@@ -54,7 +63,7 @@ namespace store {
 		return result;
 	}
 
-	void StoreUploadCore::CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream)
+	void StoreUploadCore::copyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream)
 	{
 		CUDA_CHECK_RETURN
 		(
@@ -69,7 +78,7 @@ namespace store {
 		);
 	}
 
-	void StoreUploadCore::AppendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info)
+	void StoreUploadCore::appendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info)
 	{
 		cudaStream_t stream = this->_cudaController->GetSyncStream();
 		info->startValue = this->_cudaController->GetMainMemoryOffset();
@@ -89,7 +98,7 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
 	}
 
-	size_t StoreUploadCore::CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream)
+	size_t StoreUploadCore::compressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream)
 	{
 		size_t size = sizeof(storeElement)*elemToUploadCount;
 		CUDA_CHECK_RETURN( cudaMalloc(result, size) );
@@ -106,13 +115,6 @@ namespace store {
 						);
 		return size;
 	}
-
-	StoreUploadCore::StoreUploadCore(CudaController* cudaController)
-	{
-		this->_cudaController = cudaController;
-	}
-
-	StoreUploadCore::~StoreUploadCore(){}
 
 } /* namespace store */
 } /* namespace ddj */

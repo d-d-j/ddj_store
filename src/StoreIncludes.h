@@ -22,12 +22,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-/* CUDA */
-#include <cuda.h>
-#include <cuda_runtime_api.h>
-
 /* BOOST */
-#include <boost/array.hpp>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -40,25 +35,5 @@
 #include <boost/unordered_map.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/container/container_fwd.hpp>
-
-/* OTHER */
-#include "../BTree/btree.h"
-#include "storeTypedefs.h"
-
-/* MACROS */
-#define PSTR(x)         PANTHEIOS_LITERAL_STRING(x)
-#ifndef ERROR_WHEN_FALSE
-#define ERROR_WHEN_FALSE(expression) \
-({ \
-    if(false == (expression) ){ \
-    fprintf(stderr,"%s:%d\n",__FILE__,__LINE__); \
-    kill(0,SIGKILL); \
-    exit(EXIT_FAILURE);} \
-})
-#endif
-
-/* ADDITIONAL TYPEDEFS */
-typedef stx::btree<ullint, int> tree;
-typedef tree* tree_pointer;
 
 #endif /* DDJ_STOREINCLUDES_H_ */

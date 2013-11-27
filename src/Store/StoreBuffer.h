@@ -20,13 +20,14 @@
 #ifndef DDJ_Store__DDJ_StoreBuffer_h
 #define DDJ_Store__DDJ_StoreBuffer_h
 
+#include "StoreElement.h"
+#include "StoreTrunkInfo.h"
+#include "StoreUploadCore.h"
 #include "../BTree/BTreeMonitor.h"
-#include "../GpuUpload/GpuUploadMonitor.h"
-#include "storeElement.h"
-#include "infoElement.h"
-#include "../CUDA/cudaIncludes.h"
-#include "../Helpers/Config.h"
-#include "../Helpers/Logger.h"
+#include "../Core/Logger.h"
+#include "../Cuda/CudaController.h"
+#include "../Cuda/CudaIncludes.h"
+#include <boost/thread.hpp>
 
 namespace ddj {
 namespace store {
@@ -42,27 +43,22 @@ namespace store {
     {
 		/* FIELDS */
 		private:
-			metric_type _metric;	/**< This buffer coordinates data only with this tag */
-			BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
-			GpuUploadMonitor* _gpuUploadMonitor;	/**< protects access to GpuUploadCore class */
+			metric_type _metric;					/**< This buffer coordinates data only with this tag */
+			btree::BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
+			StoreUploadCore* _uploadCore;			/**< protects access to GpuUploadCore class */
 
 			/* LOGGER */
 			Logger _logger = Logger::getRoot();
 
-			/* UPLOADER THREAD */
-			boost::thread* _uploaderThread;	/**< uploads _backBuffer to GPU and stores info in B+Tree */
-			boost::mutex _uploaderMutex;
-			boost::condition_variable _uploaderCond;
-			boost::barrier* _uploaderBarrier;
-
 			/* BUFFERS */
-			int _bufferElementsCount;	/**< how many elements are now in _buffer */
+			int _bufferElementsCount;		/**< how many elements are now in _buffer */
 			int _backBufferElementsCount;	/**< how many elements are to upload in _backBuffer */
-			bool _areBuffersSwitched;	/**< true if _backBuffer is ready to upload and haven't been yet */
-			boost::array<storeElement, STORE_BUFFER_SIZE> _buffer;	/**< main buffer where data is inserted */
-			boost::array<storeElement, STORE_BUFFER_SIZE> _backBuffer;	/**< buffer to upload as trunk */
+			int _bufferCapacity;
+			size_t _bufferSize;
+			storeElement* _buffer;		/**< main buffer where data is inserted */
+			storeElement* _backBuffer;	/**< buffer to upload as trunk */
 			boost::mutex _bufferMutex;
-			boost::condition_variable _bufferCond;
+			boost::mutex _backBufferMutex;
 
 		/* METHODS */
 		public:
@@ -70,7 +66,7 @@ namespace store {
 			/*!
 			  It creates a new instance of BTreeMonitor class and starts Upload thread
 			*/
-			StoreBuffer(metric_type metric, GpuUploadMonitor* gpuUploadMonitor);
+			StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore* uploadCore);
 
 			//! BTreeMonitor destructor.
 			/*!
@@ -98,7 +94,6 @@ namespace store {
 			storeTrunkInfo* uploadBuffer();
 			void insertToBtree(storeTrunkInfo* element);
 			void switchBuffers();
-			void uploaderThreadFunction();
     };
 
 } /* end namespace store */

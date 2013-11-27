@@ -55,7 +55,9 @@ namespace ddj
 					("GPU_MEMORY_ALLOC_ATTEMPTS", po::value<int>()->default_value(8), "number of GPU memory allocation attempts")
 					("STREAMS_NUM_QUERY", po::value<int>()->default_value(2), "number of query streams")
 					("STREAMS_NUM_UPLOAD", po::value<int>()->default_value(2), "number of upload streams")
-					("DEVICE_BUFFERS_COUNT", po::value<int>()->default_value(1), "number of device buffers")
+					("STORE_BUFFER_CAPACITY", po::value<int>()->default_value(512), "store buffer capacity")
+					("QUERY_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for queries")
+					("INSERT_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for inserts")
 					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries");
 
 			po::options_description config_file_options;

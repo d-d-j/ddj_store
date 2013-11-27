@@ -8,21 +8,28 @@
 #ifndef GPUUPLOADCORE_H_
 #define GPUUPLOADCORE_H_
 
-namespace ddj
-{
-namespace store
-{
+#include "StoreTrunkInfo.h"
+#include "StoreElement.h"
+#include "../Cuda/CudaController.h"
+#include <boost/thread.hpp>
+
+namespace ddj {
+namespace store {
 
 	class StoreUploadCore
 	{
 		CudaController* _cudaController;
+		boost::mutex _mutex;
+
 	public:
 		StoreUploadCore(CudaController* cudaController);
 		virtual ~StoreUploadCore();
+		storeTrunkInfo* Upload(storeElement* elements, int elementsToUploadCount);
 
-		void CopyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream);
-		size_t CompressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream);
-		void AppendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info);
+	private:
+		void copyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream);
+		size_t compressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream);
+		void appendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info);
 	};
 
 } /* namespace store */

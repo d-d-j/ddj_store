@@ -1,6 +1,9 @@
 #ifndef CUDAINCLUDES_H_
 #define CUDAINCLUDES_H_
 
+#include <cuda.h>
+#include <cuda_runtime_api.h>
+
 #define CUDA_CHECK_RETURN(value) {											\
 	cudaError_t _m_cudaStat = value;										\
 	if (_m_cudaStat != cudaSuccess) {										\

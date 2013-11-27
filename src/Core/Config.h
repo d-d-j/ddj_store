@@ -8,11 +8,11 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#include "Logger.h"
 #include <iostream>
 #include <fstream>
 #include <iterator>
 #include <boost/program_options.hpp>
-#include "Logger.h"
 
 namespace po = boost::program_options;
 using namespace std;

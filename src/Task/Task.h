@@ -9,6 +9,8 @@
 #define STORETASK_H_
 
 #include "TaskResult.h"
+#include <boost/thread.hpp>
+#include <boost/utility.hpp>
 
 namespace ddj {
 namespace task {
@@ -47,7 +49,7 @@ public:
 			void* resultData = nullptr,
 			int resultSize = 0);
 
-	TaskResult* GetResult();
+	taskResult* GetResult();
 
 	/* GETTERS */
 	TaskType GetType();
@@ -55,7 +57,7 @@ public:
 	bool IsCompleated();
 };
 
-typedef boost::shared_ptr<Task> StoreTask_Pointer;
+typedef boost::shared_ptr<Task> Task_Pointer;
 
 } /* namespace store */
 } /* namespace ddj */

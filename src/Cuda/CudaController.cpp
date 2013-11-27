@@ -3,9 +3,11 @@
 namespace ddj {
 namespace store {
 
-	CudaController::CudaController(int uploadStreamsCount, int queryStreamsCount)
+	CudaController::CudaController(int uploadStreamsCount, int queryStreamsCount, int cudaDeviceId)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [BEGIN]"));
+
+		this->_cudaDeviceId = cudaDeviceId;
 
 		this->_uploadStreamsSemaphore = new Semaphore(queryStreamsCount);
 		this->_queryStreamsSemaphore = new Semaphore(uploadStreamsCount);
@@ -58,6 +60,11 @@ namespace store {
 		_cudaCommons.CudaFreeMemory(this->_mainMemoryPointer);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller destructor [END]"));
+	}
+
+	int CudaController::GetCudaDeviceId()
+	{
+		return this->_cudaDeviceId;
 	}
 
 	/* STREAMS */

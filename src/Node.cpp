@@ -13,7 +13,7 @@ namespace ddj
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [BEGIN]"));
 
-		this->_storeTaskMonitor = new store::StoreTaskMonitor(&(this->_taskCond));
+		this->_taskMonitor = new task::TaskMonitor(&(this->_taskCond));
 		this->_taskBarrier = new boost::barrier(2);
 
 		// START TASK THRAED
@@ -45,7 +45,7 @@ namespace ddj
 			throw std::runtime_error(errString);
 		}
 
-		this->_client = new NetworkClient(&_requestSignal);
+		this->_client = new network::NetworkClient(&_requestSignal);
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}
@@ -70,11 +70,11 @@ namespace ddj
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [END]"));
 	}
 
-	void Node::CreateTask(taskRequest request)
+	void Node::CreateTask(task::taskRequest request)
 	{
 		// Add a new task to task monitor
-		store::StoreTask_Pointer task =
-				this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
+		task::Task_Pointer task =
+				this->_taskMonitor->AddTask(request.task_id, request.type, request.data);
 
 		// TODO: Run this task in one selected StoreController when Insert or in all StoreControllers otherwise
 		this->_controllers[0]->ExecuteTask(task);
@@ -94,16 +94,16 @@ namespace ddj
 				this->_taskCond.wait(lock);
 
 				// Get all completed tasks
-				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
-						this->_storeTaskMonitor->PopCompleatedTasks();
+				boost::container::vector<task::Task_Pointer> compleatedTasks =
+						this->_taskMonitor->PopCompleatedTasks();
 
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
-				TaskResult* result;
+				task::taskResult* result;
 
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
-					if(compleatedTasks[i]->GetType() == SelectAll)
+					if(compleatedTasks[i]->GetType() == task::SelectAll)
 					{
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();

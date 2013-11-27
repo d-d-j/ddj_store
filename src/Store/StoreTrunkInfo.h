@@ -1,6 +1,8 @@
 #ifndef INFOELEMENT_H_
 #define INFOELEMENT_H_
 
+#include "StoreTypedefs.h"
+
 namespace ddj {
 namespace store {
 

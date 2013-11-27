@@ -5,7 +5,7 @@
  *      Author: ghashd
  */
 
-#include "StoreTask.h"
+#include "Task.h"
 
 namespace ddj {
 namespace task {
@@ -53,11 +53,11 @@ namespace task {
 		this->_condResponseReady->notify_one();
 	}
 
-	TaskResult* Task::GetResult()
+	taskResult* Task::GetResult()
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
-		return new TaskResult(
+		return new taskResult(
 				this->_taskId,
 				this->_type,
 				this->_resultData,

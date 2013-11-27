@@ -5,7 +5,7 @@
  *      Author: janisz
  */
 
-#include "Client.h"
+#include "NetworkClient.h"
 #include "../Store/storeElement.h"
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
@@ -21,7 +21,7 @@ namespace network {
 		socket = new tcp::socket(io_service);
 	}
 
-	NetworkClient::NetworkClient(boost::signals2::signal<void (taskRequest)> *_requestSignal)
+	NetworkClient::NetworkClient(boost::signals2::signal<void (task::taskRequest)> *_requestSignal)
 		: NetworkClient("127.0.0.1", "8080")
 	{
 		connect();
@@ -35,7 +35,7 @@ namespace network {
 		boost::asio::connect(*socket, resolver.resolve({host.c_str(), port.c_str()}));
 	}
 
-	void NetworkClient::SendTaskResult(ddj::TaskResult* taskResult)
+	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
 		int len = 3*sizeof(int) + taskResult->result_size;
 		char* msg = new char[len];
@@ -65,8 +65,8 @@ namespace network {
 		{
 			id++;
 
-			taskRequest tr;
-			ddj::store::storeElement* se = new ddj::store::storeElement();
+			task::taskRequest tr;
+			store::storeElement* se = new store::storeElement();
 
 			memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
 			tr.data = nullptr;

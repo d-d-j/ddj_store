@@ -1,7 +1,7 @@
 #ifndef STOREELEMENT_H_
 #define STOREELEMENT_H_
 
-#include "storeTypedefs.h"
+#include "StoreTypedefs.h"
 #include <string>
 #include <sstream>
 #include <cstring>

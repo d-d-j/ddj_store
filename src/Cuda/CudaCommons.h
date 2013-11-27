@@ -8,8 +8,9 @@
 #ifndef CUDACOMMON_H_
 #define CUDACOMMON_H_
 
-#include "../Helpers/Config.h"
-#include "../Helpers/Logger.h"
+#include "CudaIncludes.h"
+#include "../Core/Logger.h"
+#include "../Core/Config.h"
 
 namespace ddj {
 namespace store {

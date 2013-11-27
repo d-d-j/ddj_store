@@ -8,19 +8,22 @@
 #ifndef CUDACONTROLLER_H_
 #define CUDACONTROLLER_H_
 
-#include "../Store/StoreIncludes.h"
-#include "../Helpers/Config.h"
-#include "../Helpers/Logger.h"
+#include "CudaIncludes.h"
+#include "CudaCommons.h"
+#include "../Core/Semaphore.h"
+#include "../Core/Config.h"
+#include "../Core/Logger.h"
+#include "../Store/StoreTypedefs.h"
+#include <boost/thread.hpp>
 #include <boost/lockfree/queue.hpp>
-#include "cudaIncludes.h"
-#include "../Helpers/Semaphore.h"
-#include "../CUDA/CudaCommons.h"
 
 namespace ddj {
 namespace store {
 
 	class CudaController : public boost::noncopyable
 	{
+		int _cudaDeviceId;
+
 		/* STREAMS */
 		Semaphore* _uploadStreamsSemaphore;
 		Semaphore* _queryStreamsSemaphore;
@@ -39,8 +42,9 @@ namespace store {
 		CudaCommons _cudaCommons;
 
 	public:
-		CudaController(int uploadStreamsNum, int queryStreamsNum);
+		CudaController(int uploadStreamsNum, int queryStreamsNum, int cudaDeviceId);
 		virtual ~CudaController();
+		int GetCudaDeviceId();
 
 		/* STREAMS */
 		cudaStream_t GetUploadStream();

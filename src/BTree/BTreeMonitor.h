@@ -8,12 +8,18 @@
 #ifndef BTREEMONITOR_H_
 #define BTREEMONITOR_H_
 
-#include "../Store/StoreIncludes.h"
-#include "../Store/infoElement.h"
-#include "../Helpers/Logger.h"
+#include "btree.h"
+#include "../Core/Logger.h"
+#include "../Store/StoreTrunkInfo.h"
+#include <boost/thread.hpp>
+#include <stdexcept>
+
+
+typedef stx::btree<ullint, int> tree;
+typedef tree* tree_pointer;
 
 namespace ddj {
-namespace store {
+namespace btree {
 
 	/*! \class BTreeMonitor
 	 \brief Protects concurrent access to B+Tree structure using boost::mutex
@@ -45,12 +51,12 @@ namespace store {
 			 * \brief Function inserts infoElement to B+Tree structure
 			 * \param infoElement* a pointer to infoElement to insert to B+Tree structure
 			 */
-			void Insert(storeTrunkInfo* element);
+			void Insert(store::storeTrunkInfo* element);
 
 		private:
-			void insertToTree(storeTrunkInfo* element);
+			void insertToTree(store::storeTrunkInfo* element);
 	};
 
 } /* namespace store */
-} /* namespace ddj */
+} /* namespace btree */
 #endif /* BTREEMONITOR_H_ */

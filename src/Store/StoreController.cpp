@@ -34,17 +34,17 @@ namespace store {
 		this->populateTaskFunctions();
 
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
-		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"));
+		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"), gpuDeviceId);
 
-		// CREATE GPU UPLOAD MONITOR
-		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
+		// CREATE STORE QUERY CORE
+		this->_queryCore = new StoreQueryCore(this->_cudaController);
 
-		// CREATE QUERY MONITOR
-		this->_queryMonitor = new QueryMonitor(this->_cudaController);
+		// CREATE STORE UPLOAD CORE
+		this->_uploadCore = new StoreUploadCore(this->_cudaController);
 
 		// SET THREAD POOL SIZES
-		this->_queryTaskThreadPool.size_controller().resize(QUERY_THRED_POOL_SIZE);
-		this->_insertTaskThreadPool.size_controller().resize(INSERT_THRED_POOL_SIZE);
+		this->_queryTaskThreadPool.size_controller().resize(this->_config->GetIntValue("QUERY_THRED_POOL_SIZE"));
+		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THRED_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -54,20 +54,21 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
 		delete this->_buffers;
-		delete this->_queryMonitor;
-		delete this->_gpuUploadMonitor;
+		delete this->_cudaController;
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}
 
-	void StoreController::ExecuteTask(StoreTask_Pointer task)
+	void StoreController::ExecuteTask(task::Task_Pointer task)
 	{
 		// Sechedule a function from _TaskFunctions with this taskId
-		TaskType type = task->GetType();
-		if(type == Insert)
+		task::TaskType type = task->GetType();
+		if(type == task::Insert)
 		{
 			this->_insertTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
-		} else {
+		}
+		else
+		{
 			this->_queryTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
 		}
 	}
@@ -77,21 +78,21 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
 
 		// INSERT
-		_taskFunctions.insert({ Insert, boost::bind(&StoreController::insertTask, this, _1) });
+		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
 		// SELECT ALL
-		_taskFunctions.insert({ SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
+		_taskFunctions.insert({ task::SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
 
 		// FLUSH
-		_taskFunctions.insert({ Flush, boost::bind(&StoreController::flushTask, this, _1) });
+		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
 }
 
-	void StoreController::insertTask(StoreTask_Pointer task)
+	void StoreController::insertTask(task::Task_Pointer task)
 	{
 		// Check possible errors
-		if(task == nullptr || task->GetType() != Insert)
+		if(task == nullptr || task->GetType() != task::Insert)
 		{
 			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
@@ -107,7 +108,7 @@ namespace store {
 			boost::mutex::scoped_lock lock(this->_buffersMutex);
 			if(!this->_buffers->count(element->metric))
 			{
-				StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_gpuUploadMonitor));
+				StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_config->GetIntValue("STORE_BUFFER_CAPACITY"), this->_uploadCore));
 				this->_buffers->insert({element->metric, newBuf});
 			}
 		}
@@ -117,24 +118,24 @@ namespace store {
 		task->SetResult(true, nullptr, nullptr, 0);
 	}
 
-	void StoreController::selectAllTask(StoreTask_Pointer task)
+	void StoreController::selectAllTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
 
 		// Check possible errors
-		if(task == nullptr || task->GetType() != SelectAll)
+		if(task == nullptr || task->GetType() != task::SelectAll)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in selectAllTask function - wrong argument");
 		}
 
 		// Get all data from GPU store
-		storeElement* queryResult;
+		void* queryResult;
 
 		// TODO: Implement all possible exceptions catching from SelectAll function
 		try
 		{
-			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
+			size_t sizeOfResult = this->_queryCore->SelectAll(&queryResult);
 			task->SetResult(true, nullptr, queryResult, sizeOfResult);
 			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [END]"));
 		}
@@ -150,12 +151,12 @@ namespace store {
 		}
 	}
 
-	void StoreController::flushTask(StoreTask_Pointer task)
+	void StoreController::flushTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [BEGIN]"));
 
 		// Check possible errors
-		if(task == nullptr || task->GetType() != Flush)
+		if(task == nullptr || task->GetType() != task::Flush)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in flushTask function - wrong argument");

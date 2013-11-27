@@ -5,7 +5,7 @@
  *      Author: ghashd
  */
 
-#include "StoreTaskMonitor.h"
+#include "TaskMonitor.h"
 
 namespace ddj {
 namespace task {
@@ -20,27 +20,27 @@ namespace task {
 	{
 	}
 
-	StoreTask_Pointer TaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
+	Task_Pointer TaskMonitor::AddTask(int taskId, TaskType type, void* taskData)
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
-		StoreTask_Pointer newTask(new Task(taskId, type, taskData, this->_condResponseReady));
+		Task_Pointer newTask(new Task(taskId, type, taskData, this->_condResponseReady));
 		this->_tasks.push_back(newTask);
 		this->_taskCount++;
 		return newTask;
 	}
 
-	boost::container::vector<StoreTask_Pointer> TaskMonitor::PopCompleatedTasks()
+	boost::container::vector<Task_Pointer> TaskMonitor::PopCompleatedTasks()
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
 		// Copy compleated tasks to result
-		boost::container::vector<StoreTask_Pointer> result(this->_tasks.size());
+		boost::container::vector<Task_Pointer> result(this->_tasks.size());
 		auto it = std::copy_if(
 				this->_tasks.begin(),
 				this->_tasks.end(),
 				result.begin(),
-				[](StoreTask_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
+				[](Task_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
 				);
 		result.resize(std::distance(result.begin(),it));
 
@@ -48,7 +48,7 @@ namespace task {
 		std::remove_if(
 				this->_tasks.begin(),
 				this->_tasks.end(),
-				[](StoreTask_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
+				[](Task_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
 				);
 
 		// Return result
