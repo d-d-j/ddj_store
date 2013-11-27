@@ -22,9 +22,13 @@ cd boost_1_54_0
 cpuCores=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'`
 echo "Available CPU cores: "$cpuCores
 sudo ./b2 --with=all -j $cpuCores install
+cd ..
+rm -rfv boost_1_54_0
 
 #Install boost-thread-pool
-wget https://raw.github.com/AlexMarlo/boost-threadpool/master/boost/threadpool/task_adaptors.hpp
-sudo mv task_adaptors.hpp /usr/local/include/boost/task_adaptors.hpp
+git clone https://github.com/AlexMarlo/boost-threadpool.git --depth 1
+sudo mv boost-threadpool/boost/threadpool /usr/local/include/boost/
+sudo mv boost-threadpool/boost/threadpool.hpp /usr/local/include/boost/
+rm -rfv boost-threadpool
 
 
