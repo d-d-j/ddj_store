@@ -3,12 +3,13 @@
 
 #include "../Task/TaskRequest.h"
 #include "../Task/TaskResult.h"
+#include "../Store/StoreElement.h"
 #include <boost/signals2/signal.hpp>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <boost/asio.hpp>
 
 namespace ddj {
 namespace network {

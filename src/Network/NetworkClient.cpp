@@ -6,10 +6,6 @@
  */
 
 #include "NetworkClient.h"
-#include "../Store/storeElement.h"
-#include <boost/thread.hpp>
-#include <boost/asio.hpp>
-#include <cstdlib>
 
 namespace ddj {
 namespace network {
