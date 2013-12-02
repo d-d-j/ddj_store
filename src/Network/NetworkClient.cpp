@@ -20,8 +20,8 @@ namespace network {
 	NetworkClient::NetworkClient(boost::signals2::signal<void (task::taskRequest)> *_requestSignal)
 		: NetworkClient("127.0.0.1", "8080")
 	{
-		connect();
 		requestSignal = _requestSignal;
+		connect();
 		boost::thread workerThread(&NetworkClient::do_read, this);
 	}
 
@@ -29,6 +29,18 @@ namespace network {
 	{
 		tcp::resolver resolver(io_service);
 		boost::asio::connect(*socket, resolver.resolve({host.c_str(), port.c_str()}));
+	}
+
+	void NetworkClient::SendLoginRequest(networkLoginRequest* request)
+	{
+		size_t len = sizeof(int)*(request->cuda_devices_count + 1);
+		char* msg = new char[len];
+
+		memcpy(msg, &(request->cuda_devices_count), sizeof(int));
+		memcpy(msg + sizeof(int), request->devices, sizeof(int)*request->cuda_devices_count);
+
+		write(msg, len);
+		delete msg;
 	}
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
@@ -42,6 +54,7 @@ namespace network {
 		memcpy(msg + 3*sizeof(int), taskResult->result_data, taskResult->result_size);
 
 		write(msg, len);
+		delete msg;
 	}
 
 	void NetworkClient::write(char *message, size_t length)

@@ -45,7 +45,14 @@ namespace ddj
 			throw std::runtime_error(errString);
 		}
 
+		// CONNECT TO MASTER AND LOG IN
 		this->_client = new network::NetworkClient(&_requestSignal);
+		int* devices = new int[1];
+		devices[0] = 0;
+		network::networkLoginRequest* loginRequest = new network::networkLoginRequest(devices, 1);
+		this->_client->SendLoginRequest(loginRequest);
+		delete devices;
+		delete loginRequest;
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}

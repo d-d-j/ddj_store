@@ -1,6 +1,7 @@
 #ifndef NETWORK_CLIENT_H_
 #define NETWORK_CLIENT_H_
 
+#include "NetworkLoginRequest.h"
 #include "../Task/TaskRequest.h"
 #include "../Task/TaskResult.h"
 #include "../Store/StoreElement.h"
@@ -28,7 +29,12 @@ namespace network {
 		NetworkClient(std::string ip, std::string port);
 		NetworkClient(boost::signals2::signal<void (task::taskRequest)>* _requestSignal);
 		virtual ~NetworkClient();
+
+		/* SEND METHODS */
 		void SendTaskResult(task::taskResult* taskResult);
+		void SendLoginRequest(networkLoginRequest* request);
+
+		/* NETWORK CLIENT */
 		void connect();
 		void write(char* message, size_t length);
 		size_t read(char* replay, size_t length);
