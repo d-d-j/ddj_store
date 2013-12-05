@@ -82,7 +82,7 @@ namespace ddj
 		// Add a new task to task monitor
 		task::Task_Pointer task =
 				this->_taskMonitor->AddTask(request.task_id, request.type, request.data);
-
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("CREATE TASK"));
 		// TODO: Run this task in one selected StoreController when Insert or in all StoreControllers otherwise
 		this->_controllers[0]->ExecuteTask(task);
 	}

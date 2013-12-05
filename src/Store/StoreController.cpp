@@ -100,9 +100,6 @@ namespace store {
 		// GET store element from task data
 		storeElement* element = (storeElement*)(task->GetData());
 
-		// Log element to insert
-		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
-
 		// Create buffer with element's metric if not exists
 		{
 			boost::mutex::scoped_lock lock(this->_buffersMutex);
@@ -112,6 +109,8 @@ namespace store {
 				this->_buffers->insert({element->metric, newBuf});
 			}
 		}
+		// Log element to insert
+		LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
 		(*_buffers)[element->metric]->Insert(element);
 
 		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed

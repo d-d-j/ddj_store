@@ -55,6 +55,7 @@ void StoreBuffer::Insert(storeElement* element)
 	this->_bufferMutex.lock();
 	this->_buffer[this->_bufferElementsCount] = *element;
 	this->_bufferElementsCount++;
+	LOG4CPLUS_DEBUG(this->_logger, "buffer elem count = " << this->_bufferElementsCount);
 	if(_bufferElementsCount == this->_bufferCapacity)
 	{
 		this->_backBufferMutex.lock();
@@ -72,12 +73,17 @@ void StoreBuffer::Insert(storeElement* element)
 		this->_backBufferMutex.unlock();
 
 		// UPLOAD BUFFER TO GPU (releases _backBufferMutex when element is already on GPU
-		storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(this->_backBuffer, this->_backBufferElementsCount);
-		CUDA_CHECK_RETURN( cudaFree(pinnedMemory) );
+		storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(pinnedMemory, this->_backBufferElementsCount);
+		CUDA_CHECK_RETURN( cudaFreeHost(pinnedMemory) );
 
 		// INSERT INFO ELEMENT TO B+TREE
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [START]");
 		this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [END]");
+
 		delete elemToInsertToBTree;
+	} else {
+	this->_bufferMutex.unlock();
 	}
 }
 
