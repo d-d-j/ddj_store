@@ -45,10 +45,10 @@ namespace network {
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
-		int len = 3*sizeof(int) + taskResult->result_size;
+		int len = sizeof(int64_t) + 2*sizeof(int) + taskResult->result_size;
 		char* msg = new char[len];
 
-		memcpy(msg, &(taskResult->task_id), sizeof(int));
+		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));
 		memcpy(msg + sizeof(int), &(taskResult->type), sizeof(int));
 		memcpy(msg + 2*sizeof(int), &(taskResult->result_size), sizeof(int));
 		memcpy(msg + 3*sizeof(int), taskResult->result_data, taskResult->result_size);
@@ -64,23 +64,30 @@ namespace network {
 
 	void NetworkClient::do_read()
 	{
-		static int id = 0;
-		const int LEN = 100;
+		const int LEN = sizeof(int32_t)*2 + sizeof(int64_t);
 		char msg[LEN];
 
-		//TODO: Split reading to read header first and then data
-		//TODO: Think about alignment
 		while (read(msg, LEN))
 		{
-			id++;
-
 			task::taskRequest tr;
-			store::storeElement* se = new store::storeElement();
 
-			memcpy(&tr, msg, sizeof(tr) - sizeof(void*));
+			// COPY HEADER
+			memcpy(&tr.task_id, msg, sizeof(int32_t));
+			memcpy(&tr.type, msg+sizeof(int64_t), sizeof(int32_t));
+			memcpy(&tr.size, msg+(sizeof(int64_t)+sizeof(int32_t)), sizeof(int32_t));
 			tr.data = nullptr;
-			memcpy(se, msg + sizeof(tr) - sizeof(void*) - 4, sizeof(*se));
-			tr.data = se;
+
+			// READ DATA
+			if(tr.size != 0)
+			{
+				char* dataMsg = new char[tr.size];
+				size_t bytesRead = read(dataMsg, tr.size);
+				if((int)bytesRead != tr.size)
+					LOG4CPLUS_ERROR(this->_logger, "Wrong number of bytes transfered - transfered " << bytesRead << " from " << tr.size);
+				tr.data = dataMsg;
+			}
+
+			// SIGNAL DATA
 			(*requestSignal)(tr);
 		}
 	}
@@ -97,6 +104,7 @@ namespace network {
 		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 		if (ec)
 		{
+			LOG4CPLUS_ERROR(this->_logger, "Error while closing network connection - " << ec.message());
 		}
 	}
 

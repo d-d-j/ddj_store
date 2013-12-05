@@ -5,6 +5,8 @@
 #include "../Task/TaskRequest.h"
 #include "../Task/TaskResult.h"
 #include "../Store/StoreElement.h"
+#include "../Core/Config.h"
+#include "../Core/Logger.h"
 #include <boost/signals2/signal.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
@@ -19,12 +21,20 @@ namespace network {
 
 	class NetworkClient {
 	private:
+		// LOGGER & CONFIG
+		Logger _logger = Logger::getRoot();
+		Config* _config = Config::GetInstance();
+
+		// CONNECTION DATA
 		std::string host;
 		std::string port;
+
+		// NETWORK SERVICE
 		boost::asio::io_service io_service;
 		tcp::socket *socket;
+
+		// SIGNAL
 		boost::signals2::signal<void (task::taskRequest)> *requestSignal;
-		void do_read();
 	public:
 		NetworkClient(std::string ip, std::string port);
 		NetworkClient(boost::signals2::signal<void (task::taskRequest)>* _requestSignal);
@@ -39,6 +49,9 @@ namespace network {
 		void write(char* message, size_t length);
 		size_t read(char* replay, size_t length);
 		void close();
+
+	private:
+		void do_read();
 	};
 
 } /* namespace store */

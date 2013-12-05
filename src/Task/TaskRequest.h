@@ -18,7 +18,7 @@ namespace task {
 	struct taskRequest
 	{
 	public:
-		int task_id;	/**< id set for a task by master */
+		int64_t task_id;	/**< id set for a task by master */
 		TaskType type;	/**< task type, for example Insert */
 		int size;
 		// data is released in StoreTask
@@ -38,7 +38,7 @@ namespace task {
 		std::string toString()
 		{
 			 std::ostringstream stream;
-			stream << "[" << task_id << ", " << type << ", " << size << "]";
+			 stream << "[" << task_id << ", " << type << ", " << size << "]";
 			 return  stream.str();
 		}
 	};
