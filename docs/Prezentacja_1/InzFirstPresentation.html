@@ -194,11 +194,55 @@
         </section>
 
         <section id="technologie">
-            <h2 style="color: #FF9933">Używane technologie</h2>
+          <section>
+              <h2 style="color: #FF9933">Używane technologie</h2>
+              <ul>
+                <li> Język programowania C/C++ </li>
+                <li> Język programowania GO </li>
+                <li> NVIDIA CUDA </li>
+                <li> BOOST </li>
+                <li> THRUST </li>
+                <li> REST API </li>
+              </ul>
+          </section>
+          <section>
+            <a href="http://www.nvidia.com/object/cuda_home_new.html">
+                <img style="float: right;" id="nvidiaLogo" title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA" src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
+            </a>
+            <p>
+              <span style="color: #009900; font-weight:bold;">CUDA</span> to opracowana przez firmę NVIDIA równoległa architektura obliczeniowa, która zapewnia radykalny wzrost wydajności obliczeń, dzięki wykorzystaniu mocy układów GPU. 
+            </p>
+            <p>
+              <a href="http://www.nvidia.com/object/cuda_home_new.html" target="_blank">www.nvidia.com/object/cuda_home_new</a>
+            </p>
+          </section>
         </section>
 
         <section id="api">
+          <section>
             <h2 style="color: #FF9933">Api dla klientów</h2>
+            <p> 
+              API systemu zostanie zrealizowane według wzorca <span style="color: #009900; font-weight:bold;">REST</span>. Komunikacja polega na wysłaniu żądania HTTP pod adres serwera głównego, np. http://ddjDB.mini.pw.edu.pl/ddj_data/ i ewentualnym przesłaniu wymaganych danych w formacie JSON. Na zapytania również zwracana jest odpowiedź w formacie JSON.
+            </p>
+          </section>
+          <section>
+            <p>
+              <span style="color: #009900; font-weight:bold;">REST API</span> jest wykorzystywany przez wiele frameworków aplikacji internetowych np. Ruby on Rails, Django czy Apache Sling. 
+              Parametry wywołania danej usługi umieszczane są w ścieżce adresu URL.
+            </p>
+            <p>
+              </br>
+              Przykłady:
+            </p>
+            <p style="text-align: center;">
+              </br>
+              <pre>
+<span style="text-align: center;">http://ddjDB.mini.pw.edu.pl/ddj_data/metric/5/agregated/summed</span>
+<span></span>
+<span style="text-align: center;">.../ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
+              </pre>
+            </p>
+          </section>
         </section>
 
         <section id="struktura">
