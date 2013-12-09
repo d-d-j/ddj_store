@@ -131,13 +131,6 @@
             width: 48%;
             height: 60%;
         }
-
-        @font-face {
-          font-family: 'Droid Sans Mono';
-          font-style: normal;
-          font-weight: 400;
-          src: local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');
-        }
     </style>
 </head>
     
@@ -158,7 +151,7 @@
                 <li>Temat pracy inżynierskiej</li>
                 <li>Używane technologie</li>
                 <li>Api dla klientów</li>
-                <li>Przewidywana struktura systemu</li>
+                <li>Struktura systemu</li>
                 <li>Styl "Map-Reduce" w projekcie</li>
                 <li>Wprowadzenie do języka GO</li>
                 <li>Wzorce języka GO</li>
@@ -175,21 +168,27 @@
               </p> 
             </section>
             <section>
-              <ul>
-                <span style="color: #009900; font-weight:bold;">Założenia pracy:</span>
-                <li> Baza szeregów czasowych będzie przechowywała rekordy składające się z metryki, tagu, czasu oraz danej jako wartość typu float </li>
-                <li> System powinien być w stanie odpowiadać na zapytania w czasie rzeczywistym, przy jednoczesnej dużej liczbie wpływających danych </li>
-                <li> System powinien oferować filtrowanie danych oraz podstawowe funkcje pozwalające na analizę danych </li>
-                <li> Podstawowymi cechami systemu będzie duża skalowalność oraz responsywność </li> 
-              </ul>
+              <span style="color: #009900; font-weight:bold;">ZAŁOŻENIA PRACY</span>
+              <p>
+                </br>
+                <ul>
+                  <li> Baza szeregów czasowych będzie przechowywała rekordy składające się z metryki, tagu, czasu oraz danej jako wartość typu float </li>
+                  <li> System powinien być w stanie odpowiadać na zapytania w czasie rzeczywistym, przy jednoczesnej dużej liczbie wpływających danych </li>
+                  <li> System powinien oferować filtrowanie danych oraz podstawowe funkcje pozwalające na analizę danych </li>
+                  <li> Podstawowymi cechami systemu będzie duża skalowalność oraz responsywność </li> 
+                </ul>
+              </p>
             </section>
             <section>
-              <ul>
-                <span style="color: #009900; font-weight:bold;">Cele:</span>
-                <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych </li>
-                <li> Dane mają być zapisywane w systemie w bardzo dużym tempie </li>
-                <li> Umożliwienie bieżącej analizy dużej ilości danych generowanych w dużym tempie </li>
-              </ul>
+              <span style="color: #009900; font-weight:bold;">CELE</span>
+              <p>
+                </br>
+                <ul>
+                  <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych </li>
+                  <li> Dane mają być zapisywane w systemie w bardzo dużym tempie </li>
+                  <li> Umożliwienie bieżącej analizy dużej ilości danych generowanych w dużym tempie </li>
+                </ul>
+              </p>
             </section>
         </section>
 
@@ -207,7 +206,7 @@
           </section>
           <section>
             <a href="http://www.nvidia.com/object/cuda_home_new.html">
-                <img style="float: right;" id="nvidiaLogo" title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA" src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
+                <img style="float: right; border: none; background: rgba(255, 255, 255, 0);" id="nvidiaLogo" title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA" src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
             </a>
             <p>
               <span style="color: #009900; font-weight:bold;">CUDA</span> to opracowana przez firmę NVIDIA równoległa architektura obliczeniowa, która zapewnia radykalny wzrost wydajności obliczeń, dzięki wykorzystaniu mocy układów GPU. 
@@ -216,13 +215,26 @@
               <a href="http://www.nvidia.com/object/cuda_home_new.html" target="_blank">www.nvidia.com/object/cuda_home_new</a>
             </p>
           </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">ŚRODOWISKA I PROGRAMY</span>
+            <p>
+              </br>
+              <ul style="width: 100%; font-size: 90%">
+                <li> Nvidia Nsight Eclipse Edition - <a href="https://developer.nvidia.com/nsight-eclipse-edition">developer.nvidia.com/nsight</a></li>
+                <li> JetBRAINS IntelliJ IDEA - <a href="http://www.jetbrains.com/idea/">jetbrains.com/idea</a></li>
+                <li> IntelliJ golang.org support plugin <a href="http://plugins.jetbrains.com/plugin/5047">plugins.jetbrains.com/plugin/5047</a></li>
+                <li> Jenkins - <a href="http://jenkins-ci.org">jenkins-ci.org</a></li>
+                <li> Redmine - <a href="http://www.redmine.org">redmine.org</a></li>
+              </ul>
+            </p>
+          </section>
         </section>
 
         <section id="api">
           <section>
             <h2 style="color: #FF9933">Api dla klientów</h2>
             <p> 
-              API systemu zostanie zrealizowane według wzorca <span style="color: #009900; font-weight:bold;">REST</span>. Komunikacja polega na wysłaniu żądania HTTP pod adres serwera głównego, np. http://ddjDB.mini.pw.edu.pl/ddj_data/ i ewentualnym przesłaniu wymaganych danych w formacie JSON. Na zapytania również zwracana jest odpowiedź w formacie JSON.
+              API systemu zostanie zrealizowane według wzorca <span style="color: #009900; font-weight:bold;">REST</span>. Komunikacja polega na wysłaniu żądania HTTP pod adres serwera głównego, np. http://ddjDB.mini.pw.edu.pl/data/ i ewentualnym przesłaniu wymaganych danych w formacie JSON. Na zapytania również zwracana jest odpowiedź w formacie JSON.
             </p>
           </section>
           <section>
@@ -246,7 +258,42 @@
         </section>
 
         <section id="struktura">
-            <h2 style="color: #FF9933">Przewidywana struktura systemu</h2>
+            <section>
+              <h2 style="color: #FF9933">Struktura systemu</h2>
+              <p>
+                <ol>
+                  <lh style="color: #009900; font-weight:bold;"> System będzie składał się z dwóch podsystemów: </lh>
+                  <li> Serwera głównego zwanego Master </li>
+                  <li> Systemu działającego na serwerach bazodanowych  </li>
+                </ol>
+              </p>
+              <p>
+                </br>
+                Komunikacja pomiędzy serwerem głównym a węzłami będzie odbywać się za pomocą TCP/IP po sieci wewnętrznej.
+                Klienci komunikują się tylko z serwerem głównym, który wystawia im REST'owe API.
+              </p>
+            </section>
+            <section>
+              <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="images/SimpleDeployment.png">
+            </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">MASTER (serwer główny) zajmuje się: </span>
+                <ul>
+                  <li> odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły. </li>
+                  <li> zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan. </li>
+                  <li> Nadzorowaniem wykonania wszystkich zapytań oraz zbieraniem ich wyników. </li>
+                  <li> Wykonywaniem agregacji otrzymanych wyników i przekazywaniem gotowych odpowiedzi do klienta. </li>
+                </ul>
+            </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">NODE (węzeł) zajmuje się: </span>
+              <ul>
+                  <li> składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA. </li>
+                  <li> wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU. </li>
+                  <li> pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać </li>
+                  <li> przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia </li>
+                </ul>
+            </section>
         </section>
 
         <section id="map-reduce">
