@@ -8,7 +8,7 @@ ifeq ($(OS),Darwin)
 else
 	#you can use g++ or clang or color-gcc
 	COMPILER := g++
-	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
 	STANDART := -std=c++0x
 endif
 
