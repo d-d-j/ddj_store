@@ -143,125 +143,122 @@
     
 <body>
     <div class="reveal">
-        <div class="slides">
+      <div class="slides">
+        <section>
+            <h1 style="color: #FF9933">Rozproszona baza szeregów czasowych</h1>
+            <h3>na węzłach obliczeniowych CUDA</h3>
+            <p class="small">Karol Dzitkowski</p>
+            <p class="small">Jakub Dutkowski</p>        
+            <p class="small">Tomasz Janiszewski</p>        
+        </section>
+
+        <section id="plan-prezentacji">
+            <h2 style="color: #FF9933">Plan prezentacji</h2>
+            <ol>
+                <li>Temat pracy inżynierskiej</li>
+                <li>Używane technologie</li>
+                <li>Api dla klientów</li>
+                <li>Przewidywana struktura systemu</li>
+                <li>Styl "Map-Reduce" w projekcie</li>
+                <li>Wprowadzenie do języka GO</li>
+                <li>Wzorce języka GO</li>
+                <li>Struktura i implementacja serwera głównego</li>
+            </ol>
+        </section>
+
+        <section id="temat">
             <section>
-                <h1 style="color: #FF9933">Rozproszona baza szeregów czasowych</h1>
-                <h3>na węzłach obliczeniowych CUDA</h3>
-                <p class="small">Karol Dzitkowski</p>
-                <p class="small">Jakub Dutkowski</p>        
-                <p class="small">Tomasz Janiszewski</p>        
+              <h2 style="color: #FF9933">Temat pracy inżynierskiej</h2>
+              <p>
+              Celem projektu jest stworzenie bazy danych szeregów czasowych efektywnie korzystającej z wydajności współczesnych kart graficznych.
+              Dane mają być przechowywane i przetwarzane w pamięci wewnętrznej kart NVIDIA. Ponadto baza ma mieć charakter rozproszonej bazy danych, tj. dane będą rozproszone na dużej ilości współpracujących komputerów.
+              </p> 
             </section>
- 
-            <section id="plan-prezentacji">
-                <h2 style="color: #FF9933">Plan prezentacji</h2>
-                <ol>
-                    <li>Temat pracy inżynierskiej</li>
-                    <li>Używane technologie</li>
-                    <li>Api dla klientów</li>
-                    <li>Przewidywana struktura systemu</li>
-                    <li>Styl "Map-Reduce" w projekcie</li>
-                    <li>Wprowadzenie do języka GO</li>
-                    <li>Wzorce języka GO</li>
-                    <li>Struktura i implementacja serwera głównego</li>
-                </ol>
+            <section>
+              <ul>
+                <span style="color: #009900; font-weight:bold;">Założenia pracy:</span>
+                <li> Baza szeregów czasowych będzie przechowywała rekordy składające się z metryki, tagu, czasu oraz danej jako wartość typu float </li>
+                <li> System powinien być w stanie odpowiadać na zapytania w czasie rzeczywistym, przy jednoczesnej dużej liczbie wpływających danych </li>
+                <li> System powinien oferować filtrowanie danych oraz podstawowe funkcje pozwalające na analizę danych </li>
+                <li> Podstawowymi cechami systemu będzie duża skalowalność oraz responsywność </li> 
+              </ul>
             </section>
+            <section>
+              <ul>
+                <span style="color: #009900; font-weight:bold;">Cele:</span>
+                <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych </li>
+                <li> Dane mają być zapisywane w systemie w bardzo dużym tempie </li>
+                <li> Umożliwienie bieżącej analizy dużej ilości danych generowanych w dużym tempie </li>
+              </ul>
+            </section>
+        </section>
 
-            <section id="temat">
-                <h2 style="color: #FF9933">Temat pracy inżynierskiej</h2>
-            </section>
+        <section id="technologie">
+            <h2 style="color: #FF9933">Używane technologie</h2>
+        </section>
 
-            <section id="technologie">
-                <h2 style="color: #FF9933">Używane technologie</h2>
-            </section>
+        <section id="api">
+            <h2 style="color: #FF9933">Api dla klientów</h2>
+        </section>
 
-            <section id="api">
-                <h2 style="color: #FF9933">Api dla klientów</h2>
-            </section>
+        <section id="struktura">
+            <h2 style="color: #FF9933">Przewidywana struktura systemu</h2>
+        </section>
 
-            <section id="struktura">
-                <h2 style="color: #FF9933">Przewidywana struktura systemu</h2>
-            </section>
+        <section id="map-reduce">
+            <h2 style="color: #FF9933">Styl "Map-Reduce" w projekcie</h2>
+        </section>
 
-            <section id="map-reduce">
-                <h2 style="color: #FF9933">Styl "Map-Reduce" w projekcie</h2>
-            </section>
-
-            <section id="GO-wprowadzenie">
-                <h2 style="color: #FF9933">Wprowadzenie do języka GO</h2>
-                <p>Przykładowy kod</a>
-                <div class="code playground" contentEditable="true" spellcheck="false">
-                    <pre style="display: none">
-                        <span>
-                        </span>         
-                    </pre>
-                    <pre><span num="1">package main</span>
-<span num="2"></span>
-<span num="3">import "fmt"</span>
-<span num="4"></span>
-<span num="5">func main() {</span>
-<span num="6"></span>
-<span num="7"><span>
-<span num="8">fmt.Println("Hello, GO")</span>
-<span num="9">}</span></pre>
-                </div>
-            </section>
-
-            <section id="GO-wzorce">
-                <h2 style="color: #FF9933">Wzorce języka GO</h2>
-                <p>Przykładowy kod</a>
-                <div class="code playground" contentEditable="true" spellcheck="false">
-                    <pre style="display: none">
-                        <span>
-                        </span>         
-                    </pre>
-                    <pre><span num="1">package main</span>
-<span num="2"></span>
-<span num="3">import "fmt"</span>
-<span num="4"></span>
-<span num="5">func main() {</span>
-<span num="6"></span>
-<span num="7"><span>
-<span num="8">fmt.Println("Hello, WZORCE")</span>
-<span num="9">}</span></pre>
-                </div>
-            </section>
-
+        <section id="GO-wprowadzenie">
+            <h2 style="color: #FF9933">Wprowadzenie do języka GO</h2>
+            <p>Przykładowy kod</a>
+            <div class="code playground" contentEditable="true" spellcheck="false">
+                <pre style="display: none">
+                    <span>
+                    </span>         
+                </pre>
+                <pre><span num="1">package main</span>
+                <span num="2"></span>
+                <span num="3">import "fmt"</span>
+                <span num="4"></span>
+                <span num="5">func main() {</span>
+                <span num="6"></span>
+                <span num="7"><span>
+                <span num="8">fmt.Println("Hello, GO")</span>
+                <span num="9">}</span></pre>
             </div>
+        </section>
+
+        <section id="GO-wzorce">
+            <h2 style="color: #FF9933">Wzorce języka GO</h2>
+            <p>Przykładowy kod</a>
+            <div class="code playground" contentEditable="true" spellcheck="false">
+                <pre style="display: none">
+                    <span>
+                    </span>         
+                </pre>
+                <pre><span num="1">package main</span>
+                <span num="2"></span>
+                <span num="3">import "fmt"</span>
+                <span num="4"></span>
+                <span num="5">func main() {</span>
+                <span num="6"></span>
+                <span num="7"><span>
+                <span num="8">fmt.Println("Hello, WZORCE")</span>
+                <span num="9">}</span></pre>
+            </div>
+        </section>
+
+        <section id="master">
+            <h2 style="color: #FF9933">Struktura i implementacja serwera głównego</h2>
+        </section>
+      </div>
     </div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
-    <!-- <script type="text/javascript" src="js/playground.js"></script> -->
     <script src="js/head.min.js"></script>
     <script src="js/reveal.min.js"></script>
     <script type="text/javascript" src="js/play.js"></script>
-    <!-- <script type="text/javascript">
-    //     (function () {
-    //         var ga = document.createElement("script");
-    //         ga.type = "text/javascript";
-    //         ga.async = true;
-    //         ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
-    //         var s = document.getElementsByTagName("script")[0];
-    //         s.parentNode.insertBefore(ga, s);
-    //     })();
-    // </script>
-
-    <script type="text/javascript">
-        window.initFuncs.push(function () {
-            if (window.playground) {
-                window.playground({
-                    "codeEl": "#learn .code",
-                    "outputEl": "#learn .output",
-                    "runEl": "#learn .run",
-                    "shareEl": "#learn .share",
-                    "shareRedirect": "http://play.golang.org/p/",
-                    "toysEl": "#learn .toys select"
-                });
-            } else {
-                $('#learn').hide()
-            }
-        });
-    </script>
-    -->
     <script>
         Reveal.initialize({});
     </script>
