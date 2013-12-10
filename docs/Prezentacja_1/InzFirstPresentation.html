@@ -442,6 +442,55 @@ fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
               </div>
             </div>
           </section>
+          <section>
+            <div style="text-align: left;">
+              <span style="text-align: left;">Struktury i Interfejsy:</span>
+              <pre style="width: 100%; margin: 0px; box-shadow: none;">
+                <code data-trim="" contenteditable="false" class="javascript">
+// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+type Vertex struct {
+    X, Y float64
+}
+// Tworzenie interfejsu z funkcją Abs() zwracającą float64
+type Abser interface {
+    Abs() float64
+}
+// Jeśli Vertex posiada funkcję wymaganą przez interfejs
+// to automatycznie go implementuje (Vertex implementuje Abser)
+func (v *Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+                </code>
+              </pre>
+              <span style="text-align: left;">Przykład:</span>
+              <div class="code playground" contentEditable="true" spellcheck="false">
+                <pre style="display: none">
+                    <span>
+                      <span num="1">package main</span>
+                      <span num="2">import "fmt"</span>
+                      <span num="3">import "math"</span>
+                      <span num="4">type Vertex struct {</span>
+                      <span num="5">    X, Y float64</span>
+                      <span num="6">}</span>
+                      <span num="7">type Abser interface {</span>
+                      <span num="8">    Abs() float64</span>
+                      <span num="9">}</span>
+                      <span num="10">func (v *Vertex) Abs() float64 {</span>
+                      <span num="11">    return math.Sqrt(v.X*v.X + v.Y*v.Y)</span>
+                      <span num="12">}</span>
+                    </span>         
+                </pre>
+                <pre>
+                  <span num="1">func main() {</span>
+                  <span num="2">var a Abser</span>
+                  <span num="3">v := Vertex{3, 4}</span>
+                  <span num="4">a = &v</span>
+                  <span num="5">fmt.Println(a.Abs())</span>
+                  <span num="6">}</span>
+                </pre>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section id="GO-wzorce">
