@@ -1,10 +1,11 @@
-    <!doctype html>
+<!doctype html>
 <html lang="en">    
 <head>
     <meta charset="utf-8">
     <title>Reveal.js 3 Slide Demo</title>
     <link rel="stylesheet" href="css/reveal.min.css">
-    <link rel="stylesheet" href="css/default.css" id="theme">    
+    <link rel="stylesheet" href="css/default.css" id="theme">   
+    <link rel="stylesheet" type="text/css" href="css/zenburn.css"> 
 
     <!--Add support for earlier versions of Internet Explorer -->
     <!--[if lt IE 9]>
@@ -54,8 +55,8 @@
 
         div.output {
           position: absolute;
-          left: 50%;
-          top: 50%;
+          left: 70%;
+          top: 25%;
           right: 40px;
           bottom: 40px;
           background: #202020;
@@ -294,30 +295,153 @@
                   <li> przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia </li>
                 </ul>
             </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">AGREGOWANIE I FILTRACJA DANYCH</span>
+              <p>
+                Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (metryka, tag). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
+              </p>
+            </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">PRZEWIDYWANE FUNKCJE AGREGUJĄCE</span>
+              <ul>
+                  <li> sumowanie </li>
+                  <li> średnia </li>
+                  <li> max i min </li>
+                  <li> odchylenie standardowe </li>
+                  <li> wariancja </li>
+                  <li> całka </li>
+                  <li> różniczka </li>
+                  <li> histogram </li>
+                  <li> liczba rekordów o wartościach z przedziału </li>
+                </ul>
+            </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">PRACA W CZASIE RZECZYWISTYM</span>
+              <p>
+                Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna wstępna agregacja danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU. Istnieje więc możliwość że część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla użytkownika gdyż jeszcze nie zdążą być zapisane na karcie pomimo że zostały przyjęte do systemu.
+              </p>
+            </section>
+            <section>
+              <span style="color: #009900; font-weight:bold;">PRACA BADAWCZA</span>
+              <p>
+                Ponieważ jest to praca “badawcza” program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań. Będziemy badać wydajność takiego rozwiązania bazy danych.
+              </p>
+            </section>
         </section>
 
         <section id="map-reduce">
-            <h2 style="color: #FF9933">Styl "Map-Reduce" w projekcie</h2>
+          <section>
+            <h2 style="color: #FF9933">"Map-Reduce"</h2>
+            <p>
+              Zaletą systemu będzie implementacja modelu programowania Map-Reduce, jako że jest to rozproszona baza danych. Systemy typu "map-reduce" są coraz częściej stosowane w zastosowaniach bazodanowych i charakteryzują się ogromną skalowalnością.
+            </p>
+          </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">SCHEMAT MAP-REDUCE W PROJEKCIE</span>
+            <img style="border: none; background: rgba(255, 255, 255, 0);" id="MapReduce" title="MapReduce Diagram" alt="MapReduce Diagram" src="images/MapReduce.png">
+          </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">DZIAŁANIE</span>
+            <p>
+              </br>
+              <ol>
+                <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj. filtrują dane pod kątem pewnych kryteriów. </li>
+                <li> Jeśli to możliwe węzły wykonują dwie operacje Compose (Redukcja na poziomie węzłów) </li>
+                <li> Pierwsza operacja Compose odbywa się jako agregacja danych z jednej karty GPU (wykonywana na tej karcie z użyciem CUDA) </li>
+                <li> Druga operacja Compose wykonuje się na węźle jako agregacja wyników uzyskanych ze wszystkich posiadanych kart </li>
+                <li> Ostatnim etapem jest wykonanie operacji Reduce na wynikach uzyskanych ze wszystkich węzłów </li>
+              </ol>
+            </p>
+          </section>
         </section>
 
         <section id="GO-wprowadzenie">
+          <section>
             <h2 style="color: #FF9933">Wprowadzenie do języka GO</h2>
-            <p>Przykładowy kod</a>
+            <img src="http://1-ps.googleusercontent.com/x/s.golang-org.appspot.com/talks.golang.org/2012/simple/xgopher.jpg.pagespeed.ic.rcVvkAdRfG.jpg">
+          </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">GO - CECHY</span>
+            <p>
+              </br>
+              <ul>
+                <li> Młody i nowoczesny język programowania - Marzec 2012 </li>
+                <li> Obiektowy (ale nie tak zwyczajnie) </li>
+                <li> Statycznie typowany </li>
+                <li> Kompilowany do asemblera </li> 
+                <li> "Odśmiecany" (Garbage Collected) </li>
+                <li> Wielowątkowość i synchronizacja ma wbudowana w język </li> 
+                <li> Kompozycja poprzez interfejsy </li>
+                <li> Open Source na licencji BSD </li>
+              </ul>
+            </p>
+          </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">HELLO WORLD</span>
+            <p>
+              </br>
+            </p>
             <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
                     </span>         
                 </pre>
-                <pre><span num="1">package main</span>
-                <span num="2"></span>
-                <span num="3">import "fmt"</span>
-                <span num="4"></span>
-                <span num="5">func main() {</span>
-                <span num="6"></span>
-                <span num="7"><span>
-                <span num="8">fmt.Println("Hello, GO")</span>
-                <span num="9">}</span></pre>
+                <pre>
+                  <span num="1">package main</span>
+                  <span num="2"></span>
+                  <span num="3">import "fmt"</span>
+                  <span num="4"></span>
+                  <span num="5">func main() {</span>
+                  <span num="6"></span>
+                  <span num="7"></span>
+                  <span num="8">fmt.Println("Hello World!")</span>
+                  <span num="9">}</span>
+                </pre>
             </div>
+          </section>
+          <section>
+            <span style="color: #009900; font-weight:bold;">SKŁADNIA</span>
+            <div style="text-align: left;">
+              <span style="text-align: left;">Deklaracja zmiennych:</span>
+              <pre style="width: 100%; margin: 0px; box-shadow: none;">
+                <code data-trim="" contenteditable="false" class="javascript">
+var name int32 = 10   // var nazwa typ = wartość
+x := 5.5              // deklaracja x z wartością 5.5 i odpowiednim typem
+y := foo(x)           // deklaracja y z wartością i typem wyniku foo(x)
+                </code>
+              </pre>
+            </div>
+            <div style="text-align: left;">
+              <span style="text-align: left;">Funkcje:</span>
+              <pre style="width: 100%; margin: 0px; box-shadow: none;">
+                <code data-trim="" contenteditable="" class="javascript">
+import "fmt"  // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
+return x + y, x-y // zwracanie wielu zmiennych
+fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
+                </code>
+              </pre>
+              <span style="text-align: left;">Przykład:</span>
+              <div class="code playground" contentEditable="true" spellcheck="false">
+                <pre style="display: none">
+                    <span>
+                    </span>         
+                </pre>
+                <pre>
+                  <span num="1">package main</span>
+                  <span num="2"></span>
+                  <span num="3">import "fmt"</span>
+                  <span num="4"></span>
+                  <span num="5">func addAndsub(x int, y int) (int, int) {</span>
+                  <span num="6">return x + y, x-y</span>
+                  <span num="7">}</span>
+                  <span num="8">func main() {</span>
+                  <span num="9">fmt.Println(addAndsub(40, 10))</span>
+                  <span num="10">}</span>
+                </pre>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section id="GO-wzorce">
