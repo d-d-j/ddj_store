@@ -494,24 +494,171 @@ func (v *Vertex) Abs() float64 {
         </section>
 
         <section id="GO-wzorce">
-            <h2>Wzorce języka GO</h2>
-            <p>Przykładowy kod</a>
-            <div class="code playground" contentEditable="true" spellcheck="false">
-                <pre style="display: none">
-                    <span>
-                    </span>         
-                </pre>
-                <pre><span num="1">package main</span>
-                <span num="2"></span>
-                <span num="3">import "fmt"</span>
-                <span num="4"></span>
-                <span num="5">func main() {</span>
-                <span num="6"></span>
-                <span num="7"><span>
-                <span num="8">fmt.Println("Hello, WZORCE")</span>
-                <span num="9">}</span></pre>
+          <section>
+            <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none"><span>// +build OMIT
+
+            package main
+
+            import (
+              "fmt"
+              "math/rand"
+              "time"
+            )
+
+            func main() {
+            </span></pre>
+
+            <pre><span num="13">    <b>c := foo("boring!") </b></span>
+            <span num="14">    for i := 0; i &lt; 5; i++ {</span>
+            <span num="15">        fmt.Printf("You say: %q\n", &lt;-c)</span>
+            <span num="16">    }</span>
+            <span num="17">    fmt.Println("You're boring; I'm leaving.")</span>
+            </pre>
+
+            <pre style="display: none"><span>}
+
+            // START2 OMIT
+            func foo(msg string) &lt;-chan string {
+              c := make(chan string)
+              go func() {
+                for i := 0; ; i++ {
+                  c &lt;- fmt.Sprintf("%s %d", msg, i)
+                  time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+                }
+              }()
+              return c
+            }
+            // STOP2 OMIT
+
+            </span></pre>
             </div>
+            <div class="code" contenteditable="true" spellcheck="false">
+
+
+            <pre><span num="22"><b>func boring(msg string) &lt;-chan string {</b></span>
+            <span num="23">    c := make(chan string)</span>
+            <span num="24">    <b>go func() { </b></span>
+            <span num="25">        for i := 0; ; i++ {</span>
+            <span num="26">            c &lt;- fmt.Sprintf("%s %d", msg, i)</span>
+            <span num="27">            time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)</span>
+            <span num="28">        }</span>
+            <span num="29">    }()</span>
+            <span num="30">    <b>return c </b></span>
+            <span num="31">}</span>
+            </pre>
+            </div>
+          </section>
+
+          <section>
+            <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none"><span>// +build OMIT
+
+            package main
+
+            import (
+              "fmt"
+              "math/rand"
+              "time"
+            )
+
+            </span></pre>
+
+            <pre><span num="12">func main() {</span>
+            <span num="13">    c := foo("A")</span>
+            <span num="14">    for {</span>
+            <span num="15">        select {</span>
+            <span num="16">        case s := &lt;-c:</span>
+            <span num="17">            fmt.Println(s)</span>
+            <span num="18">        <b>case &lt;-time.After(1 * time.Second):</b></span>
+            <span num="19">            fmt.Println("You're too slow.")</span>
+            <span num="20">            return</span>
+            <span num="21">        }</span>
+            <span num="22">    }</span>
+            <span num="23">}</span>
+            </pre>
+
+            <pre style="display: none"><span>
+            // START2 OMIT
+            func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+              c := make(chan string)
+              go func() { // We launch the goroutine from inside the function. // HL
+                for i := 0; ; i++ {
+                  c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                  time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                }
+              }()
+              return c // Return the channel to the caller. // HL
+            }
+            // STOP2 OMIT
+            </span></pre>
+            </div>
+          </section>
+          <section>
+            <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none"><span>// +build OMIT
+
+            package main
+
+            import (
+              "fmt"
+              "math/rand"
+              "time"
+            )
+
+            </span></pre>
+
+            <pre><span num="12">func main() {</span>
+            <span num="13">    c := foo("A")</span>
+            <span num="14">    <b>timeout := time.After(5 * time.Second)</b></span>
+            <span num="15">    for {</span>
+            <span num="16">        select {</span>
+            <span num="17">        case s := &lt;-c:</span>
+            <span num="18">            fmt.Println(s)</span>
+            <span num="19">        <b>case &lt;-timeout:</b></span>
+            <span num="20">            fmt.Println("You talk too much.")</span>
+            <span num="21">            return</span>
+            <span num="22">        }</span>
+            <span num="23">    }</span>
+            <span num="24">}</span>
+            </pre>
+
+            <pre style="display: none"><span>
+            // START2 OMIT
+            func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+              c := make(chan string)
+              go func() { // We launch the goroutine from inside the function. // HL
+                for i := 0; ; i++ {
+                  c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                  time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                }
+              }()
+              return c // Return the channel to the caller. // HL
+            }
+            // STOP2 OMIT
+
+
+            // START3 OMIT
+            func fanIn(input1, input2 &lt;-chan string) &lt;-chan string { // HL
+              c := make(chan string)
+              go func() {
+                for {
+                  select {
+                  case s := &lt;-input1:
+                    c &lt;- s
+                  case s := &lt;-input2:
+                    c &lt;- s
+                  }
+                }
+              }()
+              return c
+            }
+            // STOP3 OMIT
+            </span></pre>
+            </div>
+          </section>
         </section>
+
 
         <section id="master">
             <h2>Struktura i implementacja serwera głównego</h2>
