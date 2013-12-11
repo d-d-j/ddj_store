@@ -192,7 +192,7 @@
         <h3>ZAŁOŻENIA PRACY</h3>
 
         <ul style="list-style: none;">
-            <li> Rekordy składające się z metryki, tagu, czasu oraz wartości liczbowej (float)</li>
+            <li> Rekordy składające się z czasu, wartości liczbowej (float) oraz metryki i tagu</li>
             <li class="fragment"> Duże obciążenie systemu wpływającymi danymi</li>
             <li class="fragment"> Realizowanie zapytań w czasie rzeczywistym</li>
             <li class="fragment"> Flitrowanie oraz agregacja danych</li>
@@ -204,8 +204,8 @@
         <h3>CELE</h3>
 
         <ul style="list-style: none;">
-            <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych</li>
-            <li class="fragment"> Zapis dużych strumieni danych z wielu źródeł w czasie rzeczywistym</li>
+            <li> Zapis dużych strumieni danych z wielu źródeł w czasie rzeczywistym</li>
+            <li class="fragment"> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych</li>
         </ul>
     </section>
 </section>
@@ -241,7 +241,7 @@
     <section>
         <h3>ŚRODOWISKA I PROGRAMY</h3>
 
-        <ul style="width: 100%; font-size: 90%">
+        <ul style="list-style: none;">
             <li> Nvidia Nsight Eclipse Edition - <a href="https://developer.nvidia.com/nsight-eclipse-edition">developer.nvidia.com/nsight</a>
             </li>
             <li> JetBRAINS IntelliJ IDEA - <a href="http://www.jetbrains.com/idea/">jetbrains.com/idea</a></li>
@@ -260,7 +260,7 @@
         <p>
             API zrealizowane zgodnie z wzorcem <span style="color: #009900; font-weight:bold;">REST</span>.
             Komunikacja klienta z serwerem głównym za pomącą żądań HTTP np.
-            http://ddjDB.mini.pw.edu.pl/data/
+        <pre>http://ddjDB.mini.pw.edu.pl/data/</pre>
         </p>
 
         <p class="fragment">
@@ -283,7 +283,7 @@
         <pre>
         <span style="text-align: center;">http://ddjDB.mini.pw.edu.pl/ddj_data/metric/5/agregated/summed</span>
         <span></span>
-        <span style="text-align: center;">.../ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
+        <span style="text-align: center;">/ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
         </pre>
         </p>
     </section>
@@ -293,16 +293,15 @@
     <section>
         <h2>Struktura systemu</h2>
 
-        <p>
         <ol>
-            System będzie składał się z dwóch podsystemów:
-            <li> Serwera głównego zwanego Master</li>
-            <li> Systemu działającego na serwerach bazodanowych</li>
+            <li> Serwera główny - Master</li>
+            <li> Program serwerów bazodanowych - Node</li>
         </ol>
-        </p>
         <p>
-            </br>
             Komunikacja pomiędzy serwerem głównym a węzłami będzie odbywać się za pomocą TCP/IP po sieci wewnętrznej.
+        </p>
+
+        <p class="fragment">
             Klienci komunikują się tylko z serwerem głównym, który wystawia im REST'owe API.
         </p>
     </section>
@@ -312,20 +311,20 @@
     </section>
     <section>
         <h3>MASTER (serwer główny) zajmuje się: </h3>
-        <ul>
-            <li> odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły.</li>
-            <li> zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan.</li>
+        <ul style="list-style: none;">
+            <li> Odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły.</li>
+            <li> Zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan.</li>
             <li> Nadzorowaniem wykonania wszystkich zapytań oraz zbieraniem ich wyników.</li>
             <li> Wykonywaniem agregacji otrzymanych wyników i przekazywaniem gotowych odpowiedzi do klienta.</li>
         </ul>
     </section>
     <section>
         <h3>NODE (węzeł) zajmuje się: </h3>
-        <ul>
-            <li> składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA.</li>
-            <li> wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU.</li>
-            <li> pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać</li>
-            <li> przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia</li>
+        <ul style="list-style: none;">
+            <li> Składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA.</li>
+            <li> Wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU.</li>
+            <li> Pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać</li>
+            <li> Przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia</li>
         </ul>
     </section>
     <section>
@@ -333,14 +332,18 @@
 
         <p>
             Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów
-            (metryka, tag). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako
+            (metryka, tag).
+        </p>
+
+        <p class="fragment">
+            Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość, lub jako
             lista wartości zagregowana przy pomocy predefiniowanych funkcji.
         </p>
     </section>
     <section>
         <h3>PRZEWIDYWANE FUNKCJE AGREGUJĄCE</h3>
-        <ul>
-            <li> sumowanie</li>
+        <ul style="list-style: none;">
+            <li> suma</li>
             <li> średnia</li>
             <li> max i min</li>
             <li> odchylenie standardowe</li>
@@ -354,12 +357,13 @@
     <section>
         <h3>PRACA W CZASIE RZECZYWISTYM</h3>
 
-        <p>
-            Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna
-            wstępna agregacja danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU.
-            Istnieje więc możliwość że część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla
-            użytkownika gdyż jeszcze nie zdążą być zapisane na karcie pomimo że zostały przyjęte do systemu.
-        </p>
+        <ul style="list-style: none;">
+            <li>Operacje na danych będą wykonywane w czasie rzeczywistym - bez preagregacji</li>
+            <li class="fragment">Wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU</li>
+            <li class="fragment">Istnieje możliwość, że dane zostaną pominięte w zapytaniu, jeżeli nie zdążą być
+                zapisane na karcie
+            </li>
+        </ul>
     </section>
     <section>
         <h3>PRACA BADAWCZA</h3>
@@ -390,7 +394,6 @@
     <section>
         <h3>DZIAŁANIE</h3>
 
-        <p>
         <ol>
             <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj.
                 filtrują dane pod kątem pewnych kryteriów.
@@ -404,7 +407,6 @@
             </li>
             <li> Ostatnim etapem jest wykonanie operacji Reduce na wynikach uzyskanych ze wszystkich węzłów</li>
         </ol>
-        </p>
     </section>
 </section>
 
@@ -551,9 +553,9 @@
     </section>
 </section>
 
-        <section id="GO-wzorce">
-          <section>
-            <div class="code playground" contenteditable="true" spellcheck="false">
+<section id="GO-wzorce">
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
             <pre style="display: none"><span>// +build OMIT
 
             package main
@@ -590,8 +592,8 @@
             // STOP2 OMIT
 
             </span></pre>
-            </div>
-            <div class="code" contenteditable="true" spellcheck="false">
+    </div>
+    <div class="code" contenteditable="true" spellcheck="false">
 
 
             <pre><span num="22"><b>func boring(msg string) &lt;-chan string {</b></span>
@@ -605,11 +607,11 @@
             <span num="30">    <b>return c </b></span>
             <span num="31">}</span>
             </pre>
-            </div>
-          </section>
+    </div>
+</section>
 
-          <section>
-            <div class="code playground" contenteditable="true" spellcheck="false">
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
             <pre style="display: none"><span>// +build OMIT
 
             package main
@@ -650,10 +652,10 @@
             }
             // STOP2 OMIT
             </span></pre>
-            </div>
-          </section>
-          <section>
-            <div class="code playground" contenteditable="true" spellcheck="false">
+    </div>
+</section>
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
             <pre style="display: none"><span>// +build OMIT
 
             package main
@@ -713,11 +715,11 @@
             }
             // STOP3 OMIT
             </span></pre>
-            </div>
-          </section>
+    </div>
+</section>
 
-          <section>
-              <div class="code" contenteditable="true" spellcheck="false">
+<section>
+    <div class="code" contenteditable="true" spellcheck="false">
 
 
             <pre>
@@ -752,13 +754,13 @@
                 heap.Push(&amp;(b.pool), w)
               }
               </pre>
-              </div>
-          </section>
-
-        </section>
-
-      </div>
     </div>
+</section>
+
+</section>
+
+</div>
+</div>
 </section>
 
 <section id="master">
