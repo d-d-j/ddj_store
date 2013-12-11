@@ -767,7 +767,8 @@ import "fmt"
 import "time"
             </span></pre>
 
-            <pre>func generator(a chan chan int) {
+            <pre>
+func generator(a chan chan int) {
   i := 0
   for {
     select {
@@ -783,7 +784,7 @@ func worker(a chan chan int) {
   for i := 0; i < 10; i++ {
     a <- b
     fmt.Println(<-b)
-    time.Sleep(time.Duration(100) * time.Millisecond)
+    time.Sleep(time.Second)
   }
 }
 
@@ -791,7 +792,7 @@ func main() {
   c := make(chan chan int)
   go generator(c)
   go worker(c)
-  time.Sleep(time.Duration(1000) * time.Millisecond)
+  time.Sleep(10 * time.Second)
 }
             </pre>
     </div>
