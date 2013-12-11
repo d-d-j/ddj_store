@@ -2,7 +2,7 @@
 <html lang="en">    
 <head>
     <meta charset="utf-8">
-    <title>Reveal.js 3 Slide Demo</title>
+    <title>DDJ DB</title>
     <link rel="stylesheet" href="css/reveal.min.css">
     <link rel="stylesheet" href="css/default.css" id="theme">   
     <link rel="stylesheet" type="text/css" href="css/zenburn.css"> 
@@ -132,6 +132,10 @@
             width: 48%;
             height: 60%;
         }
+
+        .slides h2, .slides h3, .slides h1 {
+            color: #FF9933
+        }
     </style>
 </head>
     
@@ -139,15 +143,15 @@
     <div class="reveal">
       <div class="slides">
         <section>
-            <h1 style="color: #FF9933">Rozproszona baza szeregów czasowych</h1>
-            <h3>na węzłach obliczeniowych CUDA</h3>
+            <h1>Rozproszona baza szeregów czasowych</h1>
+            <h4>na węzłach obliczeniowych CUDA</h4>
             <p class="small">Karol Dzitkowski</p>
             <p class="small">Jakub Dutkowski</p>        
             <p class="small">Tomasz Janiszewski</p>        
         </section>
 
         <section id="plan-prezentacji">
-            <h2 style="color: #FF9933">Plan prezentacji</h2>
+            <h3>Plan prezentacji</h3>
             <ol>
                 <li>Temat pracy inżynierskiej</li>
                 <li>Używane technologie</li>
@@ -162,16 +166,15 @@
 
         <section id="temat">
             <section>
-              <h2 style="color: #FF9933">Temat pracy inżynierskiej</h2>
+              <h2>Temat pracy inżynierskiej</h2>
               <p>
               Celem projektu jest stworzenie bazy danych szeregów czasowych efektywnie korzystającej z wydajności współczesnych kart graficznych.
               Dane mają być przechowywane i przetwarzane w pamięci wewnętrznej kart NVIDIA. Ponadto baza ma mieć charakter rozproszonej bazy danych, tj. dane będą rozproszone na dużej ilości współpracujących komputerów.
               </p> 
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">ZAŁOŻENIA PRACY</span>
+              <h3>ZAŁOŻENIA PRACY</h3>
               <p>
-                </br>
                 <ul>
                   <li> Baza szeregów czasowych będzie przechowywała rekordy składające się z metryki, tagu, czasu oraz danej jako wartość typu float </li>
                   <li> System powinien być w stanie odpowiadać na zapytania w czasie rzeczywistym, przy jednoczesnej dużej liczbie wpływających danych </li>
@@ -181,9 +184,8 @@
               </p>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">CELE</span>
+              <h3>CELE</h3>
               <p>
-                </br>
                 <ul>
                   <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych </li>
                   <li> Dane mają być zapisywane w systemie w bardzo dużym tempie </li>
@@ -195,7 +197,7 @@
 
         <section id="technologie">
           <section>
-              <h2 style="color: #FF9933">Używane technologie</h2>
+              <h2>Używane technologie</h2>
               <ul>
                 <li> Język programowania C/C++ </li>
                 <li> Język programowania GO </li>
@@ -217,7 +219,7 @@
             </p>
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">ŚRODOWISKA I PROGRAMY</span>
+            <h3>ŚRODOWISKA I PROGRAMY</h3>
             <p>
               </br>
               <ul style="width: 100%; font-size: 90%">
@@ -233,7 +235,7 @@
 
         <section id="api">
           <section>
-            <h2 style="color: #FF9933">Api dla klientów</h2>
+            <h2>Api dla klientów</h2>
             <p> 
               API systemu zostanie zrealizowane według wzorca <span style="color: #009900; font-weight:bold;">REST</span>. Komunikacja polega na wysłaniu żądania HTTP pod adres serwera głównego, np. http://ddjDB.mini.pw.edu.pl/data/ i ewentualnym przesłaniu wymaganych danych w formacie JSON. Na zapytania również zwracana jest odpowiedź w formacie JSON.
             </p>
@@ -260,10 +262,10 @@
 
         <section id="struktura">
             <section>
-              <h2 style="color: #FF9933">Struktura systemu</h2>
+              <h2>Struktura systemu</h2>
               <p>
                 <ol>
-                  <lh style="color: #009900; font-weight:bold;"> System będzie składał się z dwóch podsystemów: </lh>
+                  System będzie składał się z dwóch podsystemów:
                   <li> Serwera głównego zwanego Master </li>
                   <li> Systemu działającego na serwerach bazodanowych  </li>
                 </ol>
@@ -278,7 +280,7 @@
               <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="images/SimpleDeployment.png">
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">MASTER (serwer główny) zajmuje się: </span>
+              <h3>MASTER (serwer główny) zajmuje się: </h3>
                 <ul>
                   <li> odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły. </li>
                   <li> zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan. </li>
@@ -287,7 +289,7 @@
                 </ul>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">NODE (węzeł) zajmuje się: </span>
+              <h3>NODE (węzeł) zajmuje się: </h3>
               <ul>
                   <li> składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA. </li>
                   <li> wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU. </li>
@@ -296,13 +298,13 @@
                 </ul>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">AGREGOWANIE I FILTRACJA DANYCH</span>
+              <h3>AGREGOWANIE I FILTRACJA DANYCH</h3>
               <p>
                 Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (metryka, tag). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
               </p>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">PRZEWIDYWANE FUNKCJE AGREGUJĄCE</span>
+              <h3>PRZEWIDYWANE FUNKCJE AGREGUJĄCE</h3>
               <ul>
                   <li> sumowanie </li>
                   <li> średnia </li>
@@ -316,13 +318,13 @@
                 </ul>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">PRACA W CZASIE RZECZYWISTYM</span>
+              <h3>PRACA W CZASIE RZECZYWISTYM</h3>
               <p>
                 Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna wstępna agregacja danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU. Istnieje więc możliwość że część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla użytkownika gdyż jeszcze nie zdążą być zapisane na karcie pomimo że zostały przyjęte do systemu.
               </p>
             </section>
             <section>
-              <span style="color: #009900; font-weight:bold;">PRACA BADAWCZA</span>
+              <h3>PRACA BADAWCZA</h3>
               <p>
                 Ponieważ jest to praca “badawcza” program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań. Będziemy badać wydajność takiego rozwiązania bazy danych.
               </p>
@@ -331,19 +333,18 @@
 
         <section id="map-reduce">
           <section>
-            <h2 style="color: #FF9933">"Map-Reduce"</h2>
+            <h2>"Map-Reduce"</h2>
             <p>
               Zaletą systemu będzie implementacja modelu programowania Map-Reduce, jako że jest to rozproszona baza danych. Systemy typu "map-reduce" są coraz częściej stosowane w zastosowaniach bazodanowych i charakteryzują się ogromną skalowalnością.
             </p>
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">SCHEMAT MAP-REDUCE W PROJEKCIE</span>
+            <h3>SCHEMAT MAP-REDUCE W PROJEKCIE</h3>
             <img style="border: none; background: rgba(255, 255, 255, 0);" id="MapReduce" title="MapReduce Diagram" alt="MapReduce Diagram" src="images/MapReduce.png">
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">DZIAŁANIE</span>
+            <h3>DZIAŁANIE</h3>
             <p>
-              </br>
               <ol>
                 <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj. filtrują dane pod kątem pewnych kryteriów. </li>
                 <li> Jeśli to możliwe węzły wykonują dwie operacje Compose (Redukcja na poziomie węzłów) </li>
@@ -357,13 +358,12 @@
 
         <section id="GO-wprowadzenie">
           <section>
-            <h2 style="color: #FF9933">Wprowadzenie do języka GO</h2>
+            <h2>Wprowadzenie do języka GO</h2>
             <img src="http://1-ps.googleusercontent.com/x/s.golang-org.appspot.com/talks.golang.org/2012/simple/xgopher.jpg.pagespeed.ic.rcVvkAdRfG.jpg">
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">GO - CECHY</span>
+            <h3>GO - CECHY</h3>
             <p>
-              </br>
               <ul>
                 <li> Młody i nowoczesny język programowania - Marzec 2012 </li>
                 <li> Obiektowy (ale nie tak zwyczajnie) </li>
@@ -377,7 +377,7 @@
             </p>
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">HELLO WORLD</span>
+            <h3>HELLO WORLD</h3>
             <p>
               </br>
             </p>
@@ -400,7 +400,7 @@
             </div>
           </section>
           <section>
-            <span style="color: #009900; font-weight:bold;">SKŁADNIA</span>
+            <h3>SKŁADNIA</h3>
             <div style="text-align: left;">
               <span style="text-align: left;">Deklaracja zmiennych:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
@@ -494,7 +494,7 @@ func (v *Vertex) Abs() float64 {
         </section>
 
         <section id="GO-wzorce">
-            <h2 style="color: #FF9933">Wzorce języka GO</h2>
+            <h2>Wzorce języka GO</h2>
             <p>Przykładowy kod</a>
             <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
@@ -514,7 +514,7 @@ func (v *Vertex) Abs() float64 {
         </section>
 
         <section id="master">
-            <h2 style="color: #FF9933">Struktura i implementacja serwera głównego</h2>
+            <h2>Struktura i implementacja serwera głównego</h2>
         </section>
       </div>
     </div>
