@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="en">    
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>DDJ DB</title>
     <link rel="stylesheet" href="css/reveal.min.css">
-    <link rel="stylesheet" href="css/default.css" id="theme">   
-    <link rel="stylesheet" type="text/css" href="css/zenburn.css"> 
+    <link rel="stylesheet" href="css/default.css" id="theme">
+    <link rel="stylesheet" type="text/css" href="css/zenburn.css">
 
     <!--Add support for earlier versions of Internet Explorer -->
     <!--[if lt IE 9]>
     <script src="lib/js/html5shiv.js"></script>
     <![endif]-->
 
-    <script type="text/javascript">window.initFuncs=[];</script>
+    <script type="text/javascript">window.initFuncs = [];</script>
     <style type="text/css">
 
         p.small {
@@ -20,112 +20,119 @@
             color: #C0C0C0;
         }
 
-        div.code.playground {
-            box-shadow: ;
-        }
-
         div.code {
-          padding: 5px 10px;
-          margin-top: 20px;
-          margin-bottom: 20px;
-          overflow: hidden;
+            padding: 5px 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
 
-          background: rgb(179, 179, 170);
-          border: 1px solid rgb(224, 224, 224);
+            background: rgb(179, 179, 170);
+            border: 1px solid rgb(224, 224, 224);
         }
 
         .code pre {
-          width: 100%;
-          box-shadow: 0 0 0 0;
-          text-align: left;
-          margin: 0;
-          padding: 0;
+            width: 100%;
+            box-shadow: 0 0 0 0;
+            text-align: left;
+            margin: 0;
+            padding: 0;
 
-          font-family: 'Droid Sans Mono', 'Courier New', monospace;
-          font-size: 18px;
-          line-height: 24px;
-          letter-spacing: -1px;
+            font-family: 'Droid Sans Mono', 'Courier New', monospace;
+            font-size: 18px;
+            line-height: 24px;
+            letter-spacing: -1px;
 
-          color: black;
+            color: black;
         }
 
         div.playground {
-          position: relative;
+            position: relative;
         }
 
         div.output {
-          position: absolute;
-          left: 70%;
-          top: 25%;
-          right: 40px;
-          bottom: 40px;
-          background: #202020;
-          padding: 5px 10px;
-          z-index: 2;
+            position: absolute;
+            left: 70%;
+            top: 25%;
+            right: 40px;
+            bottom: 40px;
+            background: #202020;
+            padding: 5px 10px;
+            z-index: 2;
 
-          border-radius: 10px;
-          -o-border-radius: 10px;
-          -moz-border-radius: 10px;
-          -webkit-border-radius: 10px;
+            border-radius: 10px;
+            -o-border-radius: 10px;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
 
         }
+
         div.output pre {
-          margin: 0;
-          padding: 0;
-          background: none;
-          border: none;
-          width: 100%;
-          height: 100%;
-          overflow: auto;
+            margin: 0;
+            padding: 0;
+            background: none;
+            border: none;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
         }
+
         div.output .stdout, div.output pre {
-          color: #e6e6e6;
+            color: #e6e6e6;
         }
+
         div.output .stderr, div.output .error {
-          color: rgb(244, 74, 63);
+            color: rgb(244, 74, 63);
         }
+
         div.output .system, div.output .exit {
-          color: rgb(255, 209, 77)
+            color: rgb(255, 209, 77)
         }
+
         .buttons {
-          position: relative;
-          float: right;
-          top: -60px;
-          right: 10px;
-          z-index: 1000;
+            position: relative;
+            float: right;
+            top: -60px;
+            right: 10px;
+            z-index: 1000;
         }
+
         div.output .buttons {
-          position: absolute;
-          float: none;
-          top: auto;
-          right: 5px;
-          bottom: 5px;
+            position: absolute;
+            float: none;
+            top: auto;
+            right: 5px;
+            bottom: 5px;
         }
-        /* Output resize details */
+
+            /* Output resize details */
         .ui-resizable-handle {
-          position: absolute;
+            position: absolute;
         }
+
         .ui-resizable-n {
-          cursor: n-resize;
-          height: 7px;
-          width: 100%;
-          top: -5px;
-          left: 0;
+            cursor: n-resize;
+            height: 7px;
+            width: 100%;
+            top: -5px;
+            left: 0;
         }
+
         .ui-resizable-w {
-          cursor: w-resize;
-          width: 7px;
-          left: -5px;
-          top: 0;
-          height: 100%;
+            cursor: w-resize;
+            width: 7px;
+            left: -5px;
+            top: 0;
+            height: 100%;
         }
+
         .ui-resizable-nw {
-          cursor: nw-resize;
-          width: 9px;
-          height: 9px;
-          left: -5px;
-          top: -5px;
+            cursor: nw-resize;
+            width: 9px;
+            height: 9px;
+            left: -5px;
+            top: -5px;
         }
+
         div.ui-resizable.output {
             display: block;
             overflow: scroll;
@@ -138,250 +145,298 @@
         }
     </style>
 </head>
-    
+
 <body>
-    <div class="reveal">
-      <div class="slides">
-        <section>
-            <h1>Rozproszona baza szeregów czasowych</h1>
-            <h4>na węzłach obliczeniowych CUDA</h4>
-            <p class="small">Karol Dzitkowski</p>
-            <p class="small">Jakub Dutkowski</p>        
-            <p class="small">Tomasz Janiszewski</p>        
-        </section>
+<div class="reveal">
+<div class="slides">
+<section>
+    <h1>Rozproszona baza szeregów czasowych</h1>
+    <h4>na węzłach obliczeniowych CUDA</h4>
 
-        <section id="plan-prezentacji">
-            <h3>Plan prezentacji</h3>
-            <ol>
-                <li>Temat pracy inżynierskiej</li>
-                <li>Używane technologie</li>
-                <li>Api dla klientów</li>
-                <li>Struktura systemu</li>
-                <li>Styl "Map-Reduce" w projekcie</li>
-                <li>Wprowadzenie do języka GO</li>
-                <li>Wzorce języka GO</li>
-                <li>Struktura i implementacja serwera głównego</li>
-            </ol>
-        </section>
+    <p class="small">Karol Dzitkowski</p>
 
-        <section id="temat">
-            <section>
-              <h2>Temat pracy inżynierskiej</h2>
-              <p>
-              Celem projektu jest stworzenie bazy danych szeregów czasowych efektywnie korzystającej z wydajności współczesnych kart graficznych.
-              Dane mają być przechowywane i przetwarzane w pamięci wewnętrznej kart NVIDIA. Ponadto baza ma mieć charakter rozproszonej bazy danych, tj. dane będą rozproszone na dużej ilości współpracujących komputerów.
-              </p> 
-            </section>
-            <section>
-              <h3>ZAŁOŻENIA PRACY</h3>
-              <p>
-                <ul>
-                  <li> Baza szeregów czasowych będzie przechowywała rekordy składające się z metryki, tagu, czasu oraz danej jako wartość typu float </li>
-                  <li> System powinien być w stanie odpowiadać na zapytania w czasie rzeczywistym, przy jednoczesnej dużej liczbie wpływających danych </li>
-                  <li> System powinien oferować filtrowanie danych oraz podstawowe funkcje pozwalające na analizę danych </li>
-                  <li> Podstawowymi cechami systemu będzie duża skalowalność oraz responsywność </li> 
-                </ul>
-              </p>
-            </section>
-            <section>
-              <h3>CELE</h3>
-              <p>
-                <ul>
-                  <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych </li>
-                  <li> Dane mają być zapisywane w systemie w bardzo dużym tempie </li>
-                  <li> Umożliwienie bieżącej analizy dużej ilości danych generowanych w dużym tempie </li>
-                </ul>
-              </p>
-            </section>
-        </section>
+    <p class="small">Jakub Dutkowski</p>
 
-        <section id="technologie">
-          <section>
-              <h2>Używane technologie</h2>
-              <ul>
-                <li> Język programowania C/C++ </li>
-                <li> Język programowania GO </li>
-                <li> NVIDIA CUDA </li>
-                <li> BOOST </li>
-                <li> THRUST </li>
-                <li> REST API </li>
-              </ul>
-          </section>
-          <section>
-            <a href="http://www.nvidia.com/object/cuda_home_new.html">
-                <img style="float: right; border: none; background: rgba(255, 255, 255, 0);" id="nvidiaLogo" title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA" src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
-            </a>
-            <p>
-              <span style="color: #009900; font-weight:bold;">CUDA</span> to opracowana przez firmę NVIDIA równoległa architektura obliczeniowa, która zapewnia radykalny wzrost wydajności obliczeń, dzięki wykorzystaniu mocy układów GPU. 
-            </p>
-            <p>
-              <a href="http://www.nvidia.com/object/cuda_home_new.html" target="_blank">www.nvidia.com/object/cuda_home_new</a>
-            </p>
-          </section>
-          <section>
-            <h3>ŚRODOWISKA I PROGRAMY</h3>
-            <p>
-              </br>
-              <ul style="width: 100%; font-size: 90%">
-                <li> Nvidia Nsight Eclipse Edition - <a href="https://developer.nvidia.com/nsight-eclipse-edition">developer.nvidia.com/nsight</a></li>
-                <li> JetBRAINS IntelliJ IDEA - <a href="http://www.jetbrains.com/idea/">jetbrains.com/idea</a></li>
-                <li> IntelliJ golang.org support plugin <a href="http://plugins.jetbrains.com/plugin/5047">plugins.jetbrains.com/plugin/5047</a></li>
-                <li> Jenkins - <a href="http://jenkins-ci.org">jenkins-ci.org</a></li>
-                <li> Redmine - <a href="http://www.redmine.org">redmine.org</a></li>
-              </ul>
-            </p>
-          </section>
-        </section>
+    <p class="small">Tomasz Janiszewski</p>
+</section>
 
-        <section id="api">
-          <section>
-            <h2>Api dla klientów</h2>
-            <p> 
-              API systemu zostanie zrealizowane według wzorca <span style="color: #009900; font-weight:bold;">REST</span>. Komunikacja polega na wysłaniu żądania HTTP pod adres serwera głównego, np. http://ddjDB.mini.pw.edu.pl/data/ i ewentualnym przesłaniu wymaganych danych w formacie JSON. Na zapytania również zwracana jest odpowiedź w formacie JSON.
-            </p>
-          </section>
-          <section>
-            <p>
-              <span style="color: #009900; font-weight:bold;">REST API</span> jest wykorzystywany przez wiele frameworków aplikacji internetowych np. Ruby on Rails, Django czy Apache Sling. 
-              Parametry wywołania danej usługi umieszczane są w ścieżce adresu URL.
-            </p>
-            <p>
-              </br>
-              Przykłady:
-            </p>
-            <p style="text-align: center;">
-              </br>
-              <pre>
-<span style="text-align: center;">http://ddjDB.mini.pw.edu.pl/ddj_data/metric/5/agregated/summed</span>
-<span></span>
-<span style="text-align: center;">.../ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
-              </pre>
-            </p>
-          </section>
-        </section>
+<section id="plan-prezentacji">
+    <h3>Plan prezentacji</h3>
+    <ol>
+        <li>Temat pracy inżynierskiej</li>
+        <li>Używane technologie</li>
+        <li>Api dla klientów</li>
+        <li>Struktura systemu</li>
+        <li>Styl "Map-Reduce" w projekcie</li>
+        <li>Wprowadzenie do języka GO</li>
+        <li>Wzorce języka GO</li>
+        <li>Struktura i implementacja serwera głównego</li>
+    </ol>
+</section>
 
-        <section id="struktura">
-            <section>
-              <h2>Struktura systemu</h2>
-              <p>
-                <ol>
-                  System będzie składał się z dwóch podsystemów:
-                  <li> Serwera głównego zwanego Master </li>
-                  <li> Systemu działającego na serwerach bazodanowych  </li>
-                </ol>
-              </p>
-              <p>
-                </br>
-                Komunikacja pomiędzy serwerem głównym a węzłami będzie odbywać się za pomocą TCP/IP po sieci wewnętrznej.
-                Klienci komunikują się tylko z serwerem głównym, który wystawia im REST'owe API.
-              </p>
-            </section>
-            <section>
-              <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="images/SimpleDeployment.png">
-            </section>
-            <section>
-              <h3>MASTER (serwer główny) zajmuje się: </h3>
-                <ul>
-                  <li> odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły. </li>
-                  <li> zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan. </li>
-                  <li> Nadzorowaniem wykonania wszystkich zapytań oraz zbieraniem ich wyników. </li>
-                  <li> Wykonywaniem agregacji otrzymanych wyników i przekazywaniem gotowych odpowiedzi do klienta. </li>
-                </ul>
-            </section>
-            <section>
-              <h3>NODE (węzeł) zajmuje się: </h3>
-              <ul>
-                  <li> składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA. </li>
-                  <li> wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU. </li>
-                  <li> pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać </li>
-                  <li> przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia </li>
-                </ul>
-            </section>
-            <section>
-              <h3>AGREGOWANIE I FILTRACJA DANYCH</h3>
-              <p>
-                Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów (metryka, tag). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako lista wartości zagregowana przy pomocy predefiniowanych funkcji.
-              </p>
-            </section>
-            <section>
-              <h3>PRZEWIDYWANE FUNKCJE AGREGUJĄCE</h3>
-              <ul>
-                  <li> sumowanie </li>
-                  <li> średnia </li>
-                  <li> max i min </li>
-                  <li> odchylenie standardowe </li>
-                  <li> wariancja </li>
-                  <li> całka </li>
-                  <li> różniczka </li>
-                  <li> histogram </li>
-                  <li> liczba rekordów o wartościach z przedziału </li>
-                </ul>
-            </section>
-            <section>
-              <h3>PRACA W CZASIE RZECZYWISTYM</h3>
-              <p>
-                Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna wstępna agregacja danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU. Istnieje więc możliwość że część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla użytkownika gdyż jeszcze nie zdążą być zapisane na karcie pomimo że zostały przyjęte do systemu.
-              </p>
-            </section>
-            <section>
-              <h3>PRACA BADAWCZA</h3>
-              <p>
-                Ponieważ jest to praca “badawcza” program będzie w łatwy sposób konfigurowalny i dający możliwość badania uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań. Będziemy badać wydajność takiego rozwiązania bazy danych.
-              </p>
-            </section>
-        </section>
+<section id="temat">
+    <section>
+        <h2>Temat pracy inżynierskiej</h2>
 
-        <section id="map-reduce">
-          <section>
-            <h2>"Map-Reduce"</h2>
-            <p>
-              Zaletą systemu będzie implementacja modelu programowania Map-Reduce, jako że jest to rozproszona baza danych. Systemy typu "map-reduce" są coraz częściej stosowane w zastosowaniach bazodanowych i charakteryzują się ogromną skalowalnością.
-            </p>
-          </section>
-          <section>
-            <h3>SCHEMAT MAP-REDUCE W PROJEKCIE</h3>
-            <img style="border: none; background: rgba(255, 255, 255, 0);" id="MapReduce" title="MapReduce Diagram" alt="MapReduce Diagram" src="images/MapReduce.png">
-          </section>
-          <section>
-            <h3>DZIAŁANIE</h3>
-            <p>
-              <ol>
-                <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj. filtrują dane pod kątem pewnych kryteriów. </li>
-                <li> Jeśli to możliwe węzły wykonują dwie operacje Compose (Redukcja na poziomie węzłów) </li>
-                <li> Pierwsza operacja Compose odbywa się jako agregacja danych z jednej karty GPU (wykonywana na tej karcie z użyciem CUDA) </li>
-                <li> Druga operacja Compose wykonuje się na węźle jako agregacja wyników uzyskanych ze wszystkich posiadanych kart </li>
-                <li> Ostatnim etapem jest wykonanie operacji Reduce na wynikach uzyskanych ze wszystkich węzłów </li>
-              </ol>
-            </p>
-          </section>
-        </section>
+        <ul style="list-style: none;">
+            <li class="fragment">Baza danych szeregów czasowych</li>
 
-        <section id="GO-wprowadzenie">
-          <section>
-            <h2>Wprowadzenie do języka GO</h2>
-            <img src="http://1-ps.googleusercontent.com/x/s.golang-org.appspot.com/talks.golang.org/2012/simple/xgopher.jpg.pagespeed.ic.rcVvkAdRfG.jpg">
-          </section>
-          <section>
-            <h3>GO - CECHY</h3>
-            <p>
-              <ul>
-                <li> Młody i nowoczesny język programowania - Marzec 2012 </li>
-                <li> Obiektowy (ale nie tak zwyczajnie) </li>
-                <li> Statycznie typowany </li>
-                <li> Kompilowany do asemblera </li> 
-                <li> "Odśmiecany" (Garbage Collected) </li>
-                <li> Wielowątkowość i synchronizacja ma wbudowana w język </li> 
-                <li> Kompozycja poprzez interfejsy </li>
-                <li> Open Source na licencji BSD </li>
-              </ul>
-            </p>
-          </section>
-          <section>
-            <h3>HELLO WORLD</h3>
-            <p>
-              </br>
-            </p>
-            <div class="code playground" contentEditable="true" spellcheck="false">
+            <li class="fragment">Przechowywanie danych w pamięci kart graficznych</li>
+
+            <li class="fragment">Rozproszona architektura</li>
+
+            <li class="fragment">Wykorzystanie wydajności kart graficznych</li>
+        </ul>
+    </section>
+    <section>
+        <h3>ZAŁOŻENIA PRACY</h3>
+
+        <ul style="list-style: none;">
+            <li> Rekordy składające się z metryki, tagu, czasu oraz wartości liczbowej (float)</li>
+            <li class="fragment"> Duże obciążenie systemu wpływającymi danymi</li>
+            <li class="fragment"> Realizowanie zapytań w czasie rzeczywistym</li>
+            <li class="fragment"> Flitrowanie oraz agregacja danych</li>
+            <li class="fragment"> Skalowalność systemu</li>
+        </ul>
+
+    </section>
+    <section>
+        <h3>CELE</h3>
+
+        <ul style="list-style: none;">
+            <li> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych</li>
+            <li class="fragment"> Zapis dużych strumieni danych z wielu źródeł w czasie rzeczywistym</li>
+        </ul>
+    </section>
+</section>
+
+<section id="technologie">
+    <section>
+        <h2>Używane technologie</h2>
+        <ul style="list-style: none;">
+            <li> Język programowania C/C++</li>
+            <li> Język programowania GO</li>
+            <li> NVIDIA CUDA</li>
+            <li> BOOST</li>
+            <li> THRUST</li>
+        </ul>
+    </section>
+    <section>
+        <a href="http://www.nvidia.com/object/cuda_home_new.html">
+            <img style="float: right; border: none; background: rgba(255, 255, 255, 0);" id="nvidiaLogo"
+                 title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA"
+                 src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
+        </a>
+
+        <p>
+            <span style="color: #009900; font-weight:bold;">CUDA</span> to opracowana przez firmę NVIDIA równoległa
+            architektura obliczeniowa, która zapewnia radykalny wzrost wydajności obliczeń, dzięki wykorzystaniu mocy
+            układów GPU.
+        </p>
+
+        <p>
+            <a href="http://www.nvidia.com/object/cuda_home_new.html" target="_blank">www.nvidia.com/object/cuda_home_new</a>
+        </p>
+    </section>
+    <section>
+        <h3>ŚRODOWISKA I PROGRAMY</h3>
+
+        <ul style="width: 100%; font-size: 90%">
+            <li> Nvidia Nsight Eclipse Edition - <a href="https://developer.nvidia.com/nsight-eclipse-edition">developer.nvidia.com/nsight</a>
+            </li>
+            <li> JetBRAINS IntelliJ IDEA - <a href="http://www.jetbrains.com/idea/">jetbrains.com/idea</a></li>
+            <li> IntelliJ golang.org support plugin <a href="http://plugins.jetbrains.com/plugin/5047">plugins.jetbrains.com/plugin/5047</a>
+            </li>
+            <li> Jenkins - <a href="http://jenkins-ci.org">jenkins-ci.org</a></li>
+            <li> Redmine - <a href="http://www.redmine.org">redmine.org</a></li>
+        </ul>
+    </section>
+</section>
+
+<section id="api">
+    <section>
+        <h2>Api dla klientów</h2>
+
+        <p>
+            API zrealizowane zgodnie z wzorcem <span style="color: #009900; font-weight:bold;">REST</span>.
+            Komunikacja klienta z serwerem głównym za pomącą żądań HTTP np.
+            http://ddjDB.mini.pw.edu.pl/data/
+        </p>
+
+        <p class="fragment">
+            Dane przesyłane w formacie JSON
+        </p>
+    </section>
+    <section>
+        <p>
+            <span style="color: #009900; font-weight:bold;">REST API</span> jest wykorzystywany przez wiele frameworków
+            aplikacji internetowych np. Ruby on Rails, Django czy Apache Sling.
+            Parametry wywołania danej usługi umieszczane są w ścieżce adresu URL.
+        </p>
+
+        <p>
+            </br>
+            Przykłady:
+        </p>
+
+        <p style="text-align: center;">
+        <pre>
+        <span style="text-align: center;">http://ddjDB.mini.pw.edu.pl/ddj_data/metric/5/agregated/summed</span>
+        <span></span>
+        <span style="text-align: center;">.../ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
+        </pre>
+        </p>
+    </section>
+</section>
+
+<section id="struktura">
+    <section>
+        <h2>Struktura systemu</h2>
+
+        <p>
+        <ol>
+            System będzie składał się z dwóch podsystemów:
+            <li> Serwera głównego zwanego Master</li>
+            <li> Systemu działającego na serwerach bazodanowych</li>
+        </ol>
+        </p>
+        <p>
+            </br>
+            Komunikacja pomiędzy serwerem głównym a węzłami będzie odbywać się za pomocą TCP/IP po sieci wewnętrznej.
+            Klienci komunikują się tylko z serwerem głównym, który wystawia im REST'owe API.
+        </p>
+    </section>
+    <section>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="images/SimpleDeployment.png">
+    </section>
+    <section>
+        <h3>MASTER (serwer główny) zajmuje się: </h3>
+        <ul>
+            <li> odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły.</li>
+            <li> zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan.</li>
+            <li> Nadzorowaniem wykonania wszystkich zapytań oraz zbieraniem ich wyników.</li>
+            <li> Wykonywaniem agregacji otrzymanych wyników i przekazywaniem gotowych odpowiedzi do klienta.</li>
+        </ul>
+    </section>
+    <section>
+        <h3>NODE (węzeł) zajmuje się: </h3>
+        <ul>
+            <li> składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA.</li>
+            <li> wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU.</li>
+            <li> pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać</li>
+            <li> przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia</li>
+        </ul>
+    </section>
+    <section>
+        <h3>AGREGOWANIE I FILTRACJA DANYCH</h3>
+
+        <p>
+            Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów
+            (metryka, tag). Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość lub jako
+            lista wartości zagregowana przy pomocy predefiniowanych funkcji.
+        </p>
+    </section>
+    <section>
+        <h3>PRZEWIDYWANE FUNKCJE AGREGUJĄCE</h3>
+        <ul>
+            <li> sumowanie</li>
+            <li> średnia</li>
+            <li> max i min</li>
+            <li> odchylenie standardowe</li>
+            <li> wariancja</li>
+            <li> całka</li>
+            <li> różniczka</li>
+            <li> histogram</li>
+            <li> liczba rekordów o wartościach z przedziału</li>
+        </ul>
+    </section>
+    <section>
+        <h3>PRACA W CZASIE RZECZYWISTYM</h3>
+
+        <p>
+            Wszelkie operacje na danych będą wykonywane w czasie rzeczywistym to znaczy nie będzie wykonywana żadna
+            wstępna agregacja danych, a wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU.
+            Istnieje więc możliwość że część danych nie zostanie uwzględniona w przygotowywaniu odpowiedzi dla
+            użytkownika gdyż jeszcze nie zdążą być zapisane na karcie pomimo że zostały przyjęte do systemu.
+        </p>
+    </section>
+    <section>
+        <h3>PRACA BADAWCZA</h3>
+
+        <p>
+            Ponieważ jest to praca “badawcza” program będzie w łatwy sposób konfigurowalny i dający możliwość badania
+            uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań. Będziemy badać
+            wydajność takiego rozwiązania bazy danych.
+        </p>
+    </section>
+</section>
+
+<section id="map-reduce">
+    <section>
+        <h2>"Map-Reduce"</h2>
+
+        <p>
+            Zaletą systemu będzie implementacja modelu programowania Map-Reduce, jako że jest to rozproszona baza
+            danych. Systemy typu "map-reduce" są coraz częściej stosowane w zastosowaniach bazodanowych i charakteryzują
+            się ogromną skalowalnością.
+        </p>
+    </section>
+    <section>
+        <h3>SCHEMAT MAP-REDUCE W PROJEKCIE</h3>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="MapReduce" title="MapReduce Diagram"
+             alt="MapReduce Diagram" src="images/MapReduce.png">
+    </section>
+    <section>
+        <h3>DZIAŁANIE</h3>
+
+        <p>
+        <ol>
+            <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj.
+                filtrują dane pod kątem pewnych kryteriów.
+            </li>
+            <li> Jeśli to możliwe węzły wykonują dwie operacje Compose (Redukcja na poziomie węzłów)</li>
+            <li> Pierwsza operacja Compose odbywa się jako agregacja danych z jednej karty GPU (wykonywana na tej karcie
+                z użyciem CUDA)
+            </li>
+            <li> Druga operacja Compose wykonuje się na węźle jako agregacja wyników uzyskanych ze wszystkich
+                posiadanych kart
+            </li>
+            <li> Ostatnim etapem jest wykonanie operacji Reduce na wynikach uzyskanych ze wszystkich węzłów</li>
+        </ol>
+        </p>
+    </section>
+</section>
+
+<section id="GO-wprowadzenie">
+    <section>
+        <h2>Wprowadzenie do języka GO</h2>
+        <img src="http://1-ps.googleusercontent.com/x/s.golang-org.appspot.com/talks.golang.org/2012/simple/xgopher.jpg.pagespeed.ic.rcVvkAdRfG.jpg">
+    </section>
+    <section>
+        <h3>GO - CECHY</h3>
+
+        <p>
+        <ul>
+            <li> Młody i nowoczesny język programowania - Marzec 2012</li>
+            <li> Obiektowy (ale nie tak zwyczajnie)</li>
+            <li> Statycznie typowany</li>
+            <li> Kompilowany do asemblera</li>
+            <li> "Odśmiecany" (Garbage Collected)</li>
+            <li> Wielowątkowość i synchronizacja ma wbudowana w język</li>
+            <li> Kompozycja poprzez interfejsy</li>
+            <li> Open Source na licencji BSD</li>
+        </ul>
+        </p>
+    </section>
+    <section>
+        <h3>HELLO WORLD</h3>
+
+        <p>
+            </br>
+        </p>
+
+        <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
                     </span>         
@@ -397,32 +452,34 @@
                   <span num="8">fmt.Println("Hello World!")</span>
                   <span num="9">}</span>
                 </pre>
-            </div>
-          </section>
-          <section>
-            <h3>SKŁADNIA</h3>
-            <div style="text-align: left;">
-              <span style="text-align: left;">Deklaracja zmiennych:</span>
+        </div>
+    </section>
+    <section>
+        <h3>SKŁADNIA</h3>
+
+        <div style="text-align: left;">
+            <span style="text-align: left;">Deklaracja zmiennych:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-var name int32 = 10   // var nazwa typ = wartość
-x := 5.5              // deklaracja x z wartością 5.5 i odpowiednim typem
-y := foo(x)           // deklaracja y z wartością i typem wyniku foo(x)
+                    var name int32 = 10 // var nazwa typ = wartość
+                    x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
+                    y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
                 </code>
               </pre>
-            </div>
-            <div style="text-align: left;">
-              <span style="text-align: left;">Funkcje:</span>
+        </div>
+        <div style="text-align: left;">
+            <span style="text-align: left;">Funkcje:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="" class="javascript">
-import "fmt"  // zamiast #include - powoduje dołączenie paczki o nazwie fmt
-func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
-return x + y, x-y // zwracanie wielu zmiennych
-fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
+                    import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+                    func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
+                    return x + y, x-y // zwracanie wielu zmiennych
+                    fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
                 </code>
               </pre>
-              <span style="text-align: left;">Przykład:</span>
-              <div class="code playground" contentEditable="true" spellcheck="false">
+            <span style="text-align: left;">Przykład:</span>
+
+            <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
                     </span>         
@@ -439,31 +496,32 @@ fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
                   <span num="9">fmt.Println(addAndsub(40, 10))</span>
                   <span num="10">}</span>
                 </pre>
-              </div>
             </div>
-          </section>
-          <section>
-            <div style="text-align: left;">
-              <span style="text-align: left;">Struktury i Interfejsy:</span>
+        </div>
+    </section>
+    <section>
+        <div style="text-align: left;">
+            <span style="text-align: left;">Struktury i Interfejsy:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
-type Vertex struct {
-    X, Y float64
-}
-// Tworzenie interfejsu z funkcją Abs() zwracającą float64
-type Abser interface {
-    Abs() float64
-}
-// Jeśli Vertex posiada funkcję wymaganą przez interfejs
-// to automatycznie go implementuje (Vertex implementuje Abser)
-func (v *Vertex) Abs() float64 {
-    return math.Sqrt(v.X*v.X + v.Y*v.Y)
-}
+                    // Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+                    type Vertex struct {
+                    X, Y float64
+                    }
+                    // Tworzenie interfejsu z funkcją Abs() zwracającą float64
+                    type Abser interface {
+                    Abs() float64
+                    }
+                    // Jeśli Vertex posiada funkcję wymaganą przez interfejs
+                    // to automatycznie go implementuje (Vertex implementuje Abser)
+                    func (v *Vertex) Abs() float64 {
+                    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+                    }
                 </code>
               </pre>
-              <span style="text-align: left;">Przykład:</span>
-              <div class="code playground" contentEditable="true" spellcheck="false">
+            <span style="text-align: left;">Przykład:</span>
+
+            <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
                       <span num="1">package main</span>
@@ -488,10 +546,10 @@ func (v *Vertex) Abs() float64 {
                   <span num="5">fmt.Println(a.Abs())</span>
                   <span num="6">}</span>
                 </pre>
-              </div>
             </div>
-          </section>
-        </section>
+        </div>
+    </section>
+</section>
 
         <section id="GO-wzorce">
           <section>
@@ -659,19 +717,22 @@ func (v *Vertex) Abs() float64 {
           </section>
         </section>
 
-
-        <section id="master">
-            <h2>Struktura i implementacja serwera głównego</h2>
-        </section>
       </div>
     </div>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
-    <script src="js/head.min.js"></script>
-    <script src="js/reveal.min.js"></script>
-    <script type="text/javascript" src="js/play.js"></script>
-    <script>
-        Reveal.initialize({});
-    </script>
+</section>
+
+<section id="master">
+    <h2>Struktura i implementacja serwera głównego</h2>
+</section>
+</div>
+</div>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
+<script src="js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+<script type="text/javascript" src="js/play.js"></script>
+<script>
+    Reveal.initialize({});
+</script>
 </body>
 </html>
