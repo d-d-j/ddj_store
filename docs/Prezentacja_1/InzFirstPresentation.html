@@ -441,7 +441,7 @@
         <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
-                    </span>         
+                    </span>
                 </pre>
                 <pre>
                   <span num="1">package main</span>
@@ -463,9 +463,9 @@
             <span style="text-align: left;">Deklaracja zmiennych:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-                    var name int32 = 10 // var nazwa typ = wartość
-                    x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
-                    y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
+var name int32 = 10 // var nazwa typ = wartość
+x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
+y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
                 </code>
               </pre>
         </div>
@@ -473,18 +473,19 @@
             <span style="text-align: left;">Funkcje:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="" class="javascript">
-                    import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
-                    func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
-                    return x + y, x-y // zwracanie wielu zmiennych
-                    fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
+import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
+return x + y, x-y // zwracanie wielu zmiennych
+fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
                 </code>
               </pre>
+              <section>
             <span style="text-align: left;">Przykład:</span>
 
             <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
-                    </span>         
+                    </span>
                 </pre>
                 <pre>
                   <span num="1">package main</span>
@@ -506,19 +507,19 @@
             <span style="text-align: left;">Struktury i Interfejsy:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-                    // Tworzenie struktury o dwóch polach publicznych typu float 64-bit
-                    type Vertex struct {
-                    X, Y float64
-                    }
-                    // Tworzenie interfejsu z funkcją Abs() zwracającą float64
-                    type Abser interface {
-                    Abs() float64
-                    }
-                    // Jeśli Vertex posiada funkcję wymaganą przez interfejs
-                    // to automatycznie go implementuje (Vertex implementuje Abser)
-                    func (v *Vertex) Abs() float64 {
-                    return math.Sqrt(v.X*v.X + v.Y*v.Y)
-                    }
+// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+type Vertex struct {
+  X, Y float64
+}
+// Tworzenie interfejsu z funkcją Abs() zwracającą float64
+type Abser interface {
+  Abs() float64
+}
+// Jeśli Vertex posiada funkcję wymaganą przez interfejs
+// to automatycznie go implementuje (Vertex implementuje Abser)
+func (v *Vertex) Abs() float64 {
+  return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
                 </code>
               </pre>
             <span style="text-align: left;">Przykład:</span>
@@ -538,7 +539,7 @@
                       <span num="10">func (v *Vertex) Abs() float64 {</span>
                       <span num="11">    return math.Sqrt(v.X*v.X + v.Y*v.Y)</span>
                       <span num="12">}</span>
-                    </span>         
+                    </span>
                 </pre>
                 <pre>
                   <span num="1">func main() {</span>
@@ -733,7 +734,7 @@
                 for {
                           select {
                                    case req := &lt;-work:
-                                              b.dispatch(req)
+                                      b.dispatch(req)
                                    case w := &lt;-b.done:
                                       b.completed(w)
                                   }
