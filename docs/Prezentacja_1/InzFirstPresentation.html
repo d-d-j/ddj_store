@@ -715,6 +715,46 @@
             </span></pre>
             </div>
           </section>
+
+          <section>
+              <div class="code" contenteditable="true" spellcheck="false">
+
+
+            <pre>
+              type Balancer struct {
+                pool    Pool
+                done    chan *Worker
+              }
+
+              func (b *Balancer) Balance(work &lt;-chan restApi.RestRequest) {
+                log.Info("Task manager balancer started")
+                for {
+                          select {
+                                   case req := &lt;-work:
+                                              b.dispatch(req)
+                                   case w := &lt;-b.done:
+                                      b.completed(w)
+                                  }
+                    }
+              }
+
+              func (b *Balancer) dispatch(req restApi.RestRequest) {
+                w := heap.Pop(&amp;(b.pool)).(*Worker)
+                log.Fine("Dispach request to ", w)
+                w.reqChan &lt;- req
+                w.pending++
+                heap.Push(&amp;(b.pool), w)
+              }
+
+              func (b *Balancer) completed(w *Worker) {
+                w.pending--
+                heap.Remove(&amp;(b.pool), w.index)
+                heap.Push(&amp;(b.pool), w)
+              }
+              </pre>
+              </div>
+          </section>
+
         </section>
 
       </div>
