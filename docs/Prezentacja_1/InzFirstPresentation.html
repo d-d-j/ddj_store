@@ -757,6 +757,45 @@ func (v *Vertex) Abs() float64 {
               </pre>
     </div>
 </section>
+          <section>
+                <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none"><span>// +build OMIT
+
+package main
+
+import "fmt"
+import "time"
+            </span></pre>
+
+            <pre>func generator(a chan chan int) {
+  i := 0
+  for {
+    select {
+    case get := <-a:
+      get <- i
+      i++
+    }
+  }
+}
+
+func worker(a chan chan int) {
+  b := make(chan int)
+  for i := 0; i < 10; i++ {
+    a <- b
+    fmt.Println(<-b)
+    time.Sleep(time.Duration(100) * time.Millisecond)
+  }
+}
+
+func main() {
+  c := make(chan chan int)
+  go generator(c)
+  go worker(c)
+  time.Sleep(time.Duration(1000) * time.Millisecond)
+}
+            </pre>
+    </div>
+          </section>
 
 </section>
 
