@@ -1,0 +1,269 @@
+    <!doctype html>
+<html lang="en">    
+<head>
+    <meta charset="utf-8">
+    <title>Reveal.js 3 Slide Demo</title>
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/default.css" id="theme">    
+
+    <!--Add support for earlier versions of Internet Explorer -->
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript">window.initFuncs=[];</script>
+    <style type="text/css">
+
+        p.small {
+            font-size: 30px;
+            color: #C0C0C0;
+        }
+
+        div.code.playground {
+            box-shadow: ;
+        }
+
+        div.code {
+          padding: 5px 10px;
+          margin-top: 20px;
+          margin-bottom: 20px;
+          overflow: hidden;
+
+          background: rgb(179, 179, 170);
+          border: 1px solid rgb(224, 224, 224);
+        }
+
+        .code pre {
+          width: 100%;
+          box-shadow: 0 0 0 0;
+          text-align: left;
+          margin: 0;
+          padding: 0;
+
+          font-family: 'Droid Sans Mono', 'Courier New', monospace;
+          font-size: 18px;
+          line-height: 24px;
+          letter-spacing: -1px;
+
+          color: black;
+        }
+
+        div.playground {
+          position: relative;
+        }
+
+        div.output {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          right: 40px;
+          bottom: 40px;
+          background: #202020;
+          padding: 5px 10px;
+          z-index: 2;
+
+          border-radius: 10px;
+          -o-border-radius: 10px;
+          -moz-border-radius: 10px;
+          -webkit-border-radius: 10px;
+
+        }
+        div.output pre {
+          margin: 0;
+          padding: 0;
+          background: none;
+          border: none;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+        }
+        div.output .stdout, div.output pre {
+          color: #e6e6e6;
+        }
+        div.output .stderr, div.output .error {
+          color: rgb(244, 74, 63);
+        }
+        div.output .system, div.output .exit {
+          color: rgb(255, 209, 77)
+        }
+        .buttons {
+          position: relative;
+          float: right;
+          top: -60px;
+          right: 10px;
+          z-index: 1000;
+        }
+        div.output .buttons {
+          position: absolute;
+          float: none;
+          top: auto;
+          right: 5px;
+          bottom: 5px;
+        }
+        /* Output resize details */
+        .ui-resizable-handle {
+          position: absolute;
+        }
+        .ui-resizable-n {
+          cursor: n-resize;
+          height: 7px;
+          width: 100%;
+          top: -5px;
+          left: 0;
+        }
+        .ui-resizable-w {
+          cursor: w-resize;
+          width: 7px;
+          left: -5px;
+          top: 0;
+          height: 100%;
+        }
+        .ui-resizable-nw {
+          cursor: nw-resize;
+          width: 9px;
+          height: 9px;
+          left: -5px;
+          top: -5px;
+        }
+        div.ui-resizable.output {
+            display: block;
+            overflow: scroll;
+            width: 48%;
+            height: 60%;
+        }
+
+        @font-face {
+          font-family: 'Droid Sans Mono';
+          font-style: normal;
+          font-weight: 400;
+          src: local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');
+        }
+    </style>
+</head>
+    
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h1 style="color: #FF9933">Rozproszona baza szeregów czasowych</h1>
+                <h3>na węzłach obliczeniowych CUDA</h3>
+                <p class="small">Karol Dzitkowski</p>
+                <p class="small">Jakub Dutkowski</p>        
+                <p class="small">Tomasz Janiszewski</p>        
+            </section>
+ 
+            <section id="plan-prezentacji">
+                <h2 style="color: #FF9933">Plan prezentacji</h2>
+                <ol>
+                    <li>Temat pracy inżynierskiej</li>
+                    <li>Używane technologie</li>
+                    <li>Api dla klientów</li>
+                    <li>Przewidywana struktura systemu</li>
+                    <li>Styl "Map-Reduce" w projekcie</li>
+                    <li>Wprowadzenie do języka GO</li>
+                    <li>Wzorce języka GO</li>
+                    <li>Struktura i implementacja serwera głównego</li>
+                </ol>
+            </section>
+
+            <section id="temat">
+                <h2 style="color: #FF9933">Temat pracy inżynierskiej</h2>
+            </section>
+
+            <section id="technologie">
+                <h2 style="color: #FF9933">Używane technologie</h2>
+            </section>
+
+            <section id="api">
+                <h2 style="color: #FF9933">Api dla klientów</h2>
+            </section>
+
+            <section id="struktura">
+                <h2 style="color: #FF9933">Przewidywana struktura systemu</h2>
+            </section>
+
+            <section id="map-reduce">
+                <h2 style="color: #FF9933">Styl "Map-Reduce" w projekcie</h2>
+            </section>
+
+            <section id="GO-wprowadzenie">
+                <h2 style="color: #FF9933">Wprowadzenie do języka GO</h2>
+                <p>Przykładowy kod</a>
+                <div class="code playground" contentEditable="true" spellcheck="false">
+                    <pre style="display: none">
+                        <span>
+                        </span>         
+                    </pre>
+                    <pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import "fmt"</span>
+<span num="4"></span>
+<span num="5">func main() {</span>
+<span num="6"></span>
+<span num="7"><span>
+<span num="8">fmt.Println("Hello, GO")</span>
+<span num="9">}</span></pre>
+                </div>
+            </section>
+
+            <section id="GO-wzorce">
+                <h2 style="color: #FF9933">Wzorce języka GO</h2>
+                <p>Przykładowy kod</a>
+                <div class="code playground" contentEditable="true" spellcheck="false">
+                    <pre style="display: none">
+                        <span>
+                        </span>         
+                    </pre>
+                    <pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import "fmt"</span>
+<span num="4"></span>
+<span num="5">func main() {</span>
+<span num="6"></span>
+<span num="7"><span>
+<span num="8">fmt.Println("Hello, WZORCE")</span>
+<span num="9">}</span></pre>
+                </div>
+            </section>
+
+            </div>
+    </div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
+    <!-- <script type="text/javascript" src="js/playground.js"></script> -->
+    <script src="js/head.min.js"></script>
+    <script src="js/reveal.min.js"></script>
+    <script type="text/javascript" src="js/play.js"></script>
+    <!-- <script type="text/javascript">
+    //     (function () {
+    //         var ga = document.createElement("script");
+    //         ga.type = "text/javascript";
+    //         ga.async = true;
+    //         ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+    //         var s = document.getElementsByTagName("script")[0];
+    //         s.parentNode.insertBefore(ga, s);
+    //     })();
+    // </script>
+
+    <script type="text/javascript">
+        window.initFuncs.push(function () {
+            if (window.playground) {
+                window.playground({
+                    "codeEl": "#learn .code",
+                    "outputEl": "#learn .output",
+                    "runEl": "#learn .run",
+                    "shareEl": "#learn .share",
+                    "shareRedirect": "http://play.golang.org/p/",
+                    "toysEl": "#learn .toys select"
+                });
+            } else {
+                $('#learn').hide()
+            }
+        });
+    </script>
+    -->
+    <script>
+        Reveal.initialize({});
+    </script>
+</body>
+</html>

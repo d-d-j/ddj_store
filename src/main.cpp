@@ -17,14 +17,8 @@
  */
 
 #include "Node.h"
-#include "Store/storeElement.h"
-#include "Network/Client.h"
-#include <cstdint>
-#include "Helpers/Logger.h"
-
-#include "Helpers/Config.h"
-
-using namespace ddj::store;
+#include "Core/Logger.h"
+#include "Core/Config.h"
 
 void InitializeLogger() {
 	log4cplus::initialize();
@@ -32,20 +26,16 @@ void InitializeLogger() {
 	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
 }
 
-
 int main(int ac, char* av[])
 {
-	Config::GetInstance();
-
+	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
-
 	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
 
 	ddj::Node n;
 
 	getchar();
-
 	return EXIT_SUCCESS;
 }
 
