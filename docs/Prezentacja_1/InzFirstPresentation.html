@@ -328,9 +328,9 @@
             <span style="text-align: left;">Deklaracja zmiennych:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-var name int32 = 10 // var nazwa typ = wartość
-x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
-y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
+                    var name int32 = 10 // var nazwa typ = wartość
+                    x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
+                    y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
                 </code>
               </pre>
         </div>
@@ -338,16 +338,16 @@ y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
             <span style="text-align: left;">Funkcje:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="" class="javascript">
-import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
-func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
-return x + y, x-y // zwracanie wielu zmiennych
-fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
+                    import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+                    func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
+                    return x + y, x-y // zwracanie wielu zmiennych
+                    fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
                 </code>
               </pre>
-              <section>
-            <span style="text-align: left;">Przykład:</span>
+            <section>
+                <span style="text-align: left;">Przykład:</span>
 
-            <div class="code playground" contentEditable="true" spellcheck="false">
+                <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
                     </span>
@@ -364,7 +364,7 @@ fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
                   <span num="9">fmt.Println(addAndsub(40, 10))</span>
                   <span num="10">}</span>
                 </pre>
-            </div>
+                </div>
         </div>
     </section>
     <section>
@@ -372,19 +372,19 @@ fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
             <span style="text-align: left;">Struktury i Interfejsy:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
                 <code data-trim="" contenteditable="false" class="javascript">
-// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
-type Vertex struct {
-  X, Y float64
-}
-// Tworzenie interfejsu z funkcją Abs() zwracającą float64
-type Abser interface {
-  Abs() float64
-}
-// Jeśli Vertex posiada funkcję wymaganą przez interfejs
-// to automatycznie go implementuje (Vertex implementuje Abser)
-func (v *Vertex) Abs() float64 {
-  return math.Sqrt(v.X*v.X + v.Y*v.Y)
-}
+                    // Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+                    type Vertex struct {
+                    X, Y float64
+                    }
+                    // Tworzenie interfejsu z funkcją Abs() zwracającą float64
+                    type Abser interface {
+                    Abs() float64
+                    }
+                    // Jeśli Vertex posiada funkcję wymaganą przez interfejs
+                    // to automatycznie go implementuje (Vertex implementuje Abser)
+                    func (v *Vertex) Abs() float64 {
+                    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+                    }
                 </code>
               </pre>
             <span style="text-align: left;">Przykład:</span>
@@ -584,8 +584,8 @@ func (v *Vertex) Abs() float64 {
     </div>
 </section>
 
-              <section>
-                  <div class="code" contenteditable="true" spellcheck="false">
+<section>
+    <div class="code" contenteditable="true" spellcheck="false">
                           <pre>
 type Balancer struct {
   pool    Pool
@@ -604,10 +604,10 @@ func (b *Balancer) Balance(work &lt;-chan restApi.RestRequest) {
       }
 }
                             </pre>
-                  </div>
-              </section>
-                            <section>
-                  <div class="code" contenteditable="true" spellcheck="false">
+    </div>
+</section>
+<section>
+    <div class="code" contenteditable="true" spellcheck="false">
                           <pre>
 func (b *Balancer) dispatch(req restApi.RestRequest) {
   w := heap.Pop(&amp;(b.pool)).(*Worker)
@@ -623,10 +623,10 @@ func (b *Balancer) completed(w *Worker) {
   heap.Push(&amp;(b.pool), w)
 }
                             </pre>
-                  </div>
-              </section>
-          <section>
-                <div class="code playground" contenteditable="true" spellcheck="false">
+    </div>
+</section>
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
             <pre style="display: none"><span>// +build OMIT
 
 package main
@@ -664,19 +664,17 @@ func main() {
 }
             </pre>
     </div>
-          </section>
+</section>
 
 </section>
 
-</div>
-</div>
-</section>
 
 <section id="master">
     <h2>Struktura i implementacja serwera głównego</h2>
 </section>
 </div>
 </div>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
 <script src="js/head.min.js"></script>
