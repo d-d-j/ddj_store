@@ -392,9 +392,9 @@
                   <span num="3">import "fmt"</span>
                   <span num="4"></span>
                   <span num="5">func main() {</span>
-                  <span num="6"></span>
-                  <span num="7"></span>
-                  <span num="8">fmt.Println("Hello World!")</span>
+                  <span num="6">  </span>
+                  <span num="7">  </span>
+                  <span num="8">  fmt.Println("Hello World!")</span>
                   <span num="9">}</span>
                 </pre>
             </div>
@@ -425,19 +425,18 @@ fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
               <div class="code playground" contentEditable="true" spellcheck="false">
                 <pre style="display: none">
                     <span>
+                      <span num="1">package main</span>
+                      <span num="2">import "fmt"</span>
                     </span>         
                 </pre>
                 <pre>
-                  <span num="1">package main</span>
-                  <span num="2"></span>
-                  <span num="3">import "fmt"</span>
-                  <span num="4"></span>
-                  <span num="5">func addAndsub(x int, y int) (int, int) {</span>
-                  <span num="6">return x + y, x-y</span>
-                  <span num="7">}</span>
-                  <span num="8">func main() {</span>
-                  <span num="9">fmt.Println(addAndsub(40, 10))</span>
-                  <span num="10">}</span>
+                  <span num="3"></span>
+                  <span num="4">func addAndsub(x int, y int) (int, int) {</span>
+                  <span num="5">  return x + y, x-y</span>
+                  <span num="6">}</span>
+                  <span num="7">func main() {</span>
+                  <span num="8">  fmt.Println(addAndsub(40, 10))</span>
+                  <span num="9">}</span>
                 </pre>
               </div>
             </div>
@@ -482,10 +481,10 @@ func (v *Vertex) Abs() float64 {
                 </pre>
                 <pre>
                   <span num="1">func main() {</span>
-                  <span num="2">var a Abser</span>
-                  <span num="3">v := Vertex{3, 4}</span>
-                  <span num="4">a = &v</span>
-                  <span num="5">fmt.Println(a.Abs())</span>
+                  <span num="2">  var a Abser</span>
+                  <span num="3">  v := Vertex{3, 4}</span>
+                  <span num="4">  a = &v</span>
+                  <span num="5">  fmt.Println(a.Abs())</span>
                   <span num="6">}</span>
                 </pre>
               </div>
