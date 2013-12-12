@@ -298,385 +298,401 @@
     </section>
     <section>
         <h3>HELLO WORLD</h3>
-
         <p>
             </br>
         </p>
-
         <div class="code playground" contentEditable="true" spellcheck="false">
-                <pre style="display: none">
-                    <span>
-                    </span>
-                </pre>
-                <pre>
-                  <span num="1">package main</span>
-                  <span num="2"></span>
-                  <span num="3">import "fmt"</span>
-                  <span num="4"></span>
-                  <span num="5">func main() {</span>
-                  <span num="6"></span>
-                  <span num="7"></span>
-                  <span num="8">fmt.Println("Hello World!")</span>
-                  <span num="9">}</span>
-                </pre>
+            <pre><span>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello World!")
+}</span></pre>
         </div>
     </section>
     <section>
         <h3>SKŁADNIA</h3>
+        <span style="text-align: left;">Deklaracja zmiennych:</span>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="false" contenteditable="false" class="go">
+var name int32 = 10 // var nazwa typ = wartość
+x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
+y,s,err := foo(x) // deklaracja y,s,err z wartościami zwracanymi przez foo(x)
+            </code>
+        </pre>
+        <span style="text-align: left;">Funkcje:</span>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="false" contenteditable="false" class="go">
+import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+func foo(x,y int32, path string, sth interface{}) (int, float, error) {...}
+return x + y, x-y // zwracanie wielu zmiennych
+fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt
+            </code>
+        </pre>
+    </section>
+    <section>
+        <span style="text-align: left;">Przykład:</span>
+        <div class="code playground" contentEditable="true" spellcheck="false" data-trim="false">
+            <pre data-trim="false">
+                <span>
+package main
 
-        <div style="text-align: left;">
-            <span style="text-align: left;">Deklaracja zmiennych:</span>
-              <pre style="width: 100%; margin: 0px; box-shadow: none;">
-                <code data-trim="" contenteditable="false" class="javascript">
-                    var name int32 = 10 // var nazwa typ = wartość
-                    x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
-                    y := foo(x) // deklaracja y z wartością i typem wyniku foo(x)
-                </code>
-              </pre>
-        </div>
-        <div style="text-align: left;">
-            <span style="text-align: left;">Funkcje:</span>
-              <pre style="width: 100%; margin: 0px; box-shadow: none;">
-                <code data-trim="" contenteditable="" class="javascript">
-                    import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
-                    func nazwa_funkcji(nazwa_parametru typ_parametru, ...) (typ_wyniku1, ..., typ_wynikuN) {...}
-                    return x + y, x-y // zwracanie wielu zmiennych
-                    fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt</span>
-                </code>
-              </pre>
-            <section>
-                <span style="text-align: left;">Przykład:</span>
+import "fmt"
 
-                <div class="code playground" contentEditable="true" spellcheck="false">
-                <pre style="display: none">
-                    <span>
-                    </span>
-                </pre>
-                <pre>
-                  <span num="1">package main</span>
-                  <span num="2"></span>
-                  <span num="3">import "fmt"</span>
-                  <span num="4"></span>
-                  <span num="5">func addAndsub(x int, y int) (int, int) {</span>
-                  <span num="6">return x + y, x-y</span>
-                  <span num="7">}</span>
-                  <span num="8">func main() {</span>
-                  <span num="9">fmt.Println(addAndsub(40, 10))</span>
-                  <span num="10">}</span>
-                </pre>
-                </div>
+func addAndsub(x int, y int) (int, int) {
+    return x + y, x-y
+}
+func main() {
+
+    fmt.Println(addAndsub(40, 10))
+}
+                </span>
+            </pre>
         </div>
     </section>
     <section>
         <div style="text-align: left;">
             <span style="text-align: left;">Struktury i Interfejsy:</span>
               <pre style="width: 100%; margin: 0px; box-shadow: none;">
-                <code data-trim="" contenteditable="false" class="javascript">
-                    // Tworzenie struktury o dwóch polach publicznych typu float 64-bit
-                    type Vertex struct {
-                    X, Y float64
-                    }
-                    // Tworzenie interfejsu z funkcją Abs() zwracającą float64
-                    type Abser interface {
-                    Abs() float64
-                    }
-                    // Jeśli Vertex posiada funkcję wymaganą przez interfejs
-                    // to automatycznie go implementuje (Vertex implementuje Abser)
-                    func (v *Vertex) Abs() float64 {
-                    return math.Sqrt(v.X*v.X + v.Y*v.Y)
-                    }
+                <code data-trim="" contenteditable="false" class="go">
+// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+type Vertex struct {
+    X, Y float64
+}
+// Tworzenie interfejsu z funkcją Abs() zwracającą float64
+type Abser interface {
+    Abs() float64
+}
+// Jeśli Vertex posiada funkcję wymaganą przez interfejs
+// to automatycznie go implementuje (Vertex implementuje Abser)
+func (v *Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
                 </code>
               </pre>
             <span style="text-align: left;">Przykład:</span>
-
-            <div class="code playground" contentEditable="true" spellcheck="false">
+            <div class="code playground" contentEditable="true" spellcheck="false" data-trim="false">
                 <pre style="display: none">
                     <span>
-                      <span num="1">package main</span>
-                      <span num="2">import "fmt"</span>
-                      <span num="3">import "math"</span>
-                      <span num="4">type Vertex struct {</span>
-                      <span num="5">    X, Y float64</span>
-                      <span num="6">}</span>
-                      <span num="7">type Abser interface {</span>
-                      <span num="8">    Abs() float64</span>
-                      <span num="9">}</span>
-                      <span num="10">func (v *Vertex) Abs() float64 {</span>
-                      <span num="11">    return math.Sqrt(v.X*v.X + v.Y*v.Y)</span>
-                      <span num="12">}</span>
+                        package main
+                        import "fmt"
+                        import "math"
+                        type Vertex struct {
+                            X, Y float64
+                        }
+                        type Abser interface {
+                            Abs() float64
+                        }
+                        func (v *Vertex) Abs() float64 {
+                            return math.Sqrt(v.X*v.X + v.Y*v.Y)
+                        }
                     </span>
                 </pre>
-                <pre>
-                  <span num="1">func main() {</span>
-                  <span num="2">var a Abser</span>
-                  <span num="3">v := Vertex{3, 4}</span>
-                  <span num="4">a = &v</span>
-                  <span num="5">fmt.Println(a.Abs())</span>
-                  <span num="6">}</span>
-                </pre>
+                <pre data-trim="false"><span>func main() {
+    var a Abser
+    v := Vertex{3, 4}
+    a = &v
+    fmt.Println(a.Abs())
+}</span></pre>
             </div>
         </div>
     </section>
 </section>
 
 <section id="GO-wzorce">
-<section>
+<section>   
+    <h3>NUDNY PRZYKŁAD</h3> 
     <div class="code playground" contenteditable="true" spellcheck="false">
-            <pre style="display: none"><span>// +build OMIT
+        <pre style="display: none">
+            <span>
+                package main
 
-            package main
-
-            import (
-              "fmt"
-              "math/rand"
-              "time"
-            )
-
-            func main() {
-            </span></pre>
-
-            <pre><span num="13">    <b>c := foo("boring!") </b></span>
-            <span num="14">    for i := 0; i &lt; 5; i++ {</span>
-            <span num="15">        fmt.Printf("You say: %q\n", &lt;-c)</span>
-            <span num="16">    }</span>
-            <span num="17">    fmt.Println("You're boring; I'm leaving.")</span>
-            </pre>
-
-            <pre style="display: none"><span>}
-
-            // START2 OMIT
-            func foo(msg string) &lt;-chan string {
-              c := make(chan string)
-              go func() {
-                for i := 0; ; i++ {
-                  c &lt;- fmt.Sprintf("%s %d", msg, i)
-                  time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
-                }
-              }()
-              return c
-            }
-            // STOP2 OMIT
-
-            </span></pre>
-    </div>
-    <div class="code" contenteditable="true" spellcheck="false">
-
-
-            <pre><span num="22"><b>func foo(msg string) &lt;-chan string {</b></span>
-            <span num="23">    c := make(chan string)</span>
-            <span num="24">    <b>go func() { </b></span>
-            <span num="25">        for i := 0; ; i++ {</span>
-            <span num="26">            c &lt;- fmt.Sprintf("%s %d", msg, i)</span>
-            <span num="27">            time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)</span>
-            <span num="28">        }</span>
-            <span num="29">    }()</span>
-            <span num="30">    <b>return c </b></span>
-            <span num="31">}</span>
-            </pre>
-    </div>
-</section>
-
-<section>
-    <div class="code playground" contenteditable="true" spellcheck="false">
-            <pre style="display: none"><span>// +build OMIT
-
-            package main
-
-            import (
-              "fmt"
-              "math/rand"
-              "time"
-            )
-
-            </span></pre>
-
-            <pre><span num="12">func main() {</span>
-            <span num="13">    c := foo("A")</span>
-            <span num="14">    for {</span>
-            <span num="15">        select {</span>
-            <span num="16">        case s := &lt;-c:</span>
-            <span num="17">            fmt.Println(s)</span>
-            <span num="18">        <b>case &lt;-time.After(1 * time.Second):</b></span>
-            <span num="19">            fmt.Println("You're too slow.")</span>
-            <span num="20">            return</span>
-            <span num="21">        }</span>
-            <span num="22">    }</span>
-            <span num="23">}</span>
-            </pre>
-
-            <pre style="display: none"><span>
-            // START2 OMIT
-            func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
-              c := make(chan string)
-              go func() { // We launch the goroutine from inside the function. // HL
-                for i := 0; ; i++ {
-                  c &lt;- fmt.Sprintf("%s: %d", msg, i)
-                  time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
-                }
-              }()
-              return c // Return the channel to the caller. // HL
-            }
-            // STOP2 OMIT
-            </span></pre>
-    </div>
-</section>
-<section>
-    <div class="code playground" contenteditable="true" spellcheck="false">
-            <pre style="display: none"><span>// +build OMIT
-
-            package main
-
-            import (
-              "fmt"
-              "math/rand"
-              "time"
-            )
-
-            </span></pre>
-
-            <pre><span num="12">func main() {</span>
-            <span num="13">    c := foo("A")</span>
-            <span num="14">    <b>timeout := time.After(5 * time.Second)</b></span>
-            <span num="15">    for {</span>
-            <span num="16">        select {</span>
-            <span num="17">        case s := &lt;-c:</span>
-            <span num="18">            fmt.Println(s)</span>
-            <span num="19">        <b>case &lt;-timeout:</b></span>
-            <span num="20">            fmt.Println("You talk too much.")</span>
-            <span num="21">            return</span>
-            <span num="22">        }</span>
-            <span num="23">    }</span>
-            <span num="24">}</span>
-            </pre>
-
-            <pre style="display: none"><span>
-            // START2 OMIT
-            func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
-              c := make(chan string)
-              go func() { // We launch the goroutine from inside the function. // HL
-                for i := 0; ; i++ {
-                  c &lt;- fmt.Sprintf("%s: %d", msg, i)
-                  time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
-                }
-              }()
-              return c // Return the channel to the caller. // HL
-            }
-            // STOP2 OMIT
-
-
-            // START3 OMIT
-            func fanIn(input1, input2 &lt;-chan string) &lt;-chan string { // HL
-              c := make(chan string)
-              go func() {
-                for {
-                  select {
-                  case s := &lt;-input1:
-                    c &lt;- s
-                  case s := &lt;-input2:
-                    c &lt;- s
-                  }
-                }
-              }()
-              return c
-            }
-            // STOP3 OMIT
-            </span></pre>
-    </div>
-</section>
-
-<section>
-    <div class="code" contenteditable="true" spellcheck="false">
-                          <pre>
-type Balancer struct {
-  pool    Pool
-  done    chan *Worker
-}
-
-func (b *Balancer) Balance(work &lt;-chan restApi.RestRequest) {
-  log.Info("Task manager balancer started")
-  for {
-            select {
-                     case req := &lt;-work:
-                        b.dispatch(req)
-                     case w := &lt;-b.done:
-                        b.completed(w)
-                    }
-      }
-}
-                            </pre>
-    </div>
-</section>
-<section>
-    <div class="code" contenteditable="true" spellcheck="false">
-                          <pre>
-func (b *Balancer) dispatch(req restApi.RestRequest) {
-  w := heap.Pop(&amp;(b.pool)).(*Worker)
-  log.Fine("Dispach request to ", w)
-  w.reqChan &lt;- req
-  w.pending++
-  heap.Push(&amp;(b.pool), w)
-}
-
-func (b *Balancer) completed(w *Worker) {
-  w.pending--
-  heap.Remove(&amp;(b.pool), w.index)
-  heap.Push(&amp;(b.pool), w)
-}
-                            </pre>
-    </div>
-</section>
-<section>
-    <div class="code playground" contenteditable="true" spellcheck="false">
-            <pre style="display: none"><span>// +build OMIT
-
-package main
-
-import "fmt"
-import "time"
-            </span></pre>
-
-            <pre>
-func generator(a chan chan int) {
-  i := 0
-  for {
-    select {
-    case get := <-a:
-      get <- i
-      i++
-    }
-  }
-}
-
-func worker(a chan chan int) {
-  b := make(chan int)
-  for i := 0; i < 10; i++ {
-    a <- b
-    fmt.Println(<-b)
-    time.Sleep(time.Second)
-  }
+                import (
+                  "fmt"
+                  "math/rand"
+                  "time"
+                )
+            </span>
+        </pre>
+        <pre><span>func foo(msg string) &lt;-chan string {
+    c := make(chan string)
+    <b>go func() {</b>
+    for i := 0; ; i++ {
+        c &lt;- fmt.Sprintf("%s %d", msg, i)
+        time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+        }
+    }()
+    return c
 }
 
 func main() {
-  c := make(chan chan int)
-  go generator(c)
-  go worker(c)
-  time.Sleep(10 * time.Second)
-}
+    <b>c := foo("nudy!")</b>
+    for i := 0; i &lt; 5; i++ {
+        fmt.Printf("Ale %s\n", &lt;-c)
+    }
+    fmt.Println("To jest nudne! Koniec!")
+}</span></pre>
+    </div>
+</section>
+<section>
+    <h3>I/O TIMEOUT</h3>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none">
+                <span>
+                    package main
+
+                    import (
+                      "fmt"
+                      "math/rand"
+                      "time"
+                    )
+                </span>
+            </pre>
+            <pre><span>func main() {
+    c := foo("A")   // zwraca kanał na który wypisuje "A" co losową liczbę ms
+    for {
+        <b>select {</b>
+        case s := &lt;-c:
+            fmt.Println(s)
+        <b>case &lt;-time.After(1 * time.Second):</b>
+            fmt.Println("You're too slow.")
+            return
+        }
+    }
+}</span></pre>
+            <pre style="display: none">
+                <span>
+                    func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+                      c := make(chan string)
+                      go func() { // We launch the goroutine from inside the function. // HL
+                        for i := 0; ; i++ {
+                          c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                          time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                        }
+                      }()
+                      return c // Return the channel to the caller. // HL
+                    }
+                </span>
             </pre>
     </div>
 </section>
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+        <pre style="display: none">
+            <span>
+                package main
 
+                import (
+                  "fmt"
+                  "math/rand"
+                  "time"
+                )
+            </span>
+        </pre>
+        <pre>
+<span>func fanIn(input1, input2 &lt;-chan string) &lt;-chan string {
+    c := make(chan string)
+    go func() {
+        for {
+            select {
+            case s := &lt;-input1:
+                c &lt;- s
+            case s := &lt;-input2:
+                c &lt;- s
+            }
+        }
+    }()
+    return c
+}
+func main() {
+    <b>c := fanIn(foo("A"), foo("B"))</b>
+    <b>timeout := time.After(5 * time.Second)</b>
+    for {
+        select {
+        case s := &lt;-c:
+            fmt.Println(s)
+        <b>case &lt;-timeout:</b>
+            fmt.Println("You talk too much.")
+            return    
+        }
+    }
+}</span></pre>
+        <pre style="display: none">
+            <span>
+                func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+                  c := make(chan string)
+                  go func() { // We launch the goroutine from inside the function. // HL
+                    for i := 0; ; i++ {
+                      c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                      time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                    }
+                  }()
+                  return c // Return the channel to the caller. // HL
+                }
+            </span>
+        </pre>
+    </div>
+</section>
+<section>
+    <h3>KANAŁ W KANALE</h3>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none">
+                <span>
+                    package main
+
+                    import "fmt"
+                    import "time"
+                </span>
+            </pre>
+<pre><span>func generator(a chan chan int) {
+    i := 0
+    for {
+        select {
+        case get := &lt;-a:
+            get &lt;- i
+            i++
+        }
+    }
+}
+func worker(name string, a chan chan int) {
+    <b>b := make(chan int)</b>
+    for i := 0; i &lt; 10; i++ {
+        <b>a &lt;- b</b>
+        fmt.Println(name, "dostałem", &lt;-b)
+        time.Sleep(time.Second)
+    }
+}
+func main() {
+    c := make(chan chan int)
+    go generator(c)
+    go worker("Jeden", c)
+    go worker("Drugi", c)
+    time.Sleep(10 * time.Second)
+}</span></pre>
+    </div>
+</section>
 </section>
 
 
 <section id="master">
     <section>
     <h2>Struktura i implementacja serwera głównego</h2>
+    <ul style="list-style: none;">
+        <li class="fragment">W całości napisany w GO</li>
+        <li class="fragment">Stawiający na wielowątkowość</li>
+    </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="dataFlow" title="Data Flow"
-             alt="Deployment Diagram" src="images/DataFlow_Master.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0.8);" id="MasterSimpleDataFlow" title="MasterSimpleDataFlow"
+             alt="MasterSimpleDataFlow Diagram" src="images/MasterSimpleDataFlow.png">
     </section>
+    <section>
+        <h3>Node Manager</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+var NodeManager = NewManager()  // globalna zmienna (obiekt node managera)
+
+type GetNodeRequest struct {
+    NodeId      int32
+    BackChan    chan<- *Node
+}
+
+type Manager struct {
+    nodes       map[int32]*Node
+    AddChan     chan *Node
+    GetChan     chan GetNodeRequest
+    DelChan     chan int32
+    QuitChan    chan bool
+}
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h3>Node Manager - Manage</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+func (m *Manager) Manage() {
+    log.Info("Node manager started managing")
+    for {
+        select {
+        case get := <-m.GetChan:    // GetNodeRequest
+            if _, ok := m.nodes[get.NodeId]; ok {
+                get.BackChan <- m.nodes[get.NodeId]
+            } else {
+                get.BackChan <- nil
+            }
+        case add := <-m.AddChan:
+            m.nodes[add.Id] = add
+        case del := <-m.DelChan:
+            delete(m.nodes, del)
+        case <-m.QuitChan:
+            log.Info("Node manager stopped managing")
+            return
+        }
+    }
+}
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h3>Worker - Get Node</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+    // get node
+    var insertNode *node.Node
+    nodeChan := make(chan *node.Node)
+    nodeReq := node.GetNodeRequest{nodeId, nodeChan}
+    node.NodeManager.GetChan <- nodeReq
+    insertNode = <- nodeChan
+    return insertNode
+            </code>
+        </pre>
+    </section>
+    <section>
+    <h3>Balancer</h3>
+    <pre style="width: 100%; margin: 0px; box-shadow: none;">
+        <code data-trim="" contenteditable="false" class="go">
+type Balancer struct {
+  pool    Pool
+  done    chan *Worker
+}
+
+func (b *Balancer) Balance(work &lt;-chan restApi.RestRequest) {
+    log.Info("Task manager balancer started")
+    for {
+        select {
+        case req := &lt;-work:
+            b.dispatch(req)
+        case w := &lt;-b.done:
+            b.completed(w)
+        }
+    }
+}</code></pre>
+</section>
+<section>
+    <h3>Balancer - dispatch and completed</h3>
+    <pre style="width: 100%; margin: 0px; box-shadow: none;">
+        <code data-trim="" contenteditable="false" class="go">
+func (b *Balancer) dispatch(req restApi.RestRequest) {
+    w := heap.Pop(&amp;(b.pool)).(*Worker)
+    log.Fine("Dispach request to ", w)
+    w.reqChan &lt;- req
+    w.pending++
+    heap.Push(&amp;(b.pool), w)
+}
+
+func (b *Balancer) completed(w *Worker) {
+    w.pending--
+    heap.Remove(&amp;(b.pool), w.index)
+    heap.Push(&amp;(b.pool), w)
+}
+        </code>
+    </pre>
+</section>
+</section>
+<section>
+    <h1>DZIĘKUJEMY</h1>
 </section>
 </div>
 </div>
@@ -685,9 +701,11 @@ func main() {
 <script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
 <script src="js/head.min.js"></script>
 <script src="js/reveal.min.js"></script>
+<script type="text/javascript" src="js/highlight.js"></script>
 <script type="text/javascript" src="js/play.js"></script>
 <script>
     Reveal.initialize({});
+    hljs.initHighlightingOnLoad();
 </script>
 </body>
 </html>
