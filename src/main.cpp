@@ -19,6 +19,7 @@
 #include "Node.h"
 #include "Core/Logger.h"
 #include "Core/Config.h"
+#include <gtest/gtest.h>
 
 void InitializeLogger() {
 	log4cplus::initialize();
@@ -28,6 +29,9 @@ void InitializeLogger() {
 
 int main(int ac, char* av[])
 {
+	//Run tests
+	RUN_ALL_TESTS();
+
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();

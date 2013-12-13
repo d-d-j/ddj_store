@@ -3,12 +3,12 @@ OS := $(shell uname)
 
 ifeq ($(OS),Darwin)
 	COMPILER := clang++
-	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++11 -stdlib=libc++
 else
 	#you can use g++ or clang or color-gcc
 	COMPILER := g++
-	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++0x
 endif
 
@@ -17,6 +17,7 @@ DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
 OBJS += \
+./src/UnitTests/BTreeMonitorTest.o \
 ./src/BTree/BTreeMonitor.o \
 ./src/Core/Config.o \
 ./src/Core/Semaphore.o \
@@ -33,6 +34,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
+./src/UnitTests/BTreeMonitorTest.d \
 ./src/BTree/BTreeMonitor.d \
 ./src/Core/Config.d \
 ./src/Core/Semaphore.d \
@@ -59,7 +61,7 @@ endif
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER)'
-	$(COMPILER)  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
