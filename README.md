@@ -10,7 +10,7 @@
 
 ### Common Problems
 
-1. ` error while loading shared libraries: libcudart.so.5.5:`
+1. ` error while loading shared libraries: libcudart.so.5.5:` or `nvcc fatal   : Path to libdevice library not specified`
 There are some environmental variables needed for CUDA:
 
 		export PATH=/usr/local/cuda-5.5/bin:$PATH
