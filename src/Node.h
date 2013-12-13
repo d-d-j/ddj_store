@@ -8,17 +8,17 @@
 #ifndef NODE_H_
 #define NODE_H_
 
-#include "Network/Client.h"
-#include "Task/StoreTaskMonitor.h"
 #include "Task/TaskType.h"
-#include "Task/StoreTask.h"
 #include "Task/TaskRequest.h"
 #include "Task/TaskResult.h"
+#include "Task/TaskMonitor.h"
 #include "Store/StoreController.h"
-#include "Store/storeElement.h"
-#include "Helpers/Logger.h"
-#include "Helpers/Config.h"
-#include "CUDA/CudaCommons.h"
+#include "Store/StoreElement.h"
+#include "Cuda/CudaCommons.h"
+#include "Core/Logger.h"
+#include "Core/Config.h"
+#include "Network/NetworkClient.h"
+
 
 namespace ddj
 {
@@ -34,15 +34,15 @@ namespace ddj
 		Config* _config = Config::GetInstance();
 
         /* NETWORK */
-        Client* _client;
-        boost::signals2::signal<void (taskRequest)> _requestSignal;
+        network::NetworkClient* _client;
+        boost::signals2::signal<void (task::taskRequest)> _requestSignal;
 
         /* STORE CONTROLLER */
         int _cudaDevicesCount;
         boost::unordered_map<int, StoreController_Pointer> _controllers;
 
         /* TASK */
-    	store::StoreTaskMonitor* _storeTaskMonitor;
+    	task::TaskMonitor* _taskMonitor;
         boost::thread* _taskThread;
         boost::condition_variable _taskCond;
         boost::mutex _taskMutex;
@@ -50,7 +50,7 @@ namespace ddj
 	public:
 		Node();
 		virtual ~Node();
-        void CreateTask(taskRequest request);
+        void CreateTask(task::taskRequest request);
 
 	private:
         void taskThreadFunction();

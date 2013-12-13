@@ -21,14 +21,16 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
-#include "../GpuUpload/GpuUploadMonitor.h"
-#include "../Task/StoreTask.h"
-#include "../CUDA/CudaController.h"
-#include "../Store/storeSettings.h"
-#include "../Query/QueryMonitor.h"
-#include "../Helpers/Config.h"
-#include "../Helpers/Logger.h"
-
+#include "StoreElement.h"
+#include "StoreQueryCore.h"
+#include "../Cuda/CudaController.h"
+#include "../Task/Task.h"
+#include "../Core/Logger.h"
+#include "../Core/Config.h"
+#include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/threadpool.hpp>
+#include <boost/unordered_map.hpp>
 
 namespace ddj {
 namespace store {
@@ -36,19 +38,25 @@ namespace store {
 class StoreController
 {
     /* TYPEDEFS */
-    typedef boost::function<void (StoreTask_Pointer task)> taskFunc;
+    typedef boost::function<void (task::Task_Pointer task)> taskFunc;
     typedef boost::shared_ptr<StoreBuffer> StoreBuffer_Pointer;
     typedef boost::unordered_map<metric_type, StoreBuffer_Pointer> Buffers_Map;
 
     /* FIELDS */
     private:
     	int _gpuDeviceId;
-    	GpuUploadMonitor* _gpuUploadMonitor;
-    	QueryMonitor* _queryMonitor;
     	CudaController* _cudaController;
+    	StoreUploadCore* _uploadCore;
+    	StoreQueryCore* _queryCore;
 
+    	/* BUFFERS */
     	Buffers_Map* _buffers;
+    	boost::mutex _buffersMutex;
+
+    	/* TASKS */
         boost::unordered_map<int, taskFunc> _taskFunctions;
+        boost::threadpool::fifo_pool _queryTaskThreadPool;
+        boost::threadpool::fifo_pool _insertTaskThreadPool;
 
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
@@ -58,15 +66,16 @@ class StoreController
     public:
         StoreController(int gpuDeviceId);
         virtual ~StoreController();
-        void ExecuteTask(StoreTask_Pointer task);
+        void ExecuteTask(task::Task_Pointer task);
     private:
         void populateTaskFunctions();
 
 	/* TASK FUNCTIONS */
     private:
-        void insertTask(StoreTask_Pointer task);
-        void selectAllTask(StoreTask_Pointer task);
-        void flushTask(StoreTask_Pointer task);
+        void insertTask(task::Task_Pointer task);
+        void selectAllTask(task::Task_Pointer task);
+        void flushTask(task::Task_Pointer task);
+
 };
 
 } /* end namespace store */

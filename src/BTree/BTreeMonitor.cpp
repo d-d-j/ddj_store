@@ -8,7 +8,7 @@
 #include "BTreeMonitor.h"
 
 namespace ddj {
-namespace store {
+namespace btree {
 
 	BTreeMonitor::BTreeMonitor(metric_type metric)
 	{
@@ -25,13 +25,13 @@ namespace store {
 		delete this->_bufferInfoTree;
 	}
 
-	void BTreeMonitor::Insert(infoElement* element)
+	void BTreeMonitor::Insert(store::storeTrunkInfo* element)
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 		this->insertToTree(element);
 	}
 
-	void BTreeMonitor::insertToTree(infoElement* element)
+	void BTreeMonitor::insertToTree(store::storeTrunkInfo* element)
 	{
 		try
 		{
@@ -51,4 +51,4 @@ namespace store {
 	}
 
 } /* namespace store */
-} /* namespace ddj */
+} /* namespace btree */

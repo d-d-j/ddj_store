@@ -8,7 +8,7 @@ ifeq ($(OS),Darwin)
 else
 	#you can use g++ or clang or color-gcc
 	COMPILER := g++
-	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread-mt -lboost_program_options -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus
 	STANDART := -std=c++0x
 endif
 
@@ -17,41 +17,35 @@ DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
 OBJS += \
-./src/Helpers/Config.o \
 ./src/BTree/BTreeMonitor.o \
+./src/Core/Config.o \
+./src/Core/Semaphore.o \
+./src/Cuda/CudaCommons.o \
+./src/Cuda/CudaController.o \
+./src/Network/NetworkClient.o \
 ./src/Store/StoreBuffer.o \
 ./src/Store/StoreController.o \
-./src/GpuUpload/GpuUploadMonitor.o \
-./src/GpuUpload/GpuUploadCore.o \
-./src/Query/QueryMonitor.o \
-./src/Query/QueryCore.o \
-./src/Task/TaskResult.o \
-./src/Task/StoreTask.o \
-./src/Task/StoreTaskMonitor.o \
-./src/CUDA/CudaController.o \
-./src/Helpers/Semaphore.o \
-./src/CUDA/CudaCommons.o \
+./src/Store/StoreQueryCore.o \
+./src/Store/StoreUploadCore.o \
+./src/Task/Task.o \
+./src/Task/TaskMonitor.o \
 ./src/Node.o \
-./src/Network/Client.o \
 ./src/main.o
 
 CPP_DEPS += \
-./src/Helpers/Config.d \
 ./src/BTree/BTreeMonitor.d \
+./src/Core/Config.d \
+./src/Core/Semaphore.d \
+./src/Cuda/CudaCommons.d \
+./src/Cuda/CudaController.d \
+./src/Network/NetworkClient.d \
 ./src/Store/StoreBuffer.d \
 ./src/Store/StoreController.d \
-./src/GpuUpload/GpuUploadMonitor.d \
-./src/GpuUpload/GpuUploadCore.d \
-./src/Query/QueryMonitor.d \
-./src/Query/QueryCore.d \
-./src/Task/TaskResult.d \
-./src/Task/StoreTask.d \
-./src/Task/StoreTaskMonitor.d \
-./src/CUDA/CudaController.d \
-./src/CUDA/CudaCommons.d \
-./src/Helpers/Semaphore.d \
+./src/Store/StoreQueryCore.d \
+./src/Store/StoreUploadCore.d \
+./src/Task/Task.d \
+./src/Task/TaskMonitor.d \
 ./src/Node.d \
-./src/Network/Client.d \
 ./src/main.d
 
 # CUDA code generation flags
