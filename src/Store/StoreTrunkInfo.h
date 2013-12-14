@@ -20,14 +20,15 @@ namespace store {
 			metric_type metric;
 			ullint startTime;
 			ullint endTime;
-			info_value_type startValue;
-			info_value_type endValue;
+			ullint startValue;
+			ullint endValue;
 
 		/* CONSTRUCTORS & DESTRUCTOR */
 			storeTrunkInfo(){ metric = 0; startTime = 0; endTime = 0; startValue = 0; endValue = 0; }
-			storeTrunkInfo(metric_type _metric, ullint _startTime, ullint _endTime, info_value_type _startValue, info_value_type _endValue)
+			storeTrunkInfo(metric_type _metric, ullint _startTime, ullint _endTime, ullint _startValue, ullint _endValue)
 			: metric(_metric), startTime(_startTime), endTime(_endTime), startValue(_startValue), endValue(_endValue) {}
 			~storeTrunkInfo() {}
+
 	} storeTrunkInfo;
 	
 } /* namespace ddj */

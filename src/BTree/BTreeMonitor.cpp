@@ -30,8 +30,10 @@ namespace btree {
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 		try
 		{
-			this->_bufferInfoTree->insert(element->startTime, element->startValue);
-			this->_bufferInfoTree->insert(element->endTime, element->endValue);
+			this->_bufferInfoTree->insert(
+					timePeriod{element->startTime,element->endTime},
+					trunkInfo{element->startValue, element->endValue});
+
 			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%d, endV=%d}",
 					element->metric, element->startTime, element->endTime, element->startValue, element->endValue);
 		}
@@ -43,6 +45,17 @@ namespace btree {
 		{
 			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Inserting to B+Tree error [FAILED]"));
 		}
+	}
+
+	boost::container::vector<trunkInfo>* BTreeMonitor::SelectAll(boost::container::vector<timePeriod> timePeriods)
+	{
+		boost::container::vector<trunkInfo>* result = new boost::container::vector<trunkInfo>();
+
+		auto it = this->_bufferInfoTree->begin();
+		for(; it != this->_bufferInfoTree->end(); it++)
+			result->push_back(it->second);
+
+		return result;
 	}
 
 } /* namespace store */

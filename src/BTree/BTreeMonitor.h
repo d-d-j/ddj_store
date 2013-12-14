@@ -1,10 +1,3 @@
-/*
- * BTreeMonitor.h
- *
- *  Created on: Aug 24, 2013
- *      Author: Karol Dzitkowski
- */
-
 #ifndef BTREEMONITOR_H_
 #define BTREEMONITOR_H_
 
@@ -12,14 +5,50 @@
 #include "../Core/Logger.h"
 #include "../Store/StoreTrunkInfo.h"
 #include <boost/thread.hpp>
+#include <boost/container/vector.hpp>
 #include <stdexcept>
-
-
-typedef stx::btree<ullint, int> tree;
-typedef tree* tree_pointer;
 
 namespace ddj {
 namespace btree {
+
+	/* TYPEDEFS */
+	typedef struct trunkInfo
+	{
+		ullint start;
+		ullint end;
+
+		trunkInfo(){}
+		trunkInfo(ullint s, ullint e)
+		{
+			start = s;
+			end = e;
+		}
+		trunkInfo(const trunkInfo& cp)
+		{
+			start = cp.start;
+			end = cp.end;
+		}
+		~trunkInfo(){}
+	} trunkInfo;
+	typedef struct timePeriod
+	{
+		ullint start;
+		ullint end;
+
+		bool operator< (const timePeriod& rhs) const
+		{
+			if(end < rhs.end) return true;
+			else return false;
+		}
+
+		bool operator== (const timePeriod& rhs) const
+		{
+			if(start == rhs.start && end == rhs.end) return true;
+			else return false;
+		}
+	} timePeriod;
+	typedef stx::btree<timePeriod, trunkInfo> tree;
+	typedef tree* tree_pointer;
 
 	/*! \class BTreeMonitor
 	 \brief Protects concurrent access to B+Tree structure using boost::mutex
@@ -27,8 +56,8 @@ namespace btree {
 	class BTreeMonitor
 	{
 		private:
-			metric_type _metric;	/**< A metric of elements which locations are stored in B+Tree */
-			boost::mutex _mutex;	/**< Mutex used to protect access to b+tree */
+			metric_type _metric;				/**< A metric of elements which locations are stored in B+Tree */
+			boost::mutex _mutex;				/**< Mutex used to protect access to b+tree */
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
 			/* LOGGER */
@@ -53,6 +82,7 @@ namespace btree {
 			 */
 			void Insert(store::storeTrunkInfo* element);
 
+			boost::container::vector<trunkInfo>* SelectAll(boost::container::vector<timePeriod> timePeriods);
 	};
 
 } /* namespace store */

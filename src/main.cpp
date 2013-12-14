@@ -27,15 +27,16 @@ void InitializeLogger() {
 	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
 }
 
-int main(int ac, char* av[])
+int main(int argc, char* argv[])
 {
-	//Run tests
-	RUN_ALL_TESTS();
-
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
 	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
+
+	//Run tests
+	::testing::InitGoogleTest(&argc, argv);
+	RUN_ALL_TESTS();
 
 	ddj::Node n;
 
