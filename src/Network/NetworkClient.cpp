@@ -40,7 +40,7 @@ namespace network {
 		memcpy(msg + sizeof(int), request->devices, sizeof(int)*request->cuda_devices_count);
 
 		write(msg, len);
-		delete msg;
+		delete [] msg;
 	}
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
@@ -54,7 +54,7 @@ namespace network {
 		memcpy(msg + 3*sizeof(int), taskResult->result_data, taskResult->result_size);
 
 		write(msg, len);
-		delete msg;
+		delete [] msg;
 	}
 
 	void NetworkClient::write(char *message, size_t length)

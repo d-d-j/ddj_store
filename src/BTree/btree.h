@@ -3736,6 +3736,7 @@ private:
     {
         const leaf_node *n = m_headleaf;
 
+        assert(n != NULL);
         assert(n->level == 0);
         assert(!n || n->prevleaf == NULL);
 

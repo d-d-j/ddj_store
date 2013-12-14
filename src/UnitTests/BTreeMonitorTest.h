@@ -14,20 +14,22 @@
 namespace ddj {
 namespace unittest {
 
-class BTreeMonitorTest : public testing::Test {
-protected:
-	virtual void SetUp() {
+	class BTreeMonitorTest : public testing::Test {
+	protected:
+		virtual void SetUp() {
 
-	  }
+		  }
 
-	btree::BTreeMonitor* _monitor;
-};
+		btree::BTreeMonitor* _monitor;
+	};
 
-TEST_F(BTreeMonitorTest, Constructor)
-{
-	_monitor = new btree::BTreeMonitor(1);
-	EXPECT_TRUE(_monitor != NULL);
-}
+	TEST_F(BTreeMonitorTest, Constructor)
+	{
+		_monitor = new btree::BTreeMonitor(1);
+		EXPECT_TRUE(_monitor != NULL);
+	}
+
+
 
 } /* namespace unittest */
 } /* namespace ddj */

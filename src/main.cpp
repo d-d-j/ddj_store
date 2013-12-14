@@ -19,6 +19,7 @@
 #include "Node.h"
 #include "Core/Logger.h"
 #include "Core/Config.h"
+#include "UnitTests/UnitTests.h"
 #include <gtest/gtest.h>
 
 void InitializeLogger() {
