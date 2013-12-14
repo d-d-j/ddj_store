@@ -20,6 +20,20 @@
 
 5. Install boost using `boost_install.sh`
 
+6. Install google test (GTEST) :
+	- You must have CMAKE http://www.cmake.org/cmake/resources/software.html and PHYTON >= 2.7 http://www.python.org/download/ installed
+	- Download and unpack gtest-1.7.0.zip from https://code.google.com/p/googletest/downloads/list
+	- Open unpacked folder and open this dir in console
+	- Type following commands:
+		$> mkdir mybuild
+		$> cd mybuild
+	- Build everything with cmake:
+		a) FOR LINUX $> cmake -DGTEST_HAS_PTHREAD=1 ../
+		b) FOR OS X   $> cmake -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_CXX_FLAGS="-std=c++11 -stdlib=libc++ -U__STRICT_ANSI__" -DGTEST_HAS_PTHREAD=1 ../     
+	- Copy files to your include and lib path:
+		$>  cp -r ../include/gtest /usr/local/include
+		$>  cp lib*.a /usr/local/lib
+
 7. build application with `make all`
 8. Run program
 
@@ -31,3 +45,6 @@ There are some environmental variables needed for CUDA:
 
 		export PATH=/usr/local/cuda-5.5/bin:$PATH
 		export LD_LIBRARY_PATH=/usr/local/cuda-5.5/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+		
+		
+

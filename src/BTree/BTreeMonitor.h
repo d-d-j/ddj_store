@@ -53,8 +53,6 @@ namespace btree {
 			 */
 			void Insert(store::storeTrunkInfo* element);
 
-		private:
-			void insertToTree(store::storeTrunkInfo* element);
 	};
 
 } /* namespace store */
