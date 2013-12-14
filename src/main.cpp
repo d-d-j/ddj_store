@@ -32,11 +32,14 @@ int main(int argc, char* argv[])
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
-	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
 
-	//Run tests
-	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	if (argc == 2 && !strcmp(argv[1], "--test"))
+	{
+		::testing::InitGoogleTest(&argc, argv);
+		return RUN_ALL_TESTS();
+	}
+
+	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
 
 	ddj::Node n;
 
