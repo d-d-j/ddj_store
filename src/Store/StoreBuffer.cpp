@@ -95,7 +95,7 @@ void StoreBuffer::Flush()
 	this->_bufferMutex.unlock();
 
 	// copy buffer to pinned memory
-	storeElement* pinnedMemory;
+	storeElement* pinnedMemory = nullptr;
 	CUDA_CHECK_RETURN( cudaMallocHost((void**)&(pinnedMemory), this->_bufferSize) );
 	CUDA_CHECK_RETURN
 	(

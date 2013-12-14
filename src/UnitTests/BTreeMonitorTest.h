@@ -16,20 +16,13 @@ namespace unittest {
 
 	class BTreeMonitorTest : public testing::Test {
 	protected:
-		virtual void SetUp() {
-
-		  }
+		virtual void SetUp()
+		{
+			_monitor = new btree::BTreeMonitor(1);
+		}
 
 		btree::BTreeMonitor* _monitor;
 	};
-
-	TEST_F(BTreeMonitorTest, Constructor)
-	{
-		_monitor = new btree::BTreeMonitor(1);
-		EXPECT_TRUE(_monitor != NULL);
-	}
-
-
 
 } /* namespace unittest */
 } /* namespace ddj */

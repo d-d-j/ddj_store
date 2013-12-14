@@ -1,10 +1,3 @@
-/*
- * BTreeMonitor.cpp
- *
- *  Created on: Aug 24, 2013
- *      Author: parallels
- */
-
 #include "BTreeMonitor.h"
 
 namespace ddj {
@@ -47,7 +40,7 @@ namespace btree {
 		}
 	}
 
-	boost::container::vector<trunkInfo>* BTreeMonitor::SelectAll(boost::container::vector<timePeriod> timePeriods)
+	boost::container::vector<trunkInfo>* BTreeMonitor::SelectAll()
 	{
 		boost::container::vector<trunkInfo>* result = new boost::container::vector<trunkInfo>();
 

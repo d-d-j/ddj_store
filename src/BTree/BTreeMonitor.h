@@ -82,7 +82,8 @@ namespace btree {
 			 */
 			void Insert(store::storeTrunkInfo* element);
 
-			boost::container::vector<trunkInfo>* SelectAll(boost::container::vector<timePeriod> timePeriods);
+			boost::container::vector<trunkInfo>* SelectAll();
+			//boost::container::vector<trunkInfo>* Select(boost::container::vector<timePeriod> timePeriods);
 	};
 
 } /* namespace store */

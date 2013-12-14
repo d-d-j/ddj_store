@@ -33,7 +33,7 @@ namespace store {
 				0);
 
 		// ALLOC DEVICE BUFFER
-		storeElement* deviceBufferPointer;
+		storeElement* deviceBufferPointer = nullptr;
 		CUDA_CHECK_RETURN( cudaMalloc((void**) &(deviceBufferPointer), elementsToUploadCount*sizeof(storeElement)) );
 
 		// COPY BUFFER TO GPU
