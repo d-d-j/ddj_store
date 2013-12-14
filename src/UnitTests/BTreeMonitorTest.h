@@ -21,6 +21,11 @@ namespace unittest {
 			_monitor = new btree::BTreeMonitor(1);
 		}
 
+	    virtual void TearDown() {
+    		delete _monitor;
+		}
+
+
 		btree::BTreeMonitor* _monitor;
 	};
 

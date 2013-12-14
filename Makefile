@@ -17,6 +17,7 @@ DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
 OBJS += \
+./src/UnitTests/SemaphoreTest.o \
 ./src/UnitTests/BTreeMonitorTest.o \
 ./src/BTree/BTreeMonitor.o \
 ./src/Core/Config.o \
@@ -34,6 +35,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
+./src/UnitTests/SemaphoreTest.d \
 ./src/UnitTests/BTreeMonitorTest.d \
 ./src/BTree/BTreeMonitor.d \
 ./src/Core/Config.d \
