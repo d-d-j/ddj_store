@@ -3742,7 +3742,7 @@ private:
 
         unsigned int testcount = 0;
 
-        while(n)
+        while(n != null)
         {
             assert(n->level == 0);
             assert(n->slotuse > 0);
