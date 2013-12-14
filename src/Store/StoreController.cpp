@@ -165,7 +165,7 @@ namespace store {
 		{
 			// Iterate through store buffers and flush them to GPU memory (Sync)
 			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
-			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); it++)
+			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
 			{
 				it-> second->Flush();
 			}

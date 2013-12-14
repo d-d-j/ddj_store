@@ -27,7 +27,7 @@ namespace btree {
 					timePeriod{element->startTime,element->endTime},
 					trunkInfo{element->startValue, element->endValue});
 
-			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%d, endV=%d}",
+			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%llu, endV=%llu}",
 					element->metric, element->startTime, element->endTime, element->startValue, element->endValue);
 		}
 		catch(std::exception& ex)

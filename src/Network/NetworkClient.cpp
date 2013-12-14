@@ -10,10 +10,8 @@
 namespace ddj {
 namespace network {
 
-	NetworkClient::NetworkClient(std::string ip, std::string port)
+	NetworkClient::NetworkClient(std::string ip, std::string port) : host(ip), port(port)
 	{
-		this->host = ip;
-		this->port = port;
 		socket = new tcp::socket(io_service);
 	}
 

@@ -17,7 +17,10 @@ namespace btree {
 		ullint start;
 		ullint end;
 
-		trunkInfo(){}
+		trunkInfo()
+		{
+			start = end = 0;
+		}
 		trunkInfo(ullint s, ullint e)
 		{
 			start = s;
