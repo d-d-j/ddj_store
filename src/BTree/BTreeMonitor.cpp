@@ -28,11 +28,6 @@ namespace btree {
 	void BTreeMonitor::Insert(store::storeTrunkInfo* element)
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
-		this->insertToTree(element);
-	}
-
-	void BTreeMonitor::insertToTree(store::storeTrunkInfo* element)
-	{
 		try
 		{
 			this->_bufferInfoTree->insert(element->startTime, element->startValue);
