@@ -84,6 +84,9 @@ DDJ_Store: $(OBJS) $(USER_OBJS)
 test: all
 	./DDJ_Store --test
 
+check:
+	cppcheck --enable=all -j 4 -q ./src/
+
 clean:
 	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DDJ_Store
 	-@echo ' '
