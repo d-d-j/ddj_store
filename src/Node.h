@@ -19,6 +19,8 @@
 #include "Core/Config.h"
 #include "Network/NetworkClient.h"
 
+#include "Info/NodeInfo.h"
+
 
 namespace ddj
 {

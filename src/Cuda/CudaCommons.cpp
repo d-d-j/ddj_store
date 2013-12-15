@@ -90,5 +90,9 @@ namespace store {
 		cudaMemGetInfo(&freeMemory, &totalMemory);
 	}
 
+	void CudaCommons:: GetMemoryCount(size_t* freeMemory, size_t* totalMemory){
+		cudaMemGetInfo(freeMemory, totalMemory);
+	}
+
 } /* namespace store */
 } /* namespace ddj */

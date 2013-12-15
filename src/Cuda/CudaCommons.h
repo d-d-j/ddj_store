@@ -29,6 +29,7 @@ public:
 	int CudaGetDevicesCount();
 	bool CudaCheckDeviceForRequirements(int n);
 	int CudaGetDevicesCountAndPrint();
+	void GetMemoryCount(size_t* freeMemory, size_t* totalMemory);
 
 	/* CUDA MALLOC */
 	cudaError_t CudaAllocateArray(size_t size, void** array);
