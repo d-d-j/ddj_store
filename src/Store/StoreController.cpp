@@ -45,6 +45,9 @@ namespace store {
 
 		// SET THREAD POOL SIZES
 		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
+		this->_queryTaskThreadPool.size_controller().resize(this->_config->GetIntValue("QUERY_THRED_POOL_SIZE"));
+		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THRED_POOL_SIZE"));
+		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INFO_THRED_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -196,7 +199,36 @@ namespace store {
 
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
 
+		// Check possible errors
+		if(task == nullptr || task->GetType() != task::Info)
+		{
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
+			throw std::runtime_error("Error in flushTask function - wrong argument");
+		}
+
+		try
+		{
+			// Iterate through store buffers and flush them to GPU memory (Sync)
+			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
+			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
+			{
+				it-> second->Flush();
+			}
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Flush task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
+		}
+
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
 	}
 
 } /* namespace store */

@@ -1,12 +1,5 @@
-/*
- * NodeInfo.h
- *
- *  Created on: Dec 15, 2013
- *      Author: dud
- */
-
-#ifndef NODEINFO_H_
-#define NODEINFO_H_
+#ifndef STOREINFOCORE_H_
+#define STOREINFOCORE_H_
 
 #include "../Cuda/CudaCommons.h"
 #include "../Core/Logger.h"
@@ -14,7 +7,7 @@
 
 namespace ddj{
 namespace store{
-	class NodeInfo
+	class StoreInfoCore
 	{
 		Config* _config = Config::GetInstance();
 		Logger _logger = Logger::getRoot();
@@ -28,8 +21,8 @@ namespace store{
 
 
 	public:
-		NodeInfo();
-		virtual ~NodeInfo();
+		StoreInfoCore();
+		virtual ~StoreInfoCore();
 		void GetRamInKB(int* ramTotal, int* ramFree);
 
 		void FillNodeInfo();
@@ -37,4 +30,4 @@ namespace store{
 
 }
 }
-#endif /* NODEINFO_H_ */
+#endif /* STOREINFOCORE_H_ */

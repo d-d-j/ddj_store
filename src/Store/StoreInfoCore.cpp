@@ -1,24 +1,18 @@
-/*
- * NodeInfo.cpp
- *
- *  Created on: Dec 15, 2013
- *      Author: dud
- */
-
-#include "NodeInfo.h"
+#include "StoreInfoCore.h"
 
 namespace ddj
 {
 namespace store
 {
-void NodeInfo::FillNodeInfo()
+void StoreInfoCore::FillNodeInfo()
 {
 	size_t mbSize = this->_config->GetIntValue("MB_SIZE_IN_BYTES");
 
 	_cudaCommons.GetMemoryCount(&this->gpuMemFree, &this->gpuMemTotal);
 	LOG4CPLUS_INFO_FMT(this->_logger,
 			"NODE INFO - free GPU memory => %f MB, total GPU memory => %f MB",
-			(float) this->gpuMemFree / mbSize, (float)this->gpuMemTotal / mbSize);
+			(float ) this->gpuMemFree / mbSize,
+			(float )this->gpuMemTotal / mbSize);
 
 	GetRamInKB(&memTotal, &memFree);
 
@@ -27,12 +21,16 @@ void NodeInfo::FillNodeInfo()
 			(float )this->memFree / 1024, (float )this->memTotal / 1024);
 }
 
-void NodeInfo::GetRamInKB(int* ramTotal, int* ramFree)
+void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)
 {
+	*ramTotal = *ramFree = -1;
 	FILE *meminfo = fopen("/proc/meminfo", "r");
-//	if (meminfo == NULL)
-//        ... // handle error
-
+	if (meminfo == NULL)
+	{
+		LOG4CPLUS_ERROR(this->_logger,
+				LOG4CPLUS_TEXT("Unable to open meminfo"));
+		return;
+	}
 
 	char line[256];
 
@@ -48,13 +46,13 @@ void NodeInfo::GetRamInKB(int* ramTotal, int* ramFree)
 	fclose(meminfo);
 }
 
-NodeInfo::NodeInfo()
+StoreInfoCore::StoreInfoCore()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-NodeInfo::~NodeInfo()
+StoreInfoCore::~StoreInfoCore()
 {
 	// TODO Auto-generated destructor stub
 }

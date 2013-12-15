@@ -131,6 +131,8 @@ namespace ddj
 				}
 			}
 		}
+
+
 		catch(boost::thread_interrupted& ex)
 		{
 			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Task thread interrupted [END SUCCESS]"));

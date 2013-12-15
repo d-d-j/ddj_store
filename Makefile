@@ -19,11 +19,8 @@ WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter
 VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 
 OBJS += \
-<<<<<<< HEAD
 ./src/UnitTests/StoreQueryCoreTest.o \
-=======
 ./src/Info/NodeInfo.o \
->>>>>>> first NodeInfo version
 ./src/UnitTests/SemaphoreTest.o \
 ./src/UnitTests/BTreeMonitorTest.o \
 ./src/BTree/BTreeMonitor.o \
@@ -36,18 +33,19 @@ OBJS += \
 ./src/Store/StoreController.o \
 ./src/Store/StoreQueryCore.o \
 ./src/Store/StoreUploadCore.o \
+
 ./src/Store/StoreQuery.o \
+
+./src/Store/StoreInfoCore.o \
+
 ./src/Task/Task.o \
 ./src/Task/TaskMonitor.o \
 ./src/Node.o \
 ./src/main.o
 
 CPP_DEPS += \
-<<<<<<< HEAD
 ./src/UnitTests/StoreQueryCoreTest.d \
-=======
 ./src/Info/NodeInfo.d \
->>>>>>> first NodeInfo version
 ./src/UnitTests/SemaphoreTest.d \
 ./src/UnitTests/BTreeMonitorTest.d \
 ./src/BTree/BTreeMonitor.d \
@@ -61,6 +59,7 @@ CPP_DEPS += \
 ./src/Store/StoreQueryCore.d \
 ./src/Store/StoreUploadCore.d \
 ./src/Store/StoreQuery.d \
+./src/Store/StoreInfoCore.d \
 ./src/Task/Task.d \
 ./src/Task/TaskMonitor.d \
 ./src/Node.d \

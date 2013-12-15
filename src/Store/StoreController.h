@@ -59,6 +59,7 @@ class StoreController : public boost::noncopyable
         boost::unordered_map<int, taskFunc> _taskFunctions;
         boost::threadpool::fifo_pool _taskThreadPool;
 
+
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
 		Config* _config = Config::GetInstance();
