@@ -39,7 +39,7 @@ namespace unittest {
 		boost::thread t2(f2);
 
 		EXPECT_EQ(0, x*y);
-		EXPECT_EQ(1, x+y);
+		EXPECT_GE(1, x+y);
 
 		_semaphore->Release();
 	    t1.join();
