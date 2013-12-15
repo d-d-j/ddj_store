@@ -14,11 +14,16 @@
 namespace ddj {
 namespace unittest {
 
-	class BTreeMonitorTest : public testing::Test {
+	class BTreeMonitorTest : public testing::Test
+	{
 	protected:
 		virtual void SetUp()
 		{
 			_monitor = new btree::BTreeMonitor(1);
+		}
+		virtual void TearDown()
+		{
+			delete _monitor;
 		}
 
 	    virtual void TearDown() {
@@ -27,6 +32,7 @@ namespace unittest {
 
 
 		btree::BTreeMonitor* _monitor;
+		Logger _logger = Logger::getRoot();
 	};
 
 } /* namespace unittest */

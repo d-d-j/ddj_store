@@ -1,4 +1,5 @@
 #include "BTreeMonitor.h"
+#include <boost/foreach.hpp>
 
 namespace ddj {
 namespace btree {
@@ -24,8 +25,8 @@ namespace btree {
 		try
 		{
 			this->_bufferInfoTree->insert(
-					timePeriod{element->startTime,element->endTime},
-					trunkInfo{element->startValue, element->endValue});
+					ullintPair{element->startTime,element->endTime},
+					ullintPair{element->startValue, element->endValue});
 
 			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%llu, endV=%llu}",
 					element->metric, element->startTime, element->endTime, element->startValue, element->endValue);
@@ -40,13 +41,32 @@ namespace btree {
 		}
 	}
 
-	boost::container::vector<trunkInfo>* BTreeMonitor::SelectAll()
+	boost::container::vector<ullintPair>* BTreeMonitor::SelectAll()
 	{
-		boost::container::vector<trunkInfo>* result = new boost::container::vector<trunkInfo>();
+		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
 
 		auto it = this->_bufferInfoTree->begin();
 		for(; it != this->_bufferInfoTree->end(); it++)
 			result->push_back(it->second);
+
+		return result;
+	}
+
+	boost::container::vector<ullintPair>* BTreeMonitor::Select(boost::container::vector<ullintPair> timePeriods)
+	{
+		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
+
+		BOOST_FOREACH(ullintPair &tp, timePeriods)
+		{
+			auto it = this->_bufferInfoTree->lower_bound(tp);
+			if(tp.first < it->first.first) it--;
+			while(it->first.first < tp.second)
+			{
+				result->push_back(it->second);
+				if(it == this->_bufferInfoTree->end()) break;
+				it++;
+			}
+		}
 
 		return result;
 	}
