@@ -26,11 +26,6 @@ namespace unittest {
 			delete _monitor;
 		}
 
-	    virtual void TearDown() {
-    		delete _monitor;
-		}
-
-
 		btree::BTreeMonitor* _monitor;
 		Logger _logger = Logger::getRoot();
 	};

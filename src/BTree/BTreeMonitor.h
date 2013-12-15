@@ -3,6 +3,7 @@
 
 #include "btree.h"
 #include "../Core/Logger.h"
+#include "../Core/UllintPair.h"
 #include "../Store/StoreTrunkInfo.h"
 #include <boost/thread.hpp>
 #include <boost/container/vector.hpp>
@@ -12,45 +13,7 @@ namespace ddj {
 namespace btree {
 
 	/* TYPEDEFS */
-	typedef struct trunkInfo
-	{
-		ullint start;
-		ullint end;
-
-		trunkInfo()
-		{
-			start = end = 0;
-		}
-		trunkInfo(ullint s, ullint e)
-		{
-			start = s;
-			end = e;
-		}
-		trunkInfo(const trunkInfo& cp)
-		{
-			start = cp.start;
-			end = cp.end;
-		}
-		~trunkInfo(){}
-	} trunkInfo;
-	typedef struct timePeriod
-	{
-		ullint start;
-		ullint end;
-
-		bool operator< (const timePeriod& rhs) const
-		{
-			if(end < rhs.end) return true;
-			else return false;
-		}
-
-		bool operator== (const timePeriod& rhs) const
-		{
-			if(start == rhs.start && end == rhs.end) return true;
-			else return false;
-		}
-	} timePeriod;
-	typedef stx::btree<timePeriod, trunkInfo> tree;
+	typedef stx::btree<ullintPair, ullintPair> tree;
 	typedef tree* tree_pointer;
 
 	/*! \class BTreeMonitor
@@ -85,8 +48,8 @@ namespace btree {
 			 */
 			void Insert(store::storeTrunkInfo* element);
 
-			boost::container::vector<trunkInfo>* SelectAll();
-			//boost::container::vector<trunkInfo>* Select(boost::container::vector<timePeriod> timePeriods);
+			boost::container::vector<ullintPair>* SelectAll();
+			boost::container::vector<ullintPair>* Select(boost::container::vector<ullintPair> timePeriods);
 	};
 
 } /* namespace store */
