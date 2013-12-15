@@ -87,7 +87,7 @@ namespace store {
 		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
-}
+	}
 
 	void StoreController::insertTask(task::Task_Pointer task)
 	{
@@ -164,7 +164,7 @@ namespace store {
 		try
 		{
 			// Iterate through store buffers and flush them to GPU memory (Sync)
-			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
+			// TODO: All flushes should be done in parallel and sync. before returning from this function
 			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
 			{
 				it-> second->Flush();
