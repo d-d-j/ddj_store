@@ -50,6 +50,9 @@ namespace btree {
 
 			boost::container::vector<ullintPair>* SelectAll();
 			boost::container::vector<ullintPair>* Select(boost::container::vector<ullintPair> timePeriods);
+
+		private:
+			bool isIntersecting(ullintPair A, ullintPair B);
 	};
 
 } /* namespace store */

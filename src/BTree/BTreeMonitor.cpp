@@ -52,6 +52,15 @@ namespace btree {
 		return result;
 	}
 
+	bool BTreeMonitor::isIntersecting(ullintPair A, ullintPair B)
+	{
+		if(A.first > B.first && A.first < B.second) return true;
+		if(A.second > B.first && A.second < B.second) return true;
+		if(B.first > A.first && B.first < A.second) return true;
+		if(B.second > A.first && B.second < A.second) return true;
+		return false;
+	}
+
 	boost::container::vector<ullintPair>* BTreeMonitor::Select(boost::container::vector<ullintPair> timePeriods)
 	{
 		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
@@ -59,11 +68,15 @@ namespace btree {
 		BOOST_FOREACH(ullintPair &tp, timePeriods)
 		{
 			auto it = this->_bufferInfoTree->lower_bound(tp);
-			if(tp.first < it->first.first) it--;
-			while(it->first.first < tp.second)
+			it--;
+			if(isIntersecting(it->first, tp))
 			{
 				result->push_back(it->second);
-				if(it == this->_bufferInfoTree->end()) break;
+			}
+			it++;
+			while(it->first.first < tp.second && it != this->_bufferInfoTree->end())
+			{
+				result->push_back(it->second);
 				it++;
 			}
 		}

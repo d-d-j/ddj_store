@@ -17,7 +17,7 @@ namespace ddj {
 		ullint first;
 		ullint second;
 
-		ullintPair():first(0),second(0){}
+		ullintPair():first(1),second(1){}
 		ullintPair(ullint f, ullint s):first(f),second(s){}
 		ullintPair(const ullintPair& cp)
 		{
@@ -28,14 +28,15 @@ namespace ddj {
 
 		bool operator< (const ullintPair& rhs) const
 		{
-			if(second < rhs.second) return true;
+			if(first < rhs.first && second < rhs.second) return true;
 			else return false;
 		}
 
 		bool operator== (const ullintPair& rhs) const
 		{
-			if(first == rhs.first && second == rhs.second) return true;
-			else return false;
+			if(first >= rhs.first && second <= rhs.second) return true;
+			if(first <= rhs.first && second >= rhs.second) return true;
+			return false;
 		}
 	};
 

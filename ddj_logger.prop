@@ -1,4 +1,4 @@
-log4cplus.rootLogger=WARN, STDOUT, R
+log4cplus.rootLogger=DEBUG, STDOUT, R
 
 log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
 log4cplus.appender.STDOUT.Threshold=DEBUG

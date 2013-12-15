@@ -7,6 +7,8 @@ namespace unittest {
 	{
 		// CHECK
 		EXPECT_TRUE(_monitor != NULL);
+		auto result = _monitor->SelectAll();
+		ASSERT_TRUE(result->empty());
 	}
 
 	TEST_F(BTreeMonitorTest, Insert_One)
@@ -155,10 +157,10 @@ namespace unittest {
 	{
 		// PREAPRE
 		store::storeTrunkInfo* elem = new store::storeTrunkInfo(1, 2, 8, 0, 7);
+		_monitor->Insert(elem);
 		ullintPair period{0,10};
 		boost::container::vector<ullintPair> timePeriods;
 		timePeriods.push_back(period);
-		_monitor->Insert(elem);
 
 		// TEST
 		auto result = _monitor->Select(timePeriods);
@@ -272,10 +274,7 @@ namespace unittest {
 		auto result = _monitor->Select(timePeriods);
 
 		// CHECK
-		ASSERT_FALSE(result->empty());
-		EXPECT_EQ(1, result->size());
-		EXPECT_EQ(0, result->data()[0].first);
-		EXPECT_EQ(7, result->data()[0].second);
+		ASSERT_TRUE(result->empty());
 
 		// CLEAN
 		delete result;
@@ -299,10 +298,7 @@ namespace unittest {
 		auto result = _monitor->Select(timePeriods);
 
 		// CHECK
-		ASSERT_FALSE(result->empty());
-		EXPECT_EQ(1, result->size());
-		EXPECT_EQ(0, result->data()[0].first);
-		EXPECT_EQ(7, result->data()[0].second);
+		ASSERT_TRUE(result->empty());
 
 		// CLEAN
 		delete result;
