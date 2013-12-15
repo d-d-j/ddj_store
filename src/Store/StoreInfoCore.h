@@ -5,6 +5,8 @@
 #include "../Core/Logger.h"
 #include "../Core/Config.h"
 
+#include "StoreNodeInfo.h"
+
 namespace ddj{
 namespace store{
 	class StoreInfoCore
@@ -13,19 +15,14 @@ namespace store{
 		Logger _logger = Logger::getRoot();
 		store::CudaCommons _cudaCommons;
 
-		int memTotal;
-		int memFree;
-		int cpuPercent;
-		size_t gpuMemTotal;
-		size_t gpuMemFree;
-
 
 	public:
 		StoreInfoCore();
 		virtual ~StoreInfoCore();
+
 		void GetRamInKB(int* ramTotal, int* ramFree);
 
-		void FillNodeInfo();
+		size_t GetNodeInfo(void* result);
 	};
 
 }

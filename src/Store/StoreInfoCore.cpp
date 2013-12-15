@@ -4,21 +4,30 @@ namespace ddj
 {
 namespace store
 {
-void StoreInfoCore::FillNodeInfo()
+size_t StoreInfoCore::GetNodeInfo(void* result)
 {
 	size_t mbSize = this->_config->GetIntValue("MB_SIZE_IN_BYTES");
 
-	_cudaCommons.GetMemoryCount(&this->gpuMemFree, &this->gpuMemTotal);
+	size_t gpuMemFree, gpuMemTotal;
+	int memTotal, memFree;
+
+	_cudaCommons.GetMemoryCount(&gpuMemFree, &gpuMemTotal);
 	LOG4CPLUS_INFO_FMT(this->_logger,
 			"NODE INFO - free GPU memory => %f MB, total GPU memory => %f MB",
-			(float ) this->gpuMemFree / mbSize,
-			(float )this->gpuMemTotal / mbSize);
+			(float ) gpuMemFree / mbSize,
+			(float ) gpuMemTotal / mbSize);
 
 	GetRamInKB(&memTotal, &memFree);
 
 	LOG4CPLUS_INFO_FMT(this->_logger,
 			"NODE INFO - free RAM memory => %f MB, total RAM memory => %f MB",
-			(float )this->memFree / 1024, (float )this->memTotal / 1024);
+			(float )memFree / 1024, (float )memTotal / 1024);
+
+
+	StoreNodeInfo nodeInfo = StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
+
+	result = &nodeInfo;
+	return sizeof(nodeInfo);
 }
 
 void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)

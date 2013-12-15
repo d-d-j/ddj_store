@@ -42,6 +42,9 @@ namespace store {
 
 		// CREATE STORE UPLOAD CORE
 		this->_uploadCore = new StoreUploadCore(this->_cudaController);
+		
+		// CREATE STORE INFO CORE
+		this->_infoCore = new StoreInfoCore();
 
 		// SET THREAD POOL SIZES
 		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
@@ -199,36 +202,25 @@ namespace store {
 
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
-
-		// Check possible errors
-		if(task == nullptr || task->GetType() != task::Info)
-		{
-			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
-			throw std::runtime_error("Error in flushTask function - wrong argument");
-		}
-
+		void* queryResult;
 		try
 		{
-			// Iterate through store buffers and flush them to GPU memory (Sync)
-			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
-			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
-			{
-				it-> second->Flush();
-			}
-		}
-		catch(std::exception& ex)
+			size_t sizeOfResult = this->_infoCore->GetNodeInfo(queryResult);
+			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
+
+		} catch (std::exception& ex)
 		{
-			LOG4CPLUS_ERROR_FMT(this->_logger, "Flush task error with exception - [%s] [FAILED]", ex.what());
+			LOG4CPLUS_ERROR_FMT(this->_logger,
+					"Info task error with exception - [%s] [FAILED]", ex.what());
 			task->SetResult(false, ex.what(), nullptr, 0);
-		}
-		catch(...)
+		} catch (...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
-			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
+			LOG4CPLUS_FATAL(this->_logger,
+					LOG4CPLUS_TEXT("Info task error [FAILED]"));
 		}
 
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
 	}
 
 } /* namespace store */

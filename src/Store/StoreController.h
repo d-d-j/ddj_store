@@ -24,10 +24,12 @@
 #include "StoreElement.h"
 #include "StoreQueryCore.h"
 #include "StoreQuery.h"
+#include "StoreInfoCore.h"
 #include "../Cuda/CudaController.h"
 #include "../Task/Task.h"
 #include "../Core/Logger.h"
 #include "../Core/Config.h"
+#include "StoreNodeInfo.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/threadpool.hpp>
@@ -50,6 +52,7 @@ class StoreController : public boost::noncopyable
     	CudaController* _cudaController;
     	StoreUploadCore* _uploadCore;
     	StoreQueryCore* _queryCore;
+    	StoreInfoCore* _infoCore;
 
     	/* BUFFERS */
     	Buffers_Map* _buffers;
