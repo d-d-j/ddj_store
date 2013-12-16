@@ -18,10 +18,13 @@ namespace store {
 class CudaCommons {
 private:
 	/* LOGGER & CONFIG */
-	Logger _logger = Logger::getRoot();
-	Config* _config = Config::GetInstance();
+	Logger _logger;
+	Config* _config;
 
 public:
+
+	CudaCommons() : _logger(Logger::getRoot()), _config(Config::GetInstance()) { }
+
 	/* CUDA DEVICES */
 	int CudaGetDevicesCount();
 	bool CudaCheckDeviceForRequirements(int n);

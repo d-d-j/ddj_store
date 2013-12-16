@@ -30,8 +30,8 @@ namespace ddj
 
 		/* LOGGER & CONFIG & CUDA_COMMONS */
 		store::CudaCommons _cudaCommons;
-		Logger _logger = Logger::getRoot();
-		Config* _config = Config::GetInstance();
+		Logger _logger;
+		Config* _config;
 
         /* NETWORK */
         network::NetworkClient* _client;

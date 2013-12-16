@@ -48,7 +48,7 @@ namespace store {
 			StoreUploadCore* _uploadCore;			/**< protects access to GpuUploadCore class */
 
 			/* LOGGER */
-			Logger _logger = Logger::getRoot();
+			Logger _logger;
 
 			/* BUFFERS */
 			int _bufferElementsCount;		/**< how many elements are now in _buffer */

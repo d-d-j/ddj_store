@@ -9,6 +9,7 @@
 #define BTREEMONITORTEST_H_
 
 #include "../BTree/BTreeMonitor.h"
+ #include "../Core/Logger.h"
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -17,6 +18,7 @@ namespace unittest {
 	class BTreeMonitorTest : public testing::Test
 	{
 	protected:
+		BTreeMonitorTest() : _logger(Logger::getRoot()) {}
 		virtual void SetUp()
 		{
 			_monitor = new btree::BTreeMonitor(1);
@@ -27,7 +29,7 @@ namespace unittest {
 		}
 
 		btree::BTreeMonitor* _monitor;
-		Logger _logger = Logger::getRoot();
+		Logger _logger;
 	};
 
 } /* namespace unittest */

@@ -9,7 +9,7 @@
 
 namespace ddj
 {
-	Node::Node()
+	Node::Node() : _logger(Logger::getRoot()), _config(Config::GetInstance())
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [BEGIN]"));
 

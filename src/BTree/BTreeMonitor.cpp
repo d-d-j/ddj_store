@@ -4,7 +4,7 @@
 namespace ddj {
 namespace btree {
 
-	BTreeMonitor::BTreeMonitor(metric_type metric)
+	BTreeMonitor::BTreeMonitor(metric_type metric) :  _logger(Logger::getRoot())
 	{
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [metric=%d] constructor [BEGIN]", metric);
 

@@ -11,6 +11,7 @@ namespace ddj {
 namespace network {
 
 	NetworkClient::NetworkClient(boost::signals2::signal<void (task::taskRequest)> *_requestSignal)
+		: _logger(Logger::getRoot()), _config(Config::GetInstance())
 	{
 		this->host = this->_config->GetStringValue("MASTER_IP_ADDRESS");
 		this->port = this->_config->GetStringValue("MASTER_LOGIN_PORT");

@@ -24,8 +24,8 @@ namespace network {
 	{
 	private:
 		// LOGGER & CONFIG
-		Logger _logger = Logger::getRoot();
-		Config* _config = Config::GetInstance();
+		Logger _logger;
+		Config* _config;
 
 		// CONNECTION DATA
 		std::string host;

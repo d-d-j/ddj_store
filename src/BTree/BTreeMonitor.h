@@ -27,7 +27,7 @@ namespace btree {
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
 			/* LOGGER */
-			Logger _logger = Logger::getRoot();
+			Logger _logger;
 		public:
 			//! BTreeMonitor constructor.
 			/*!

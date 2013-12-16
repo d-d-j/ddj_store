@@ -34,7 +34,7 @@ namespace task {
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
-		// Copy compleated tasks to result
+		// Copy completed tasks to result
 		boost::container::vector<Task_Pointer> result(this->_tasks.size());
 		auto it = std::copy_if(
 				this->_tasks.begin(),
@@ -44,7 +44,7 @@ namespace task {
 				);
 		result.resize(std::distance(result.begin(),it));
 
-		// Remove compleated tasks from _tasks
+		// Remove completed tasks from tasks
 		std::remove_if(
 				this->_tasks.begin(),
 				this->_tasks.end(),

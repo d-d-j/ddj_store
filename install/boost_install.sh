@@ -19,7 +19,7 @@ cd boost_1_54_0
 
 #Compile and install
 ./bootstrap.sh --prefix=/usr/local
-cpuCores=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $0}'`
+cpuCores=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $4}'`
 echo "Available CPU cores: "$cpuCores
 sudo ./b2 --with=all -j $cpuCores install
 cd ..

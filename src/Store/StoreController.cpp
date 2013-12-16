@@ -23,6 +23,7 @@ namespace ddj {
 namespace store {
 
 	StoreController::StoreController(int gpuDeviceId)
+		: _logger(Logger::getRoot()), _config(Config::GetInstance())
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
@@ -122,8 +123,6 @@ namespace store {
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in selectTask function - wrong argument");
 		}
-
-		void* queryResult;
 
 		try
 		{
