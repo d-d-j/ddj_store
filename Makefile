@@ -16,6 +16,8 @@ INCLUDES := -I"/usr/local/cuda/include"
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
+VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
+
 OBJS += \
 ./src/UnitTests/SemaphoreTest.o \
 ./src/UnitTests/BTreeMonitorTest.o \
@@ -84,7 +86,9 @@ DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo ' '
 
 test: all
-	./DDJ_Store --test
+	./DDJ_Store --test 2> /dev/null
+leak-check: all
+	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
 
 check:
 	cppcheck --enable=all -j 4 -q ./src/
