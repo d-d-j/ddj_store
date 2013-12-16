@@ -39,7 +39,7 @@ namespace store {
 	 Implement sync function of getting trunks with their location on GPU with this tag
 	 and specified time (from - to)
 	*/
-    class StoreBuffer
+    class StoreBuffer : public boost::noncopyable
     {
 		/* FIELDS */
 		private:

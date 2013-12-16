@@ -19,7 +19,7 @@ namespace btree {
 	/*! \class BTreeMonitor
 	 \brief Protects concurrent access to B+Tree structure using boost::mutex
 	*/
-	class BTreeMonitor
+	class BTreeMonitor : public boost::noncopyable
 	{
 		private:
 			metric_type _metric;				/**< A metric of elements which locations are stored in B+Tree */

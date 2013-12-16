@@ -20,7 +20,8 @@ namespace network {
 
 	using boost::asio::ip::tcp;
 
-	class NetworkClient : public boost::noncopyable {
+	class NetworkClient : public boost::noncopyable
+	{
 	private:
 		// LOGGER & CONFIG
 		Logger _logger = Logger::getRoot();

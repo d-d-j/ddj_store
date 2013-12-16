@@ -35,7 +35,7 @@
 namespace ddj {
 namespace store {
 
-class StoreController
+class StoreController : public boost::noncopyable
 {
     /* TYPEDEFS */
     typedef boost::function<void (task::Task_Pointer task)> taskFunc;

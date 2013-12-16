@@ -22,7 +22,7 @@
 
 namespace ddj
 {
-	class Node
+	class Node : public boost::noncopyable
 	{
 	private:
 		/* TYPEFEFS */
