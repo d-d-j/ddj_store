@@ -3738,7 +3738,7 @@ private:
 
         assert(n != NULL);
         assert(n->level == 0);
-        assert(!n || n->prevleaf == NULL);
+        assert(n->prevleaf == NULL);
 
         unsigned int testcount = 0;
 

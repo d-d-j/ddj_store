@@ -33,8 +33,8 @@ namespace unittest {
 		int x = 0, y = 0;
 		_semaphore->Wait();
 
-		auto f1 = [&](){ _semaphore->Wait(); x++; _semaphore->Release();};
-		auto f2 = [&](){ _semaphore->Wait(); y++; _semaphore->Release();};
+		auto f1 = [&](){ _semaphore->Wait(); x++; };
+		auto f2 = [&](){ _semaphore->Wait(); y++; };
 		boost::thread t1(f1);
 		boost::thread t2(f2);
 
@@ -42,9 +42,10 @@ namespace unittest {
 		EXPECT_GE(1, x+y);
 
 		_semaphore->Release();
+		_semaphore->Release();
 	    t1.join();
 	    t2.join();
-
+	    _semaphore->Release();
 		EXPECT_EQ(1, x);
 		EXPECT_EQ(1, y);
 	}
