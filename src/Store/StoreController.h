@@ -55,8 +55,7 @@ class StoreController
 
     	/* TASKS */
         boost::unordered_map<int, taskFunc> _taskFunctions;
-        boost::threadpool::fifo_pool _queryTaskThreadPool;
-        boost::threadpool::fifo_pool _insertTaskThreadPool;
+        boost::threadpool::fifo_pool _taskThreadPool;
 
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
@@ -73,9 +72,9 @@ class StoreController
 	/* TASK FUNCTIONS */
     private:
         void insertTask(task::Task_Pointer task);
-        void selectAllTask(task::Task_Pointer task);
+        void selectTask(task::Task_Pointer task);
         void flushTask(task::Task_Pointer task);
-
+        void infoTask(task::Task_Pointer task);
 };
 
 } /* end namespace store */

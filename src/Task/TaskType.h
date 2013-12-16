@@ -15,8 +15,9 @@ namespace task {
 	{
 		Error = 0,
 		Insert = 1,
-		SelectAll = 2,
-		Flush = 3
+		Select = 2,
+		Flush = 3,
+		Info = 4
 	};
 
 } /* namespace task */

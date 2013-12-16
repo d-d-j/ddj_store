@@ -43,8 +43,7 @@ namespace store {
 		this->_uploadCore = new StoreUploadCore(this->_cudaController);
 
 		// SET THREAD POOL SIZES
-		this->_queryTaskThreadPool.size_controller().resize(this->_config->GetIntValue("QUERY_THRED_POOL_SIZE"));
-		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THRED_POOL_SIZE"));
+		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -63,14 +62,7 @@ namespace store {
 	{
 		// Sechedule a function from _TaskFunctions with this taskId
 		task::TaskType type = task->GetType();
-		if(type == task::Insert)
-		{
-			this->_insertTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
-		}
-		else
-		{
-			this->_queryTaskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
-		}
+		this->_taskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
 	}
 
 	void StoreController::populateTaskFunctions()
@@ -81,10 +73,13 @@ namespace store {
 		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
 		// SELECT ALL
-		_taskFunctions.insert({ task::SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
+		_taskFunctions.insert({ task::Select, boost::bind(&StoreController::selectTask, this, _1) });
 
 		// FLUSH
 		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
+
+		// FLUSH
+		_taskFunctions.insert({ task::Info, boost::bind(&StoreController::infoTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
 	}
@@ -117,12 +112,12 @@ namespace store {
 		task->SetResult(true, nullptr, nullptr, 0);
 	}
 
-	void StoreController::selectAllTask(task::Task_Pointer task)
+	void StoreController::selectTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
 
 		// Check possible errors
-		if(task == nullptr || task->GetType() != task::SelectAll)
+		if(task == nullptr || task->GetType() != task::Select)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in selectAllTask function - wrong argument");
@@ -183,5 +178,11 @@ namespace store {
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
 	}
+
+	void StoreController::infoTask(task::Task_Pointer task)
+	{
+
+	}
+
 } /* namespace store */
 } /* namespace ddj */

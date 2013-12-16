@@ -56,8 +56,7 @@ namespace ddj
 					("STREAMS_NUM_QUERY", po::value<int>()->default_value(2), "number of query streams")
 					("STREAMS_NUM_UPLOAD", po::value<int>()->default_value(2), "number of upload streams")
 					("STORE_BUFFER_CAPACITY", po::value<int>()->default_value(512), "store buffer capacity")
-					("QUERY_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for queries")
-					("INSERT_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for inserts")
+					("THREAD_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for tasks")
 					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries");
 
 			po::options_description config_file_options;
