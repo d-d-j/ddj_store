@@ -58,13 +58,22 @@ namespace btree {
 
 		BOOST_FOREACH(ullintPair &tp, timePeriods)
 		{
+			// get first element from B+Tree with greater or equal key than tp
 			auto it = this->_bufferInfoTree->lower_bound(tp);
+			/* check if the last smaller element isn't intersecting with tp because in this situation
+			 *	tp 						<----------->
+			 * 	elems in tree	|-----A1-----| |-----A2-----|
+			 * 	A2 will be returned as lower_bound so we must check if A1 isn't intersecting with tp
+			 */
 			it--;
 			if(it->first.isIntersecting(tp))
 			{
 				result->push_back(it->second);
 			}
 			it++;
+			/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
+			 * are inside selected time period and if it is not and end of data from B+Tree
+			 */
 			while(it->first.first < tp.second && it != this->_bufferInfoTree->end())
 			{
 				result->push_back(it->second);

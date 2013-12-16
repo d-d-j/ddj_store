@@ -111,7 +111,7 @@ namespace ddj
 
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
-					if(compleatedTasks[i]->GetType() == task::SelectAll)
+					if(compleatedTasks[i]->GetType() == task::Select)
 					{
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
