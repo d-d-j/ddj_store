@@ -31,6 +31,7 @@ OBJS += \
 ./src/Store/StoreController.o \
 ./src/Store/StoreQueryCore.o \
 ./src/Store/StoreUploadCore.o \
+./src/Store/StoreQuery.o \
 ./src/Task/Task.o \
 ./src/Task/TaskMonitor.o \
 ./src/Node.o \
@@ -49,6 +50,7 @@ CPP_DEPS += \
 ./src/Store/StoreController.d \
 ./src/Store/StoreQueryCore.d \
 ./src/Store/StoreUploadCore.d \
+./src/Store/StoreQuery.d \
 ./src/Task/Task.d \
 ./src/Task/TaskMonitor.d \
 ./src/Node.d \

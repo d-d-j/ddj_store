@@ -120,28 +120,24 @@ namespace store {
 		if(task == nullptr || task->GetType() != task::Select)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
-			throw std::runtime_error("Error in selectAllTask function - wrong argument");
+			throw std::runtime_error("Error in selectTask function - wrong argument");
 		}
 
-		// Get all data from GPU store
 		void* queryResult;
 
-		// TODO: Implement all possible exceptions catching from SelectAll function
 		try
 		{
-			size_t sizeOfResult = this->_queryCore->SelectAll(&queryResult);
-			task->SetResult(true, nullptr, queryResult, sizeOfResult);
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [END]"));
+
 		}
 		catch(std::exception& ex)
 		{
-			LOG4CPLUS_ERROR_FMT(this->_logger, "SelectAll task error with exception - [%s] [FAILED]", ex.what());
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Select task error with exception - [%s] [FAILED]", ex.what());
 			task->SetResult(false, ex.what(), nullptr, 0);
 		}
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
-			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Select task error [FAILED]"));
 		}
 	}
 
