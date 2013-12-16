@@ -1,6 +1,8 @@
 #!/bin/bash
 
-#Create temp directory for instalation
+sudo apt-get install cmake
+
+#Create temp directory for installation
 mkdir gtestInstallTemp
 cd gtestInstallTemp
 
@@ -21,7 +23,7 @@ fi
 #Build
 make
 
-#Install 
+#Install
 sudo cp -r ../include/gtest /usr/local/include
 sudo cp lib*.a /usr/local/lib
 
