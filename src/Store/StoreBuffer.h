@@ -90,6 +90,8 @@ namespace store {
 			 */
 			void Flush();
 
+			boost::container::vector<ullintPair>* Select(boost::container::vector<ullintPair> timePeriods);
+
 		private:
 			storeTrunkInfo* uploadBuffer();
 			void insertToBtree(storeTrunkInfo* element);

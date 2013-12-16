@@ -23,6 +23,7 @@
 #include "StoreBuffer.h"
 #include "StoreElement.h"
 #include "StoreQueryCore.h"
+#include "StoreQuery.h"
 #include "../Cuda/CudaController.h"
 #include "../Task/Task.h"
 #include "../Core/Logger.h"
@@ -31,6 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/threadpool.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/foreach.hpp>
 
 namespace ddj {
 namespace store {

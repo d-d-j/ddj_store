@@ -1,5 +1,4 @@
 #include "BTreeMonitor.h"
-#include <boost/foreach.hpp>
 
 namespace ddj {
 namespace btree {

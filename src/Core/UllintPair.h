@@ -9,6 +9,8 @@
 #define ULLINTPAIR_H_
 
 #include "../Store/StoreTypedefs.h"
+#include <string>
+#include <sstream>
 
 namespace ddj {
 
@@ -46,6 +48,13 @@ namespace ddj {
 			if(rhs.first > first && rhs.first < second) return true;
 			if(rhs.second > first && rhs.second < second) return true;
 			return false;
+		}
+
+		std::string toString()
+		{
+			std::ostringstream stream;
+			stream << "(" << first << "," << second << ")";
+			return  stream.str();
 		}
 	};
 

@@ -7,6 +7,7 @@
 #include "../Store/StoreTrunkInfo.h"
 #include <boost/thread.hpp>
 #include <boost/container/vector.hpp>
+#include <boost/foreach.hpp>
 #include <stdexcept>
 
 namespace ddj {

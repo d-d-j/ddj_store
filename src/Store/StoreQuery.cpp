@@ -51,5 +51,30 @@ namespace store {
 		delete [] tp;
 	}
 
+	std::string storeQuery::toString()
+	{
+		 std::ostringstream stream;
+
+		 stream << "query[";
+		 stream << "aggregationType: " << this->aggregationType;
+		 stream << "; metrices:";
+		 BOOST_FOREACH(metric_type &m, this->metrices)
+		 {
+			 stream << " " << m;
+		 }
+		 stream << "; tags:";
+		 BOOST_FOREACH(int &t, this->tags)
+		 {
+			 stream << " " << t;
+		 }
+		 stream << "; timePeriods:";
+		 BOOST_FOREACH(ullintPair &tp, this->timePeriods)
+		 {
+			 stream << " " << tp.toString();
+		 }
+		 stream << "]";
+		 return  stream.str();
+	}
+
 } /* namespace ddj */
 } /* namespace store */

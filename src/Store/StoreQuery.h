@@ -4,6 +4,9 @@
 #include "StoreAggregationType.h"
 #include "../Core/UllintPair.h"
 #include <boost/container/vector.hpp>
+#include <boost/foreach.hpp>
+#include <string>
+#include <sstream>
 
 namespace ddj {
 namespace store {
@@ -16,6 +19,8 @@ namespace store {
 		task::AggregationType aggregationType;
 
 		storeQuery(void* queryData);
+
+		std::string toString();
 	};
 
 } /* namespace ddj */
