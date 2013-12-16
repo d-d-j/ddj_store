@@ -10,17 +10,20 @@
 namespace ddj {
 namespace network {
 
-	NetworkClient::NetworkClient(std::string ip, std::string port) : host(ip), port(port)
-	{
-		socket = new tcp::socket(io_service);
-	}
-
 	NetworkClient::NetworkClient(boost::signals2::signal<void (task::taskRequest)> *_requestSignal)
-		: NetworkClient("127.0.0.1", "8080")
 	{
+		this->host = this->_config->GetStringValue("MASTER_IP_ADDRESS");
+		this->port = this->_config->GetStringValue("MASTER_LOGIN_PORT");
+		socket = new tcp::socket(io_service);
 		requestSignal = _requestSignal;
 		connect();
 		boost::thread workerThread(&NetworkClient::do_read, this);
+	}
+
+	NetworkClient::~NetworkClient()
+	{
+		close();
+		delete socket;
 	}
 
 	void NetworkClient::connect()
@@ -104,12 +107,6 @@ namespace network {
 		{
 			LOG4CPLUS_ERROR(this->_logger, "Error while closing network connection - " << ec.message());
 		}
-	}
-
-	NetworkClient::~NetworkClient()
-	{
-		close();
-		delete socket;
 	}
 
 } /* namespace store */

@@ -10,6 +10,7 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/utility.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -19,7 +20,7 @@ namespace network {
 
 	using boost::asio::ip::tcp;
 
-	class NetworkClient {
+	class NetworkClient : public boost::noncopyable {
 	private:
 		// LOGGER & CONFIG
 		Logger _logger = Logger::getRoot();
@@ -36,7 +37,6 @@ namespace network {
 		// SIGNAL
 		boost::signals2::signal<void (task::taskRequest)> *requestSignal;
 	public:
-		NetworkClient(std::string ip, std::string port);
 		NetworkClient(boost::signals2::signal<void (task::taskRequest)>* _requestSignal);
 		virtual ~NetworkClient();
 

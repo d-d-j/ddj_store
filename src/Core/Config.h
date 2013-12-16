@@ -32,6 +32,7 @@ namespace ddj
 
 	public:
 		int GetIntValue(string);
+		string GetStringValue(string settingName);
 		static Config* GetInstance();
 		void ListAllSettings();
 	};

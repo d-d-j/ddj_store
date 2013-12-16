@@ -22,9 +22,6 @@ private:
 	Config* _config = Config::GetInstance();
 
 public:
-	CudaCommons();
-	virtual ~CudaCommons();
-
 	/* CUDA DEVICES */
 	int CudaGetDevicesCount();
 	bool CudaCheckDeviceForRequirements(int n);

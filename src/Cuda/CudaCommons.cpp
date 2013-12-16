@@ -9,10 +9,6 @@
 
 namespace ddj {
 namespace store {
-
-	CudaCommons::CudaCommons() {}
-	CudaCommons::~CudaCommons() {}
-
 	int CudaCommons::CudaGetDevicesCount()
 	{
 		int count = 0;

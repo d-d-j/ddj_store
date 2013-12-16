@@ -31,6 +31,16 @@ namespace ddj
 		return -1;
 	}
 
+	string Config::GetStringValue(string settingName)
+	{
+		if (_configMap.count(settingName))
+		{
+			return _configMap[settingName].as<string>();
+		}
+		//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("value for the setting not found"));
+		return nullptr;
+	}
+
 	void Config::ListAllSettings()
 	{
 		po::variables_map::iterator it;
@@ -57,7 +67,9 @@ namespace ddj
 					("STREAMS_NUM_UPLOAD", po::value<int>()->default_value(2), "number of upload streams")
 					("STORE_BUFFER_CAPACITY", po::value<int>()->default_value(512), "store buffer capacity")
 					("THREAD_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for tasks")
-					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries");
+					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries")
+					("MASTER_IP_ADDRESS", po::value<string>()->default_value("127.0.0.1"), "address of master server")
+					("MASTER_LOGIN_PORT", po::value<string>()->default_value("8080"), "port of master server login service");
 
 			po::options_description config_file_options;
 			config_file_options.add(hidden);
