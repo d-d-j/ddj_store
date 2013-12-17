@@ -35,6 +35,7 @@ namespace store {
 		ullint _mainMemoryOffset;
 		boost::mutex _offsetMutex;
 		void* _mainMemoryPointer;
+		ullint _mainMemoryCapacity;
 
 		/* LOGGER & CONFIG & CUDA_COMMONS */
 		Logger _logger = Logger::getRoot();
@@ -53,15 +54,12 @@ namespace store {
 		void ReleaseQueryStream(cudaStream_t st);
 		cudaStream_t GetSyncStream();
 
-		/* MAIN STORE MEMORY (on GPU) */
-		cudaStream_t GetUploadStream(int num);
-		cudaStream_t GetQueryStream(int num);
-
 		/* MAIN STORE ARRAY */
 		ullint GetMainMemoryOffset();
 		void SetMainMemoryOffset(ullint offset);
 		void* GetMainMemoryPointer();
 		void* GetMainMemoryFirstFreeAddress();
+		ullint GetMainMemoryCapacity();
 
 	private:
 		void allocateMainGpuStorage();

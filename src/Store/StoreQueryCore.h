@@ -12,12 +12,16 @@
 #include "StoreElement.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
+#include <gtest/gtest.h>
 
 namespace ddj {
 namespace store {
 
 	class StoreQueryCore
 	{
+		friend class StoreQueryCoreTest;
+		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
+	private:
 		CudaController* _cudaController;
 	public:
 		StoreQueryCore(CudaController* cudaController);
@@ -36,7 +40,7 @@ namespace store {
 
 	private:
 		/* DATA MANAGEMENT METHODS */
-		size_t mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo);
+		size_t mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 		storeElement* decompressData(void* data, size_t size);
 		void filterData(storeElement* elements, storeQuery* query);
 

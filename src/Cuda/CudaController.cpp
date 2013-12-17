@@ -113,6 +113,7 @@ namespace store {
 	void CudaController::SetMainMemoryOffset(ullint offset)
 	{
 		boost::mutex::scoped_lock lock(_offsetMutex);
+		// TODO: Implement offset >= _mainMemoryCapacity
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Setting main memory offset to: %llu", offset);
 		this->_mainMemoryOffset = offset;
 	}
@@ -148,6 +149,7 @@ namespace store {
 			else
 			{
 				LOG4CPLUS_INFO(this->_logger, "CUDA SUCCESS - allocated " << (float)memorySize/mbSize << " MB of GPU memory");
+				this->_mainMemoryCapacity = memorySize;
 				break;
 			}
 			maxAttempts--;
@@ -158,6 +160,11 @@ namespace store {
 			LOG4CPLUS_FATAL_FMT(this->_logger, "CUDA FATAL ERROR MAIN MEMORY ALLOCATION - %s", cudaGetErrorString(error));
 			throw std::runtime_error("Cannot allocate main GPU memory in storeController");
 		}
+	}
+
+	ullint CudaController::GetMainMemoryCapacity()
+	{
+		return this->_mainMemoryCapacity;
 	}
 
 } /* namespace store */

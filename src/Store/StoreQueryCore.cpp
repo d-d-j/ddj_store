@@ -31,8 +31,6 @@ namespace store {
 	size_t StoreQueryCore::ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
-		void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
-
 
 		// Decompress temporary data buffer
 
@@ -45,7 +43,7 @@ namespace store {
 	}
 
 	/* DATA MANAGEMENT METHODS */
-	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo = nullptr)
+	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		return 0;
 	}
