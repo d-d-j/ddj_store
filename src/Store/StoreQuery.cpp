@@ -35,9 +35,9 @@ namespace store {
 		position+=sizeof(int32_t);
 
 		// Get timePeriods
-		int* tp = new int[2*size];
-		memcpy(&tp, (char*)queryData+position, 2*size*sizeof(int32_t));
-		position+=2*size*sizeof(int32_t);
+		ullint* tp = new ullint[2*size];
+		memcpy(&tp, (char*)queryData+position, 2*size*sizeof(ullint));
+		position+=2*size*sizeof(ullint);
 		while(size--)
 			this->timePeriods.push_back(ullintPair{tp[2*size],tp[2*size+1]});
 
