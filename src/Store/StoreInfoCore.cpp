@@ -4,7 +4,7 @@ namespace ddj
 {
 namespace store
 {
-size_t StoreInfoCore::GetNodeInfo(void* result)
+size_t StoreInfoCore::GetNodeInfo(void** result)
 {
 	size_t mbSize = this->_config->GetIntValue("MB_SIZE_IN_BYTES");
 
@@ -17,7 +17,7 @@ size_t StoreInfoCore::GetNodeInfo(void* result)
 			(float ) gpuMemFree / mbSize,
 			(float ) gpuMemTotal / mbSize);
 
-// move getting ram info to Node instear of here
+// TODO: move getting ram info to Node instear of here
 	GetRamInKB(&memTotal, &memFree);
 
 	LOG4CPLUS_INFO_FMT(this->_logger,
@@ -25,9 +25,9 @@ size_t StoreInfoCore::GetNodeInfo(void* result)
 			(float )memFree / 1024, (float )memTotal / 1024);
 
 
-	StoreNodeInfo nodeInfo = StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
+	StoreNodeInfo* nodeInfo = new StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
 
-	result = &nodeInfo;
+	*result = &nodeInfo;
 	return sizeof(nodeInfo);
 }
 
@@ -60,11 +60,6 @@ StoreInfoCore::StoreInfoCore()
 {
 	// TODO Auto-generated constructor stub
 
-}
-
-StoreInfoCore::~StoreInfoCore()
-{
-	// TODO Auto-generated destructor stub
 }
 }
 }

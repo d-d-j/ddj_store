@@ -205,10 +205,9 @@ namespace store {
 		void* queryResult;
 		try
 		{
-			size_t sizeOfResult = this->_infoCore->GetNodeInfo(queryResult);
+			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
 			task->SetResult(true, nullptr, queryResult, sizeOfResult);
 			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
-
 		} catch (std::exception& ex)
 		{
 			LOG4CPLUS_ERROR_FMT(this->_logger,

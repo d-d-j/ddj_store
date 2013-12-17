@@ -18,11 +18,10 @@ namespace store{
 
 	public:
 		StoreInfoCore();
-		virtual ~StoreInfoCore();
 
 		void GetRamInKB(int* ramTotal, int* ramFree);
 
-		size_t GetNodeInfo(void* result);
+		size_t GetNodeInfo(void** result);
 	};
 
 }

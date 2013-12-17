@@ -11,8 +11,7 @@ namespace ddj
 {
 namespace store
 {
-StoreNodeInfo::StoreNodeInfo(int memTotal, int memFree, size_t gpuMemTotal,
-		size_t gpuMemFree)
+StoreNodeInfo::StoreNodeInfo(int memTotal, int memFree, size_t gpuMemTotal,	size_t gpuMemFree)
 {
 	_memTotal = memTotal;
 	_memFree = memFree;

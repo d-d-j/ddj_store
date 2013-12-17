@@ -24,7 +24,6 @@ class StoreNodeInfo
 public:
 	StoreNodeInfo();
 	StoreNodeInfo(int memTotal, int memFree, size_t gpuMemTotal, size_t gpuMemFree);
-	virtual ~StoreNodeInfo();
 };
 }
 }
