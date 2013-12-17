@@ -1,7 +1,6 @@
 #include "SemaphoreTest.h"
 
 namespace ddj {
-namespace unittest {
 
 	TEST_F(SemaphoreTest, Constructor)
 	{
@@ -49,5 +48,5 @@ namespace unittest {
 		EXPECT_EQ(1, x);
 		EXPECT_EQ(1, y);
 	}
-}
-}
+
+}	//ddj

@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 namespace ddj {
-namespace unittest {
+namespace btree {
 
 	class BTreeMonitorTest : public testing::Test
 	{
@@ -32,6 +32,6 @@ namespace unittest {
 		Logger _logger;
 	};
 
-} /* namespace unittest */
+} /* namespace btree */
 } /* namespace ddj */
 #endif /* BTREEMONITORTEST_H_ */

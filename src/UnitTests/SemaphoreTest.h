@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 namespace ddj {
-namespace unittest {
 
 	class SemaphoreTest : public testing::Test {
 	protected:
@@ -21,6 +20,5 @@ namespace unittest {
 		Semaphore* _semaphore;
 	};
 
-}
-}
-#endif
+}	// ddj
+#endif // SEMAPHORETEST_H_

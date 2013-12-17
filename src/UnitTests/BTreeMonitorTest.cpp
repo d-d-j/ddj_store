@@ -1,7 +1,7 @@
 #include "BTreeMonitorTest.h"
 
 namespace ddj {
-namespace unittest {
+namespace btree {
 
 	TEST_F(BTreeMonitorTest, Constructor)
 	{
@@ -395,5 +395,5 @@ namespace unittest {
 		delete elem4;
 	}
 
-} /* namespace unittest */
+} /* namespace btree */
 } /* namespace ddj */

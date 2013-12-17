@@ -17,6 +17,7 @@ namespace store {
 
 	StoreQueryCore::~StoreQueryCore(){}
 
+	/*
 	size_t StoreQueryCore::SelectAll(void** queryResult)
 	{
 		void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
@@ -24,6 +25,45 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaMallocHost(queryResult, offset) );
 		CUDA_CHECK_RETURN( cudaMemcpy(*queryResult, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
 		return offset;
+	}
+	*/
+
+	size_t StoreQueryCore::ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo)
+	{
+		// Read and copy data from mainMemoryPointer to temporary data buffer
+		void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
+
+
+		// Decompress temporary data buffer
+
+		// Filter to set of tags specified in query (only if set is not empty)
+
+		// Aggregate all mapped data
+
+		// Set queryResult, clean and return result size
+		return 0;
+	}
+
+	/* DATA MANAGEMENT METHODS */
+	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo = nullptr)
+	{
+		return 0;
+	}
+
+	storeElement* StoreQueryCore::decompressData(void* data, size_t size)
+	{
+		return nullptr;
+	}
+
+	void StoreQueryCore::filterData(storeElement* elements, storeQuery* query)
+	{
+
+	}
+
+	/* AGGREGATION MATHODS */
+	void StoreQueryCore::add(storeQuery* query)
+	{
+
 	}
 
 } /* namespace store */

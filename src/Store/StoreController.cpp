@@ -130,11 +130,12 @@ namespace store {
 			storeQuery* query = new storeQuery(task->GetData());
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
 
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;
 
 			// if query should be filtered ask StoreBuffer for data location on GPU
 			if(query->metrices.size())
 			{
+				dataLocationInfo = new boost::container::vector<ullintPair>();
 				BOOST_FOREACH(metric_type &m, query->metrices)
 				{
 					boost::container::vector<ullintPair>* locations = (*_buffers)[m]->Select(query->timePeriods);
@@ -143,11 +144,11 @@ namespace store {
 				}
 			}
 			// Execute query with optional data locations using StoreQueryCore
-
+			void* queryResult = nullptr;
+			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
 
 			// Set task result and return
-
-
+			task->SetResult(true, nullptr, queryResult, size);
 		}
 		catch(std::exception& ex)
 		{
