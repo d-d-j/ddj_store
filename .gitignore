@@ -8,3 +8,7 @@
 DDJ_Store
 /ddj_store.log
 *.bak
+
+#Configuration
+config.ini
+ddj_logger.prop
