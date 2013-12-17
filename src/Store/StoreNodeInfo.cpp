@@ -19,16 +19,5 @@ StoreNodeInfo::StoreNodeInfo(int memTotal, int memFree, size_t gpuMemTotal,
 	_gpuMemFree = gpuMemFree;
 	_gpuMemTotal = gpuMemTotal;
 }
-
-StoreNodeInfo::StoreNodeInfo()
-{
-// TODO Auto-generated constructor stub
-
-}
-
-StoreNodeInfo::~StoreNodeInfo()
-{
-// TODO Auto-generated destructor stub
-}
 }
 }

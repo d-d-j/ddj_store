@@ -19,7 +19,6 @@ class StoreNodeInfo
 {
 	int _memTotal;
 	int _memFree;
-	int _cpuPercent;
 	size_t _gpuMemTotal;
 	size_t _gpuMemFree;
 public:

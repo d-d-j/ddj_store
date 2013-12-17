@@ -128,6 +128,17 @@ namespace ddj
 						// Destroy Task and TaskResult
 						delete result;
 					}
+					else if(compleatedTasks[i]->GetType() == task::Info)
+					{
+						// Get result of the task
+						result = compleatedTasks[i]->GetResult();
+
+						// Send result
+						this->_client->SendTaskResult(result);
+
+						// Destroy Task and TaskResult
+						delete result;
+					}
 				}
 			}
 		}

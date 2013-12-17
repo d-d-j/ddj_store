@@ -17,6 +17,7 @@ size_t StoreInfoCore::GetNodeInfo(void* result)
 			(float ) gpuMemFree / mbSize,
 			(float ) gpuMemTotal / mbSize);
 
+// move getting ram info to Node instear of here
 	GetRamInKB(&memTotal, &memFree);
 
 	LOG4CPLUS_INFO_FMT(this->_logger,
