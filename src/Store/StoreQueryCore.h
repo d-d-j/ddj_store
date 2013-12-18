@@ -21,6 +21,8 @@ namespace store {
 	{
 		friend class StoreQueryCoreTest;
 		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
+		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
+		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
 	private:
 		CudaController* _cudaController;
 	public:

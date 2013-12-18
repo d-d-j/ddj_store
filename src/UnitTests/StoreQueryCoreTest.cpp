@@ -53,5 +53,50 @@ namespace store {
 
 	}
 
+	TEST_F(StoreQueryCoreTest, mapData_ChooseOneTrunk)
+	{
+		// PREPARE
+		char* data;
+		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+		dataLocationInfo->push_back(ullintPair{64,127});
+
+		// TEST
+		size_t size = _queryCore->mapData((void**)&data, dataLocationInfo);
+
+		// CHECK
+		ASSERT_EQ(64, size);
+		for(unsigned long i=0; i<size; i++)
+			if(data[i]!=(char)((i+size)%256))
+				ADD_FAILURE();
+	}
+
+	TEST_F(StoreQueryCoreTest, mapData_ChooseManyTrunks)
+	{
+		// PREPARE
+		char* data;
+		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+		dataLocationInfo->push_back(ullintPair{64,127});	// length 64
+		dataLocationInfo->push_back(ullintPair{256,383});	// length 128
+		dataLocationInfo->push_back(ullintPair{601,728});	// length 128
+
+		// TEST
+		size_t size = _queryCore->mapData((void**)&data, dataLocationInfo);
+
+		// CHECK
+		ASSERT_EQ(64+128+128, size);
+		unsigned long i = 0;
+		for(i=0; i<64; i++)
+			if(data[i]!=(char)((i+64)%256))
+				ADD_FAILURE();
+
+		for(i=64; i<64+128; i++)
+			if(data[i]!=(char)((i+256-64)%256))
+				ADD_FAILURE();
+
+		for(i=64+128; i<64+128+128; i++)
+			if(data[i]!=(char)((i+601-64-128)%256))
+				ADD_FAILURE();
+	}
+
 } /* namespace store */
 } /* namespace ddj */
