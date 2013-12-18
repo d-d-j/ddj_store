@@ -33,8 +33,9 @@ int main(int argc, char* argv[])
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
 
-	if (argc == 2 && !strcmp(argv[1], "--test"))
+	if (argc >= 2 && !strcmp(argv[1], "--test"))
 	{
+		Logger::getRoot().getHierarchy().disableAll();
 		::testing::InitGoogleTest(&argc, argv);
 		return RUN_ALL_TESTS();
 	}

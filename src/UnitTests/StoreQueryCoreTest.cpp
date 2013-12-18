@@ -17,9 +17,8 @@ namespace store {
 	{
 		int major = THRUST_MAJOR_VERSION;
 		int minor = THRUST_MINOR_VERSION;
-
-		LOG4CPLUS_INFO(this->_logger, "Thrust version: " << major << "." << minor);
-
+		RecordProperty("Thrust version major", major);
+		RecordProperty("Thrust version minor", minor);
 		EXPECT_EQ(1, major);
 		EXPECT_EQ(7, minor);
 	}

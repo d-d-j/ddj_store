@@ -18,18 +18,17 @@ namespace btree {
 	class BTreeMonitorTest : public testing::Test
 	{
 	protected:
-		BTreeMonitorTest() : _logger(Logger::getRoot()) {}
 		virtual void SetUp()
 		{
 			_monitor = new btree::BTreeMonitor(1);
 		}
+
 		virtual void TearDown()
 		{
 			delete _monitor;
 		}
 
 		btree::BTreeMonitor* _monitor;
-		Logger _logger;
 	};
 
 } /* namespace btree */

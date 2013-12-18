@@ -21,7 +21,7 @@ namespace store {
 	class StoreQueryCoreTest : public ::testing::Test
 	{
 	protected:
-		StoreQueryCoreTest() : _logger(Logger::getRoot())
+		StoreQueryCoreTest()
 		{
 			_cudaController = new CudaController(3,3,0);
 			this->createTestData();
@@ -45,7 +45,6 @@ namespace store {
 
 		StoreQueryCore* _queryCore;
 		CudaController* _cudaController;
-		Logger _logger;
 	};
 
 } /* namespace store */
