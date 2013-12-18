@@ -207,5 +207,6 @@ namespace store {
 		delete hostElements;
 		CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 	}
+
 } /* namespace store */
 } /* namespace ddj */

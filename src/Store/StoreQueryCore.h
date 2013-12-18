@@ -27,7 +27,7 @@ namespace store {
 
 		/*
 		 * Description:
-		 * Method executing query with optional selected dataLocations
+		 * Method executing query with optional selected dataLocations;
 		 * If no dataLocation provided query is executed to all data in store
 		 * Returns:
 		 * 	size of data produced by query
@@ -38,9 +38,34 @@ namespace store {
 
 	private:
 		/* DATA MANAGEMENT METHODS */
+
+		/*
+		 * Description:
+		 * Method mapping all data stored in GPU to selected data locations;
+		 * Selects only parts of mainGpuArray specified by ullintPair, for example:
+		 * if dataLocationInfo contains ullintPair (100,300) then a part or mainGpuArray
+		 * from index 100 to index 300 will be returned as new gpu (device) array in data parameter
+		 * Returns:
+		 *  returns size of mapped data
+		 * Output:
+		 *  mapped data is returned as device array in data parameter
+		 */
 		size_t mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
-		storeElement* decompressData(void* data, size_t size);
+
+		/*
+		 * Description:
+		 * Method filtering an array of storeElements on GPU by tags
+		 * It does nothing if no tags are specified in query;
+		 * Otherwise, it moves all elements with tag equal to any of provided in query
+		 * to the front of elements array, and returns a number of these elements
+		 * Returns:
+		 *  number of elements moved to front (number of elements with specified tags)
+		 * Output:
+		 *  changed elements array
+		 */
 		size_t filterData(storeElement* elements, storeQuery* query);
+
+		storeElement* decompressData(void* data, size_t size);
 
 		/* AGGREGATION MATHODS */
 		void add(storeQuery* query);

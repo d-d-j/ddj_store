@@ -43,6 +43,8 @@ namespace store {
 	}
 
 	/* DATA MANAGEMENT METHODS */
+
+
 	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		return 0;

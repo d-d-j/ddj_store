@@ -44,7 +44,7 @@ namespace store {
 		// Get aggregationType
 		int type = 0;
 		memcpy(&type, (char*)queryData+position, sizeof(int32_t));
-		aggregationType = (task::AggregationType)type;
+		aggregationType = (AggregationType)type;
 
 		delete [] mt;
 		delete [] t;
