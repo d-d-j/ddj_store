@@ -48,7 +48,8 @@ namespace network {
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
 		int len = sizeof(int64_t) + 2*sizeof(int32_t) + taskResult->result_size;
-		LOG4CPLUS_ERROR(this->_logger, "Trying to send " << len);
+		LOG4CPLUS_DEBUG(this->_logger, "Trying to send " << len << "bytes");
+		LOG4CPLUS_DEBUG(this->_logger, "Task " << taskResult->toString());
 		char* msg = new char[len];
 		char *oldMsg = msg;
 		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));

@@ -11,16 +11,16 @@ namespace task {
 	struct taskResult
 	{
 	public:
-		int task_id;
+		int64_t task_id;
 		TaskType type;
-		int result_size;
+		int32_t result_size;
 		void* result_data;
 
 		taskResult(
-				int taskId,
+				int64_t taskId,
 				TaskType type,
 				void* resultData = nullptr,
-				int resultSize = 0):
+				int32_t resultSize = 0):
 					task_id(taskId),
 					type(type),
 					result_size(resultSize),
