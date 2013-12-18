@@ -81,7 +81,7 @@ namespace store {
 	void StoreUploadCore::appendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info)
 	{
 		cudaStream_t stream = this->_cudaController->GetSyncStream();
-		info->startValue = this->_cudaController->GetMainMemoryOffset();
+		info->startValue = this->_cudaController->GetMainMemoryOffset();	// index of first byte of trunk in main gpu memory
 		CUDA_CHECK_RETURN
 				(
 						cudaMemcpyAsync
@@ -93,7 +93,7 @@ namespace store {
 								stream
 						)
 				);
-		info->endValue = info->startValue + size;
+		info->endValue = info->startValue + size - 1;	// index of last byte of trunk in main gpu memory
 		this->_cudaController->SetMainMemoryOffset(info->endValue);
 		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
 	}

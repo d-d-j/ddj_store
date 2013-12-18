@@ -13,6 +13,7 @@
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
 #include <gtest/gtest.h>
+#include <boost/foreach.hpp>
 
 namespace ddj {
 namespace store {
@@ -44,7 +45,7 @@ namespace store {
 		 * Method mapping all data stored in GPU to selected data locations;
 		 * Selects only parts of mainGpuArray specified by ullintPair, for example:
 		 * if dataLocationInfo contains ullintPair (100,300) then a part or mainGpuArray
-		 * from index 100 to index 300 will be returned as new gpu (device) array in data parameter
+		 * from index 100 to index 300 (including 300) will be returned as new gpu (device) array in data parameter
 		 * Returns:
 		 *  returns size of mapped data
 		 * Output:
@@ -65,7 +66,7 @@ namespace store {
 		 */
 		size_t filterData(storeElement* elements, storeQuery* query);
 
-		storeElement* decompressData(void* data, size_t size);
+		storeElement* decompressData(void* data, size_t* size);
 
 		/* AGGREGATION MATHODS */
 		void add(storeQuery* query);
