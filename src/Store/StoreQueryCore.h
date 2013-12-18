@@ -19,10 +19,6 @@ namespace store {
 
 	class StoreQueryCore
 	{
-		friend class StoreQueryCoreTest;
-		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
-		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
-		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
 	private:
 		CudaController* _cudaController;
 	public:
@@ -44,10 +40,22 @@ namespace store {
 		/* DATA MANAGEMENT METHODS */
 		size_t mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 		storeElement* decompressData(void* data, size_t size);
-		void filterData(storeElement* elements, storeQuery* query);
+		size_t filterData(storeElement* elements, storeQuery* query);
 
 		/* AGGREGATION MATHODS */
 		void add(storeQuery* query);
+
+
+
+
+	private:
+		/* TESTS */
+		friend class StoreQueryCoreTest;
+		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
+		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
+		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_EmptyFilter);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_NonEmptyFilter);
 	};
 
 } /* namespace store */

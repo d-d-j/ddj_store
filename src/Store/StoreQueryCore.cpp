@@ -53,9 +53,9 @@ namespace store {
 		return nullptr;
 	}
 
-	void StoreQueryCore::filterData(storeElement* elements, storeQuery* query)
+	size_t StoreQueryCore::filterData(storeElement* elements, storeQuery* query)
 	{
-
+		return 0;
 	}
 
 	/* AGGREGATION MATHODS */

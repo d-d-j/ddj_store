@@ -9,7 +9,7 @@
 #define STOREAGGREGATIONTYPE_H_
 
 namespace ddj {
-namespace task {
+namespace store {
 
 	enum AggregationType
 	{
@@ -18,7 +18,7 @@ namespace task {
 		Average = 2
 	};
 
-} /* namespace task */
+} /* namespace store */
 } /* namespace ddj */
 
 #endif /* STOREAGGREGATIONTYPE_H_ */

@@ -11,14 +11,16 @@
 namespace ddj {
 namespace store {
 
-	struct storeQuery
+	struct storeQuery : public boost::noncopyable
 	{
 		boost::container::vector<metric_type> metrices;
 		boost::container::vector<int> tags;
 		boost::container::vector<ullintPair> timePeriods;
-		task::AggregationType aggregationType;
+		AggregationType aggregationType;
 
+		storeQuery():aggregationType(None){}
 		storeQuery(void* queryData);
+		~storeQuery(){}
 
 		std::string toString();
 	};
