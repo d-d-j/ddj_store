@@ -31,15 +31,21 @@ namespace store {
 	size_t StoreQueryCore::ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
+		void* tempDataBuffer = nullptr;
+		size_t tempDataSizeInBytes = this->mapData(&tempDataBuffer, dataLocationInfo);
 
-		// Decompress temporary data buffer
+		// TODO: Decompress temporary data buffer
 
 		// Filter to set of tags specified in query (only if set is not empty)
+		size_t filteredStoreElementsCount = this->filterData((storeElement*)tempDataBuffer, tempDataSizeInBytes/sizeof(storeElement), query);
 
-		// Aggregate all mapped data
+		// TODO: Aggregate all mapped data
 
 		// Set queryResult, clean and return result size
-		return 0;
+		(*queryResult) = new storeElement[filteredStoreElementsCount];
+		CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreElementsCount*sizeof(storeElement), cudaMemcpyDeviceToHost) );
+		CUDA_CHECK_RETURN( cudaFree(tempDataBuffer) );
+		return filteredStoreElementsCount;
 	}
 
 	/* DATA MANAGEMENT METHODS */
