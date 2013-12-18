@@ -69,8 +69,9 @@ namespace network {
 		const int LEN = sizeof(int32_t)*2 + sizeof(int64_t);
 		char msg[LEN];
 
-		while (read(msg, LEN))
+		while (int readedBytes = read(msg, LEN))
 		{
+			LOG4CPLUS_DEBUG(this->_logger, "Received: " << readedBytes << "\n[\n" << msg << "\n]");
 			task::taskRequest tr;
 
 			// COPY HEADER
@@ -96,8 +97,15 @@ namespace network {
 
 	size_t NetworkClient::read(char *replay, size_t length)
 	{
-		return boost::asio::read(*socket,
+		try
+		{
+			return boost::asio::read(*socket,
 								 boost::asio::buffer(replay, length));
+		}
+		catch (const std::exception &e) {
+			LOG4CPLUS_ERROR(this->_logger, "Error while reading from socket - " << e.what());
+		}
+		return 0;
 	}
 
 	void NetworkClient::close()

@@ -86,6 +86,9 @@ src/%.o: ./src/%.cu
 
 all: DDJ_Store
 
+run: all
+	./DDJ_Store
+
 DDJ_Store: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'

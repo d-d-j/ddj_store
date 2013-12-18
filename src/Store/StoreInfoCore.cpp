@@ -16,7 +16,7 @@ namespace store {
 				(float ) gpuMemFree / mbSize,
 				(float ) gpuMemTotal / mbSize);
 
-		// TODO: move getting ram info to Node instear of here
+		// TODO: move getting ram info to Node instead of here
 		GetRamInKB(&memTotal, &memFree);
 
 		LOG4CPLUS_INFO_FMT(this->_logger,
