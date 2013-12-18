@@ -11,13 +11,13 @@ namespace ddj{
 namespace store{
 	class StoreInfoCore
 	{
-		Config* _config = Config::GetInstance();
-		Logger _logger = Logger::getRoot();
+        Logger _logger;
+		Config* _config;
 		store::CudaCommons _cudaCommons;
 
 
 	public:
-		StoreInfoCore();
+		StoreInfoCore() : _logger(Logger::getRoot()), _config(Config::GetInstance()) {};
 
 		void GetRamInKB(int* ramTotal, int* ramFree);
 

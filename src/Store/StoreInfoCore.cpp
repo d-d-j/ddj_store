@@ -25,10 +25,9 @@ size_t StoreInfoCore::GetNodeInfo(void** result)
 			(float )memFree / 1024, (float )memTotal / 1024);
 
 
-	StoreNodeInfo* nodeInfo = new StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
+	*result = new StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
 
-	*result = &nodeInfo;
-	return sizeof(nodeInfo);
+	return sizeof(StoreNodeInfo);
 }
 
 void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)
@@ -54,12 +53,6 @@ void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)
 	}
 
 	fclose(meminfo);
-}
-
-StoreInfoCore::StoreInfoCore()
-{
-	// TODO Auto-generated constructor stub
-
 }
 }
 }
