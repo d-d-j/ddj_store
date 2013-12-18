@@ -4,17 +4,18 @@
 #include <thrust/reduce.h>
 #include <thrust/count.h>
 #include <thrust/partition.h>
+#include <thrust/execution_policy.h>
 #include <thrust/iterator/constant_iterator.h>
 
 #define CUDA_THREADS_PER_BLOCK 256
 
-struct gpuElem
+typedef struct
 {
 	int tag;
 	int metric;
 	unsigned long long int time;
 	float value;
-};
+} gpuElem;
 
 __global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int elemCount, int* tags, int tagsCount, int* stencil)
 {
@@ -56,9 +57,11 @@ size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::st
 	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount, tags.data().get(), tags.size(), stencil);
 
 	// PARTITION ELEMENTS
-	gpuElem* e = (gpuElem*)elements;
-	thrust::partition(e, e+elemCount, stencil, is_one());
+	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
+	thrust::device_ptr<int> stencil_ptr(stencil);
+
+	thrust::partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
-	return thrust::count(stencil, stencil+elemCount, 1);
+	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1);
 }

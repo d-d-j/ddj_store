@@ -60,9 +60,15 @@ namespace store {
 
 			// Copy fragments of mainGpuArray specified in dataLocationInfo vector to mapped data array
 			// TODO: SPEED UP THIS COPING
+			int position = 0;
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
 			{
-				CUDA_CHECK_RETURN( cudaMemcpy(*data, (char*)mainGpuArray+dli.first, (dli.second-dli.first+1), cudaMemcpyDeviceToDevice) );
+				CUDA_CHECK_RETURN(
+						cudaMemcpy((char*)(*data)+position,
+						(char*)mainGpuArray+dli.first,
+						(dli.second-dli.first+1),
+						cudaMemcpyDeviceToDevice));
+				position += (dli.second-dli.first+1);
 			}
 		}
 		else	// select all data
@@ -84,8 +90,12 @@ namespace store {
 
 	size_t StoreQueryCore::filterData(storeElement* elements, int elemCount, storeQuery* query)
 	{
-
-		return 0;
+		if(query && query->tags.size())
+		{
+			printf("a");
+			return gpu_filterData(elements, elemCount, query);
+		}
+		else return elemCount;
 	}
 
 	/* AGGREGATION MATHODS */

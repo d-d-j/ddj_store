@@ -13,16 +13,6 @@
 namespace ddj {
 namespace store {
 
-	TEST_F(StoreQueryCoreTest, ThrustVersion)
-	{
-		int major = THRUST_MAJOR_VERSION;
-		int minor = THRUST_MINOR_VERSION;
-		RecordProperty("Thrust version major", major);
-		RecordProperty("Thrust version minor", minor);
-		EXPECT_EQ(1, major);
-		EXPECT_EQ(7, minor);
-	}
-
 	void StoreQueryCoreTest::createTestData()
 	{
 		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
@@ -34,6 +24,16 @@ namespace store {
 
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size, cudaMemcpyHostToDevice) );
 		_cudaController->SetMainMemoryOffset(size);
+	}
+
+	TEST_F(StoreQueryCoreTest, ThrustVersion)
+	{
+		int major = THRUST_MAJOR_VERSION;
+		int minor = THRUST_MINOR_VERSION;
+		RecordProperty("Thrust version major", major);
+		RecordProperty("Thrust version minor", minor);
+		EXPECT_EQ(1, major);
+		EXPECT_EQ(7, minor);
 	}
 
 	TEST_F(StoreQueryCoreTest, mapData_AllData)
@@ -52,11 +52,10 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
 
 		for(unsigned long i=0; i<size; i++)
-			if(hostData[i]!=(char)(i%256))
-				ADD_FAILURE();
+			EXPECT_EQ((char)(i%256), hostData[i]);
 
 		// CLEAN
-		delete hostData;
+		delete [] hostData;
 		CUDA_CHECK_RETURN( cudaFree(deviceData) );
 	}
 
@@ -78,11 +77,10 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
 
 		for(unsigned long i=0; i<size; i++)
-			if(hostData[i]!=(char)((i+size)%256))
-				ADD_FAILURE();
+			EXPECT_EQ((char)((i+size)%256), hostData[i]);
 
 		// CLEAN
-		delete hostData;
+		delete [] hostData;
 		CUDA_CHECK_RETURN( cudaFree(deviceData) );
 	}
 
@@ -105,21 +103,20 @@ namespace store {
 		hostData = new char[size];
 		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
 
+
+
 		unsigned long i = 0;
 		for(i=0; i<64; i++)
-			if(hostData[i]!=(char)((i+64)%256))
-				ADD_FAILURE();
+			EXPECT_EQ((char)((i+64)%256), hostData[i]);
 
 		for(i=64; i<64+128; i++)
-			if(hostData[i]!=(char)((i+256-64)%256))
-				ADD_FAILURE();
+			EXPECT_EQ((char)((i+256-64)%256), (char)hostData[i]);
 
 		for(i=64+128; i<64+128+128; i++)
-			if(hostData[i]!=(char)((i+601-64-128)%256))
-				ADD_FAILURE();
+			EXPECT_EQ((char)((i+601-64-128)%256), (char)hostData[i]);
 
 		// CLEAN
-		delete hostData;
+		delete [] hostData;
 		CUDA_CHECK_RETURN( cudaFree(deviceData) );
 	}
 
@@ -153,11 +150,11 @@ namespace store {
 			EXPECT_EQ(1, hostElements[i].metric);
 			EXPECT_EQ(i%20, hostElements[i].tag);
 			EXPECT_EQ(696969, hostElements[i].time);
-			EXPECT_EQ(666.666, hostElements[i].value);
+			EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 		}
 
 		// CLEAN
-		delete hostElements;
+		delete [] hostElements;
 		CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 	}
 
@@ -200,11 +197,11 @@ namespace store {
 			EXPECT_EQ(1, hostElements[i].metric);
 			EXPECT_TRUE(checkTagFunc(hostElements[i].tag));
 			EXPECT_EQ(696969, hostElements[i].time);
-			EXPECT_EQ(666.666, hostElements[i].value);
+			EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 		}
 
 		// CLEAN
-		delete hostElements;
+		delete [] hostElements;
 		CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 	}
 

@@ -10,8 +10,10 @@
 
 #include "StoreQuery.h"
 #include "StoreElement.h"
+#include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
+#include "../Cuda/CudaQuery.cuh"
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
 
@@ -22,6 +24,8 @@ namespace store {
 	{
 	private:
 		CudaController* _cudaController;
+		Logger _logger = Logger::getRoot();
+
 	public:
 		StoreQueryCore(CudaController* cudaController);
 		virtual ~StoreQueryCore();
