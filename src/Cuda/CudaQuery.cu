@@ -1,53 +1,64 @@
-/**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- */
+#include "CudaQuery.cuh"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/reduce.h>
+#include <thrust/count.h>
+#include <thrust/partition.h>
+#include <thrust/iterator/constant_iterator.h>
 
-static const int WORK_SIZE = 256;
+#define CUDA_THREADS_PER_BLOCK 256
 
-__host__ __device__ unsigned int bitreverse(unsigned int number)
+struct gpuElem
 {
-	number = ((0xf0f0f0f0 & number) >> 4) | ((0x0f0f0f0f & number) << 4);
-	number = ((0xcccccccc & number) >> 2) | ((0x33333333 & number) << 2);
-	number = ((0xaaaaaaaa & number) >> 1) | ((0x55555555 & number) << 1);
-	return number;
+	int tag;
+	int metric;
+	unsigned long long int time;
+	float value;
+};
+
+__global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int elemCount, int* tags, int tagsCount, int* stencil)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= elemCount) return;
+	int tag = elements[idx].tag;
+	stencil[idx] = 0;
+	while(tagsCount--)
+	{
+		if(tag == tags[tagsCount])
+		{
+			stencil[idx] = 1;
+			return;
+		}
+	}
+
 }
 
-struct bitreverse_functor
+struct is_one
 {
-	__host__ __device__ unsigned int operator()(const unsigned int &x)
+	__host__ __device__
+	bool operator()(const int &x)
 	{
-		return bitreverse(x);
+		return x == 1;
 	}
 };
 
-int dosth()
+size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::store::storeQuery* query)
 {
-	thrust::host_vector<unsigned int> idata(WORK_SIZE);
-	thrust::host_vector<unsigned int> odata;
-	thrust::device_vector<unsigned int> dv;
-	int i;
+	// CREATE STENCIL
+	int* stencil;
+	cudaMalloc(&stencil, elemCount*sizeof(int));
 
-	for (i = 0; i < WORK_SIZE; i++) {
-		idata[i] = i;
-	}
-	dv = idata;
+	// CREATE TAGS VECTOR ON GPU
+	thrust::device_vector<int> tags(query->tags.begin(), query->tags.end());
 
-	thrust::transform(dv.begin(), dv.end(), dv.begin(), bitreverse_functor());
+	// FILL STENCIL
+	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount, tags.data().get(), tags.size(), stencil);
 
-	odata = dv;
-	for (int i = 0; i < WORK_SIZE; i++) {
-		std::cout << "Input value: " << idata[i] << ", output value: "
-				<< odata[i] << std::endl;
-	}
+	// PARTITION ELEMENTS
+	gpuElem* e = (gpuElem*)elements;
+	thrust::partition(e, e+elemCount, stencil, is_one());
 
-	return 0;
+	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
+	return thrust::count(stencil, stencil+elemCount, 1);
 }

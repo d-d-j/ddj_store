@@ -20,6 +20,7 @@ namespace store {
 
 		storeQuery():aggregationType(None){}
 		storeQuery(void* queryData);
+		storeQuery(const storeQuery& q);
 		~storeQuery(){}
 
 		std::string toString();

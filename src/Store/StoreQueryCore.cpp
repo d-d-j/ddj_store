@@ -49,7 +49,7 @@ namespace store {
 	{
 		void* mainGpuArray = _cudaController->GetMainMemoryPointer();
 		size_t size = 0;
-		if(dataLocationInfo->size())	// select mapped data
+		if(dataLocationInfo && dataLocationInfo->size())	// select mapped data
 		{
 			// Calculate mapped data size and create new device array for mapped data
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
@@ -82,7 +82,7 @@ namespace store {
 		return nullptr;
 	}
 
-	size_t StoreQueryCore::filterData(storeElement* elements, storeQuery* query)
+	size_t StoreQueryCore::filterData(storeElement* elements, int elemCount, storeQuery* query)
 	{
 
 		return 0;

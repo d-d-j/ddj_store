@@ -64,7 +64,7 @@ namespace store {
 		 * Output:
 		 *  changed elements array
 		 */
-		size_t filterData(storeElement* elements, storeQuery* query);
+		size_t filterData(storeElement* elements, int elemCount, storeQuery* query);
 
 		storeElement* decompressData(void* data, size_t* size);
 

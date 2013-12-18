@@ -25,6 +25,7 @@ OBJS += \
 ./src/BTree/BTreeMonitor.o \
 ./src/Core/Config.o \
 ./src/Core/Semaphore.o \
+./src/Cuda/CudaQuery.o \
 ./src/Cuda/CudaCommons.o \
 ./src/Cuda/CudaController.o \
 ./src/Network/NetworkClient.o \
@@ -47,6 +48,7 @@ CPP_DEPS += \
 ./src/BTree/BTreeMonitor.d \
 ./src/Core/Config.d \
 ./src/Core/Semaphore.d \
+./src/Cuda/CudaQuery.d \
 ./src/Cuda/CudaCommons.d \
 ./src/Cuda/CudaController.d \
 ./src/Network/NetworkClient.d \

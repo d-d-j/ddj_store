@@ -142,7 +142,7 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
 
 		// TEST
-		size_t size = _queryCore->filterData(deviceElements, &query);
+		size_t size = _queryCore->filterData(deviceElements, N, &query);
 
 		// CHECK
 		ASSERT_EQ(N, size);
@@ -182,7 +182,7 @@ namespace store {
 		CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
 
 		// TEST
-		size_t size = _queryCore->filterData(deviceElements, &query);
+		size_t size = _queryCore->filterData(deviceElements, N, &query);
 
 		// CHECK
 		ASSERT_EQ(15, size);
