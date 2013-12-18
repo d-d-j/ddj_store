@@ -42,15 +42,12 @@ namespace store {
 
 		// CREATE STORE UPLOAD CORE
 		this->_uploadCore = new StoreUploadCore(this->_cudaController);
-		
+
 		// CREATE STORE INFO CORE
 		this->_infoCore = new StoreInfoCore();
 
 		// SET THREAD POOL SIZES
 		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
-		this->_queryTaskThreadPool.size_controller().resize(this->_config->GetIntValue("QUERY_THRED_POOL_SIZE"));
-		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THRED_POOL_SIZE"));
-		this->_insertTaskThreadPool.size_controller().resize(this->_config->GetIntValue("INFO_THRED_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}

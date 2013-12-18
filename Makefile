@@ -20,7 +20,6 @@ VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 
 OBJS += \
 ./src/UnitTests/StoreQueryCoreTest.o \
-./src/Info/NodeInfo.o \
 ./src/UnitTests/SemaphoreTest.o \
 ./src/UnitTests/BTreeMonitorTest.o \
 ./src/BTree/BTreeMonitor.o \
@@ -33,9 +32,7 @@ OBJS += \
 ./src/Store/StoreController.o \
 ./src/Store/StoreQueryCore.o \
 ./src/Store/StoreUploadCore.o \
-
 ./src/Store/StoreQuery.o \
-
 ./src/Store/StoreInfoCore.o \
 ./src/Store/StoreNodeInfo.o \
 ./src/Task/Task.o \
@@ -45,7 +42,6 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/UnitTests/StoreQueryCoreTest.d \
-./src/Info/NodeInfo.d \
 ./src/UnitTests/SemaphoreTest.d \
 ./src/UnitTests/BTreeMonitorTest.d \
 ./src/BTree/BTreeMonitor.d \

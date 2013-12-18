@@ -70,10 +70,6 @@ namespace ddj
 					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries")
 					("MASTER_IP_ADDRESS", po::value<string>()->default_value("127.0.0.1"), "address of master server")
 					("MASTER_LOGIN_PORT", po::value<string>()->default_value("8080"), "port of master server login service");
-					("QUERY_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for queries")
-					("INSERT_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for inserts")
-					("INFO_THRED_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for info")
-					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries");
 
 
 			po::options_description config_file_options;
