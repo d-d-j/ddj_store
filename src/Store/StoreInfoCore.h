@@ -9,6 +9,8 @@
 
 namespace ddj{
 namespace store{
+
+	// TODO: Move this class to Core/ and rename it to NodeInfo or InfoCore
 	class StoreInfoCore
 	{
         Logger _logger;
