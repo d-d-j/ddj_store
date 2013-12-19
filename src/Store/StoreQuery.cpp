@@ -12,9 +12,8 @@ namespace store {
 		memcpy(&size, (char*)queryData+position, sizeof(int32_t));
 		position+=sizeof(int32_t);
 
-		// Get metrices
-		metric_type* mt = new metric_type[size];
-		memcpy(mt, (char*)queryData+position, size*sizeof(metric_type));
+		// Get metrics
+		metric_type* mt = (metric_type*)((char*)queryData+position);
 		position+=size*sizeof(metric_type);
 		while(size--)
 			this->metrices.push_back(mt[size]);
@@ -24,8 +23,7 @@ namespace store {
 		position+=sizeof(int32_t);
 
 		// Get tags
-		int* t = new int[size];
-		memcpy(t, (char*)queryData+position, size*sizeof(int));
+		int* t = (int*)((char*)queryData+position);
 		position+=size*sizeof(int);
 		while(size--)
 			this->tags.push_back(t[size]);
@@ -35,8 +33,7 @@ namespace store {
 		position+=sizeof(int32_t);
 
 		// Get timePeriods
-		ullint* tp = new ullint[2*size];
-		memcpy(&tp, (char*)queryData+position, 2*size*sizeof(ullint));
+		ullint* tp = (ullint*)((char*)queryData+position);
 		position+=2*size*sizeof(ullint);
 		while(size--)
 			this->timePeriods.push_back(ullintPair{tp[2*size],tp[2*size+1]});
@@ -45,10 +42,6 @@ namespace store {
 		int type = 0;
 		memcpy(&type, (char*)queryData+position, sizeof(int32_t));
 		aggregationType = (AggregationType)type;
-
-		delete [] mt;
-		delete [] t;
-		delete [] tp;
 	}
 
 	storeQuery::storeQuery(const storeQuery& q)
@@ -65,7 +58,7 @@ namespace store {
 
 		 stream << "query[";
 		 stream << "aggregationType: " << this->aggregationType;
-		 stream << "; metrices:";
+		 stream << "; metrics:";
 		 BOOST_FOREACH(metric_type &m, this->metrices)
 		 {
 			 stream << " " << m;
