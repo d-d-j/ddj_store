@@ -11,17 +11,15 @@ namespace store {
 		int memTotal, memFree;
 
 		_cudaCommons.GetMemoryCount(&gpuMemFree, &gpuMemTotal);
-		LOG4CPLUS_INFO_FMT(this->_logger,
-				"NODE INFO - free GPU memory => %f MB, total GPU memory => %f MB",
-				(float ) gpuMemFree / mbSize,
-				(float ) gpuMemTotal / mbSize);
+		//LOG4CPLUS_INFO_FMT(this->_logger, "NODE INFO - free GPU memory => %f MB, total GPU memory => %f MB",
+		//		(float ) gpuMemFree / mbSize,
+		//		(float ) gpuMemTotal / mbSize);
 
 		// TODO: move getting ram info to Node instead of here
 		GetRamInKB(&memTotal, &memFree);
 
-		LOG4CPLUS_INFO_FMT(this->_logger,
-				"NODE INFO - free RAM memory => %f MB, total RAM memory => %f MB",
-				(float )memFree / 1024, (float )memTotal / 1024);
+		//LOG4CPLUS_INFO_FMT(this->_logger, "NODE INFO - free RAM memory => %f MB, total RAM memory => %f MB",
+		//		(float )memFree / 1024, (float )memTotal / 1024);
 
 
 		*result = new StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
@@ -36,8 +34,7 @@ namespace store {
 		FILE *meminfo = fopen("/proc/meminfo", "r");
 		if (meminfo == NULL)
 		{
-			LOG4CPLUS_ERROR(this->_logger,
-					LOG4CPLUS_TEXT("Unable to open meminfo"));
+			//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Unable to open meminfo"));
 			return;
 		}
 

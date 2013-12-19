@@ -76,13 +76,13 @@ namespace store {
 		// INSERT
 		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
-		// SELECT ALL
+		// SELECT
 		_taskFunctions.insert({ task::Select, boost::bind(&StoreController::selectTask, this, _1) });
 
 		// FLUSH
 		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
 
-		// FLUSH
+		// INFO
 		_taskFunctions.insert({ task::Info, boost::bind(&StoreController::infoTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
@@ -118,7 +118,7 @@ namespace store {
 
 	void StoreController::selectTask(task::Task_Pointer task)
 	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [BEGIN]"));
 
 		// Check possible errors
 		if(task == nullptr || task->GetType() != task::Select)

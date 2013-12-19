@@ -48,8 +48,8 @@ namespace network {
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
 		int len = sizeof(int64_t) + 2*sizeof(int32_t) + taskResult->result_size;
-		LOG4CPLUS_DEBUG(this->_logger, "Trying to send " << len << "bytes");
-		LOG4CPLUS_DEBUG(this->_logger, "Task " << taskResult->toString());
+		//LOG4CPLUS_DEBUG(this->_logger, "Trying to send " << len << "bytes");
+		//LOG4CPLUS_DEBUG(this->_logger, "Task " << taskResult->toString());
 		char* msg = new char[len];
 		char *oldMsg = msg;
 		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));
@@ -76,7 +76,7 @@ namespace network {
 
 		while (int readedBytes = read(msg, LEN))
 		{
-			LOG4CPLUS_DEBUG(this->_logger, "Received: " << readedBytes);
+			//LOG4CPLUS_DEBUG(this->_logger, "Received: " << readedBytes);
 			task::taskRequest tr;
 
 			// COPY HEADER
