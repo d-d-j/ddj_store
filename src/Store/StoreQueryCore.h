@@ -42,7 +42,9 @@ namespace store {
 		size_t ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
 	private:
+		/***************************/
 		/* DATA MANAGEMENT METHODS */
+		/***************************/
 
 		/*
 		 * Description:
@@ -72,20 +74,45 @@ namespace store {
 
 		storeElement* decompressData(void* data, size_t* size);
 
+		/***********************/
 		/* AGGREGATION MATHODS */
-		void add(storeQuery* query);
+		/***********************/
 
-
-
+		float add(storeElement* elements, int count);
+		float average(storeElement* elements, int count);
+		storeElement* max(storeElement* elements, int count);
+		storeElement* min(storeElement* elements, int count);
 
 	private:
-		/* TESTS */
 		friend class StoreQueryCoreTest;
+
+		/*********/
+		/* TESTS */
+		/*********/
+
+	//mapData
 		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
 		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
 		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
+	//filterData
 		FRIEND_TEST(StoreQueryCoreTest, filterData_EmptyFilter);
 		FRIEND_TEST(StoreQueryCoreTest, filterData_NonEmptyFilter);
+	//add
+		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);
+		FRIEND_TEST(StoreQueryCoreTest, add_OddNumberOfValues);
+	//average
+		FRIEND_TEST(StoreQueryCoreTest, average_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, average_Positive);
+		FRIEND_TEST(StoreQueryCoreTest, average_Negative);
+	//max
+		FRIEND_TEST(StoreQueryCoreTest, max_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, max_Positive);
+		FRIEND_TEST(StoreQueryCoreTest, max_Negative);
+	//min
+		FRIEND_TEST(StoreQueryCoreTest, min_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, min_Positive);
+		FRIEND_TEST(StoreQueryCoreTest, min_Negative);
 	};
 
 } /* namespace store */

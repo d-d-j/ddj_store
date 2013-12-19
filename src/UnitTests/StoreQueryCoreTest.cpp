@@ -26,140 +26,149 @@ namespace store {
 		_cudaController->SetMainMemoryOffset(size);
 	}
 
-	TEST_F(StoreQueryCoreTest, ThrustVersion)
-	{
-		int major = THRUST_MAJOR_VERSION;
-		int minor = THRUST_MINOR_VERSION;
-		RecordProperty("Thrust version major", major);
-		RecordProperty("Thrust version minor", minor);
-		EXPECT_EQ(1, major);
-		EXPECT_EQ(7, minor);
-	}
 
-	TEST_F(StoreQueryCoreTest, mapData_AllData)
-	{
-		// PREPARE
-		char* deviceData;
-		char* hostData;
+	/***************************/
+	/* DATA MANAGEMENT METHODS */
+	/***************************/
 
-		// TEST
-		size_t size = _queryCore->mapData((void**)&deviceData);
+	//mapData
 
-		// CHECK
-		ASSERT_EQ(STORE_QUERY_CORE_TEST_MEM_SIZE, size);
-
-		hostData = new char[size];
-		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
-
-		for(unsigned long i=0; i<size; i++)
-			EXPECT_EQ((char)(i%256), hostData[i]);
-
-		// CLEAN
-		delete [] hostData;
-		CUDA_CHECK_RETURN( cudaFree(deviceData) );
-	}
-
-	TEST_F(StoreQueryCoreTest, mapData_ChooseOneTrunk)
-	{
-		// PREPARE
-		char* deviceData;
-		char* hostData;
-		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-		dataLocationInfo->push_back(ullintPair{64,127});
-
-		// TEST
-		size_t size = _queryCore->mapData((void**)&deviceData, dataLocationInfo);
-
-		// CHECK
-		ASSERT_EQ(64, size);
-
-		hostData = new char[size];
-		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
-
-		for(unsigned long i=0; i<size; i++)
-			EXPECT_EQ((char)((i+size)%256), hostData[i]);
-
-		// CLEAN
-		delete [] hostData;
-		CUDA_CHECK_RETURN( cudaFree(deviceData) );
-	}
-
-	TEST_F(StoreQueryCoreTest, mapData_ChooseManyTrunks)
-	{
-		// PREPARE
-		char* deviceData;
-		char* hostData;
-		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-		dataLocationInfo->push_back(ullintPair{64,127});	// length 64
-		dataLocationInfo->push_back(ullintPair{256,383});	// length 128
-		dataLocationInfo->push_back(ullintPair{601,728});	// length 128
-
-		// TEST
-		size_t size = _queryCore->mapData((void**)&deviceData, dataLocationInfo);
-
-		// CHECK
-		ASSERT_EQ(64+128+128, size);
-
-		hostData = new char[size];
-		CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
-
-
-
-		unsigned long i = 0;
-		for(i=0; i<64; i++)
-			EXPECT_EQ((char)((i+64)%256), hostData[i]);
-
-		for(i=64; i<64+128; i++)
-			EXPECT_EQ((char)((i+256-64)%256), (char)hostData[i]);
-
-		for(i=64+128; i<64+128+128; i++)
-			EXPECT_EQ((char)((i+601-64-128)%256), (char)hostData[i]);
-
-		// CLEAN
-		delete [] hostData;
-		CUDA_CHECK_RETURN( cudaFree(deviceData) );
-	}
-
-	// Select all data (all tags)
-	TEST_F(StoreQueryCoreTest, filterData_EmptyFilter)
-	{
-		// PREPARE
-		int N = 100;
-		storeElement* hostElements = new storeElement[N];
-		for(int i=0; i<N; i++)
+		TEST_F(StoreQueryCoreTest, ThrustVersion)
 		{
-			hostElements[i].metric = 1;
-			hostElements[i].tag = i%20;
-			hostElements[i].time = 696969;
-			hostElements[i].value = 666.666;
-		}
-		storeQuery query;
-		storeElement* deviceElements = nullptr;
-		CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
-		CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
-
-		// TEST
-		size_t size = _queryCore->filterData(deviceElements, N, &query);
-
-		// CHECK
-		ASSERT_EQ(N, size);
-		CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, N*sizeof(storeElement), cudaMemcpyDeviceToHost) )
-
-		for(int i=0; i<N; i++)
-		{
-			EXPECT_EQ(1, hostElements[i].metric);
-			EXPECT_EQ(i%20, hostElements[i].tag);
-			EXPECT_EQ(696969, hostElements[i].time);
-			EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
+			int major = THRUST_MAJOR_VERSION;
+			int minor = THRUST_MINOR_VERSION;
+			RecordProperty("Thrust version major", major);
+			RecordProperty("Thrust version minor", minor);
+			EXPECT_EQ(1, major);
+			EXPECT_EQ(7, minor);
 		}
 
-		// CLEAN
-		delete [] hostElements;
-		CUDA_CHECK_RETURN( cudaFree(deviceElements) );
-	}
+		TEST_F(StoreQueryCoreTest, mapData_AllData)
+		{
+			// PREPARE
+			char* deviceData;
+			char* hostData;
 
-	// Select data only with specified tags
-	TEST_F(StoreQueryCoreTest, filterData_NonEmptyFilter)
+			// TEST
+			size_t size = _queryCore->mapData((void**)&deviceData);
+
+			// CHECK
+			ASSERT_EQ(STORE_QUERY_CORE_TEST_MEM_SIZE, size);
+
+			hostData = new char[size];
+			CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
+
+			for(unsigned long i=0; i<size; i++)
+				EXPECT_EQ((char)(i%256), hostData[i]);
+
+			// CLEAN
+			delete [] hostData;
+			CUDA_CHECK_RETURN( cudaFree(deviceData) );
+		}
+
+		TEST_F(StoreQueryCoreTest, mapData_ChooseOneTrunk)
+		{
+			// PREPARE
+			char* deviceData;
+			char* hostData;
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{64,127});
+
+			// TEST
+			size_t size = _queryCore->mapData((void**)&deviceData, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(64, size);
+
+			hostData = new char[size];
+			CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
+
+			for(unsigned long i=0; i<size; i++)
+				EXPECT_EQ((char)((i+size)%256), hostData[i]);
+
+			// CLEAN
+			delete [] hostData;
+			CUDA_CHECK_RETURN( cudaFree(deviceData) );
+		}
+
+		TEST_F(StoreQueryCoreTest, mapData_ChooseManyTrunks)
+		{
+			// PREPARE
+			char* deviceData;
+			char* hostData;
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{64,127});	// length 64
+			dataLocationInfo->push_back(ullintPair{256,383});	// length 128
+			dataLocationInfo->push_back(ullintPair{601,728});	// length 128
+
+			// TEST
+			size_t size = _queryCore->mapData((void**)&deviceData, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(64+128+128, size);
+
+			hostData = new char[size];
+			CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
+
+
+
+			unsigned long i = 0;
+			for(i=0; i<64; i++)
+				EXPECT_EQ((char)((i+64)%256), hostData[i]);
+
+			for(i=64; i<64+128; i++)
+				EXPECT_EQ((char)((i+256-64)%256), (char)hostData[i]);
+
+			for(i=64+128; i<64+128+128; i++)
+				EXPECT_EQ((char)((i+601-64-128)%256), (char)hostData[i]);
+
+			// CLEAN
+			delete [] hostData;
+			CUDA_CHECK_RETURN( cudaFree(deviceData) );
+		}
+
+	//filterData
+
+		// Select all data (all tags)
+		TEST_F(StoreQueryCoreTest, filterData_EmptyFilter)
+		{
+			// PREPARE
+			int N = 100;
+			storeElement* hostElements = new storeElement[N];
+			for(int i=0; i<N; i++)
+			{
+				hostElements[i].metric = 1;
+				hostElements[i].tag = i%20;
+				hostElements[i].time = 696969;
+				hostElements[i].value = 666.666;
+			}
+			storeQuery query;
+			storeElement* deviceElements = nullptr;
+			CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
+			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
+
+			// TEST
+			size_t size = _queryCore->filterData(deviceElements, N, &query);
+
+			// CHECK
+			ASSERT_EQ(N, size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, N*sizeof(storeElement), cudaMemcpyDeviceToHost) )
+
+			for(int i=0; i<N; i++)
+			{
+				EXPECT_EQ(1, hostElements[i].metric);
+				EXPECT_EQ(i%20, hostElements[i].tag);
+				EXPECT_EQ(696969, hostElements[i].time);
+				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
+			}
+
+			// CLEAN
+			delete [] hostElements;
+			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+		}
+
+		// Select data only with specified tags
+		TEST_F(StoreQueryCoreTest, filterData_NonEmptyFilter)
 	{
 		int N = 100;
 		storeElement* hostElements = new storeElement[N];
@@ -204,6 +213,81 @@ namespace store {
 		delete [] hostElements;
 		CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 	}
+
+
+
+	/***********************/
+	/* AGGREGATION MATHODS */
+	/***********************/
+
+	//add
+
+		TEST_F(StoreQueryCoreTest, add_Empty)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, add_EvenNumberOfValues)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, add_OddNumberOfValues)
+		{
+
+		}
+
+	//average
+
+		TEST_F(StoreQueryCoreTest, average_Empty)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, average_Positive)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, average_Negative)
+		{
+
+		}
+
+	//max
+
+		TEST_F(StoreQueryCoreTest, max_Empty)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, max_Positive)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, max_Negative)
+		{
+
+		}
+
+	//min
+
+		TEST_F(StoreQueryCoreTest, min_Empty)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, min_Positive)
+		{
+
+		}
+
+		TEST_F(StoreQueryCoreTest, min_Negative)
+		{
+
+		}
+
 
 } /* namespace store */
 } /* namespace ddj */

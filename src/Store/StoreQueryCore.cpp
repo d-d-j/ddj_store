@@ -17,17 +17,6 @@ namespace store {
 
 	StoreQueryCore::~StoreQueryCore(){}
 
-	/*
-	size_t StoreQueryCore::SelectAll(void** queryResult)
-	{
-		void* mainMemoryPointer = this->_cudaController->GetMainMemoryPointer();
-		ullint offset = this->_cudaController->GetMainMemoryOffset();
-		CUDA_CHECK_RETURN( cudaMallocHost(queryResult, offset) );
-		CUDA_CHECK_RETURN( cudaMemcpy(*queryResult, mainMemoryPointer, offset, cudaMemcpyDeviceToHost) );
-		return offset;
-	}
-	*/
-
 	size_t StoreQueryCore::ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
@@ -48,8 +37,9 @@ namespace store {
 		return filteredStoreElementsCount;
 	}
 
+	/***************************/
 	/* DATA MANAGEMENT METHODS */
-
+	/***************************/
 
 	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
@@ -97,17 +87,32 @@ namespace store {
 	size_t StoreQueryCore::filterData(storeElement* elements, int elemCount, storeQuery* query)
 	{
 		if(query && query->tags.size())
-		{
-			printf("a");
 			return gpu_filterData(elements, elemCount, query);
-		}
 		else return elemCount;
 	}
 
+	/***********************/
 	/* AGGREGATION MATHODS */
-	void StoreQueryCore::add(storeQuery* query)
-	{
+	/***********************/
 
+	float add(storeElement* elements, int count)
+	{
+		return 0.0f;
+	}
+
+	float average(storeElement* elements, int count)
+	{
+		return 0.0f;
+	}
+
+	storeElement* max(storeElement* elements, int count)
+	{
+		return nullptr;
+	}
+
+	storeElement* min(storeElement* elements, int count)
+	{
+		return nullptr;
 	}
 
 } /* namespace store */
