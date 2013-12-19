@@ -141,9 +141,12 @@ namespace store {
 				dataLocationInfo = new boost::container::vector<ullintPair>();
 				BOOST_FOREACH(metric_type &m, query->metrices)
 				{
-					boost::container::vector<ullintPair>* locations = (*_buffers)[m]->Select(query->timePeriods);
-					dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
-					delete locations;
+					if(_buffers->count(m))	// if elements with such a metric exist in store
+					{
+						boost::container::vector<ullintPair>* locations = (*_buffers)[m]->Select(query->timePeriods);
+						dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+						delete locations;
+					}
 				}
 			}
 			// Execute query with optional data locations using StoreQueryCore
