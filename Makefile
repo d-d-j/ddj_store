@@ -20,6 +20,7 @@ VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 
 OBJS += \
 ./src/UnitTests/StoreQueryCoreTest.o \
+./src/UnitTests/StoreQueryTest.o \
 ./src/UnitTests/SemaphoreTest.o \
 ./src/UnitTests/BTreeMonitorTest.o \
 ./src/BTree/BTreeMonitor.o \
@@ -42,6 +43,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
+./src/UnitTests/StoreQueryTest.d \
 ./src/UnitTests/StoreQueryCoreTest.d \
 ./src/UnitTests/SemaphoreTest.d \
 ./src/UnitTests/BTreeMonitorTest.d \
