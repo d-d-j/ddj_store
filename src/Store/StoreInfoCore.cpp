@@ -45,8 +45,8 @@ namespace store {
 
 		while (fgets(line, sizeof(line), meminfo))
 		{
-			sscanf(line, "MemTotal: %d kB", ramTotal);
-			if (sscanf(line, "MemFree: %d kB", ramFree) == 1)
+			sscanf(line, "MemTotal: %10d kB", ramTotal);
+			if (sscanf(line, "MemFree: %10d kB", ramFree) == 1)
 			{
 				continue;
 			}
