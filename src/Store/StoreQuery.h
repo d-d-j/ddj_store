@@ -11,7 +11,7 @@
 namespace ddj {
 namespace store {
 
-	struct storeQuery : public boost::noncopyable
+	struct storeQuery
 	{
 		boost::container::vector<metric_type> metrices;
 		boost::container::vector<int> tags;
