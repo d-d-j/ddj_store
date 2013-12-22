@@ -123,8 +123,8 @@ namespace store {
 		// Check possible errors
 		if(task == nullptr || task->GetType() != task::Select)
 		{
-			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
-			throw std::runtime_error("Error in selectTask function - wrong argument");
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("select Task function - wrong argument [FAILED]"));
+			throw std::runtime_error("Error in select Task function - wrong argument");
 		}
 
 		try
@@ -149,12 +149,17 @@ namespace store {
 					}
 				}
 			}
+			for(int i=0; i<dataLocationInfo->size(); i++)
+				LOG4CPLUS_DEBUG(this->_logger, "Select - data location: " << (*dataLocationInfo)[i].toString());
+
 			// Execute query with optional data locations using StoreQueryCore
 			void* queryResult = nullptr;
 			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
 
 			// Set task result and return
 			task->SetResult(true, nullptr, queryResult, size);
+
+			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [END]"));
 		}
 		catch(std::exception& ex)
 		{
@@ -202,6 +207,7 @@ namespace store {
 
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
 		StoreNodeInfo* queryResult;
 		try
 		{

@@ -13,7 +13,7 @@ typedef struct
 {
 	int tag;
 	int metric;
-	unsigned long long int time;
+	ullint time;
 	float value;
 } gpuElem;
 

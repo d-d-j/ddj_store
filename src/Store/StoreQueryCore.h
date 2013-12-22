@@ -20,7 +20,7 @@
 namespace ddj {
 namespace store {
 
-	class StoreQueryCore
+	class StoreQueryCore : public boost::noncopyable
 	{
 	private:
 		CudaController* _cudaController;

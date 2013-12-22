@@ -3,6 +3,7 @@
 
 #include "../Store/StoreElement.h"
 #include "../Store/StoreQuery.h"
+#include "../Store/StoreTypedefs.h"
 
 extern "C" {
 

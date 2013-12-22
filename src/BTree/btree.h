@@ -157,7 +157,7 @@ template <typename _Key, typename _Data,
           typename _Value = std::pair<_Key, _Data>,
           typename _Compare = std::less<_Key>,
           typename _Traits = btree_default_map_traits<_Key, _Data>,
-          bool _Duplicates = false,
+          bool _Duplicates = true,
           typename _Alloc = std::allocator<_Value>,
           bool _UsedAsSet = false >
 class btree

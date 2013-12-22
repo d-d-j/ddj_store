@@ -128,9 +128,14 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 	{
 		if(timePeriods.size())
 		{
+			LOG4CPLUS_DEBUG(this->_logger, "StoreBuffer - Select data locations for time periods");
 			return this->_bufferInfoTreeMonitor->Select(timePeriods);
 		}
-		else return this->_bufferInfoTreeMonitor->SelectAll();
+		else
+		{
+			LOG4CPLUS_DEBUG(this->_logger, "StoreBuffer - Select all data locations");
+			return this->_bufferInfoTreeMonitor->SelectAll();
+		}
 	}
 
 } /* namespace store */

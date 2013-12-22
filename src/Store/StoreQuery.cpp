@@ -44,14 +44,6 @@ namespace store {
 		aggregationType = (AggregationType)type;
 	}
 
-	storeQuery::storeQuery(const storeQuery& q)
-	{
-		this->aggregationType = q.aggregationType;
-		this->tags = q.tags;
-		this->metrices = q.metrices;
-		this->timePeriods = q.timePeriods;
-	}
-
 	std::string storeQuery::toString()
 	{
 		 std::ostringstream stream;
