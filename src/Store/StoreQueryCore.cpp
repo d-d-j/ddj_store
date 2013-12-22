@@ -21,20 +21,20 @@ namespace store {
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
 		void* tempDataBuffer = nullptr;
-		size_t tempDataSizeInBytes = this->mapData(&tempDataBuffer, dataLocationInfo);
-
+		size_t tempDataSize = this->mapData(&tempDataBuffer, dataLocationInfo);
+		LOG4CPLUS_DEBUG(this->_logger, "StoreQueryCore - tempDataElemCount = " << tempDataSize/sizeof(storeElement));
 		// TODO: Decompress temporary data buffer
 
 		// Filter to set of tags specified in query (only if set is not empty)
-		size_t filteredStoreElementsCount = this->filterData((storeElement*)tempDataBuffer, tempDataSizeInBytes/sizeof(storeElement), query);
-
+		size_t filteredStoreSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
+		LOG4CPLUS_DEBUG(this->_logger, "StoreQueryCore - filteredDataElemCount = " << filteredStoreSize/sizeof(storeElement));
 		// TODO: Aggregate all mapped data
 
 		// Set queryResult, clean and return result size
-		(*queryResult) = new storeElement[filteredStoreElementsCount];
-		CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreElementsCount*sizeof(storeElement), cudaMemcpyDeviceToHost) );
+		(*queryResult) = malloc(filteredStoreSize);
+		CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreSize, cudaMemcpyDeviceToHost) );
 		CUDA_CHECK_RETURN( cudaFree(tempDataBuffer) );
-		return filteredStoreElementsCount;
+		return filteredStoreSize;
 	}
 
 	/***************************/
@@ -67,7 +67,7 @@ namespace store {
 				position += (dli.second-dli.first+1);
 			}
 		}
-		else	// select all data
+		else	// TODO: REMOVE!!
 		{
 			// Get mainGpuArray data size (offset)
 			size = _cudaController->GetMainMemoryOffset();
@@ -84,11 +84,11 @@ namespace store {
 		return nullptr;
 	}
 
-	size_t StoreQueryCore::filterData(storeElement* elements, int elemCount, storeQuery* query)
+	size_t StoreQueryCore::filterData(storeElement* elements, size_t dataSize, storeQuery* query)
 	{
 		if(query && query->tags.size())
-			return gpu_filterData(elements, elemCount, query);
-		else return elemCount;
+			return gpu_filterData(elements, dataSize, query);
+		else return dataSize;
 	}
 
 	/***********************/

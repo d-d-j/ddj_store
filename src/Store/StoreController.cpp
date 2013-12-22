@@ -58,6 +58,8 @@ namespace store {
 
 		delete this->_buffers;
 		delete this->_cudaController;
+		_taskThreadPool.wait();
+		_taskThreadPool.clear();
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}

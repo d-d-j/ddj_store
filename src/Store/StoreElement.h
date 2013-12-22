@@ -20,7 +20,7 @@ namespace store {
 	{
 		public:
 			/* FIELDS */
-			int tag;
+			int32_t tag;
 			metric_type metric;
 			ullint time;
 			store_value_type value;

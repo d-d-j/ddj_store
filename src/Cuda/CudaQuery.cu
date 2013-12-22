@@ -7,11 +7,28 @@
 #include <thrust/execution_policy.h>
 #include <thrust/iterator/constant_iterator.h>
 
+
+
+// HOW TO PRINT STH TO CONSOLE IN KERNEL
+//// System includes
+//#include <stdio.h>
+//#include <assert.h>
+//// CUDA runtime
+//#include <cuda_runtime.h>
+//#include "cuPrintf.cu"
+//#define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
+//                                  blockIdx.y*gridDim.x+blockIdx.x,\
+//                                  threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
+//                                  __VA_ARGS__)
+//// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
+
+
+
 #define CUDA_THREADS_PER_BLOCK 256
 
 typedef struct
 {
-	int tag;
+	int32_t tag;
 	int metric;
 	ullint time;
 	float value;
@@ -21,7 +38,7 @@ __global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int ele
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= elemCount) return;
-	int tag = elements[idx].tag;
+	int32_t tag = elements[idx].tag;
 	stencil[idx] = 0;
 	while(tagsCount--)
 	{
@@ -31,7 +48,7 @@ __global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int ele
 			return;
 		}
 	}
-
+	return;
 }
 
 struct is_one
@@ -43,9 +60,10 @@ struct is_one
 	}
 };
 
-size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::store::storeQuery* query)
+size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query)
 {
 	// CREATE STENCIL
+	int elemCount = dataSize/sizeof(ddj::store::storeElement);
 	int* stencil;
 	cudaMalloc(&stencil, elemCount*sizeof(int));
 
@@ -55,6 +73,7 @@ size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::st
 	// FILL STENCIL
 	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount, tags.data().get(), tags.size(), stencil);
+	cudaDeviceSynchronize();
 
 	// PARTITION ELEMENTS
 	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
@@ -63,5 +82,5 @@ size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::st
 	thrust::partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
-	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1);
+	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(ddj::store::storeElement);
 }

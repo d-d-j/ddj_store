@@ -45,11 +45,11 @@ namespace task {
 		result.resize(std::distance(result.begin(),it));
 
 		// Remove completed tasks from tasks
-		std::remove_if(
+		_tasks.erase( std::remove_if(
 				this->_tasks.begin(),
 				this->_tasks.end(),
 				[](Task_Pointer task){ if(task != nullptr) return task->IsCompleated(); else return false; }
-				);
+				) );
 
 		// Return result
 		return result;

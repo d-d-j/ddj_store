@@ -148,11 +148,11 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
 
 			// TEST
-			size_t size = _queryCore->filterData(deviceElements, N, &query);
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query);
 
 			// CHECK
-			ASSERT_EQ(N, size);
-			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, N*sizeof(storeElement), cudaMemcpyDeviceToHost) )
+			ASSERT_EQ(N*sizeof(storeElement), size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
 
 			for(int i=0; i<N; i++)
 			{
@@ -188,11 +188,11 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
 
 			// TEST
-			size_t size = _queryCore->filterData(deviceElements, N, &query);
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query);
 
 			// CHECK
-			ASSERT_EQ(15, size);
-			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, N*sizeof(storeElement), cudaMemcpyDeviceToHost) )
+			ASSERT_EQ(15*sizeof(storeElement), size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
 			auto checkTagFunc = [&] (const int& tag)
 				{
 				if (tag == 4 || tag == 12 || tag == 17)

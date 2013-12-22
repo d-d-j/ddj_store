@@ -30,9 +30,13 @@ namespace task {
 	Task::~Task()
 	{
 		if(this->_taskData != nullptr)
-			free(this->_taskData);
+		{
+			delete (char*)this->_taskData;
+		}
 		if(this->_resultData != nullptr)
+		{
 			free(this->_resultData);
+		}
 	}
 
 	void Task::SetResult(

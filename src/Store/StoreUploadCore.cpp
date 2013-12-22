@@ -93,8 +93,9 @@ namespace store {
 								stream
 						)
 				);
-		info->endValue = info->startValue + size - 1;	// index of last byte of trunk in main gpu memory
-		this->_cudaController->SetMainMemoryOffset(info->endValue);
+		int newOffset = info->startValue + size;
+		info->endValue = newOffset - 1;
+		this->_cudaController->SetMainMemoryOffset(newOffset);
 		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
 	}
 

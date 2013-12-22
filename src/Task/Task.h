@@ -1,10 +1,3 @@
-/*
- * StoreTask.h
- *
- *  Created on: 19-09-2013
- *      Author: ghashd
- */
-
 #ifndef STORETASK_H_
 #define STORETASK_H_
 
@@ -15,50 +8,51 @@
 namespace ddj {
 namespace task {
 
-class Task : public boost::noncopyable
-{
-private:
-	/* TASK */
-	int _taskId;
-	TaskType _type;
-	void* _taskData;
+	class Task : public boost::noncopyable
+	{
+	private:
+		/* TASK */
+		int _taskId;
+		TaskType _type;
+		void* _taskData;
 
-	/* RESULT */
-	void* _resultData;
-	int _resultSize;
-	char* _message;
-	bool _isSuccessfull;
-	bool _isCompleated;
+		/* RESULT */
+		void* _resultData;
+		int _resultSize;
+		char* _message;
+		bool _isSuccessfull;
+		bool _isCompleated;
 
-	/* MONITOR */
-	boost::condition_variable* _condResponseReady;
-	boost::mutex _mutex;
+		/* MONITOR */
+		boost::condition_variable* _condResponseReady;
+		boost::mutex _mutex;
 
-public:
-	Task(
-			int taskId,
-			TaskType type,
-			void* taskData,
-			boost::condition_variable* cond);
+	public:
+		Task(
+				int taskId,
+				TaskType type,
+				void* taskData,
+				boost::condition_variable* cond);
 
-	virtual ~Task();
+		virtual ~Task();
 
-	void SetResult(
-			bool isSuccessfull,
-			const char* message = nullptr,
-			void* resultData = nullptr,
-			int resultSize = 0);
+		void SetResult(
+				bool isSuccessfull,
+				const char* message = nullptr,
+				void* resultData = nullptr,
+				int resultSize = 0);
 
-	taskResult* GetResult();
+		taskResult* GetResult();
 
-	/* GETTERS */
-	TaskType GetType();
-	void* GetData();
-	bool IsCompleated();
-};
+		/* GETTERS */
+		TaskType GetType();
+		void* GetData();
+		bool IsCompleated();
+	};
 
-typedef boost::shared_ptr<Task> Task_Pointer;
+	typedef boost::shared_ptr<Task> Task_Pointer;
 
 } /* namespace store */
 } /* namespace ddj */
+
 #endif /* STORETASK_H_ */

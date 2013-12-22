@@ -7,7 +7,7 @@
 
 extern "C" {
 
-size_t gpu_filterData(ddj::store::storeElement* elements, int elemCount, ddj::store::storeQuery* query);
+size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query);
 
 }
 
