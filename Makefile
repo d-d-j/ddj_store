@@ -66,12 +66,9 @@ CPP_DEPS += \
 ./src/main.d
 
 # CUDA code generation flags
-ifneq ($(OS_ARCH),armv7l)
-GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-endif
 GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
-GENCODE_FLAGS   := $(GENCODE_SM10) $(GENCODE_SM20) $(GENCODE_SM30)
+GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM30)
 
 
 src/%.o: ./src/%.cpp
