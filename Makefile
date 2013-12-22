@@ -65,11 +65,6 @@ CPP_DEPS += \
 ./src/Node.d \
 ./src/main.d
 
-# CUDA code generation flags
-GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
-GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
-GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM30)
-
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
@@ -81,7 +76,7 @@ src/%.o: ./src/%.cpp
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
+	nvcc $(INCLUDES) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
