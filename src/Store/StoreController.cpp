@@ -202,11 +202,12 @@ namespace store {
 
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
-		void* queryResult;
+		StoreNodeInfo* queryResult;
 		try
 		{
 			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
-			task->SetResult(true, nullptr, queryResult, sizeOfResult);
+			task->SetResult(true, nullptr, (void*)queryResult, sizeOfResult);
+			LOG4CPLUS_DEBUG(this->_logger, queryResult->toString());
 			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
 		} catch (std::exception& ex)
 		{

@@ -8,8 +8,8 @@
 #ifndef STORENODEINFO_H_
 #define STORENODEINFO_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <string>
+#include <sstream>
 
 namespace ddj
 {
@@ -17,13 +17,20 @@ namespace store
 {
 class StoreNodeInfo
 {
-	int _memTotal;
-	int _memFree;
-	size_t _gpuMemTotal;
-	size_t _gpuMemFree;
+	int32_t _memTotal;
+	int32_t _memFree;
+	int32_t _gpuMemTotal;
+	int32_t _gpuMemFree;
 public:
 	StoreNodeInfo();
-	StoreNodeInfo(int memTotal, int memFree, size_t gpuMemTotal, size_t gpuMemFree);
+	StoreNodeInfo(int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree)
+		: _memTotal(memTotal), _memFree(memFree), _gpuMemTotal(gpuMemTotal), _gpuMemFree(gpuMemFree) {}
+	std::string toString()
+	{
+		 std::ostringstream stream;
+	     stream << "RAM: "<<_memFree<<"/"<<_memTotal<<"\t GPU: "<<_gpuMemFree<<"/"<<_gpuMemTotal;
+	     return  stream.str();
+	}
 };
 }
 }

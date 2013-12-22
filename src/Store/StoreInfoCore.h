@@ -23,7 +23,7 @@ namespace store{
 
 		void GetRamInKB(int* ramTotal, int* ramFree);
 
-		size_t GetNodeInfo(void** result);
+		size_t GetNodeInfo(StoreNodeInfo** result);
 	};
 
 }

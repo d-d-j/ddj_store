@@ -36,7 +36,6 @@ OBJS += \
 ./src/Store/StoreUploadCore.o \
 ./src/Store/StoreQuery.o \
 ./src/Store/StoreInfoCore.o \
-./src/Store/StoreNodeInfo.o \
 ./src/Task/Task.o \
 ./src/Task/TaskMonitor.o \
 ./src/Node.o \

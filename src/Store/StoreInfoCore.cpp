@@ -3,7 +3,7 @@
 namespace ddj {
 namespace store {
 
-	size_t StoreInfoCore::GetNodeInfo(void** result)
+	size_t StoreInfoCore::GetNodeInfo(StoreNodeInfo** result)
 	{
 		size_t gpuMemFree, gpuMemTotal;
 		int memTotal, memFree;
@@ -26,7 +26,7 @@ namespace store {
 		FILE *meminfo = fopen("/proc/meminfo", "r");
 		if (meminfo == NULL)
 		{
-			//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Unable to open meminfo"));
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Unable to open meminfo"));
 			return;
 		}
 
