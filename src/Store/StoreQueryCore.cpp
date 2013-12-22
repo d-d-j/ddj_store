@@ -67,15 +67,6 @@ namespace store {
 				position += (dli.second-dli.first+1);
 			}
 		}
-		else	// TODO: REMOVE!!
-		{
-			// Get mainGpuArray data size (offset)
-			size = _cudaController->GetMainMemoryOffset();
-			CUDA_CHECK_RETURN( cudaMalloc(data, size) );
-
-			// Copy whole data from mainGpuArray to new device array (only part containing some data)
-			CUDA_CHECK_RETURN( cudaMemcpy(*data, mainGpuArray, size, cudaMemcpyDeviceToDevice) );
-		}
 		return size;
 	}
 

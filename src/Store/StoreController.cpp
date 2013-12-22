@@ -151,8 +151,6 @@ namespace store {
 					}
 				}
 			}
-			for(int i=0; i<dataLocationInfo->size(); i++)
-				LOG4CPLUS_DEBUG(this->_logger, "Select - data location: " << (*dataLocationInfo)[i].toString());
 
 			// Execute query with optional data locations using StoreQueryCore
 			void* queryResult = nullptr;

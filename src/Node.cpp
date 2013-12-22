@@ -116,10 +116,10 @@ namespace ddj
 						result = compleatedTasks[i]->GetResult();
 
 						// TODO: only for testing purposes - should be removed
-						int n = result->result_size / sizeof(store::storeElement);
-						store::storeElement* elements = (store::storeElement*)result->result_data;
-						for(int k=0; k<n; k++)
-							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select element[%d]: {metric=%d, tag=%d, time=%llu, value=%f}", k, elements[k].metric, elements[k].tag, elements[k].time, elements[k].value);
+						//int n = result->result_size / sizeof(store::storeElement);
+						//store::storeElement* elements = (store::storeElement*)result->result_data;
+						//for(int k=0; k<n; k++)
+						//	LOG4CPLUS_DEBUG_FMT(this->_logger, "Select element[%d]: {metric=%d, tag=%d, time=%llu, value=%f}", k, elements[k].metric, elements[k].tag, elements[k].time, elements[k].value);
 
 						// Send result
 						this->_client->SendTaskResult(result);
