@@ -167,5 +167,11 @@ namespace store {
 		return this->_mainMemoryCapacity;
 	}
 
+	void CudaController::SetProperDevice()
+	{
+		cudaThreadExit(); // clears all the runtime state for the current thread
+		cudaSetDevice(this->_cudaDeviceId); // explicit set the current device for the other calls
+	}
+
 } /* namespace store */
 } /* namespace ddj */

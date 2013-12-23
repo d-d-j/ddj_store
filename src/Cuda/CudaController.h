@@ -46,6 +46,7 @@ namespace store {
 		CudaController(int uploadStreamsNum, int queryStreamsNum, int cudaDeviceId);
 		virtual ~CudaController();
 		int GetCudaDeviceId();
+		void SetProperDevice();
 
 		/* STREAMS */
 		cudaStream_t GetUploadStream();

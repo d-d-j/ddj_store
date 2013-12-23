@@ -73,7 +73,8 @@ namespace network {
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
-		int len = sizeof(int64_t) + 2*sizeof(int32_t) + taskResult->result_size;
+		int deviceId = -1;
+		int len = sizeof(int64_t) + 3*sizeof(int32_t) + taskResult->result_size;
 		char* msg = new char[len];
 		char *oldMsg = msg;
 		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));
@@ -81,6 +82,8 @@ namespace network {
 		memcpy(msg, &(taskResult->type), sizeof(int32_t));
 		msg += sizeof(int32_t);
 		memcpy(msg, &(taskResult->result_size), sizeof(int32_t));
+		msg += sizeof(int32_t);
+		memcpy(msg, &deviceId, sizeof(int32_t));
 		msg += sizeof(int32_t);
 		memcpy(msg, taskResult->result_data, taskResult->result_size);
 
@@ -95,7 +98,7 @@ namespace network {
 
 	void NetworkClient::do_read()
 	{
-		const int LEN = sizeof(int32_t)*2 + sizeof(int64_t);
+		const int LEN = sizeof(int32_t)*3 + sizeof(int64_t);
 		char msg[LEN];
 
 		while (read(msg, LEN))
