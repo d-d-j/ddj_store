@@ -24,6 +24,7 @@ GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,
 GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30)
 
 OBJS += \
+./src/UnitTests/StoreElementTest.o \
 ./src/UnitTests/StoreQueryCoreTest.o \
 ./src/UnitTests/StoreQueryTest.o \
 ./src/UnitTests/SemaphoreTest.o \
@@ -47,6 +48,7 @@ OBJS += \
 ./src/main.o
 
 CPP_DEPS += \
+./src/UnitTests/StoreElementTest.d \
 ./src/UnitTests/StoreQueryTest.d \
 ./src/UnitTests/StoreQueryCoreTest.d \
 ./src/UnitTests/SemaphoreTest.d \
