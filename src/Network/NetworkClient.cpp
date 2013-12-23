@@ -6,6 +6,8 @@
  */
 
 #include "NetworkClient.h"
+#include "cstdlib"
+
 
 namespace ddj {
 namespace network {
@@ -29,8 +31,32 @@ namespace network {
 
 	void NetworkClient::connect()
 	{
-		tcp::resolver resolver(io_service);
-		boost::asio::connect(*socket, resolver.resolve({host.c_str(), port.c_str()}));
+		bool connected = false;
+		int32_t delay = 1000;
+		const int numberOfTryies = 10;
+		for (int i=0;i<numberOfTryies && !connected;i++)
+		{
+			LOG4CPLUS_INFO(this->_logger, "Trying to connect");
+			try
+			{
+				tcp::resolver resolver(io_service);
+				boost::asio::connect(*socket, resolver.resolve({host.c_str(), port.c_str()}));
+				connected = true;
+			}
+			catch (boost::system::system_error const& e)
+			{
+				LOG4CPLUS_ERROR(this->_logger, "Error while trying to connect - " << e.what());
+				connected = false;
+			}
+			boost::this_thread::sleep(boost::posix_time::milliseconds(delay));
+		}
+		if (!connected)
+		{
+			LOG4CPLUS_ERROR(this->_logger, "Can't connect with master");
+			LOG4CPLUS_INFO(this->_logger, "Program will be terminated");
+			std::exit(EXIT_FAILURE);
+		}
+		LOG4CPLUS_INFO(this->_logger, "Connection established");
 	}
 
 	void NetworkClient::SendLoginRequest(networkLoginRequest* request)
@@ -106,6 +132,8 @@ namespace network {
 		}
 		catch (const std::exception &e) {
 			LOG4CPLUS_ERROR(this->_logger, "Error while reading from socket - " << e.what());
+			LOG4CPLUS_INFO(this->_logger, "Program will be terminated");
+			std::exit(EXIT_FAILURE);
 		}
 		return 0;
 	}
