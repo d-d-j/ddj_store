@@ -129,8 +129,7 @@ namespace store {
 
 	//filterData
 
-		// Select all data (all tags)
-		TEST_F(StoreQueryCoreTest, filterData_EmptyFilter)
+		TEST_F(StoreQueryCoreTest, Select_All_Data)
 		{
 			// PREPARE
 			int N = 100;
@@ -139,7 +138,7 @@ namespace store {
 			{
 				hostElements[i].metric = 1;
 				hostElements[i].tag = i%20;
-				hostElements[i].time = 696969;
+				hostElements[i].time = i%10;
 				hostElements[i].value = 666.666;
 			}
 			storeQuery query;
@@ -158,7 +157,7 @@ namespace store {
 			{
 				EXPECT_EQ(1, hostElements[i].metric);
 				EXPECT_EQ(i%20, hostElements[i].tag);
-				EXPECT_EQ(696969, hostElements[i].time);
+				EXPECT_EQ(i/10, hostElements[i].time);	//Data should be sorted by time
 				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 			}
 
@@ -167,8 +166,8 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-		// Select data only with specified tags
-		TEST_F(StoreQueryCoreTest, filterData_NonEmptyFilter)
+
+		TEST_F(StoreQueryCoreTest, Select_Data_Only_With_Specific_Tags)
 		{
 			int N = 100;
 			storeElement* hostElements = new storeElement[N];
@@ -214,6 +213,93 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
+		TEST_F(StoreQueryCoreTest, Select_Data_From_Specific_Time_Frame)
+		{
+			int N = 100;
+			storeElement* hostElements = new storeElement[N];
+			for(int i=0; i<N; i++)
+			{
+				hostElements[i].metric = 1;
+				hostElements[i].tag = i%20;
+				hostElements[i].time = i;
+				hostElements[i].value = i/3.0;
+			}
+			storeQuery query;
+			query.timePeriods.push_back(ullintPair(1, 2));
+			storeElement* deviceElements = nullptr;
+			CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
+			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
+
+			// TEST
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query);
+
+			// CHECK
+			ASSERT_EQ(2*sizeof(storeElement), size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
+
+
+			EXPECT_EQ(1, hostElements[0].metric);
+			EXPECT_EQ(1, hostElements[0].tag);
+			EXPECT_EQ(1, hostElements[0].time);
+			EXPECT_FLOAT_EQ(1/3.0, hostElements[0].value);
+
+			EXPECT_EQ(1, hostElements[1].metric);
+			EXPECT_EQ(2, hostElements[1].tag);
+			EXPECT_EQ(2, hostElements[1].time);
+			EXPECT_FLOAT_EQ(2/3.0, hostElements[1].value);
+
+
+			// CLEAN
+			delete [] hostElements;
+			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+		}
+
+		TEST_F(StoreQueryCoreTest, Select_Data_From_Specific_Time_Frames)
+		{
+			int N = 100;
+			storeElement* hostElements = new storeElement[N];
+			for(int i=0; i<N; i++)
+			{
+				hostElements[i].metric = 1;
+				hostElements[i].tag = i%20;
+				hostElements[i].time = i;
+				hostElements[i].value = i/3.0;
+			}
+			storeQuery query;
+			query.timePeriods.push_back(ullintPair(1, 2));
+			query.timePeriods.push_back(ullintPair(0, 0));
+			storeElement* deviceElements = nullptr;
+			CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
+			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
+
+			// TEST
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query);
+
+			// CHECK
+			ASSERT_EQ(3*sizeof(storeElement), size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
+
+
+			EXPECT_EQ(1, hostElements[0].metric);
+			EXPECT_EQ(0, hostElements[0].tag);
+			EXPECT_EQ(0, hostElements[0].time);
+			EXPECT_FLOAT_EQ(0/3.0, hostElements[0].value);
+
+			EXPECT_EQ(1, hostElements[1].metric);
+			EXPECT_EQ(1, hostElements[1].tag);
+			EXPECT_EQ(1, hostElements[1].time);
+			EXPECT_FLOAT_EQ(1/3.0, hostElements[1].value);
+
+			EXPECT_EQ(1, hostElements[2].metric);
+			EXPECT_EQ(2, hostElements[3].tag);
+			EXPECT_EQ(2, hostElements[2].time);
+			EXPECT_FLOAT_EQ(2/3.0, hostElements[2].value);
+
+
+			// CLEAN
+			delete [] hostElements;
+			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+		}
 
 
 	/***********************/
