@@ -157,7 +157,7 @@ namespace store {
 			{
 				EXPECT_EQ(1, hostElements[i].metric);
 				EXPECT_EQ(i%20, hostElements[i].tag);
-				EXPECT_EQ(i/10, hostElements[i].time);	//Data should be sorted by time
+				EXPECT_EQ(i%10, hostElements[i].time);	//Data should be sorted by time
 				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 			}
 

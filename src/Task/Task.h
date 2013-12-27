@@ -2,6 +2,7 @@
 #define STORETASK_H_
 
 #include "TaskResult.h"
+#include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
 #include <cstring>
@@ -55,7 +56,11 @@ namespace task {
 		bool IsCompleated();
 
 	private:
-		void appendMessage(char* message);
+		void appendMessage(const char* message);
+
+		friend class TaskTest;
+
+		FRIEND_TEST(TaskTest, AppendMessage);
 	};
 
 	typedef boost::shared_ptr<Task> Task_Pointer;

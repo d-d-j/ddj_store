@@ -42,10 +42,19 @@ namespace task {
 		}
 	}
 
-	void Task::appendMessage(char* message)
+	void Task::appendMessage(const char* message)
 	{
-		std::string a(this->_message);
-		std::string b(message);
+		std::string a = "";
+		std::string b = "";
+		if (this->_message != NULL)
+		{
+			a = std::string(this->_message);
+		}
+		if (message != NULL)
+		{
+			b = std::string(message);
+		}
+
 		this->_message = (char*)(a+b).c_str();
 	}
 
