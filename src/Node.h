@@ -18,9 +18,8 @@
 #include "Core/Logger.h"
 #include "Core/Config.h"
 #include "Network/NetworkClient.h"
-
 #include "Store/StoreInfoCore.h"
-
+#include <boost/scoped_ptr.hpp>
 
 namespace ddj
 {

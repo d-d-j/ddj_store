@@ -98,24 +98,41 @@ namespace store {
 			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
 
-		// GET store element from task data
-		storeElement* element = (storeElement*)(task->GetData());
-
-		// Create buffer with element's metric if not exists
+		try
 		{
-			boost::mutex::scoped_lock lock(this->_buffersMutex);
-			if(!this->_buffers->count(element->metric))
-			{
-				StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_config->GetIntValue("STORE_BUFFER_CAPACITY"), this->_uploadCore));
-				this->_buffers->insert({element->metric, newBuf});
-			}
-		}
-		// Log element to insert
-		LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
-		(*_buffers)[element->metric]->Insert(element);
 
-		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
-		task->SetResult(true, nullptr, nullptr, 0);
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			// GET store element from task data
+			storeElement* element = (storeElement*)(task->GetData());
+
+			// Create buffer with element's metric if not exists
+			{
+				boost::mutex::scoped_lock lock(this->_buffersMutex);
+				if(!this->_buffers->count(element->metric))
+				{
+					StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_config->GetIntValue("STORE_BUFFER_CAPACITY"), this->_uploadCore));
+					this->_buffers->insert({element->metric, newBuf});
+				}
+			}
+			// Log element to insert
+			LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
+			(*_buffers)[element->metric]->Insert(element);
+
+			// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+			task->SetResult(true, nullptr, nullptr, 0);
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Insert task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Insert task error [FAILED]"));
+		}
 	}
 
 	void StoreController::selectTask(task::Task_Pointer task)
@@ -131,6 +148,9 @@ namespace store {
 
 		try
 		{
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
 			// Create query from task data
 			storeQuery* query = new storeQuery(task->GetData());
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
@@ -186,6 +206,10 @@ namespace store {
 
 		try
 		{
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			// TODO: REPAIR FLUSH - and make integration tests for it
 			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
 			{
 				it-> second->Flush();
@@ -211,6 +235,9 @@ namespace store {
 		StoreNodeInfo* queryResult;
 		try
 		{
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
 			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
 			task->SetResult(true, nullptr, (void*)queryResult, sizeOfResult);
 			LOG4CPLUS_DEBUG(this->_logger, queryResult->toString());

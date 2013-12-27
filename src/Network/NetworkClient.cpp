@@ -8,7 +8,6 @@
 #include "NetworkClient.h"
 #include "cstdlib"
 
-
 namespace ddj {
 namespace network {
 
@@ -73,7 +72,7 @@ namespace network {
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
-		int deviceId = -1;
+		int deviceId = TASK_ALL_DEVICES;
 		int len = sizeof(int64_t) + 3*sizeof(int32_t) + taskResult->result_size;
 		char* msg = new char[len];
 		char *oldMsg = msg;
@@ -106,9 +105,14 @@ namespace network {
 			task::taskRequest tr;
 
 			// COPY HEADER
-			memcpy(&tr.task_id, msg, sizeof(int32_t));
-			memcpy(&tr.type, msg+sizeof(int64_t), sizeof(int32_t));
-			memcpy(&tr.size, msg+(sizeof(int64_t)+sizeof(int32_t)), sizeof(int32_t));
+			int position = 0;
+			memcpy(&tr.task_id, msg+position, sizeof(int64_t));
+			position+=sizeof(int64_t);
+			memcpy(&tr.type, msg+position, sizeof(int32_t));
+			position+=sizeof(int32_t);
+			memcpy(&tr.size, msg+position, sizeof(int32_t));
+			position+=sizeof(int32_t);
+			memcpy(&tr.device_id, msg+position, sizeof(int32_t));
 			tr.data = nullptr;
 
 			// READ DATA

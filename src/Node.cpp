@@ -27,15 +27,21 @@ namespace ddj
 
 		StoreController_Pointer* controller;
 
-		//for(int i=0; i<this->_cudaDevicesCount; i++)
-		for(int i=0; i<1; i++)
+		boost::container::vector<int> devices;
+
+		for(int i=0; i<this->_cudaDevicesCount; i++)
 		{
 			// Check if GPU i satisfies ddj_store requirements
-			if(!_cudaCommons.CudaCheckDeviceForRequirements(i)) continue;
+			if(!_cudaCommons.CudaCheckDeviceForRequirements(i))
+			{
+				continue;
+			}
 			controller = new StoreController_Pointer(new store::StoreController(i));
-			this->_controllers.insert({i,*controller});
-			delete controller;
+			this->_controllers.insert({i,*controller});	// copy shared pointer to map
+			devices.push_back(i);
+			delete controller;	// delete shared pointer to controller
 		}
+		this->_cudaDevicesCount = this->_controllers.size();	// update number of devices
 
 		//throw exception if suitable cuda gpu devices count == 0
 		if(this->_controllers.empty())
@@ -47,12 +53,8 @@ namespace ddj
 
 		// CONNECT TO MASTER AND LOG IN
 		this->_client = new network::NetworkClient(&_requestSignal);
-		int* devices = new int[1];
-		devices[0] = 0;
-		network::networkLoginRequest* loginRequest = new network::networkLoginRequest(devices, 1);
-		this->_client->SendLoginRequest(loginRequest);
-		delete [] devices;
-		delete loginRequest;
+		boost::scoped_ptr<network::networkLoginRequest> loginRequest(new network::networkLoginRequest(devices.data(), 1));
+		this->_client->SendLoginRequest(loginRequest.get());
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}
@@ -81,10 +83,20 @@ namespace ddj
 	{
 		// Add a new task to task monitor
 		task::Task_Pointer task =
-				this->_taskMonitor->AddTask(request.task_id, request.type, request.data);
+				this->_taskMonitor->AddTask(request.task_id, request.type, request.device_id, request.data);
 
-		// TODO: Run this task in one selected StoreController when Insert or in all StoreControllers otherwise
-		this->_controllers[0]->ExecuteTask(task);
+		// Pass task to proper Store Controller (or all of them)
+		if(request.device_id != TASK_ALL_DEVICES)
+		{
+			this->_controllers[request.device_id]->ExecuteTask(task);
+		}
+		else	// all
+		{
+			for(auto it = this->_controllers.begin(); it != this->_controllers.end(); it++)
+			{
+				it->second->ExecuteTask(task);
+			}
+		}
 	}
 
 	void Node::taskThreadFunction()

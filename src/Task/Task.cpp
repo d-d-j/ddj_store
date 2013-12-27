@@ -13,11 +13,13 @@ namespace task {
 	Task::Task(
 			int taskId,
 			TaskType type,
+			int deviceId,
 			void* taskData,
 			boost::condition_variable* cond)
 	{
 		this->_taskId = taskId;
 		this->_type = type;
+		this->_deviceId = deviceId;
 		this->_taskData = taskData;
 		this->_condResponseReady = cond;
 		this->_isCompleated = false;
@@ -71,8 +73,6 @@ namespace task {
 
 	TaskType Task::GetType()
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
-
 		return this->_type;
 	}
 
@@ -81,6 +81,11 @@ namespace task {
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
 		return this->_taskData;
+	}
+
+	int Task::GetDevice()
+	{
+		return this->_deviceId;
 	}
 
 	bool Task::IsCompleated()

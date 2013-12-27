@@ -12,9 +12,10 @@ namespace task {
 	{
 	private:
 		/* TASK */
-		int _taskId;
+		int64_t _taskId;
 		TaskType _type;
 		void* _taskData;
+		int _deviceId;
 
 		/* RESULT */
 		void* _resultData;
@@ -31,6 +32,7 @@ namespace task {
 		Task(
 				int taskId,
 				TaskType type,
+				int deviceId,
 				void* taskData,
 				boost::condition_variable* cond);
 
@@ -47,6 +49,7 @@ namespace task {
 		/* GETTERS */
 		TaskType GetType();
 		void* GetData();
+		int GetDevice();
 		bool IsCompleated();
 	};
 

@@ -20,6 +20,9 @@ namespace task {
 		Info = 4
 	};
 
+#define	TASK_ALL_DEVICES -1
+
+
 } /* namespace task */
 } /* namespace ddj */
 

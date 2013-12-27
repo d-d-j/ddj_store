@@ -32,7 +32,7 @@ namespace task {
 		public:
 			TaskMonitor(boost::condition_variable* condResponseReady);
 			virtual ~TaskMonitor();
-			Task_Pointer AddTask(int taskId, TaskType type, void* taskData);
+			Task_Pointer AddTask(int taskId, TaskType type, int32_t deviceId, void* taskData);
 			boost::container::vector<Task_Pointer> PopCompleatedTasks();
 	};
 

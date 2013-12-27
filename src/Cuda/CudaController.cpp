@@ -6,13 +6,14 @@ namespace store {
 	CudaController::CudaController(int uploadStreamsCount, int queryStreamsCount, int cudaDeviceId)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Cuda controller constructor [BEGIN]"));
-
 		this->_cudaDeviceId = cudaDeviceId;
-
 		this->_uploadStreamsSemaphore = new Semaphore(queryStreamsCount);
 		this->_queryStreamsSemaphore = new Semaphore(uploadStreamsCount);
 		this->_uploadStreams = new boost::lockfree::queue<cudaStream_t>(uploadStreamsCount);
 		this->_queryStreams = new boost::lockfree::queue<cudaStream_t>(queryStreamsCount);
+
+		// Use device number _cudaDeviceId
+		this->SetProperDevice();
 
 		int i;
 		cudaStream_t stream;
