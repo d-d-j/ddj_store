@@ -82,8 +82,9 @@ namespace ddj
 	void Node::CreateTask(task::taskRequest request)
 	{
 		// Add a new task to task monitor
+		int expectedResultCount = request.device_id != TASK_ALL_DEVICES ? 1 : this->_cudaDevicesCount;
 		task::Task_Pointer task =
-				this->_taskMonitor->AddTask(request.task_id, request.type, request.device_id, request.data);
+				this->_taskMonitor->AddTask(request.task_id, request.type, request.data, expectedResultCount);
 
 		// Pass task to proper Store Controller (or all of them)
 		if(request.device_id != TASK_ALL_DEVICES)

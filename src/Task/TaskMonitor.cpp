@@ -20,11 +20,11 @@ namespace task {
 	{
 	}
 
-	Task_Pointer TaskMonitor::AddTask(int taskId, TaskType type, int32_t deviceId, void* taskData)
+	Task_Pointer TaskMonitor::AddTask(int taskId, TaskType type, void* taskData, int expectedResultCount)
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
-		Task_Pointer newTask(new Task(taskId, type, deviceId, taskData, this->_condResponseReady));
+		Task_Pointer newTask(new Task(taskId, type, taskData, expectedResultCount, this->_condResponseReady));
 		this->_tasks.push_back(newTask);
 		this->_taskCount++;
 		return newTask;

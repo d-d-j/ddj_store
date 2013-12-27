@@ -4,6 +4,7 @@
 #include "TaskResult.h"
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
+#include <cstring>
 
 namespace ddj {
 namespace task {
@@ -15,14 +16,15 @@ namespace task {
 		int64_t _taskId;
 		TaskType _type;
 		void* _taskData;
-		int _deviceId;
 
 		/* RESULT */
 		void* _resultData;
-		int _resultSize;
+		size_t _resultSize;
 		char* _message;
 		bool _isSuccessfull;
 		bool _isCompleated;
+		int _currentResultCount;
+		int _expectedResultCount;
 
 		/* MONITOR */
 		boost::condition_variable* _condResponseReady;
@@ -32,8 +34,8 @@ namespace task {
 		Task(
 				int taskId,
 				TaskType type,
-				int deviceId,
 				void* taskData,
+				int expectedResultCount,
 				boost::condition_variable* cond);
 
 		virtual ~Task();
@@ -42,7 +44,7 @@ namespace task {
 				bool isSuccessfull,
 				const char* message = nullptr,
 				void* resultData = nullptr,
-				int resultSize = 0);
+				size_t resultSize = 0);
 
 		taskResult* GetResult();
 
@@ -51,6 +53,9 @@ namespace task {
 		void* GetData();
 		int GetDevice();
 		bool IsCompleated();
+
+	private:
+		void appendMessage(char* message);
 	};
 
 	typedef boost::shared_ptr<Task> Task_Pointer;
