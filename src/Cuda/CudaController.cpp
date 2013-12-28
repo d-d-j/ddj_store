@@ -51,11 +51,13 @@ namespace store {
 		while(this->_uploadStreams->pop(stream))
 			CUDA_CHECK_RETURN( cudaStreamDestroy(stream) );
 		delete this->_uploadStreams;
+		this->_uploadStreams = nullptr;
 
 		// RELEASE QUERY STREAMS
 		while(this->_queryStreams->pop(stream))
 			CUDA_CHECK_RETURN( cudaStreamDestroy(stream) );
 		delete this->_queryStreams;
+		this->_queryStreams = nullptr;
 
 		// RELEASE MAIN GPU STORE MEMORY
 		_cudaCommons.CudaFreeMemory(this->_mainMemoryPointer);
