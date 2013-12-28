@@ -5,7 +5,8 @@
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
-#include <cstring>
+#include <cstdio>
+#include <string>
 
 namespace ddj {
 namespace task {

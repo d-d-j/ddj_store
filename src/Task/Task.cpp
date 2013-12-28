@@ -41,22 +41,34 @@ namespace task {
 		{
 			free(this->_resultData);
 		}
+		if (this->_message != nullptr)
+		{
+			delete this->_message;
+		}
+		this->_taskData = nullptr;
+		this->_resultData = nullptr;
+		this->_message = nullptr;
 	}
 
 	void Task::appendMessage(const char* message)
 	{
-		std::string a = "";
-		std::string b = "";
+		size_t lengthA = 0, lengthB = 0, length;
 		if (this->_message != nullptr)
 		{
-			a = std::string(this->_message);
+			lengthA = std::char_traits<char>::length(this->_message);
 		}
 		if (message != nullptr)
 		{
-			b = std::string(message);
+			lengthB = std::char_traits<char>::length(message);
 		}
 
-		this->_message = (char*)(a+b).c_str();
+		length = lengthA + lengthB + 1;
+
+		char *result = new char[length];
+		snprintf(result, length, "%s%s", this->_message ? this->_message : "", message ? message : "");
+
+		delete this->_message;
+		this->_message = result;
 	}
 
 	void Task::SetResult(
