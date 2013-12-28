@@ -170,8 +170,15 @@ namespace store {
 
 	void CudaController::SetProperDevice()
 	{
-		cudaThreadExit(); // clears all the runtime state for the current thread
-		cudaSetDevice(this->_cudaDeviceId); // explicit set the current device for the other calls
+		int devId = -1;
+
+		CUDA_CHECK_RETURN( cudaGetDevice(&devId) );
+
+		if(devId != this->_cudaDeviceId)
+		{
+			CUDA_CHECK_RETURN( cudaThreadExit() ); // clears all the runtime state for the current thread
+			CUDA_CHECK_RETURN( cudaSetDevice(this->_cudaDeviceId) ); // explicit set the current device for the other calls
+		}
 	}
 
 } /* namespace store */

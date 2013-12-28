@@ -26,22 +26,22 @@ namespace store {
 		_cudaController->SetMainMemoryOffset(size);
 	}
 
+	// check thrust version
+	TEST_F(StoreQueryCoreTest, ThrustVersion)
+	{
+		int major = THRUST_MAJOR_VERSION;
+		int minor = THRUST_MINOR_VERSION;
+		RecordProperty("Thrust version major", major);
+		RecordProperty("Thrust version minor", minor);
+		EXPECT_EQ(1, major);
+		EXPECT_EQ(7, minor);
+	}
 
 	/***************************/
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
 	//mapData
-
-		TEST_F(StoreQueryCoreTest, ThrustVersion)
-		{
-			int major = THRUST_MAJOR_VERSION;
-			int minor = THRUST_MINOR_VERSION;
-			RecordProperty("Thrust version major", major);
-			RecordProperty("Thrust version minor", minor);
-			EXPECT_EQ(1, major);
-			EXPECT_EQ(7, minor);
-		}
 
 		TEST_F(StoreQueryCoreTest, mapData_AllData)
 		{
@@ -168,6 +168,7 @@ namespace store {
 
 		TEST_F(StoreQueryCoreTest, filterData_ExistingTags)
 		{
+			// PREPARE
 			int N = 100;
 			storeElement* hostElements = new storeElement[N];
 			for(int i=0; i<N; i++)
@@ -214,6 +215,7 @@ namespace store {
 
 		TEST_F(StoreQueryCoreTest, filterData_NonExistingTags)
 		{
+			// PREPARE
 			int N = 100;
 			storeElement* hostElements = new storeElement[N];
 			for(int i=0; i<N; i++)
@@ -246,7 +248,23 @@ namespace store {
 
 		TEST_F(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
 		{
+			// PREPARE
+			char* hostData;
+			storeQuery query;
+			query.aggregationType = AggregationType::None;
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{64,127});
 
+			// TEST
+			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(64, size);
+			for(unsigned long i=0; i<size; i++)
+							EXPECT_EQ((char)((i+size)%256), hostData[i]);
+
+			// CLEAN
+			free( hostData );
 		}
 
 		TEST_F(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation)
