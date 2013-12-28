@@ -125,6 +125,6 @@ extern "C" void cudaPrintfEnd();
 //      Returns:
 //              cudaSuccess if all is well.
 //
-extern "C" cudaError_t cudaPrintfDisplay(void *outputFP=NULL, bool showThreadID=false);
+extern "C" cudaError_t cudaPrintfDisplay(void *outputFP=nullptr, bool showThreadID=false);
 
 #endif  // CUPRINTF_H

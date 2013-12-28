@@ -6,7 +6,7 @@ namespace btree {
 	TEST_F(BTreeMonitorTest, Constructor)
 	{
 		// CHECK
-		EXPECT_TRUE(_monitor != NULL);
+		EXPECT_TRUE(_monitor != nullptr);
 		auto result = _monitor->SelectAll();
 		ASSERT_TRUE(result->empty());
 	}

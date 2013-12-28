@@ -337,7 +337,7 @@ private:
         inline void initialize()
         {
             node::initialize(0);
-            prevleaf = nextleaf = NULL;
+            prevleaf = nextleaf = nullptr;
         }
 
         /// True if the node's slots are full
@@ -496,7 +496,7 @@ public:
 
         /// Default-Constructor of a mutable iterator
         inline iterator()
-            : currnode(NULL), currslot(0)
+            : currnode(nullptr), currslot(0)
         { }
 
         /// Initializing-Constructor of a mutable iterator
@@ -544,7 +544,7 @@ public:
             if (currslot + 1 < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 0;
             }
@@ -564,7 +564,7 @@ public:
             if (currslot + 1 < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 0;
             }
@@ -582,7 +582,7 @@ public:
             if (currslot > 0) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse - 1;
             }
@@ -602,7 +602,7 @@ public:
             if (currslot > 0) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse - 1;
             }
@@ -688,7 +688,7 @@ public:
 
         /// Default-Constructor of a const iterator
         inline const_iterator()
-            : currnode(NULL), currslot(0)
+            : currnode(nullptr), currslot(0)
         { }
 
         /// Initializing-Constructor of a const iterator
@@ -747,7 +747,7 @@ public:
             if (currslot + 1 < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 0;
             }
@@ -767,7 +767,7 @@ public:
             if (currslot + 1 < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 0;
             }
@@ -785,7 +785,7 @@ public:
             if (currslot > 0) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse - 1;
             }
@@ -805,7 +805,7 @@ public:
             if (currslot > 0) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse - 1;
             }
@@ -899,7 +899,7 @@ public:
 
         /// Default-Constructor of a reverse iterator
         inline reverse_iterator()
-            : currnode(NULL), currslot(0)
+            : currnode(nullptr), currslot(0)
         { }
 
         /// Initializing-Constructor of a mutable reverse iterator
@@ -951,7 +951,7 @@ public:
             if (currslot > 1) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse;
             }
@@ -971,7 +971,7 @@ public:
             if (currslot > 1) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse;
             }
@@ -989,7 +989,7 @@ public:
             if (currslot < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 1;
             }
@@ -1009,7 +1009,7 @@ public:
             if (currslot < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 1;
             }
@@ -1095,7 +1095,7 @@ public:
 
         /// Default-Constructor of a const reverse iterator
         inline const_reverse_iterator()
-            : currnode(NULL), currslot(0)
+            : currnode(nullptr), currslot(0)
         { }
 
         /// Initializing-Constructor of a const reverse iterator
@@ -1158,7 +1158,7 @@ public:
             if (currslot > 1) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse;
             }
@@ -1178,7 +1178,7 @@ public:
             if (currslot > 1) {
                 --currslot;
             }
-            else if (currnode->prevleaf != NULL) {
+            else if (currnode->prevleaf != nullptr) {
                 currnode = currnode->prevleaf;
                 currslot = currnode->slotuse;
             }
@@ -1196,7 +1196,7 @@ public:
             if (currslot < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 1;
             }
@@ -1216,7 +1216,7 @@ public:
             if (currslot < currnode->slotuse) {
                 ++currslot;
             }
-            else if (currnode->nextleaf != NULL) {
+            else if (currnode->nextleaf != nullptr) {
                 currnode = currnode->nextleaf;
                 currslot = 1;
             }
@@ -1311,7 +1311,7 @@ public:
     /// Default constructor initializing an empty B+ tree with the standard key
     /// comparison function
     explicit inline btree(const allocator_type &alloc = allocator_type())
-        : m_root(NULL), m_headleaf(NULL), m_tailleaf(NULL), m_allocator(alloc)
+        : m_root(nullptr), m_headleaf(nullptr), m_tailleaf(nullptr), m_allocator(alloc)
     {
     }
 
@@ -1319,7 +1319,7 @@ public:
     /// comparison object
     explicit inline btree(const key_compare &kcf,
                           const allocator_type &alloc = allocator_type())
-        : m_root(NULL), m_headleaf(NULL), m_tailleaf(NULL),
+        : m_root(nullptr), m_headleaf(nullptr), m_tailleaf(nullptr),
           m_key_less(kcf), m_allocator(alloc)
     {
     }
@@ -1330,7 +1330,7 @@ public:
     template <class InputIterator>
     inline btree(InputIterator first, InputIterator last,
                  const allocator_type &alloc = allocator_type())
-        : m_root(NULL), m_headleaf(NULL), m_tailleaf(NULL), m_allocator(alloc)
+        : m_root(nullptr), m_headleaf(nullptr), m_tailleaf(nullptr), m_allocator(alloc)
     {
         insert(first, last);
     }
@@ -1341,7 +1341,7 @@ public:
     template <class InputIterator>
     inline btree(InputIterator first, InputIterator last, const key_compare &kcf,
                  const allocator_type &alloc = allocator_type())
-        : m_root(NULL), m_headleaf(NULL), m_tailleaf(NULL),
+        : m_root(nullptr), m_headleaf(nullptr), m_tailleaf(nullptr),
           m_key_less(kcf), m_allocator(alloc)
     {
         insert(first, last);
@@ -1531,8 +1531,8 @@ public:
             clear_recursive(m_root);
             free_node(m_root);
 
-            m_root = NULL;
-            m_headleaf = m_tailleaf = NULL;
+            m_root = nullptr;
+            m_headleaf = m_tailleaf = nullptr;
 
             m_stats = tree_stats();
         }
@@ -2020,7 +2020,7 @@ public:
     /// Copy constructor. The newly initialized B+ tree object will contain a
     /// copy of all key/data pairs.
     inline btree(const btree_self &other)
-        : m_root(NULL), m_headleaf(NULL), m_tailleaf(NULL),
+        : m_root(nullptr), m_headleaf(nullptr), m_tailleaf(nullptr),
           m_stats( other.m_stats ),
           m_key_less( other.key_comp() ),
           m_allocator( other.get_allocator() )
@@ -2048,10 +2048,10 @@ private:
             std::copy(leaf->slotkey, leaf->slotkey + leaf->slotuse, newleaf->slotkey);
             data_copy(leaf->slotdata, leaf->slotdata + leaf->slotuse, newleaf->slotdata);
 
-            if (m_headleaf == NULL)
+            if (m_headleaf == nullptr)
             {
                 m_headleaf = m_tailleaf = newleaf;
-                newleaf->prevleaf = newleaf->nextleaf = NULL;
+                newleaf->prevleaf = newleaf->nextleaf = nullptr;
             }
             else
             {
@@ -2143,10 +2143,10 @@ private:
     /// splits. Returns true if the item was inserted
     std::pair<iterator, bool> insert_start(const key_type& key, const data_type& value)
     {
-        node *newchild = NULL;
+        node *newchild = nullptr;
         key_type newkey = key_type();
 
-        if (m_root == NULL) {
+        if (m_root == nullptr) {
             m_root = m_headleaf = m_tailleaf = allocate_leaf();
         }
 
@@ -2196,7 +2196,7 @@ private:
             inner_node *inner = static_cast<inner_node*>(n);
 
             key_type newkey = key_type();
-            node *newchild = NULL;
+            node *newchild = nullptr;
 
             int slot = find_lower(inner, key);
 
@@ -2334,7 +2334,7 @@ private:
         newleaf->slotuse = leaf->slotuse - mid;
 
         newleaf->nextleaf = leaf->nextleaf;
-        if (newleaf->nextleaf == NULL) {
+        if (newleaf->nextleaf == nullptr) {
             BTREE_ASSERT(leaf == m_tailleaf);
             m_tailleaf = newleaf;
         }
@@ -2422,7 +2422,7 @@ public:
             for (size_t s = 0; s < leaf->slotuse; ++s, ++it)
                 leaf->set_slot(s, *it);
 
-            if (m_tailleaf != NULL) {
+            if (m_tailleaf != nullptr) {
                 m_tailleaf->nextleaf = leaf;
                 leaf->prevleaf = m_tailleaf;
             }
@@ -2480,7 +2480,7 @@ public:
             num_leaves -= n->slotuse+1;
         }
 
-        BTREE_ASSERT( leaf == NULL && num_leaves == 0 );
+        BTREE_ASSERT( leaf == nullptr && num_leaves == 0 );
 
         // recursively build inner nodes pointing to inner nodes.
         for (int level = 2; num_parents != 1; ++level)
@@ -2601,7 +2601,7 @@ public:
 
         if (!m_root) return false;
 
-        result_t result = erase_one_descend(key, m_root, NULL, NULL, NULL, NULL, NULL, 0);
+        result_t result = erase_one_descend(key, m_root, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
 
         if (!result.has(btree_not_found))
             --m_stats.itemcount;
@@ -2638,7 +2638,7 @@ public:
 
         if (!m_root) return;
 
-        result_t result = erase_iter_descend(iter, m_root, NULL, NULL, NULL, NULL, NULL, 0);
+        result_t result = erase_iter_descend(iter, m_root, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
 
         if (!result.has(btree_not_found))
             --m_stats.itemcount;
@@ -2730,16 +2730,16 @@ private:
                 // determine what to do about the underflow
 
                 // case : if this empty leaf is the root, then delete all nodes
-                // and set root to NULL.
-                if (leftleaf == NULL && rightleaf == NULL)
+                // and set root to nullptr.
+                if (leftleaf == nullptr && rightleaf == nullptr)
                 {
                     BTREE_ASSERT(leaf == m_root);
                     BTREE_ASSERT(leaf->slotuse == 0);
 
                     free_node(m_root);
 
-                    m_root = leaf = NULL;
-                    m_headleaf = m_tailleaf = NULL;
+                    m_root = leaf = nullptr;
+                    m_headleaf = m_tailleaf = nullptr;
 
                     // will be decremented soon by insert_start()
                     BTREE_ASSERT(m_stats.itemcount == 1);
@@ -2751,7 +2751,7 @@ private:
                 // case : if both left and right leaves would underflow in case of
                 // a shift, then merging is necessary. choose the more local merger
                 // with our parent
-                else if ( (leftleaf == NULL || leftleaf->isfew()) && (rightleaf == NULL || rightleaf->isfew()) )
+                else if ( (leftleaf == nullptr || leftleaf->isfew()) && (rightleaf == nullptr || rightleaf->isfew()) )
                 {
                     if (leftparent == parent)
                         myres |= merge_leaves(leftleaf, leaf, leftparent);
@@ -2759,7 +2759,7 @@ private:
                         myres |= merge_leaves(leaf, rightleaf, rightparent);
                 }
                 // case : the right leaf has extra data, so balance right with current
-                else if ( (leftleaf != NULL && leftleaf->isfew()) && (rightleaf != NULL && !rightleaf->isfew()) )
+                else if ( (leftleaf != nullptr && leftleaf->isfew()) && (rightleaf != nullptr && !rightleaf->isfew()) )
                 {
                     if (rightparent == parent)
                         myres |= shift_left_leaf(leaf, rightleaf, rightparent, parentslot);
@@ -2767,7 +2767,7 @@ private:
                         myres |= merge_leaves(leftleaf, leaf, leftparent);
                 }
                 // case : the left leaf has extra data, so balance left with current
-                else if ( (leftleaf != NULL && !leftleaf->isfew()) && (rightleaf != NULL && rightleaf->isfew()) )
+                else if ( (leftleaf != nullptr && !leftleaf->isfew()) && (rightleaf != nullptr && rightleaf->isfew()) )
                 {
                     if (leftparent == parent)
                         shift_right_leaf(leftleaf, leaf, leftparent, parentslot - 1);
@@ -2806,7 +2806,7 @@ private:
             int slot = find_lower(inner, key);
 
             if (slot == 0) {
-                myleft = (left == NULL) ? NULL : (static_cast<inner_node*>(left))->childid[left->slotuse - 1];
+                myleft = (left == nullptr) ? nullptr : (static_cast<inner_node*>(left))->childid[left->slotuse - 1];
                 myleftparent = leftparent;
             }
             else {
@@ -2815,7 +2815,7 @@ private:
             }
 
             if (slot == inner->slotuse) {
-                myright = (right == NULL) ? NULL : (static_cast<inner_node*>(right))->childid[0];
+                myright = (right == nullptr) ? nullptr : (static_cast<inner_node*>(right))->childid[0];
                 myrightparent = rightparent;
             }
             else {
@@ -2884,7 +2884,7 @@ private:
             if (inner->isunderflow() && !(inner == m_root && inner->slotuse >= 1))
             {
                 // case: the inner node is the root and has just one child. that child becomes the new root
-                if (leftinner == NULL && rightinner == NULL)
+                if (leftinner == nullptr && rightinner == nullptr)
                 {
                     BTREE_ASSERT(inner == m_root);
                     BTREE_ASSERT(inner->slotuse == 0);
@@ -2899,7 +2899,7 @@ private:
                 // case : if both left and right leaves would underflow in case of
                 // a shift, then merging is necessary. choose the more local merger
                 // with our parent
-                else if ( (leftinner == NULL || leftinner->isfew()) && (rightinner == NULL || rightinner->isfew()) )
+                else if ( (leftinner == nullptr || leftinner->isfew()) && (rightinner == nullptr || rightinner->isfew()) )
                 {
                     if (leftparent == parent)
                         myres |= merge_inner(leftinner, inner, leftparent, parentslot - 1);
@@ -2907,7 +2907,7 @@ private:
                         myres |= merge_inner(inner, rightinner, rightparent, parentslot);
                 }
                 // case : the right leaf has extra data, so balance right with current
-                else if ( (leftinner != NULL && leftinner->isfew()) && (rightinner != NULL && !rightinner->isfew()) )
+                else if ( (leftinner != nullptr && leftinner->isfew()) && (rightinner != nullptr && !rightinner->isfew()) )
                 {
                     if (rightparent == parent)
                         shift_left_inner(inner, rightinner, rightparent, parentslot);
@@ -2915,7 +2915,7 @@ private:
                         myres |= merge_inner(leftinner, inner, leftparent, parentslot - 1);
                 }
                 // case : the left leaf has extra data, so balance left with current
-                else if ( (leftinner != NULL && !leftinner->isfew()) && (rightinner != NULL && rightinner->isfew()) )
+                else if ( (leftinner != nullptr && !leftinner->isfew()) && (rightinner != nullptr && rightinner->isfew()) )
                 {
                     if (leftparent == parent)
                         shift_right_inner(leftinner, inner, leftparent, parentslot - 1);
@@ -3026,16 +3026,16 @@ private:
                 // determine what to do about the underflow
 
                 // case : if this empty leaf is the root, then delete all nodes
-                // and set root to NULL.
-                if (leftleaf == NULL && rightleaf == NULL)
+                // and set root to nullptr.
+                if (leftleaf == nullptr && rightleaf == nullptr)
                 {
                     BTREE_ASSERT(leaf == m_root);
                     BTREE_ASSERT(leaf->slotuse == 0);
 
                     free_node(m_root);
 
-                    m_root = leaf = NULL;
-                    m_headleaf = m_tailleaf = NULL;
+                    m_root = leaf = nullptr;
+                    m_headleaf = m_tailleaf = nullptr;
 
                     // will be decremented soon by insert_start()
                     BTREE_ASSERT(m_stats.itemcount == 1);
@@ -3047,7 +3047,7 @@ private:
                 // case : if both left and right leaves would underflow in case of
                 // a shift, then merging is necessary. choose the more local merger
                 // with our parent
-                else if ( (leftleaf == NULL || leftleaf->isfew()) && (rightleaf == NULL || rightleaf->isfew()) )
+                else if ( (leftleaf == nullptr || leftleaf->isfew()) && (rightleaf == nullptr || rightleaf->isfew()) )
                 {
                     if (leftparent == parent)
                         myres |= merge_leaves(leftleaf, leaf, leftparent);
@@ -3055,7 +3055,7 @@ private:
                         myres |= merge_leaves(leaf, rightleaf, rightparent);
                 }
                 // case : the right leaf has extra data, so balance right with current
-                else if ( (leftleaf != NULL && leftleaf->isfew()) && (rightleaf != NULL && !rightleaf->isfew()) )
+                else if ( (leftleaf != nullptr && leftleaf->isfew()) && (rightleaf != nullptr && !rightleaf->isfew()) )
                 {
                     if (rightparent == parent)
                         myres |= shift_left_leaf(leaf, rightleaf, rightparent, parentslot);
@@ -3063,7 +3063,7 @@ private:
                         myres |= merge_leaves(leftleaf, leaf, leftparent);
                 }
                 // case : the left leaf has extra data, so balance left with current
-                else if ( (leftleaf != NULL && !leftleaf->isfew()) && (rightleaf != NULL && rightleaf->isfew()) )
+                else if ( (leftleaf != nullptr && !leftleaf->isfew()) && (rightleaf != nullptr && rightleaf->isfew()) )
                 {
                     if (leftparent == parent)
                         shift_right_leaf(leftleaf, leaf, leftparent, parentslot - 1);
@@ -3108,7 +3108,7 @@ private:
                 inner_node *myleftparent, *myrightparent;
 
                 if (slot == 0) {
-                    myleft = (left == NULL) ? NULL : (static_cast<inner_node*>(left))->childid[left->slotuse - 1];
+                    myleft = (left == nullptr) ? nullptr : (static_cast<inner_node*>(left))->childid[left->slotuse - 1];
                     myleftparent = leftparent;
                 }
                 else {
@@ -3117,7 +3117,7 @@ private:
                 }
 
                 if (slot == inner->slotuse) {
-                    myright = (right == NULL) ? NULL : (static_cast<inner_node*>(right))->childid[0];
+                    myright = (right == nullptr) ? nullptr : (static_cast<inner_node*>(right))->childid[0];
                     myrightparent = rightparent;
                 }
                 else {
@@ -3196,7 +3196,7 @@ private:
             {
                 // case: the inner node is the root and has just one
                 // child. that child becomes the new root
-                if (leftinner == NULL && rightinner == NULL)
+                if (leftinner == nullptr && rightinner == nullptr)
                 {
                     BTREE_ASSERT(inner == m_root);
                     BTREE_ASSERT(inner->slotuse == 0);
@@ -3211,7 +3211,7 @@ private:
                 // case : if both left and right leaves would underflow in case of
                 // a shift, then merging is necessary. choose the more local merger
                 // with our parent
-                else if ( (leftinner == NULL || leftinner->isfew()) && (rightinner == NULL || rightinner->isfew()) )
+                else if ( (leftinner == nullptr || leftinner->isfew()) && (rightinner == nullptr || rightinner->isfew()) )
                 {
                     if (leftparent == parent)
                         myres |= merge_inner(leftinner, inner, leftparent, parentslot - 1);
@@ -3219,7 +3219,7 @@ private:
                         myres |= merge_inner(inner, rightinner, rightparent, parentslot);
                 }
                 // case : the right leaf has extra data, so balance right with current
-                else if ( (leftinner != NULL && leftinner->isfew()) && (rightinner != NULL && !rightinner->isfew()) )
+                else if ( (leftinner != nullptr && leftinner->isfew()) && (rightinner != nullptr && !rightinner->isfew()) )
                 {
                     if (rightparent == parent)
                         shift_left_inner(inner, rightinner, rightparent, parentslot);
@@ -3227,7 +3227,7 @@ private:
                         myres |= merge_inner(leftinner, inner, leftparent, parentslot - 1);
                 }
                 // case : the left leaf has extra data, so balance left with current
-                else if ( (leftinner != NULL && !leftinner->isfew()) && (rightinner != NULL && rightinner->isfew()) )
+                else if ( (leftinner != nullptr && !leftinner->isfew()) && (rightinner != nullptr && rightinner->isfew()) )
                 {
                     if (leftparent == parent)
                         shift_right_inner(leftinner, inner, leftparent, parentslot - 1);
@@ -3736,13 +3736,13 @@ private:
     {
         const leaf_node *n = m_headleaf;
 
-        assert(n != NULL);
+        assert(n != nullptr);
         assert(n->level == 0);
-        assert(n->prevleaf == NULL);
+        assert(n->prevleaf == nullptr);
 
         unsigned int testcount = 0;
 
-        while(n)
+        while(n != nullptr)
         {
             assert(n->level == 0);
             assert(n->slotuse > 0);
@@ -3879,7 +3879,7 @@ public:
         if (fileheader.itemcount > 0)
         {
             m_root = restore_node(is);
-            if (m_root == NULL) return false;
+            if (m_root == nullptr) return false;
 
             m_stats.itemcount = fileheader.itemcount;
         }
@@ -3932,13 +3932,13 @@ private:
 
         // first read only the top of the node
         is.read(reinterpret_cast<char*>(&nu.top), sizeof(nu.top));
-        if (!is.good()) return NULL;
+        if (!is.good()) return nullptr;
 
         if (nu.top.isleafnode())
         {
             // read remaining data of leaf node
             is.read(reinterpret_cast<char*>(&nu.leaf) + sizeof(nu.top), sizeof(nu.leaf) - sizeof(nu.top));
-            if (!is.good()) return NULL;
+            if (!is.good()) return nullptr;
 
             leaf_node *newleaf = allocate_leaf();
 
@@ -3946,8 +3946,8 @@ private:
             *newleaf = nu.leaf;
 
             // reconstruct the linked list from the order in the file
-            if (m_headleaf == NULL) {
-                BTREE_ASSERT(newleaf->prevleaf == NULL);
+            if (m_headleaf == nullptr) {
+                BTREE_ASSERT(newleaf->prevleaf == nullptr);
                 m_headleaf = m_tailleaf = newleaf;
             }
             else {
@@ -3962,7 +3962,7 @@ private:
         {
             // read remaining data of inner node
             is.read(reinterpret_cast<char*>(&nu.inner) + sizeof(nu.top), sizeof(nu.inner) - sizeof(nu.top));
-            if (!is.good()) return NULL;
+            if (!is.good()) return nullptr;
 
             inner_node *newinner = allocate_inner(0);
 

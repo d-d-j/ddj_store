@@ -6,7 +6,7 @@ namespace task {
 
 	TEST_F(TaskTest, Constructor)
 	{
-		ASSERT_TRUE(_task != NULL);
+		ASSERT_TRUE(_task != nullptr);
 		EXPECT_FALSE(_task->IsCompleated());
 		EXPECT_EQ(nullptr, _task->GetResult());
 	}
@@ -20,7 +20,7 @@ namespace task {
 
 		// TEST
 		_task->appendMessage(foo);
-		_task->appendMessage(NULL);
+		_task->appendMessage(nullptr);
 		_task->appendMessage(bar);
 
 		// CHECK

@@ -4,7 +4,7 @@ namespace ddj {
 
 	TEST_F(SemaphoreTest, Constructor)
 	{
-		EXPECT_TRUE(_semaphore != NULL);
+		EXPECT_TRUE(_semaphore != nullptr);
 	}
 
 	TEST_F(SemaphoreTest, Two_Threads_Trying_To_Acces_Critical_Section)

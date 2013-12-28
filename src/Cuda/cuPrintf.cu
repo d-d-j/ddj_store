@@ -76,10 +76,10 @@ typedef struct __align__(8)
 // calculated from printfBufferPtr by mod-ing with printfBufferLength.
 // For sm_10 architecture, we must subdivide the buffer per-thread
 // since we do not even have an atomic primitive.
-__constant__ static char *globalPrintfBuffer = NULL;         // Start of circular buffer (set up by host)
+__constant__ static char *globalPrintfBuffer = nullptr;         // Start of circular buffer (set up by host)
 __constant__ static int printfBufferLength = 0;              // Size of circular buffer (set up by host)
 __device__ static cuPrintfRestriction restrictRules;         // Output restrictions
-__device__ volatile static char *printfBufferPtr = NULL;     // Current atomically-incremented non-wrapped offset
+__device__ volatile static char *printfBufferPtr = nullptr;     // Current atomically-incremented non-wrapped offset
 
 // This is the header preceeding all printf entries.
 // NOTE: It *must* be size-aligned to the maximum entity size (size_t)
@@ -133,18 +133,18 @@ __device__ static char *getNextPrintfBufPtr()
     // Initialisation check
     if (!printfBufferPtr)
     {
-        return NULL;
+        return nullptr;
     }
 
     // Thread/block restriction check
     if ((restrictRules.blockid != CUPRINTF_UNRESTRICTED) && (restrictRules.blockid != (blockIdx.x + gridDim.x*blockIdx.y)))
     {
-        return NULL;
+        return nullptr;
     }
 
     if ((restrictRules.threadid != CUPRINTF_UNRESTRICTED) && (restrictRules.threadid != (threadIdx.x + blockDim.x*threadIdx.y + blockDim.x*blockDim.y*threadIdx.z)))
     {
-        return NULL;
+        return nullptr;
     }
 
     // Conditional section, dependent on architecture
@@ -164,7 +164,7 @@ __device__ static char *getNextPrintfBufPtr()
     // We *must* have a thread buffer length able to fit at least two printfs (one header, one real)
     if (thread_buf_len < (CUPRINTF_MAX_LEN * 2))
     {
-        return NULL;
+        return nullptr;
     }
 
     // Now address our section of the buffer. The first item is a header.
@@ -243,7 +243,7 @@ __device__ static char *cuPrintfStrncpy(char *dest, const char *src, int n, char
     // Initialisation and overflow check
     if (!dest || !src || (dest >= end))
     {
-        return NULL;
+        return nullptr;
     }
 
     // Prepare to write the length specifier. We're guaranteed to have
@@ -278,7 +278,7 @@ __device__ static char *cuPrintfStrncpy(char *dest, const char *src, int n, char
     }
 
     *lenptr = len;
-    return (dest < end) ? dest : NULL;        // Overflow means return NULL
+    return (dest < end) ? dest : nullptr;        // Overflow means return nullptr
 }
 
 
@@ -302,11 +302,11 @@ __device__ static char *copyArg(char *ptr, const char *arg, char *end)
     // Initialisation check
     if (!ptr || !arg)
     {
-        return NULL;
+        return nullptr;
     }
 
     // strncpy does all our work. We just terminate.
-    if ((ptr = cuPrintfStrncpy(ptr, arg, CUPRINTF_MAX_LEN, end)) != NULL)
+    if ((ptr = cuPrintfStrncpy(ptr, arg, CUPRINTF_MAX_LEN, end)) != nullptr)
     {
         *ptr = 0;
     }
@@ -322,7 +322,7 @@ __device__ static char *copyArg(char *ptr, T &arg, char *end)
     // to check that one offset.
     if (!ptr || ((ptr+CUPRINTF_ALIGN_SIZE) >= end))
     {
-        return NULL;
+        return nullptr;
     }
 
     // Write the length and argument
@@ -357,7 +357,7 @@ __device__ static char *copyArg(char *ptr, T &arg, char *end)
 //  makes it look like we're done.
 //
 //  Errors, which are basically lack-of-initialisation, are ignored
-//  in the called functions because NULL pointers are passed around
+//  in the called functions because nullptr pointers are passed around
 //
 
 // All printf variants basically do the same thing, setting up the
@@ -365,7 +365,7 @@ __device__ static char *copyArg(char *ptr, T &arg, char *end)
 // clarity, we'll pack the code into some big macros.
 #define CUPRINTF_PREAMBLE \
     char *start, *end, *bufptr, *fmtstart; \
-    if((start = getNextPrintfBufPtr()) == NULL) return 0; \
+    if((start = getNextPrintfBufPtr()) == nullptr) return 0; \
     end = start + CUPRINTF_MAX_LEN; \
     bufptr = start + sizeof(cuPrintfHeader);
 
@@ -377,7 +377,7 @@ __device__ static char *copyArg(char *ptr, T &arg, char *end)
 #define CUPRINTF_POSTAMBLE \
     fmtstart = bufptr; \
     end = cuPrintfStrncpy(bufptr, fmt, CUPRINTF_MAX_LEN, end); \
-    writePrintfHeader(start, end ? fmtstart : NULL); \
+    writePrintfHeader(start, end ? fmtstart : nullptr); \
     return end ? (int)(end - start) : 0;
 
 __device__ int cuPrintf(const char *fmt)
@@ -549,8 +549,8 @@ __device__ void cuPrintfRestrict(int threadid, int blockid)
 #include <stdio.h>
 static FILE *printf_fp;
 
-static char *printfbuf_start=NULL;
-static char *printfbuf_device=NULL;
+static char *printfbuf_start=nullptr;
+static char *printfbuf_device=nullptr;
 static int printfbuf_len=0;
 
 
@@ -575,7 +575,7 @@ static int outputPrintfData(char *fmt, char *data)
     // to format it.
     char *p = strchr(fmt, '%');
 
-    while (p != NULL)
+    while (p != nullptr)
     {
         // Print up to the % character
         *p = '\0';
@@ -792,7 +792,7 @@ extern "C" void cudaPrintfEnd()
     }
 
     cudaFree(printfbuf_device);
-    printfbuf_start = printfbuf_device = NULL;
+    printfbuf_start = printfbuf_device = nullptr;
 }
 
 
@@ -809,12 +809,12 @@ extern "C" void cudaPrintfEnd()
 //  access, then the whole buffer should empty in one go.
 //
 //      Arguments:
-//              outputFP     - File descriptor to output to (NULL => stdout)
+//              outputFP     - File descriptor to output to (nullptr => stdout)
 //              showThreadID - If true, prints [block,thread] before each line
 //
 extern "C" cudaError_t cudaPrintfDisplay(void *outputFP, bool showThreadID)
 {
-    printf_fp = (FILE *)((outputFP == NULL) ? stdout : outputFP);
+    printf_fp = (FILE *)((outputFP == nullptr) ? stdout : outputFP);
 
     // For now, we force "synchronous" mode which means we're not concurrent
     // with kernel execution. This also means we don't need clearOnPrint.
@@ -889,7 +889,7 @@ extern "C" cudaError_t cudaPrintfDisplay(void *outputFP, bool showThreadID)
     else if (magic == CUPRINTF_SM11_MAGIC)
     {
         // Grab the current "end of circular buffer" pointer.
-        char *printfbuf_end = NULL;
+        char *printfbuf_end = nullptr;
         cudaMemcpyFromSymbol(&printfbuf_end, printfBufferPtr, sizeof(char *));
 
         // Adjust our starting and ending pointers to within the block

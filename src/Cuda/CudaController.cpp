@@ -34,7 +34,7 @@ namespace store {
 		}
 
 		this->_mainMemoryOffset = 0;
-		this->_mainMemoryPointer = NULL;
+		this->_mainMemoryPointer = nullptr;
 
 		this->allocateMainGpuStorage();
 

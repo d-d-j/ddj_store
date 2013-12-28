@@ -24,7 +24,7 @@ namespace store {
 		// TODO: Implement for Mac OS X
 		*ramTotal = *ramFree = -1;
 		FILE *meminfo = fopen("/proc/meminfo", "r");
-		if (meminfo == NULL)
+		if (meminfo == nullptr)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Unable to open meminfo"));
 			return;
