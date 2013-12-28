@@ -151,7 +151,7 @@ namespace store {
 			}
 			else
 			{
-				LOG4CPLUS_INFO(this->_logger, "CUDA SUCCESS - allocated " << (float)memorySize/mbSize << " MB of GPU memory");
+				LOG4CPLUS_WARN(this->_logger, "CUDA SUCCESS - allocated " << (float)memorySize/mbSize << " MB of GPU memory");
 				this->_mainMemoryCapacity = memorySize;
 				break;
 			}

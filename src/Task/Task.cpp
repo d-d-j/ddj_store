@@ -33,12 +33,12 @@ namespace task {
 
 	Task::~Task()
 	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+
 		delete this->_taskData;
-		this->_taskData = nullptr;
 		delete this->_message;
-		this->_message = nullptr;
 		free(this->_resultData);
-		this->_resultData = nullptr;
+		delete this->_result;
 	}
 
 	void Task::appendMessage(const char* message)
@@ -68,7 +68,7 @@ namespace task {
 			void* resultData,
 			size_t resultSize)
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
+		boost::mutex::scoped_lock lock(this->_mutex);
 
 		// Append message to task message
 		this->appendMessage(message);
@@ -100,8 +100,7 @@ namespace task {
 					this->_taskId,
 					this->_type,
 					this->_resultData,
-					this->_resultSize,
-					this->_message
+					this->_resultSize
 					);
 			this->_isCompleated = true;
 			this->_condResponseReady->notify_one();
@@ -110,27 +109,25 @@ namespace task {
 
 	taskResult* Task::GetResult()
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
-
+		boost::mutex::scoped_lock lock(this->_mutex);
 		return this->_result;
 	}
 
 	TaskType Task::GetType()
 	{
+		boost::mutex::scoped_lock lock(this->_mutex);
 		return this->_type;
 	}
 
 	void* Task::GetData()
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
-
+		boost::mutex::scoped_lock lock(this->_mutex);
 		return this->_taskData;
 	}
 
 	bool Task::IsCompleated()
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
-
+		boost::mutex::scoped_lock lock(this->_mutex);
 		return this->_isCompleated;
 	}
 

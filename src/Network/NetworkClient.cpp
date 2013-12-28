@@ -62,31 +62,31 @@ namespace network {
 	void NetworkClient::SendLoginRequest(networkLoginRequest* request)
 	{
 		size_t len = sizeof(int)*(request->cuda_devices_count + 1);
-		char msg[len];
+		boost::shared_ptr<char> msg(new char[len]);
 
-		memcpy(msg, &(request->cuda_devices_count), sizeof(int));
-		memcpy(msg + sizeof(int), request->devices, sizeof(int)*request->cuda_devices_count);
+		memcpy(msg.get(), &(request->cuda_devices_count), sizeof(int));
+		memcpy(msg.get() + sizeof(int), request->devices, sizeof(int)*request->cuda_devices_count);
 
-		write(msg, len);
+		write(msg.get(), len);
 	}
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
 		int deviceId = TASK_ALL_DEVICES;
 		int len = sizeof(int64_t) + 3*sizeof(int32_t) + taskResult->result_size;
-		char oldMsg[len];
-		char *msg = oldMsg;
-		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));
-		msg += sizeof(int64_t);
-		memcpy(msg, &(taskResult->type), sizeof(int32_t));
-		msg += sizeof(int32_t);
-		memcpy(msg, &(taskResult->result_size), sizeof(int32_t));
-		msg += sizeof(int32_t);
-		memcpy(msg, &deviceId, sizeof(int32_t));
-		msg += sizeof(int32_t);
-		memcpy(msg, taskResult->result_data, taskResult->result_size);
+		boost::shared_ptr<char> msg(new char[len]);
+		int position = 0;
+		memcpy(msg.get()+position, &(taskResult->task_id), sizeof(int64_t));
+		position += sizeof(int64_t);
+		memcpy(msg.get()+position, &(taskResult->type), sizeof(int32_t));
+		position += sizeof(int32_t);
+		memcpy(msg.get()+position, &(taskResult->result_size), sizeof(int32_t));
+		position += sizeof(int32_t);
+		memcpy(msg.get()+position, &deviceId, sizeof(int32_t));
+		position += sizeof(int32_t);
+		memcpy(msg.get()+position, taskResult->result_data, taskResult->result_size);
 
-		write(oldMsg, len);
+		boost::asio::write(*socket, boost::asio::buffer(msg.get(), len));
 	}
 
 	void NetworkClient::write(char *message, size_t length)

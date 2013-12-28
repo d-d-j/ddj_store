@@ -16,7 +16,6 @@ namespace task {
 		TaskType type;
 		int32_t result_size;
 		void* result_data;
-		char* message;
 
 		taskResult(
 				int64_t taskId,
@@ -27,8 +26,7 @@ namespace task {
 					task_id(taskId),
 					type(type),
 					result_size(resultSize),
-					result_data(resultData),
-					message(message){}
+					result_data(resultData){}
 
 		taskResult(const taskResult & result)
 		{
@@ -36,13 +34,14 @@ namespace task {
 			type = result.type;
 			result_size = result.result_size;
 			result_data = result.result_data;
-			message = result.message;
 		}
+
+		~taskResult(){}
 
 		bool operator== (const taskResult& rhs) const
 		{
 			if(task_id == rhs.task_id && type == rhs.type &&
-					result_size == rhs.result_size && strcmp(message, rhs.message) == 0)
+					result_size == rhs.result_size)
 			{
 				return true;
 			}
@@ -52,7 +51,7 @@ namespace task {
 		std::string toString()
 		{
 			 std::ostringstream stream;
-		     stream << "["<<task_id<<", "<<type<<", "<<result_size<<", "<<message<<"]";
+		     stream << "["<<task_id<<", "<<type<<", "<<result_size<<"]";
 		     return  stream.str();
 		}
 	};
