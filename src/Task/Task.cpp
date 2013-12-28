@@ -33,21 +33,12 @@ namespace task {
 
 	Task::~Task()
 	{
-		if(this->_taskData != nullptr)
-		{
-			delete (char*)this->_taskData;
-		}
-		if(this->_resultData != nullptr)
-		{
-			free(this->_resultData);
-		}
-		if (this->_message != nullptr)
-		{
-			delete this->_message;
-		}
+		delete this->_taskData;
 		this->_taskData = nullptr;
-		this->_resultData = nullptr;
+		delete this->_message;
 		this->_message = nullptr;
+		free(this->_resultData);
+		this->_resultData = nullptr;
 	}
 
 	void Task::appendMessage(const char* message)
