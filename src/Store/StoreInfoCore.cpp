@@ -3,7 +3,7 @@
 namespace ddj {
 namespace store {
 
-	size_t StoreInfoCore::GetNodeInfo(StoreNodeInfo** result)
+	size_t StoreInfoCore::GetNodeInfo(storeNodeInfo** result)
 	{
 		size_t gpuMemFree, gpuMemTotal;
 		int memTotal, memFree;
@@ -14,9 +14,9 @@ namespace store {
 		GetRamInKB(&memTotal, &memFree);
 
 
-		*result = new StoreNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
+		*result = new storeNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
 
-		return sizeof(StoreNodeInfo);
+		return sizeof(storeNodeInfo);
 	}
 
 	void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)

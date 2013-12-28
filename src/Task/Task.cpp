@@ -23,11 +23,12 @@ namespace task {
 		this->_condResponseReady = cond;
 		this->_isCompleated = false;
 		this->_isSuccessfull = false;
-		this->_message = NULL;
-		this->_resultData = NULL;
+		this->_message = nullptr;
+		this->_resultData = nullptr;
 		this->_resultSize = 0;
 		this->_currentResultCount = 0;
 		this->_expectedResultCount = expectedResultCount;
+		this->_result = nullptr;
 	}
 
 	Task::~Task()
@@ -46,11 +47,11 @@ namespace task {
 	{
 		std::string a = "";
 		std::string b = "";
-		if (this->_message != NULL)
+		if (this->_message != nullptr)
 		{
 			a = std::string(this->_message);
 		}
-		if (message != NULL)
+		if (message != nullptr)
 		{
 			b = std::string(message);
 		}
@@ -67,17 +68,23 @@ namespace task {
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
 		// Append message to task message
-		this->appendMessage(this->_message);
+		this->appendMessage(message);
 		this->_isSuccessfull &= isSuccessfull;
 
 		// Append data to task data
-		void* newTaskResult = malloc(this->_resultSize+resultSize);
-		memcpy(newTaskResult, this->_resultData, sizeof(this->_resultSize));
-		free(this->_resultData);
-		memcpy((char*)newTaskResult+this->_resultSize, resultData, resultSize);
-		free(resultData);
-		this->_resultData = newTaskResult;
-		this->_resultSize += resultSize;
+		if(resultData != nullptr && resultSize != 0)
+		{
+			int newSize = this->_resultSize+resultSize;
+			void* newTaskResult = malloc(newSize);
+			if(this->_resultData != nullptr && this->_resultSize != 0)
+			{
+				memcpy(newTaskResult, this->_resultData, this->_resultSize);
+				free(this->_resultData);
+			}
+			memcpy((char*)newTaskResult+this->_resultSize, resultData, resultSize);
+			this->_resultData = newTaskResult;
+			this->_resultSize = newSize;
+		}
 
 		// Decide if task is completed and should be reduced
 		this->_currentResultCount++;
@@ -85,6 +92,14 @@ namespace task {
 		{
 			// TODO: REDUCE TASK RESULTS
 
+			// SET TASK RESULT
+			this->_result = new taskResult(
+					this->_taskId,
+					this->_type,
+					this->_resultData,
+					this->_resultSize,
+					this->_message
+					);
 			this->_isCompleated = true;
 			this->_condResponseReady->notify_one();
 		}
@@ -94,12 +109,7 @@ namespace task {
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
 
-		return new taskResult(
-				this->_taskId,
-				this->_type,
-				this->_resultData,
-				this->_resultSize
-				);
+		return this->_result;
 	}
 
 	TaskType Task::GetType()
@@ -121,5 +131,5 @@ namespace task {
 		return this->_isCompleated;
 	}
 
-} /* namespace store */
+} /* namespace task */
 } /* namespace ddj */

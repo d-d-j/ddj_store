@@ -232,7 +232,7 @@ namespace store {
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
-		StoreNodeInfo* queryResult;
+		storeNodeInfo* queryResult;
 		try
 		{
 			// SET DEVICE TODO: Can be done once per thread

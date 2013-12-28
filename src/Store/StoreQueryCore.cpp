@@ -28,6 +28,7 @@ namespace store {
 		// Filter to set of tags specified in query (only if set is not empty)
 		size_t filteredStoreSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
 		LOG4CPLUS_DEBUG(this->_logger, "StoreQueryCore - filteredDataElemCount = " << filteredStoreSize/sizeof(storeElement));
+
 		// TODO: Aggregate all mapped data
 
 		// Set queryResult, clean and return result size

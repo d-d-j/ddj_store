@@ -95,10 +95,12 @@ namespace store {
 		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
 		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
 	//filterData
-		FRIEND_TEST(StoreQueryCoreTest, Select_All_Data);
-		FRIEND_TEST(StoreQueryCoreTest, Select_Data_Only_With_Specific_Tags);
-		FRIEND_TEST(StoreQueryCoreTest, Select_Data_From_Specific_Time_Frame);
-		FRIEND_TEST(StoreQueryCoreTest, Select_Data_From_Specific_Time_Frames);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_AllData);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_ExistingTags);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_NonExistingTags);
+	//selectData
+		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
+		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
 	//add
 		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);

@@ -4,6 +4,7 @@
 #include "TaskType.h"
 #include <string>
 #include <sstream>
+#include <cstring>
 
 namespace ddj {
 namespace task {
@@ -15,16 +16,19 @@ namespace task {
 		TaskType type;
 		int32_t result_size;
 		void* result_data;
+		char* message;
 
 		taskResult(
 				int64_t taskId,
 				TaskType type,
 				void* resultData = nullptr,
-				int32_t resultSize = 0):
+				int32_t resultSize = 0,
+				char* message = nullptr):
 					task_id(taskId),
 					type(type),
 					result_size(resultSize),
-					result_data(resultData){}
+					result_data(resultData),
+					message(message){}
 
 		taskResult(const taskResult & result)
 		{
@@ -32,12 +36,23 @@ namespace task {
 			type = result.type;
 			result_size = result.result_size;
 			result_data = result.result_data;
+			message = result.message;
+		}
+
+		bool operator== (const taskResult& rhs) const
+		{
+			if(task_id == rhs.task_id && type == rhs.type &&
+					result_size == rhs.result_size && strcmp(message, rhs.message) == 0)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		std::string toString()
 		{
 			 std::ostringstream stream;
-		     stream << "["<<task_id<<", "<<type<<", "<<result_size<<"]";
+		     stream << "["<<task_id<<", "<<type<<", "<<result_size<<", "<<message<<"]";
 		     return  stream.str();
 		}
 	};

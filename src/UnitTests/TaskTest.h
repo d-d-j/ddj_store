@@ -2,6 +2,7 @@
 #define TASKTEST_H
 
 #include "../Task/Task.h"
+#include "../Store/StoreNodeInfo.h"
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -14,9 +15,9 @@ namespace task {
 			_task = new Task(
 								0,
 								TaskType::Error,
-								NULL,
+								nullptr,
 								0,
-								NULL);
+								nullptr);
 		}
 
 		virtual void TearDown() {

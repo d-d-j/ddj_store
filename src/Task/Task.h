@@ -26,6 +26,7 @@ namespace task {
 		bool _isCompleated;
 		int _currentResultCount;
 		int _expectedResultCount;
+		taskResult* _result;
 
 		/* MONITOR */
 		boost::condition_variable* _condResponseReady;
