@@ -6,7 +6,7 @@
  */
 
 #include "StoreUploadCore.h"
-
+#include <algorithm>
 
 namespace ddj {
 namespace store {
@@ -18,19 +18,26 @@ namespace store {
 
 	StoreUploadCore::~StoreUploadCore(){}
 
-
+	storeTrunkInfo* StoreUploadCore::sortTrunkAndPrepareInfo(storeElement* elementsToUpload, int elementsToUploadCount)
+	{
+		std::sort(elementsToUpload, elementsToUpload+elementsToUploadCount);
+		return new storeTrunkInfo(
+						elementsToUpload[0].metric,
+						elementsToUpload[0].time,
+						elementsToUpload[elementsToUploadCount-1].time,
+						0,
+						0);
+	}
 
 	storeTrunkInfo* StoreUploadCore::Upload(storeElement* elementsToUpload, int elementsToUploadCount)
 	{
+		if(elementsToUploadCount == 0) return nullptr;
+
 		// GET CUDA STREAM
 		cudaStream_t stream = this->_cudaController->GetUploadStream();
 
-		storeTrunkInfo* result = new storeTrunkInfo(
-				elementsToUpload[0].metric,
-				elementsToUpload[0].time,
-				elementsToUpload[elementsToUploadCount-1].time,
-				0,
-				0);
+		// SORT TRUNK AND SET STORE TRUNK INFO
+		storeTrunkInfo* result = this->sortTrunkAndPrepareInfo(elementsToUpload, elementsToUploadCount);
 
 		// ALLOC DEVICE BUFFER
 		storeElement* deviceBufferPointer = nullptr;
@@ -38,8 +45,6 @@ namespace store {
 
 		// COPY BUFFER TO GPU
 		copyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, stream);
-
-		// TODO: SORT ARRAY ON GPU AND RETURN PROPER storeTrunkInfo (because this one above has wrong start/end time)
 
 		// COMPRESSION (returns pointer to new memory)
 		void* compressedBufferPointer;

@@ -38,6 +38,12 @@ namespace store {
 			}
 			~storeElement(){}
 
+			bool operator< (const storeElement& rhs) const
+			{
+				if(time < rhs.time) return true;
+				else return false;
+			}
+
 			std::string toString()
 			{
 				 std::ostringstream stream;

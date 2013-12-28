@@ -30,6 +30,7 @@ namespace store {
 		void copyToGpu(storeElement* hostPointer, storeElement* devicePointer, int numElements, cudaStream_t stream);
 		size_t compressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream);
 		void appendToMainStore(void* devicePointer, size_t size, storeTrunkInfo* info);
+		storeTrunkInfo* sortTrunkAndPrepareInfo(storeElement* elementsToUpload, int elementsToUploadCount);
 	};
 
 } /* namespace store */
