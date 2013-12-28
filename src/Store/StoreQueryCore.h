@@ -98,6 +98,7 @@ namespace store {
 		FRIEND_TEST(StoreQueryCoreTest, filterData_AllData);
 		FRIEND_TEST(StoreQueryCoreTest, filterData_ExistingTags);
 		FRIEND_TEST(StoreQueryCoreTest, filterData_NonExistingTags);
+		FRIEND_TEST(StoreQueryCoreTest, filterData_ExistingTags_FromTimePeriod);
 	//selectData
 		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);

@@ -72,7 +72,12 @@ size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::
 
 	// FILL STENCIL
 	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
-	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount, tags.data().get(), tags.size(), stencil);
+	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			elements,
+			elemCount,
+			tags.data().get(),
+			tags.size(),
+			stencil);
 	cudaDeviceSynchronize();
 
 	// PARTITION ELEMENTS

@@ -23,7 +23,9 @@ namespace store {
 	protected:
 		StoreQueryCoreTest()
 		{
-			_cudaController = new CudaController(3,3,0);
+			int devId = 0;
+			cudaChooseDevice(&devId, NULL);
+			_cudaController = new CudaController(3,3,devId);
 			this->createTestData();
 			_queryCore = nullptr;
 		}

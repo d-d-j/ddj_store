@@ -244,6 +244,59 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
+		TEST_F(StoreQueryCoreTest, filterData_ExistingTags_FromTimePeriod)
+				{
+					// PREPARE
+					int N = 100;
+					storeElement* hostElements = new storeElement[N];
+					for(int i=0; i<N; i++)
+					{
+						hostElements[i].metric = 1;
+						hostElements[i].tag = i%20;
+						hostElements[i].time = i;
+						hostElements[i].value = 666.666;
+					}
+
+					storeQuery query;
+					query.timePeriods.push_back(ullintPair{20,35});
+					query.timePeriods.push_back(ullintPair{35,60});
+					query.tags.push_back(4);	// 2 times in 20 to 60 time period
+					query.tags.push_back(12);	// 2 times in 20 to 60 time period
+					query.tags.push_back(17);	// 2 times in 20 to 60 time period
+					storeElement* deviceElements = nullptr;
+					CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
+					CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
+
+					// EXPECTED RESULTS
+					int expected_size = 6;
+
+					// TEST
+					size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query);
+
+					// CHECK
+					ASSERT_EQ(expected_size*sizeof(storeElement), size);
+					CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
+					auto checkTagFunc = [&] (const int& tag)
+						{
+						if (tag == 4 || tag == 12 || tag == 17)
+						    return ::testing::AssertionSuccess();
+						  else
+						    return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
+						};
+
+					for(unsigned int i=0; i<size; i++)
+					{
+						EXPECT_EQ(1, hostElements[i].metric);
+						EXPECT_TRUE(checkTagFunc(hostElements[i].tag));
+						EXPECT_LE(60, hostElements[i].time);
+						EXPECT_GE(20, hostElements[i].time);
+						EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
+					}
+
+					// CLEAN
+					delete [] hostElements;
+					CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+				}
 	//selectData
 
 		TEST_F(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
