@@ -40,6 +40,7 @@ namespace ddj
 			this->_controllers.insert({i,*controller});	// copy shared pointer to map
 			devices.push_back(i);
 			delete controller;	// delete shared pointer to controller
+			controller = nullptr;
 		}
 		this->_cudaDevicesCount = this->_controllers.size();	// update number of devices
 
@@ -65,6 +66,7 @@ namespace ddj
 
 		// Disconnect and release client
 		delete this->_client;
+		this->_client = nullptr;
 
 		// Stop task thread and release it
 		{
@@ -75,6 +77,8 @@ namespace ddj
 
 		delete this->_taskBarrier;
 		delete this->_taskThread;
+		this->_taskBarrier = nullptr;
+		this->_taskThread = nullptr;
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [END]"));
 	}
@@ -139,6 +143,7 @@ namespace ddj
 
 						// Destroy Task and TaskResult
 						delete result;
+						result = nullptr;
 					}
 					else if(compleatedTasks[i]->GetType() == task::Info)
 					{
@@ -150,6 +155,7 @@ namespace ddj
 
 						// Destroy Task and TaskResult
 						delete result;
+						result = nullptr;
 					}
 				}
 			}

@@ -26,6 +26,7 @@ namespace network {
 	{
 		close();
 		delete socket;
+		socket = nullptr;
 	}
 
 	void NetworkClient::connect()
@@ -61,21 +62,20 @@ namespace network {
 	void NetworkClient::SendLoginRequest(networkLoginRequest* request)
 	{
 		size_t len = sizeof(int)*(request->cuda_devices_count + 1);
-		char* msg = new char[len];
+		char msg[len];
 
 		memcpy(msg, &(request->cuda_devices_count), sizeof(int));
 		memcpy(msg + sizeof(int), request->devices, sizeof(int)*request->cuda_devices_count);
 
 		write(msg, len);
-		delete [] msg;
 	}
 
 	void NetworkClient::SendTaskResult(task::taskResult* taskResult)
 	{
 		int deviceId = TASK_ALL_DEVICES;
 		int len = sizeof(int64_t) + 3*sizeof(int32_t) + taskResult->result_size;
-		char* msg = new char[len];
-		char *oldMsg = msg;
+		char oldMsg[len];
+		char *msg = oldMsg;
 		memcpy(msg, &(taskResult->task_id), sizeof(int64_t));
 		msg += sizeof(int64_t);
 		memcpy(msg, &(taskResult->type), sizeof(int32_t));
@@ -87,7 +87,6 @@ namespace network {
 		memcpy(msg, taskResult->result_data, taskResult->result_size);
 
 		write(oldMsg, len);
-		delete [] oldMsg;
 	}
 
 	void NetworkClient::write(char *message, size_t length)

@@ -16,6 +16,7 @@ namespace btree {
 	BTreeMonitor::~BTreeMonitor()
 	{
 		delete this->_bufferInfoTree;
+		this->_bufferInfoTree = nullptr;
 	}
 
 	void BTreeMonitor::Insert(store::storeTrunkInfo* element)

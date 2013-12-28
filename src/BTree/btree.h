@@ -2523,6 +2523,7 @@ public:
 
         m_root = nextlevel[0].first;
         delete [] nextlevel;
+        nextlevel = nullptr;
 
         if (selfverify) verify();
     }

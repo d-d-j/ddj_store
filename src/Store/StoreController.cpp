@@ -58,6 +58,8 @@ namespace store {
 
 		delete this->_buffers;
 		delete this->_cudaController;
+		this->_buffers = nullptr;
+		this->_cudaController = nullptr;
 		_taskThreadPool.wait();
 		_taskThreadPool.clear();
 
@@ -168,6 +170,7 @@ namespace store {
 						boost::container::vector<ullintPair>* locations = (*_buffers)[m]->Select(query->timePeriods);
 						dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
 						delete locations;
+						locations = nullptr;
 					}
 				}
 			}

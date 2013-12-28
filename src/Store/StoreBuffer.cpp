@@ -47,6 +47,8 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 
 		delete this->_bufferInfoTreeMonitor;
 		delete this->_uploadCore;
+		this->_bufferInfoTreeMonitor = nullptr;
+		this->_uploadCore = nullptr;
 
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] destructor [END]", this->_metric);
 	}
@@ -83,6 +85,7 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 			LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [END]");
 
 			delete elemToInsertToBTree;
+			elemToInsertToBTree = nullptr;
 		} else {
 		this->_bufferMutex.unlock();
 		}
@@ -112,6 +115,7 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 		// INSERT INFO ELEMENT TO B+TREE
 		this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
 		delete elemToInsertToBTree;
+		elemToInsertToBTree = nullptr;
 	}
 
 	void StoreBuffer::switchBuffers()

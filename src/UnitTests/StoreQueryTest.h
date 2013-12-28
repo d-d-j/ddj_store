@@ -14,11 +14,9 @@ namespace store {
 		{
 		}
 
-		virtual void TearDown() {
-
-    		delete _storeQuery;
+		virtual void TearDown()
+		{
 		}
-	storeQuery* _storeQuery;
 
 	};
 }
