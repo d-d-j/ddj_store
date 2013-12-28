@@ -32,9 +32,12 @@ namespace store {
 		// TODO: Aggregate all mapped data
 
 		// Set queryResult, clean and return result size
-		(*queryResult) = malloc(filteredStoreSize);
-		CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreSize, cudaMemcpyDeviceToHost) );
-		CUDA_CHECK_RETURN( cudaFree(tempDataBuffer) );
+		if(filteredStoreSize)
+		{
+			(*queryResult) = malloc(filteredStoreSize);
+			CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreSize, cudaMemcpyDeviceToHost) );
+			CUDA_CHECK_RETURN( cudaFree(tempDataBuffer) );
+		}
 		return filteredStoreSize;
 	}
 
