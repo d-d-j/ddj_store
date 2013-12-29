@@ -90,8 +90,10 @@ namespace store {
 
 	size_t StoreQueryCore::filterData(storeElement* elements, size_t dataSize, storeQuery* query)
 	{
-		if(query && query->tags.size())
+		if(query && (query->tags.size() || query->timePeriods.size()))
+		{
 			return gpu_filterData(elements, dataSize, query);
+		}
 		else return dataSize;
 	}
 

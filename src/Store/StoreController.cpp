@@ -175,6 +175,8 @@ namespace store {
 				}
 			}
 
+			LOG4CPLUS_WARN(this->_logger, "Query: " << query->toString());
+
 			// Execute query with optional data locations using StoreQueryCore
 			void* queryResult = nullptr;
 			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);

@@ -9,20 +9,19 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-//// System includes
-//#include <stdio.h>
-//#include <assert.h>
-//// CUDA runtime
-//#include <cuda_runtime.h>
-//#include "cuPrintf.cu"
-//#define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
-//                                  blockIdx.y*gridDim.x+blockIdx.x,\
-//                                  threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
-//                                  __VA_ARGS__)
-//// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
+// System includes
+#include <stdio.h>
+#include <assert.h>
+// CUDA runtime
+#include <cuda_runtime.h>
+#include "cuPrintf.cu"
+#define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
+                                  blockIdx.y*gridDim.x+blockIdx.x,\
+                                  threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
+                                  __VA_ARGS__)
+// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
 
-
-
+// TODO: Move this define to config
 #define CUDA_THREADS_PER_BLOCK 256
 
 typedef struct
@@ -32,6 +31,8 @@ typedef struct
 	ullint time;
 	float value;
 } gpuElem;
+
+// TODO: Remove repeating code
 
 __device__ bool isInside(ullint value, ddj::ullintPair* timePeriod)
 {
@@ -61,7 +62,29 @@ __global__ void cuda_produce_stencil_using_tag(
 	return;
 }
 
-__global__ void cuda_produce_stencil_using_tagAndTime(
+__global__ void cuda_produce_stencil_using_time(
+		ddj::store::storeElement* elements,
+		int elemCount,
+		ddj::ullintPair* timePeriods,
+		int timePeriodsCount,
+		int* stencil)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= elemCount) return;
+	ullint time = elements[idx].time;
+	stencil[idx] = 0;
+	while(timePeriodsCount--)
+	{
+		if(isInside(time, &timePeriods[timePeriodsCount]))
+		{
+			stencil[idx] = 1;
+			return;
+		}
+	}
+	return;
+}
+
+__global__ void cuda_produce_stencil_using_tag_and_time(
 		ddj::store::storeElement* elements,
 		int elemCount,
 		int* tags,
@@ -101,6 +124,8 @@ struct is_one
 	}
 };
 
+
+
 size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query)
 {
 	// CREATE STENCIL
@@ -108,16 +133,20 @@ size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::
 	int* stencil;
 	cudaMalloc(&stencil, elemCount*sizeof(int));
 
+	// FILL STENCIL
+	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+
+	// CREATE TIME PERIODS VECTOR ON GPU
+	thrust::device_vector<ddj::ullintPair> timePeriods(query->timePeriods.begin(), query->timePeriods.end());
 	// CREATE TAGS VECTOR ON GPU
 	thrust::device_vector<int> tags(query->tags.begin(), query->tags.end());
 
-	// FILL STENCIL
-	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
-	if(query->timePeriods.size())
+	// RUN STENCIL KERNEL
+	int filterTags = query->tags.size();
+	int filterTimePeriods = query->timePeriods.size();
+	if(filterTags && filterTimePeriods)
 	{
-		// CREATE TIME PERIODS VECTOR ON GPU
-		thrust::device_vector<ddj::ullintPair> timePeriods(query->timePeriods.begin(), query->timePeriods.end());
-		cuda_produce_stencil_using_tagAndTime<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+		cuda_produce_stencil_using_tag_and_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 				elements,
 				elemCount,
 				tags.data().get(),
@@ -125,12 +154,19 @@ size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::
 				timePeriods.data().get(),
 				timePeriods.size(),
 				stencil);
-	} else {
+	} else if(filterTags){
 		cuda_produce_stencil_using_tag<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 				elements,
 				elemCount,
 				tags.data().get(),
 				tags.size(),
+				stencil);
+	} else {
+		cuda_produce_stencil_using_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+				elements,
+				elemCount,
+				timePeriods.data().get(),
+				timePeriods.size(),
 				stencil);
 	}
 	cudaDeviceSynchronize();
