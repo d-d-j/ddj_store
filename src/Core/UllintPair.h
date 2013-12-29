@@ -26,7 +26,6 @@ namespace ddj {
 			first = cp.first;
 			second = cp.second;
 		}
-		~ullintPair(){}
 
 		bool operator< (const ullintPair& rhs) const
 		{

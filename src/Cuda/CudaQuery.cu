@@ -8,7 +8,6 @@
 #include <thrust/iterator/constant_iterator.h>
 
 
-
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
 //// System includes
 //#include <stdio.h>
@@ -34,7 +33,18 @@ typedef struct
 	float value;
 } gpuElem;
 
-__global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int elemCount, int* tags, int tagsCount, int* stencil)
+__device__ bool isInside(ullint value, ddj::ullintPair* timePeriod)
+{
+	if(value >= timePeriod->first && value <= timePeriod->second) return true;
+	else return false;
+}
+
+__global__ void cuda_produce_stencil_using_tag(
+		ddj::store::storeElement* elements,
+		int elemCount,
+		int* tags,
+		int tagsCount,
+		int* stencil)
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= elemCount) return;
@@ -46,6 +56,37 @@ __global__ void cuda_produce_stencil(ddj::store::storeElement* elements, int ele
 		{
 			stencil[idx] = 1;
 			return;
+		}
+	}
+	return;
+}
+
+__global__ void cuda_produce_stencil_using_tagAndTime(
+		ddj::store::storeElement* elements,
+		int elemCount,
+		int* tags,
+		int tagsCount,
+		ddj::ullintPair* timePeriods,
+		int timePeriodsCount,
+		int* stencil)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= elemCount) return;
+	int32_t tag = elements[idx].tag;
+	ullint time = elements[idx].time;
+	stencil[idx] = 0;
+	while(tagsCount--)
+	{
+		if(tag == tags[tagsCount])
+		{
+			while(timePeriodsCount--)
+			{
+				if(isInside(time, &timePeriods[timePeriodsCount]))
+				{
+					stencil[idx] = 1;
+					return;
+				}
+			}
 		}
 	}
 	return;
@@ -72,12 +113,26 @@ size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::
 
 	// FILL STENCIL
 	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
-	cuda_produce_stencil<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
-			elements,
-			elemCount,
-			tags.data().get(),
-			tags.size(),
-			stencil);
+	if(query->timePeriods.size())
+	{
+		// CREATE TIME PERIODS VECTOR ON GPU
+		thrust::device_vector<ddj::ullintPair> timePeriods(query->timePeriods.begin(), query->timePeriods.end());
+		cuda_produce_stencil_using_tagAndTime<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+				elements,
+				elemCount,
+				tags.data().get(),
+				tags.size(),
+				timePeriods.data().get(),
+				timePeriods.size(),
+				stencil);
+	} else {
+		cuda_produce_stencil_using_tag<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+				elements,
+				elemCount,
+				tags.data().get(),
+				tags.size(),
+				stencil);
+	}
 	cudaDeviceSynchronize();
 
 	// PARTITION ELEMENTS

@@ -14,6 +14,7 @@
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+#include "../Core/helper_cuda.h"
 
 namespace ddj {
 namespace store {
@@ -23,8 +24,8 @@ namespace store {
 	protected:
 		StoreQueryCoreTest()
 		{
-			int devId = 0;
-			cudaChooseDevice(&devId, NULL);
+			const char* argv = "";
+			int devId = findCudaDevice(0, &argv);
 			_cudaController = new CudaController(3,3,devId);
 			this->createTestData();
 			_queryCore = nullptr;

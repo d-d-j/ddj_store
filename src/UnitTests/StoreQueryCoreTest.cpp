@@ -284,12 +284,12 @@ namespace store {
 						    return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
 						};
 
-					for(unsigned int i=0; i<size; i++)
+					for(int i=0; i<expected_size; i++)
 					{
 						EXPECT_EQ(1, hostElements[i].metric);
 						EXPECT_TRUE(checkTagFunc(hostElements[i].tag));
-						EXPECT_LE(60, hostElements[i].time);
-						EXPECT_GE(20, hostElements[i].time);
+						EXPECT_LE(20, hostElements[i].time);
+						EXPECT_GE(60, hostElements[i].time);
 						EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 					}
 
