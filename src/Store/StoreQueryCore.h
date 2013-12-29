@@ -48,10 +48,23 @@ namespace store {
 
 		/*
 		 * Description:
+		 * Method aggregating dataSize data from elements using aggregation defined in query;
+		 * If dataSize equals 0 method should set result to null;
+		 * Store elements passed to a method as elements should stay untouched.
+		 * Returns:
+		 *  returns size of result
+		 * Output:
+		 *  aggregated data is returned in result parameter as raw data (what is returned in result
+		 *  depends on aggregation type)
+		 */
+		size_t aggregateData(storeElement* elements, size_t dataSize, storeQuery* query, void** result);
+
+		/*
+		 * Description:
 		 * Method mapping all data stored in GPU to selected data locations;
 		 * Selects only parts of mainGpuArray specified by ullintPair, for example:
 		 * if dataLocationInfo contains ullintPair (100,300) then a part or mainGpuArray
-		 * from index 100 to index 300 (including 300) will be returned as new gpu (device) array in data parameter
+		 * from index 100 to index 300 (including 300) will be returned as new gpu (device) array in data parameter.
 		 * Returns:
 		 *  returns size of mapped data
 		 * Output:
@@ -64,7 +77,7 @@ namespace store {
 		 * Method filtering an array of storeElements on GPU by tags
 		 * It does nothing if no tags are specified in query;
 		 * Otherwise, it moves all elements with tag equal to any of provided in query
-		 * to the front of elements array, and returns a number of these elements
+		 * to the front of elements array, and returns a number of these elements.
 		 * Returns:
 		 *  number of elements moved to front (number of elements with specified tags)
 		 * Output:

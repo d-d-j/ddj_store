@@ -45,6 +45,11 @@ namespace store {
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
+	size_t aggregateData(storeElement* elements, size_t dataSize, storeQuery* query, void** result)
+	{
+		return 0;
+	}
+
 	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		void* mainGpuArray = _cudaController->GetMainMemoryPointer();
