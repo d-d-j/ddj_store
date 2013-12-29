@@ -15,7 +15,6 @@ namespace store {
 	TEST_F(StoreElementTest, Sort)
 	{
 		const int len = 10;
-		int mod = 3;
 		storeElement elements[len];
 
 		for (int i=0;i<len;i++)
