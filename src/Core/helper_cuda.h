@@ -258,6 +258,8 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorApiFailureBase:
             return "cudaErrorApiFailureBase";
+        default:
+        	return "CUDA_ERROR_UNKNOWN";
     }
 
     return "<unknown>";
@@ -410,6 +412,8 @@ static const char *_cudaGetErrorEnum(CUresult error)
 
         case CUDA_ERROR_UNKNOWN:
             return "CUDA_ERROR_UNKNOWN";
+        default:
+        	return "CUDA_ERROR_UNKNOWN";
     }
 
     return "<unknown>";
