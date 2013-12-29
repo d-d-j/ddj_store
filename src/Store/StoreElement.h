@@ -38,12 +38,6 @@ namespace store {
 			}
 			~storeElement(){}
 
-			bool operator< (const storeElement& rhs) const
-			{
-				if(time < rhs.time) return true;
-				else return false;
-			}
-
 			std::string toString()
 			{
 				 std::ostringstream stream;
@@ -51,6 +45,10 @@ namespace store {
 			     return  stream.str();
 			}
 	} storeElement;
+
+	struct OrderStoreElementByTimeAsc {
+  		bool operator() (const storeElement &x, const storeElement &y) { return x.time < y.time; }
+	};
 
 } /* namespace ddj */
 } /* namespace store */

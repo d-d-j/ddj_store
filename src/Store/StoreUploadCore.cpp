@@ -20,7 +20,7 @@ namespace store {
 
 	storeTrunkInfo* StoreUploadCore::sortTrunkAndPrepareInfo(storeElement* elementsToUpload, int elementsToUploadCount)
 	{
-		std::sort(elementsToUpload, elementsToUpload+elementsToUploadCount);
+		std::sort(elementsToUpload, elementsToUpload+elementsToUploadCount, OrderStoreElementByTimeAsc());
 		return new storeTrunkInfo(
 						elementsToUpload[0].metric,
 						elementsToUpload[0].time,
