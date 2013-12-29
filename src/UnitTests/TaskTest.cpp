@@ -50,9 +50,9 @@ namespace task {
 		// PREPARE DATA
 		boost::condition_variable condVar;
 		Task task(1, TaskType::Info, nullptr, 3, &condVar);
-		store::storeNodeInfo* info_1 = new store::storeNodeInfo(199,198,177,1);
-		store::storeNodeInfo* info_2 = new store::storeNodeInfo(299,28,277,266);
-		store::storeNodeInfo* info_3 = new store::storeNodeInfo(399,0,17,6);
+		store::storeNodeInfo* info_1 = new store::storeNodeInfo(1, 199,198,177,1);
+		store::storeNodeInfo* info_2 = new store::storeNodeInfo(2, 299,28,277,266);
+		store::storeNodeInfo* info_3 = new store::storeNodeInfo(3, 399,0,17,6);
 		int infoSize = sizeof(store::storeNodeInfo);
 
 		// PREPARE EXPECTED RESULT

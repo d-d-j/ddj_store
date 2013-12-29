@@ -1,48 +1,50 @@
 #include "StoreInfoCore.h"
 
-namespace ddj {
-namespace store {
+namespace ddj
+{
+namespace store
+{
+size_t StoreInfoCore::GetNodeInfo(storeNodeInfo** result)
+{
+	size_t gpuMemFree, gpuMemTotal;
+	int memTotal, memFree, gpuId;
 
-	size_t StoreInfoCore::GetNodeInfo(storeNodeInfo** result)
+	gpuId = _cudaController->GetCudaDeviceId();
+	_cudaCommons.GetMemoryCount(&gpuMemFree, &gpuMemTotal);
+
+	// TODO: move getting ram info to Node instead of here
+	GetRamInKB(&memTotal, &memFree);
+
+	*result = new storeNodeInfo(gpuId, memTotal, memFree, gpuMemTotal, gpuMemFree);
+
+	return sizeof(storeNodeInfo);
+}
+
+void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)
+{
+	// TODO: Implement for Mac OS X
+	*ramTotal = *ramFree = -1;
+	FILE *meminfo = fopen("/proc/meminfo", "r");
+	if (meminfo == nullptr)
 	{
-		size_t gpuMemFree, gpuMemTotal;
-		int memTotal, memFree;
-
-		_cudaCommons.GetMemoryCount(&gpuMemFree, &gpuMemTotal);
-
-		// TODO: move getting ram info to Node instead of here
-		GetRamInKB(&memTotal, &memFree);
-
-
-		*result = new storeNodeInfo(memTotal, memFree, gpuMemTotal, gpuMemFree);
-
-		return sizeof(storeNodeInfo);
+		LOG4CPLUS_ERROR(this->_logger,
+				LOG4CPLUS_TEXT("Unable to open meminfo"));
+		return;
 	}
 
-	void StoreInfoCore::GetRamInKB(int* ramTotal, int* ramFree)
+	char line[256];
+
+	while (fgets(line, sizeof(line), meminfo))
 	{
-		// TODO: Implement for Mac OS X
-		*ramTotal = *ramFree = -1;
-		FILE *meminfo = fopen("/proc/meminfo", "r");
-		if (meminfo == nullptr)
+		sscanf(line, "MemTotal: %10d kB", ramTotal);
+		if (sscanf(line, "MemFree: %10d kB", ramFree) == 1)
 		{
-			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Unable to open meminfo"));
-			return;
+			continue;
 		}
-
-		char line[256];
-
-		while (fgets(line, sizeof(line), meminfo))
-		{
-			sscanf(line, "MemTotal: %10d kB", ramTotal);
-			if (sscanf(line, "MemFree: %10d kB", ramFree) == 1)
-			{
-				continue;
-			}
-		}
-
-		fclose(meminfo);
 	}
+
+	fclose(meminfo);
+}
 
 }
 }

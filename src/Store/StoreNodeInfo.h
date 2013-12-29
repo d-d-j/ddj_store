@@ -10,14 +10,15 @@ namespace store {
 	struct storeNodeInfo
 	{
 	public:
+		int32_t gpu_id;
 		int32_t mem_total;
 		int32_t mem_free;
 		int32_t gpu_mem_total;
 		int32_t gpu_mem_free;
 
 		storeNodeInfo();
-		storeNodeInfo(int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree)
-			: mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree) {}
+		storeNodeInfo(int32_t gpuId, int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree)
+			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree) {}
 
 		bool operator== (const storeNodeInfo& rhs) const
 		{

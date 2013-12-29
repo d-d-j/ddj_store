@@ -44,7 +44,7 @@ namespace store {
 		this->_uploadCore = new StoreUploadCore(this->_cudaController);
 
 		// CREATE STORE INFO CORE
-		this->_infoCore = new StoreInfoCore();
+		this->_infoCore = new StoreInfoCore(this->_cudaController);
 
 		// SET THREAD POOL SIZES
 		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
