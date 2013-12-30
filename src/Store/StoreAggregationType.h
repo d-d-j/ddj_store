@@ -15,7 +15,9 @@ namespace store {
 	{
 		None = 0,
 		Add = 1,
-		Average = 2
+		Average = 2,
+		Min = 3,
+		Max = 4
 	};
 
 } /* namespace store */
