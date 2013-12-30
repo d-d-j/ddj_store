@@ -22,32 +22,47 @@ namespace store {
 		// Read and copy data from mainMemoryPointer to temporary data buffer
 		void* tempDataBuffer = nullptr;
 		size_t tempDataSize = this->mapData(&tempDataBuffer, dataLocationInfo);
-		LOG4CPLUS_DEBUG(this->_logger, "StoreQueryCore - tempDataElemCount = " << tempDataSize/sizeof(storeElement));
+
 		// TODO: Decompress temporary data buffer
 
-		// Filter to set of tags specified in query (only if set is not empty)
-		size_t filteredStoreSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
-		LOG4CPLUS_DEBUG(this->_logger, "StoreQueryCore - filteredDataElemCount = " << filteredStoreSize/sizeof(storeElement));
+		// Filter to set of tags and time periods specified in query (only if set is not empty)
+		size_t filteredDataSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
 
-		// TODO: Aggregate all mapped data
+		// Aggregate all mapped and filtered data
+		size_t aggregatedDataSize = this->aggregateData((storeElement**)&tempDataBuffer, filteredDataSize, query);
 
 		// Set queryResult, clean and return result size
-		if(filteredStoreSize)
+		(*queryResult) = nullptr;
+		if(aggregatedDataSize)
 		{
-			(*queryResult) = malloc(filteredStoreSize);
-			CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, filteredStoreSize, cudaMemcpyDeviceToHost) );
-			CUDA_CHECK_RETURN( cudaFree(tempDataBuffer) );
+			(*queryResult) = malloc(aggregatedDataSize);
+			CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, aggregatedDataSize, cudaMemcpyDeviceToHost) );
 		}
-		return filteredStoreSize;
+		return aggregatedDataSize;
 	}
 
 	/***************************/
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
-	size_t aggregateData(storeElement* elements, size_t dataSize, storeQuery* query, void** result)
+	size_t StoreQueryCore::aggregateData(storeElement** elements, size_t dataSize, storeQuery* query)
 	{
-		return 0;
+		if (dataSize == 0)
+		{
+			CUDA_CHECK_RETURN( cudaFree(*elements) );
+			(*elements) = nullptr;
+			return 0;
+		}
+		if(query->aggregationType != AggregationType::None)
+		{
+			storeElement* aggregatedData = nullptr;
+			size_t aggregatedDataSize =
+					this->_aggregationFunctions[query->aggregationType](*elements, dataSize, &aggregatedData);
+			CUDA_CHECK_RETURN( cudaFree(*elements) );
+			(*elements) = aggregatedData;
+			return aggregatedDataSize;
+		}
+		return dataSize;
 	}
 
 	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
@@ -106,24 +121,28 @@ namespace store {
 	/* AGGREGATION MATHODS */
 	/***********************/
 
-	float add(storeElement* elements, int count)
+	size_t StoreQueryCore::add(storeElement* elements, int count, storeElement** result)
 	{
-		return 0.0f;
+		(*result) = nullptr;
+		return 0;
 	}
 
-	float average(storeElement* elements, int count)
+	size_t StoreQueryCore::average(storeElement* elements, int count, storeElement** result)
 	{
-		return 0.0f;
+		(*result) = nullptr;
+		return 0;
 	}
 
-	storeElement* max(storeElement* elements, int count)
+	size_t StoreQueryCore::max(storeElement* elements, int count, storeElement** result)
 	{
-		return nullptr;
+		(*result) = nullptr;
+		return 0;
 	}
 
-	storeElement* min(storeElement* elements, int count)
+	size_t StoreQueryCore::min(storeElement* elements, int count, storeElement** result)
 	{
-		return nullptr;
+		(*result) = nullptr;
+		return 0;
 	}
 
 } /* namespace store */

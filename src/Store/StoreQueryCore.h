@@ -16,15 +16,19 @@
 #include "../Cuda/CudaQuery.cuh"
 #include <gtest/gtest.h>
 #include <boost/foreach.hpp>
+#include <boost/unordered_map.hpp>
 
 namespace ddj {
 namespace store {
 
 	class StoreQueryCore : public boost::noncopyable
 	{
+		typedef boost::function<size_t (storeElement* elements, size_t size, storeElement** result)> aggregationFunc;
+
 	private:
 		CudaController* _cudaController;
 		Logger _logger = Logger::getRoot();
+		boost::unordered_map<int, aggregationFunc> _aggregationFunctions;
 
 	public:
 		StoreQueryCore(CudaController* cudaController);
@@ -49,15 +53,14 @@ namespace store {
 		/*
 		 * Description:
 		 * Method aggregating dataSize data from elements using aggregation defined in query;
-		 * If dataSize equals 0 method should set result to null;
-		 * Store elements passed to a method as elements should stay untouched.
+		 * If aggregation type isn't None, method releases elements and sets it to aggregation result;
+		 * If dataSize equals 0 method should set elements to null and returns 0;
 		 * Returns:
-		 *  returns size of result
+		 *  returns size of new elements data
 		 * Output:
-		 *  aggregated data is returned in result parameter as raw data (what is returned in result
-		 *  depends on aggregation type)
+		 *  aggregated data is returned as elements array (old one is released)
 		 */
-		size_t aggregateData(storeElement* elements, size_t dataSize, storeQuery* query, void** result);
+		size_t aggregateData(storeElement** elements, size_t dataSize, storeQuery* query);
 
 		/*
 		 * Description:
@@ -91,10 +94,10 @@ namespace store {
 		/* AGGREGATION MATHODS */
 		/***********************/
 
-		float add(storeElement* elements, int count);
-		float average(storeElement* elements, int count);
-		storeElement* max(storeElement* elements, int count);
-		storeElement* min(storeElement* elements, int count);
+		size_t add(storeElement* elements, int count, storeElement** result);
+		size_t average(storeElement* elements, int count, storeElement** result);
+		size_t max(storeElement* elements, int count, storeElement** result);
+		size_t min(storeElement* elements, int count, storeElement** result);
 
 	private:
 		friend class StoreQueryCoreTest;
