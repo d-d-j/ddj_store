@@ -95,7 +95,6 @@ namespace store {
 		/***********************/
 
 		size_t add(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t average(storeElement* elements, size_t dataSize, storeElement** result);
 		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
 		size_t min(storeElement* elements, size_t dataSize, storeElement** result);
 
@@ -122,10 +121,6 @@ namespace store {
 		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);
 		FRIEND_TEST(StoreQueryCoreTest, add_OddNumberOfValues);
-	//average
-		FRIEND_TEST(StoreQueryCoreTest, average_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, average_Positive);
-		FRIEND_TEST(StoreQueryCoreTest, average_Negative);
 	//max
 		FRIEND_TEST(StoreQueryCoreTest, max_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, max_Positive);

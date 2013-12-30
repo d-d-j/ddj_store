@@ -128,21 +128,17 @@ namespace store {
 		else return 0;
 	}
 
-	size_t StoreQueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
-	{
-		(*result) = nullptr;
-		return 0;
-	}
-
 	size_t StoreQueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
+		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
 		return 0;
 	}
 
 	size_t StoreQueryCore::min(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
+		if(dataSize) return gpu_min_from_values(elements, dataSize, result);
 		return 0;
 	}
 
