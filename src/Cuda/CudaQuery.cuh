@@ -45,10 +45,10 @@ struct gpuElem
 
 extern "C" {
 
-size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query);
-size_t gpu_add_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
-size_t gpu_max_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
-size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
+	size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query);
+	size_t gpu_add_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
+	size_t gpu_max_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
+	size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
 
 }
 
