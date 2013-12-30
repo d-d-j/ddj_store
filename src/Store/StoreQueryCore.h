@@ -94,10 +94,10 @@ namespace store {
 		/* AGGREGATION MATHODS */
 		/***********************/
 
-		size_t add(storeElement* elements, int count, storeElement** result);
-		size_t average(storeElement* elements, int count, storeElement** result);
-		size_t max(storeElement* elements, int count, storeElement** result);
-		size_t min(storeElement* elements, int count, storeElement** result);
+		size_t add(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t average(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t min(storeElement* elements, size_t dataSize, storeElement** result);
 
 	private:
 		friend class StoreQueryCoreTest;

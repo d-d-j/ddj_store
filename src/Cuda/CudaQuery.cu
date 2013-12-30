@@ -9,6 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
+/*
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -20,19 +21,18 @@
                                   threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
                                   __VA_ARGS__)
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-
-// TODO: Move this define to config
-#define CUDA_THREADS_PER_BLOCK 256
-
-typedef struct
-{
-	int32_t tag;
-	int metric;
-	ullint time;
-	float value;
-} gpuElem;
+*/
 
 // TODO: Remove repeating code
+
+struct is_one
+{
+	__host__ __device__
+	bool operator()(const int &x)
+	{
+		return x == 1;
+	}
+};
 
 __device__ bool isInside(ullint value, ddj::ullintPair* timePeriod)
 {
@@ -114,17 +114,6 @@ __global__ void cuda_produce_stencil_using_tag_and_time(
 	}
 	return;
 }
-
-struct is_one
-{
-	__host__ __device__
-	bool operator()(const int &x)
-	{
-		return x == 1;
-	}
-};
-
-
 
 size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query)
 {

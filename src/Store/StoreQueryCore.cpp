@@ -121,25 +121,26 @@ namespace store {
 	/* AGGREGATION MATHODS */
 	/***********************/
 
-	size_t StoreQueryCore::add(storeElement* elements, int count, storeElement** result)
+	size_t StoreQueryCore::add(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_add_values(elements, dataSize, result);
+		else return 0;
+	}
+
+	size_t StoreQueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		return 0;
 	}
 
-	size_t StoreQueryCore::average(storeElement* elements, int count, storeElement** result)
+	size_t StoreQueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		return 0;
 	}
 
-	size_t StoreQueryCore::max(storeElement* elements, int count, storeElement** result)
-	{
-		(*result) = nullptr;
-		return 0;
-	}
-
-	size_t StoreQueryCore::min(storeElement* elements, int count, storeElement** result)
+	size_t StoreQueryCore::min(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		return 0;
