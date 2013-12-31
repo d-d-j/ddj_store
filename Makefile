@@ -76,6 +76,10 @@ CPP_DEPS += \
 ./src/Node.d \
 ./src/main.d
 
+all: DDJ_Store
+
+debug: COMPILER += -DDEBUG -g
+debug: all
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
@@ -90,8 +94,6 @@ src/%.o: ./src/%.cu
 	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
-
-all: DDJ_Store
 
 run: all
 	./DDJ_Store
