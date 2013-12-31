@@ -86,7 +86,7 @@ namespace network {
 		position += sizeof(int32_t);
 		memcpy(msg.get()+position, taskResult->result_data, taskResult->result_size);
 
-		boost::asio::write(*socket, boost::asio::buffer(msg.get(), len));
+		write(msg.get(), len);
 	}
 
 	void NetworkClient::write(char *message, size_t length)
