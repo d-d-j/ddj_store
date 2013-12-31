@@ -21,30 +21,30 @@ namespace store {
 
 	class StoreQueryCoreTest : public ::testing::Test
 	{
+		int _devId;
+
 	protected:
 		StoreQueryCoreTest()
 		{
 			const char* argv = "";
-			int devId = findCudaDevice(0, &argv);
-			_cudaController = new CudaController(3,3,devId);
-			this->createTestData();
+			_devId = findCudaDevice(0, &argv);
+			_cudaController = nullptr;
 			_queryCore = nullptr;
-		}
-		virtual ~StoreQueryCoreTest()
-		{
-			delete _cudaController;
 		}
 
 		virtual void SetUp()
 		{
+			_cudaController = new CudaController(3,3,_devId);
 			_queryCore = new StoreQueryCore(_cudaController);
 		}
 		virtual void TearDown()
 		{
+			delete _cudaController;
 			delete _queryCore;
 		}
 
-		void createTestData();
+		void createSimpleCharTestData();
+		void createTestDataWithStoreElements();
 
 		StoreQueryCore* _queryCore;
 		CudaController* _cudaController;

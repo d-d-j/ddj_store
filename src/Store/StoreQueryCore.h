@@ -117,6 +117,7 @@ namespace store {
 	//selectData
 		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
+		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
 	//add
 		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);

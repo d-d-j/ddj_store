@@ -13,7 +13,7 @@
 namespace ddj {
 namespace store {
 
-	void StoreQueryCoreTest::createTestData()
+	void StoreQueryCoreTest::createSimpleCharTestData()
 	{
 		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
 		size_t size = STORE_QUERY_CORE_TEST_MEM_SIZE;
@@ -24,6 +24,25 @@ namespace store {
 
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size, cudaMemcpyHostToDevice) );
 		_cudaController->SetMainMemoryOffset(size);
+	}
+
+	void StoreQueryCoreTest::createTestDataWithStoreElements()
+	{
+		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
+		size_t size = STORE_QUERY_CORE_TEST_MEM_SIZE;
+		storeElement* testArray = new storeElement[size];
+
+		// FILL TAST ARRAY WITH STORE ELEMENTS
+		for(unsigned long i=0; i<size; i++)
+		{
+			testArray[i].tag = i%20;
+			testArray[i].metric = 1;
+			testArray[i].time = i*10;
+			testArray[i].value = 3;
+		}
+
+		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size*sizeof(storeElement), cudaMemcpyHostToDevice) );
+		_cudaController->SetMainMemoryOffset(size*sizeof(storeElement));
 	}
 
 	// check thrust version
@@ -46,6 +65,7 @@ namespace store {
 		TEST_F(StoreQueryCoreTest, mapData_AllData)
 		{
 			// PREPARE
+			createSimpleCharTestData();
 			char* deviceData;
 			char* hostData;
 
@@ -69,6 +89,7 @@ namespace store {
 		TEST_F(StoreQueryCoreTest, mapData_ChooseOneTrunk)
 		{
 			// PREPARE
+			createSimpleCharTestData();
 			char* deviceData;
 			char* hostData;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
@@ -94,6 +115,7 @@ namespace store {
 		TEST_F(StoreQueryCoreTest, mapData_ChooseManyTrunks)
 		{
 			// PREPARE
+			createSimpleCharTestData();
 			char* deviceData;
 			char* hostData;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
@@ -303,6 +325,7 @@ namespace store {
 		TEST_F(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
 		{
 			// PREPARE
+			createSimpleCharTestData();
 			char* hostData;
 			storeQuery query;
 			query.aggregationType = AggregationType::None;
@@ -315,7 +338,7 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(64, size);
 			for(unsigned long i=0; i<size; i++)
-							EXPECT_EQ((char)((i+size)%256), hostData[i]);
+				EXPECT_EQ((char)((i+size)%256), hostData[i]);
 
 			// CLEAN
 			free( hostData );
@@ -323,7 +346,107 @@ namespace store {
 
 		TEST_F(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation)
 		{
+			// PREPARE
+			createTestDataWithStoreElements();
+			storeElement* hostData;
+			storeQuery query;
+			query.aggregationType = AggregationType::None;
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{0,STORE_QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			query.tags.push_back(1);	// 52 elements
+			query.tags.push_back(6);	// 51 elements
+			query.tags.push_back(11);	// 51 elements
+			query.tags.push_back(19);	// 51 elements
+			query.timePeriods.push_back(ullintPair{1000,2000});	// all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{3000,4000}); // all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{9000,10240});// all: 124 elements, with good tags: 25
 
+			// EXPECTED
+			int expected_elements_count = 65;
+			int expected_elements_size = expected_elements_count*sizeof(storeElement);
+			auto checkTagFunc = [&] (const int& tag)
+			{
+				if (tag == 1 || tag == 6 || tag == 11 || tag == 19)
+					return ::testing::AssertionSuccess();
+				else
+					return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
+			};
+			auto checkTimeFunc = [&] (const ullint& time)
+			{
+				if ( (time > 1000 && time < 2000) ||
+					 (time > 3000 && time < 4000) ||
+					 (time > 9000 && time < 10240) )
+					return ::testing::AssertionSuccess();
+				else
+					return ::testing::AssertionFailure() << "Expected: time in range (1000-2000) or (3000-4000) or (9000-10240)\nActual: tag=" << time;
+			};
+
+
+			// TEST
+			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(expected_elements_size, size);
+			for(int i=0; i < expected_elements_count; i++)
+			{
+				EXPECT_EQ(1, hostData[i].metric);
+				EXPECT_TRUE(checkTagFunc(hostData[i].tag));
+				EXPECT_TRUE(checkTimeFunc(hostData[i].time));
+				EXPECT_FLOAT_EQ(3, hostData[i].value);
+			}
+
+			// CLEAN
+			free( hostData );
+		}
+
+		TEST_F(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation)
+		{
+			// PREPARE
+			createTestDataWithStoreElements();
+			storeElement* hostData;
+			storeQuery query;
+			query.aggregationType = AggregationType::Add;
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{0,STORE_QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			query.tags.push_back(1);	// 52 elements
+			query.tags.push_back(6);	// 51 elements
+			query.tags.push_back(11);	// 51 elements
+			query.tags.push_back(19);	// 51 elements
+			query.timePeriods.push_back(ullintPair{1000,2000});	// all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{3000,4000}); // all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{9000,10240});// all: 124 elements, with good tags: 25
+
+			// EXPECTED
+			int expected_elements_count = 1;
+			int expected_elements_size = expected_elements_count*sizeof(storeElement);
+			float expected_value = 65*3.0f;
+			auto checkTagFunc = [&] (const int& tag)
+			{
+				if (tag == 1 || tag == 6 || tag == 11 || tag == 19)
+					return ::testing::AssertionSuccess();
+				else
+					return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
+			};
+			auto checkTimeFunc = [&] (const ullint& time)
+			{
+				if ( (time > 1000 && time < 2000) ||
+					 (time > 3000 && time < 4000) ||
+					 (time > 9000 && time < 10240) )
+					return ::testing::AssertionSuccess();
+				else
+					return ::testing::AssertionFailure() << "Expected: time in range (1000-2000) or (3000-4000) or (9000-10240)\nActual: tag=" << time;
+			};
+
+
+			// TEST
+			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(expected_elements_size, size);
+			EXPECT_FLOAT_EQ(expected_value, hostData[0].value);
+
+			// CLEAN
+			free( hostData );
 		}
 
 	/***********************/
