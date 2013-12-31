@@ -54,7 +54,7 @@ namespace ddj
 
 		// CONNECT TO MASTER AND LOG IN
 		this->_client = new network::NetworkClient(&_requestSignal);
-		boost::scoped_ptr<network::networkLoginRequest> loginRequest(new network::networkLoginRequest(devices.data(), 1));
+		boost::scoped_ptr<network::networkLoginRequest> loginRequest(new network::networkLoginRequest(devices.data(), this->_cudaDevicesCount));
 		this->_client->SendLoginRequest(loginRequest.get());
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
