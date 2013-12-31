@@ -54,7 +54,8 @@ size_t gpu_max_from_values(ddj::store::storeElement* elements, size_t dataSize, 
 	int elemCount = dataSize / storeElemSize;
 
 	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
-	gpuElem init = elements[0];
+	gpuElem init;
+	cudaMemcpy(&init, elements, storeElemSize, cudaMemcpyDeviceToHost);
 	gpuElem max = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, max_gpu_elem());
 	cudaMalloc(result, storeElemSize);
 	cudaMemcpy(*result, &max, storeElemSize, cudaMemcpyDeviceToDevice);
@@ -68,7 +69,8 @@ size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, 
 	int elemCount = dataSize / storeElemSize;
 
 	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
-	gpuElem init = elements[0];
+	gpuElem init;
+	cudaMemcpy(&init, elements, storeElemSize, cudaMemcpyDeviceToHost);
 	gpuElem min = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, min_gpu_elem());
 	cudaMalloc(result, storeElemSize);
 	cudaMemcpy(*result, &min, storeElemSize, cudaMemcpyDeviceToDevice);
