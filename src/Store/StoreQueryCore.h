@@ -94,9 +94,12 @@ namespace store {
 		/* AGGREGATION MATHODS */
 		/***********************/
 
+		void propagateAggregationMethods();
+
 		size_t add(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
 		size_t min(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
+
 
 	private:
 		friend class StoreQueryCoreTest;

@@ -13,6 +13,7 @@ namespace store {
 	StoreQueryCore::StoreQueryCore(CudaController* cudaController)
 	{
 		this->_cudaController = cudaController;
+		propagateAggregationMethods();
 	}
 
 	StoreQueryCore::~StoreQueryCore(){}
@@ -121,6 +122,18 @@ namespace store {
 	/* AGGREGATION MATHODS */
 	/***********************/
 
+	void StoreQueryCore::propagateAggregationMethods()
+	{
+		// ADD
+		this->_aggregationFunctions.insert({ AggregationType::Add, boost::bind(&StoreQueryCore::add, this, _1, _2, _3) });
+
+		// MIN
+		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&StoreQueryCore::min, this, _1, _2, _3) });
+
+		// MAX
+		this->_aggregationFunctions.insert({ AggregationType::Max, boost::bind(&StoreQueryCore::max, this, _1, _2, _3) });
+	}
+
 	size_t StoreQueryCore::add(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
@@ -128,17 +141,17 @@ namespace store {
 		else return 0;
 	}
 
-	size_t StoreQueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
-		return 0;
-	}
-
 	size_t StoreQueryCore::min(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_min_from_values(elements, dataSize, result);
+		return 0;
+	}
+
+	size_t StoreQueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
 		return 0;
 	}
 
