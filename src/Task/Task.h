@@ -56,6 +56,7 @@ namespace task {
 		void* GetData();
 		int GetDevice();
 		bool IsCompleated();
+		int64_t GetId();
 
 	private:
 		void appendMessage(const char* message);
@@ -63,6 +64,7 @@ namespace task {
 		friend class TaskTest;
 
 		FRIEND_TEST(TaskTest, AppendMessage);
+		FRIEND_TEST(TaskMonitorTest, PopCompleatedTasks_Should_Removed_Only_Tasks_That_Are_Returned);
 	};
 
 	typedef boost::shared_ptr<Task> Task_Pointer;

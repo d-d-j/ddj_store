@@ -131,5 +131,11 @@ namespace task {
 		return this->_isCompleated;
 	}
 
+	int64_t Task::GetId()
+	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+		return this->_taskId;
+	}
+
 } /* namespace task */
 } /* namespace ddj */
