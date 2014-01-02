@@ -61,39 +61,26 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 		LOG4CPLUS_DEBUG(this->_logger, "buffer elem count = " << this->_bufferElementsCount);
 		if(_bufferElementsCount == this->_bufferCapacity)
 		{
-			this->_backBufferMutex.lock();
-			this->switchBuffers();
-			this->_bufferMutex.unlock();
-
-			// copy buffer to pinned memory
-			storeElement* pinnedMemory = nullptr;
-			CUDA_CHECK_RETURN( cudaMallocHost((void**)&(pinnedMemory), this->_bufferSize) );
-			CUDA_CHECK_RETURN
-			(
-				cudaMemcpy(pinnedMemory, this->_backBuffer, this->_bufferCapacity * sizeof(storeElement), cudaMemcpyHostToHost);
-			)
-
-			this->_backBufferMutex.unlock();
-
-			// UPLOAD BUFFER TO GPU (releases _backBufferMutex when element is already on GPU
-			storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(pinnedMemory, this->_backBufferElementsCount);
-			CUDA_CHECK_RETURN( cudaFreeHost(pinnedMemory) );
-
-			// INSERT INFO ELEMENT TO B+TREE
-			LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [START]");
-			this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
-			LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [END]");
-
-			delete elemToInsertToBTree;
-			elemToInsertToBTree = nullptr;
+			uploadBufferToGPU();
 		} else {
-		this->_bufferMutex.unlock();
+			this->_bufferMutex.unlock();
 		}
 	}
 
 	void StoreBuffer::Flush()
 	{
 		this->_bufferMutex.lock();
+
+		if (this->_bufferElementsCount != 0)
+		{
+			uploadBufferToGPU();
+		} else {
+			this->_bufferMutex.unlock();
+		}
+	}
+
+	void StoreBuffer::uploadBufferToGPU()
+	{
 		this->_backBufferMutex.lock();
 		this->switchBuffers();
 		this->_bufferMutex.unlock();

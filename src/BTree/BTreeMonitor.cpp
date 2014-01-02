@@ -22,11 +22,7 @@ namespace btree {
 	void BTreeMonitor::Insert(store::storeTrunkInfo* element)
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
-		//TODO: Detect why sometimes element is null
-		if (element == nullptr) {
-			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Inserting to B+Tree empty element"));
-		 	return;
-		}
+
 		try
 		{
 			this->_bufferInfoTree->insert(

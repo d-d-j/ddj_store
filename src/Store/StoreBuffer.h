@@ -96,6 +96,7 @@ namespace store {
 			storeTrunkInfo* uploadBuffer();
 			void insertToBtree(storeTrunkInfo* element);
 			void switchBuffers();
+			void uploadBufferToGPU();
     };
 
 } /* end namespace store */
