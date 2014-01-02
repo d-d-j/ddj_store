@@ -109,11 +109,14 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 		this->_backBufferMutex.unlock();
 
 		// UPLOAD BUFFER TO GPU (releases _backBufferMutex when element is already on GPU
-		storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(this->_backBuffer, this->_backBufferElementsCount);
-		CUDA_CHECK_RETURN( cudaFree(pinnedMemory) );
+		storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(pinnedMemory, this->_backBufferElementsCount);
+		CUDA_CHECK_RETURN( cudaFreeHost(pinnedMemory) );
 
 		// INSERT INFO ELEMENT TO B+TREE
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [START]");
 		this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [END]");
+
 		delete elemToInsertToBTree;
 		elemToInsertToBTree = nullptr;
 	}

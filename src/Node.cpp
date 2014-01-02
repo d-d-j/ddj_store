@@ -130,19 +130,11 @@ namespace ddj
 
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
-					if(compleatedTasks[i]->GetType() == task::Select)
+					if(compleatedTasks[i]->GetType() != task::Insert)
 					{
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
-
-						// Send result
-						this->_client->SendTaskResult(result);
-					}
-					else if(compleatedTasks[i]->GetType() == task::Info)
-					{
-						// Get result of the task
-						result = compleatedTasks[i]->GetResult();
-
+						LOG4CPLUS_INFO(this->_logger, "Sending result" << result->toString());
 						// Send result
 						this->_client->SendTaskResult(result);
 					}

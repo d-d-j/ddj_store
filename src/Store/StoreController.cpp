@@ -215,8 +215,10 @@ namespace store {
 			// TODO: REPAIR FLUSH - and make integration tests for it
 			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
 			{
-				it-> second->Flush();
+				it->second->Flush();
 			}
+
+			task->SetResult(true, "", nullptr, 0);
 		}
 		catch(std::exception& ex)
 		{
