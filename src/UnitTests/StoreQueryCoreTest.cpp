@@ -537,34 +537,174 @@ namespace store {
 
 		TEST_F(StoreQueryCoreTest, max_Empty)
 		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
 
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->max(elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
 		}
 
 		TEST_F(StoreQueryCoreTest, max_Positive)
 		{
+			// PREPARE
+			int numberOfValues = 2000;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value =-(i*i) + i*180.0f;	// max for i = 90 is 90*90 = 8100
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
 
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_max = 8100.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->max(deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			printf("%s\n", hostResult.toString().c_str());
+			EXPECT_FLOAT_EQ(expected_max, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
 		}
 
 		TEST_F(StoreQueryCoreTest, max_Negative)
 		{
+			// PREPARE
+			int numberOfValues = 2000;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value =(i*i) - i*180.0f;	// max for i = 1999 is 1999*1999-1999*180 = 3636181
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
 
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_max = 3636181.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->max(deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			printf("%s\n", hostResult.toString().c_str());
+			EXPECT_FLOAT_EQ(expected_max, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
 		}
 
 	//min
 
 		TEST_F(StoreQueryCoreTest, min_Empty)
 		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
 
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->min(elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
 		}
 
 		TEST_F(StoreQueryCoreTest, min_Positive)
 		{
+			// PREPARE
+			int numberOfValues = 2000;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			int x = 0;
+			for(int i=0; i < numberOfValues; i++) {
+				x = i-1000;
+				hostData[i].value =(i*i)+3.0f;	// min for i=1000 is 3
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
 
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_min = 3.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->min(deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			printf("%s\n", hostResult.toString().c_str());
+			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
 		}
 
 		TEST_F(StoreQueryCoreTest, min_Negative)
 		{
+			// PREPARE
+			int numberOfValues = 2000;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value =(i*i) - i*180.0f;	// min for i = 90 is -90*90 = -8100
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
 
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_min = -8100.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->min(deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			printf("%s\n", hostResult.toString().c_str());
+			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
 		}
 
 

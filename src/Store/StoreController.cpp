@@ -102,7 +102,6 @@ namespace store {
 
 		try
 		{
-
 			// SET DEVICE TODO: Can be done once per thread
 			this->_cudaController->SetProperDevice();
 
@@ -183,8 +182,6 @@ namespace store {
 
 			// Set task result and return
 			task->SetResult(true, nullptr, queryResult, size);
-
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [END]"));
 		}
 		catch(std::exception& ex)
 		{
@@ -196,6 +193,7 @@ namespace store {
 			task->SetResult(false, nullptr, nullptr, 0);
 			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Select task error [FAILED]"));
 		}
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [END]"));
 	}
 
 	void StoreController::flushTask(task::Task_Pointer task)
@@ -230,7 +228,6 @@ namespace store {
 			task->SetResult(false, nullptr, nullptr, 0);
 			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
 		}
-
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
 	}
 
@@ -246,19 +243,20 @@ namespace store {
 			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
 			task->SetResult(true, nullptr, (void*)queryResult, sizeOfResult);
 			LOG4CPLUS_DEBUG(this->_logger, queryResult->toString());
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
-		} catch (std::exception& ex)
+		}
+		catch (std::exception& ex)
 		{
 			LOG4CPLUS_ERROR_FMT(this->_logger,
 					"Info task error with exception - [%s] [FAILED]", ex.what());
 			task->SetResult(false, ex.what(), nullptr, 0);
-		} catch (...)
+		}
+		catch (...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
 			LOG4CPLUS_FATAL(this->_logger,
 					LOG4CPLUS_TEXT("Info task error [FAILED]"));
 		}
-
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
 	}
 
 } /* namespace store */

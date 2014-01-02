@@ -38,6 +38,7 @@ namespace ddj
 			}
 			controller = new StoreController_Pointer(new store::StoreController(i));
 			this->_controllers.insert({i,*controller});	// copy shared pointer to map
+			LOG4CPLUS_INFO(this->_logger, "Created controller for device" << i);
 			devices.push_back(i);
 			delete controller;	// delete shared pointer to controller
 			controller = nullptr;
@@ -99,6 +100,7 @@ namespace ddj
 		{
 			for(auto it = this->_controllers.begin(); it != this->_controllers.end(); it++)
 			{
+				LOG4CPLUS_DEBUG(this->_logger, "Executing task on controller " << it->first);
 				it->second->ExecuteTask(task);
 			}
 		}
@@ -123,6 +125,7 @@ namespace ddj
 
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
+				LOG4CPLUS_INFO_FMT(this->_logger, "Completed %d tasks", compleatedTaskCount);
 				task::taskResult* result;
 
 				for(int i=0; i<compleatedTaskCount; i++)

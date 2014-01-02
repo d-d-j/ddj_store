@@ -40,12 +40,12 @@ namespace task {
           _tasks.begin(),
           _tasks.end(),
           result.begin(),
-          [](Task_Pointer task){ if (task == nullptr) return false; return task->IsCompleated(); }
+          [](Task_Pointer task){ return task->IsCompleated(); }
      	);
 	    result.resize(std::distance(result.begin(),it));
 
 	    // Remove completed tasks from tasks
-	    auto comparator = [](const Task_Pointer &x, const Task_Pointer &y){ if (x == nullptr || y == nullptr) return false; return x->GetId() < y->GetId(); };
+	    auto comparator = [](const Task_Pointer &x, const Task_Pointer &y){ return x->GetId() < y->GetId(); };
 		std::sort(result.begin(), result.end(), comparator);
 		std::sort(_tasks.begin(), _tasks.end(), comparator);
 
