@@ -24,6 +24,9 @@ namespace results {
 		float sum;
 		int32_t count;
 
+		averageResult():sum(0),count(0){}
+		averageResult(float sum, int count):sum(sum),count(count){}
+
 		bool operator== (const averageResult& rhs) const
 		{
 			if(count == rhs.count && sum == rhs.sum)

@@ -104,12 +104,8 @@ size_t gpu_average_from_values(ddj::store::storeElement* elements, size_t dataSi
 	gpuElem init;
 	init.value = 0;
 	gpuElem sum = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, sum_gpu_elem());
-	ddj::query::results::averageResult average;
-	average.sum = sum.value;
-	average.count = elemCount;
-	cudaMalloc(result, averageSize);
-	cudaMemcpy(*result, &average, averageSize, cudaMemcpyHostToDevice);
-
+	ddj::query::results::averageResult* average = new ddj::query::results::averageResult(sum.value, elemCount);
+	(*result) = average;
 	return averageSize;
 }
 

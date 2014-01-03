@@ -707,8 +707,7 @@ namespace query {
 				hostData[i].value = x;	// average = 0
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			void* deviceResult;
-			results::averageResult hostResult;
+			results::averageResult* hostResult;
 
 			// EXPECTED
 			size_t expected_size = sizeof(results::averageResult);
@@ -716,13 +715,12 @@ namespace query {
 			int32_t expected_count = 2001;
 
 			// TEST
-			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&hostResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
-			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_sum, hostResult.sum);
-			EXPECT_EQ(expected_count, hostResult.count);
+			EXPECT_FLOAT_EQ(expected_sum, hostResult->sum);
+			EXPECT_EQ(expected_count, hostResult->count);
 
 			// CLEAN
 			delete [] hostData;
@@ -741,8 +739,7 @@ namespace query {
 				hostData[i].value = std::sin(i*M_PI/4.0f);
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			void* deviceResult;
-			results::averageResult hostResult;
+			results::averageResult* hostResult;
 
 			// EXPECTED
 			size_t expected_size = sizeof(results::averageResult);
@@ -750,13 +747,12 @@ namespace query {
 			int expected_count = 2001;
 
 			// TEST
-			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&hostResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
-			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_sum, hostResult.sum);
-			EXPECT_EQ(expected_count, hostResult.count);
+			EXPECT_FLOAT_EQ(expected_sum, hostResult->sum);
+			EXPECT_EQ(expected_count, hostResult->count);
 
 			// CLEAN
 			delete [] hostData;
