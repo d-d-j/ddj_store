@@ -51,7 +51,7 @@ run: all
 	./DDJ_Store
 
 copy:
-	rsync -rtvu src/ .src/
+	rsync -rtvu --delete src/ .src/
 	@echo $(SRCS)
 
 DDJ_Store: copy $(OBJS)
