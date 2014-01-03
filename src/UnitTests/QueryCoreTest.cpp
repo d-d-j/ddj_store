@@ -433,7 +433,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -456,7 +456,7 @@ namespace query {
 			storeElement* hostData = new storeElement[numberOfValues];
 			for(int i=0; i < numberOfValues; i++) hostData[i].value = 3;
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -486,7 +486,7 @@ namespace query {
 			storeElement* hostData = new storeElement[numberOfValues];
 			for(int i=0; i < numberOfValues; i++) hostData[i].value = 4.2f;
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -513,7 +513,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -538,7 +538,7 @@ namespace query {
 				hostData[i].value =-(i*i) + i*180.0f;	// max for i = 90 is 90*90 = 8100
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -570,7 +570,7 @@ namespace query {
 				hostData[i].value =(i*i) - i*180.0f;	// max for i = 1999 is 1999*1999-1999*180 = 3636181
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -597,7 +597,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -622,7 +622,7 @@ namespace query {
 				hostData[i].value =(i*i)+3.0f;	// min for i=1000 is 3
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -654,7 +654,7 @@ namespace query {
 				hostData[i].value =(i*i) - i*180.0f;	// min for i = 90 is -90*90 = -8100
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -681,7 +681,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -707,7 +707,7 @@ namespace query {
 				hostData[i].value = x;	// average = 0
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -739,7 +739,7 @@ namespace query {
 				hostData[i].value = std::sin(i*M_PI/4);
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -766,7 +766,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -792,7 +792,7 @@ namespace query {
 			hostData[2].value = 8;
 			hostData[3].value = 9;
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -831,7 +831,7 @@ namespace query {
 				hostData[i].value = i;	// 0,1,2,3,...,2000
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -865,7 +865,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -890,7 +890,7 @@ namespace query {
 				hostData[i].value = 2*i;
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -917,7 +917,7 @@ namespace query {
 			// PREPARE
 			storeElement* elements = nullptr;
 			size_t dataSize = 0;
-			storeElement* result;
+			void* result;
 
 			// EXPECTED
 			size_t expected_size = 0;
@@ -943,7 +943,7 @@ namespace query {
 			hostData[2].value = 8;
 			hostData[3].value = 9;
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED
@@ -982,7 +982,7 @@ namespace query {
 				hostData[i].value = i;	// 0,1,2,3,...,2000
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			storeElement* deviceResult;
+			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED

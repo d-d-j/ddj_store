@@ -18,7 +18,7 @@ using namespace store;
 
 	class QueryCore : public boost::noncopyable
 	{
-		typedef boost::function<size_t (storeElement* elements, size_t size, storeElement** result)> aggregationFunc;
+		typedef boost::function<size_t (storeElement* elements, size_t size, void** result)> aggregationFunc;
 
 	private:
 		CudaController* _cudaController;
@@ -55,7 +55,7 @@ using namespace store;
 		 * Output:
 		 *  aggregated data is returned as elements array (old one is released)
 		 */
-		size_t aggregateData(storeElement** elements, size_t dataSize, Query* query);
+		size_t aggregateData(void** elements, size_t dataSize, Query* query);
 
 		/*
 		 * Description:
@@ -91,15 +91,15 @@ using namespace store;
 
 		void propagateAggregationMethods();
 
-		size_t add(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t min(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t average(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t stdDeviation(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t count(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t variance(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t differential(storeElement* elements, size_t dataSize, storeElement** result);
-		size_t integral(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t add(storeElement* elements, size_t dataSize, void** result);
+		size_t min(storeElement* elements, size_t dataSize, void** result);
+		size_t max(storeElement* elements, size_t dataSize, void** result);
+		size_t average(storeElement* elements, size_t dataSize, void** result);
+		size_t stdDeviation(storeElement* elements, size_t dataSize, void** result);
+		size_t count(storeElement* elements, size_t dataSize, void** result);
+		size_t variance(storeElement* elements, size_t dataSize, void** result);
+		size_t differential(storeElement* elements, size_t dataSize, void** result);
+		size_t integral(storeElement* elements, size_t dataSize, void** result);
 
 	private:
 		friend class QueryCoreTest;
