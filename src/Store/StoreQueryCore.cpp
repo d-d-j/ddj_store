@@ -167,6 +167,8 @@ namespace store {
 
 	size_t StoreQueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
 	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_average_from_values(elements, dataSize, result);
 		return 0;
 	}
 

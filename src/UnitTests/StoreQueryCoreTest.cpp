@@ -417,23 +417,6 @@ namespace store {
 			int expected_elements_count = 1;
 			int expected_elements_size = expected_elements_count*sizeof(storeElement);
 			float expected_value = 65*3.0f;
-			auto checkTagFunc = [&] (const int& tag)
-			{
-				if (tag == 1 || tag == 6 || tag == 11 || tag == 19)
-					return ::testing::AssertionSuccess();
-				else
-					return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
-			};
-			auto checkTimeFunc = [&] (const ullint& time)
-			{
-				if ( (time > 1000 && time < 2000) ||
-					 (time > 3000 && time < 4000) ||
-					 (time > 9000 && time < 10240) )
-					return ::testing::AssertionSuccess();
-				else
-					return ::testing::AssertionFailure() << "Expected: time in range (1000-2000) or (3000-4000) or (9000-10240)\nActual: tag=" << time;
-			};
-
 
 			// TEST
 			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, dataLocationInfo);
@@ -642,9 +625,7 @@ namespace store {
 			storeElement* deviceData;
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
-			int x = 0;
 			for(int i=0; i < numberOfValues; i++) {
-				x = i-1000;
 				hostData[i].value =(i*i)+3.0f;	// min for i=1000 is 3
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
@@ -728,10 +709,9 @@ namespace store {
 			storeElement* deviceData;
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
-			int x = 0;
 			for(int i=0; i < numberOfValues; i++) {
-				x = i-1000;
-				hostData[i].value = i;	// average = 0
+				int x = i - 1000;
+				hostData[i].value = x;	// average = 0
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 			storeElement* deviceResult;
@@ -762,7 +742,6 @@ namespace store {
 			storeElement* deviceData;
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
-			int x = 0;
 			for(int i=0; i < numberOfValues; i++) {
 				hostData[i].value = std::sin(i*M_PI/4);
 			}
