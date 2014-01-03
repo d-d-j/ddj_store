@@ -174,6 +174,14 @@ namespace query {
 
 	size_t QueryCore::count(storeElement* elements, size_t dataSize, void** result)
 	{
+		(*result) = nullptr;
+		if(dataSize)
+		{
+			CUDA_CHECK_RETURN( cudaMalloc(result, sizeof(storeElement)) );
+			storeElement elem(0, 0, 0, dataSize / sizeof(storeElement) );
+			CUDA_CHECK_RETURN( cudaMemcpy(*result, &elem, sizeof(storeElement), cudaMemcpyHostToDevice) );
+			return sizeof(storeElement);
+		}
 		return 0;
 	}
 
