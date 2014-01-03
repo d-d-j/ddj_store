@@ -6,9 +6,6 @@
  */
 
 #include "StoreQueryCoreTest.h"
-#include <thrust/version.h>
-#include "../Cuda/CudaIncludes.h"
-#define STORE_QUERY_CORE_TEST_MEM_SIZE 1024
 
 namespace ddj {
 namespace store {
@@ -578,7 +575,6 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			printf("%s\n", hostResult.toString().c_str());
 			EXPECT_FLOAT_EQ(expected_max, hostResult.value);
 
 			// CLEAN
@@ -611,7 +607,6 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			printf("%s\n", hostResult.toString().c_str());
 			EXPECT_FLOAT_EQ(expected_max, hostResult.value);
 
 			// CLEAN
@@ -666,7 +661,6 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			printf("%s\n", hostResult.toString().c_str());
 			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
 
 			// CLEAN
@@ -699,7 +693,6 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			printf("%s\n", hostResult.toString().c_str());
 			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
 
 			// CLEAN
@@ -707,6 +700,92 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
+	//average
+
+		TEST_F(StoreQueryCoreTest, average_Empty)
+		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
+
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
+		}
+
+		TEST_F(StoreQueryCoreTest, average_Linear)
+		{
+			// PREPARE
+			int numberOfValues = 2001;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			int x = 0;
+			for(int i=0; i < numberOfValues; i++) {
+				x = i-1000;
+				hostData[i].value = i;	// average = 0
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_min = 0.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+		TEST_F(StoreQueryCoreTest, average_Sinusoidal)
+		{
+			// PREPARE
+			int numberOfValues = 2001;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			int x = 0;
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value = std::sin(i*M_PI/4);
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_min = 0.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
 
 } /* namespace store */
 } /* namespace ddj */

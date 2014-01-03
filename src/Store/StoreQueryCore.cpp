@@ -126,12 +126,22 @@ namespace store {
 	{
 		// ADD
 		this->_aggregationFunctions.insert({ AggregationType::Add, boost::bind(&StoreQueryCore::add, this, _1, _2, _3) });
-
 		// MIN
 		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&StoreQueryCore::min, this, _1, _2, _3) });
-
 		// MAX
 		this->_aggregationFunctions.insert({ AggregationType::Max, boost::bind(&StoreQueryCore::max, this, _1, _2, _3) });
+		// AVERAGE
+		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&StoreQueryCore::average, this, _1, _2, _3) });
+		// STDDEVIATION
+		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&StoreQueryCore::stdDeviation, this, _1, _2, _3) });
+		// COUNT
+		this->_aggregationFunctions.insert({ AggregationType::Count, boost::bind(&StoreQueryCore::count, this, _1, _2, _3) });
+		// VARIANCE
+		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&StoreQueryCore::variance, this, _1, _2, _3) });
+		// DIFFERENTIAL
+		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&StoreQueryCore::differential, this, _1, _2, _3) });
+		// INTEGRAL
+		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&StoreQueryCore::integral, this, _1, _2, _3) });
 	}
 
 	size_t StoreQueryCore::add(storeElement* elements, size_t dataSize, storeElement** result)
@@ -152,6 +162,36 @@ namespace store {
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
+		return 0;
+	}
+
+	size_t StoreQueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		return 0;
+	}
+
+	size_t StoreQueryCore::stdDeviation(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		return 0;
+	}
+
+	size_t StoreQueryCore::count(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		return 0;
+	}
+
+	size_t StoreQueryCore::variance(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		return 0;
+	}
+
+	size_t StoreQueryCore::differential(storeElement* elements, size_t dataSize, storeElement** result)
+	{
+		return 0;
+	}
+
+	size_t StoreQueryCore::integral(storeElement* elements, size_t dataSize, storeElement** result)
+	{
 		return 0;
 	}
 

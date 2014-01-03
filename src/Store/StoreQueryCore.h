@@ -99,7 +99,12 @@ namespace store {
 		size_t add(storeElement* elements, size_t dataSize, storeElement** result);
 		size_t min(storeElement* elements, size_t dataSize, storeElement** result);
 		size_t max(storeElement* elements, size_t dataSize, storeElement** result);
-
+		size_t average(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t stdDeviation(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t count(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t variance(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t differential(storeElement* elements, size_t dataSize, storeElement** result);
+		size_t integral(storeElement* elements, size_t dataSize, storeElement** result);
 
 	private:
 		friend class StoreQueryCoreTest;
@@ -125,14 +130,24 @@ namespace store {
 		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);
 		FRIEND_TEST(StoreQueryCoreTest, add_OddNumberOfValues);
-	//max
-		FRIEND_TEST(StoreQueryCoreTest, max_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, max_Positive);
-		FRIEND_TEST(StoreQueryCoreTest, max_Negative);
 	//min
 		FRIEND_TEST(StoreQueryCoreTest, min_Empty);
 		FRIEND_TEST(StoreQueryCoreTest, min_Positive);
 		FRIEND_TEST(StoreQueryCoreTest, min_Negative);
+	//max
+		FRIEND_TEST(StoreQueryCoreTest, max_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, max_Positive);
+		FRIEND_TEST(StoreQueryCoreTest, max_Negative);
+	//average
+		FRIEND_TEST(StoreQueryCoreTest, average_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, average_Linear);
+		FRIEND_TEST(StoreQueryCoreTest, average_Sinusoidal);
+	//stdDeviation
+	//count
+	//variance
+	//differential
+	//integral
+
 	};
 
 } /* namespace store */

@@ -8,13 +8,21 @@
 #ifndef STOREQUERYCORETEST_H_
 #define STOREQUERYCORETEST_H_
 
+#define _USE_MATH_DEFINES
+#define STORE_QUERY_CORE_TEST_MEM_SIZE 1024
+
 #include "../Store/StoreQueryCore.h"
 #include "../Cuda/CudaController.h"
 #include "../Core/Logger.h"
+#include "../Cuda/CudaIncludes.h"
 #include <gtest/gtest.h>
+#include <cmath>
+
+// CUDA
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 #include "../Core/helper_cuda.h"
+#include <thrust/version.h>
 
 namespace ddj {
 namespace store {
