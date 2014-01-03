@@ -14,7 +14,7 @@ struct gpuElem
 	int32_t tag;
 	int metric;
 	ullint time;
-	float value;
+	store_value_type value;
 
 	__host__ __device__
 	gpuElem()
@@ -24,6 +24,10 @@ struct gpuElem
 		time = 0;
 		value = 0;
 	}
+
+	__host__ __device__
+	gpuElem(int32_t tag, int metric, ullint time, store_value_type value):
+		tag(tag), metric(metric), time(time), value(value) {}
 
 	gpuElem& operator= (const ddj::store::storeElement& elem)
 	{
@@ -50,6 +54,7 @@ extern "C" {
 	size_t gpu_max_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
 	size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
 	size_t gpu_average_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
+	size_t gpu_stdDeviation_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result);
 
 }
 

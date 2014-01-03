@@ -3,6 +3,23 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_ptr.h>
 #include <thrust/reduce.h>
+#include <thrust/transform_reduce.h>
+#include <cmath>
+
+// HOW TO PRINT STH TO CONSOLE IN KERNEL
+/*
+// System includes
+#include <stdio.h>
+#include <assert.h>
+// CUDA runtime
+#include <cuda_runtime.h>
+#include "cuPrintf.cu"
+#define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
+                                  blockIdx.y*gridDim.x+blockIdx.x,\
+                                  threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
+                                  __VA_ARGS__)
+// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
+*/
 
 struct sum_gpu_elem
 {
@@ -81,15 +98,89 @@ size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, 
 size_t gpu_average_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result)
 {
 	size_t storeElemSize = sizeof(ddj::store::storeElement);
-		int elemCount = dataSize / storeElemSize;
+	int elemCount = dataSize / storeElemSize;
 
-		thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
-		gpuElem init;
-		init.value = 0;
-		gpuElem average = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, sum_gpu_elem());
-		average.value /= elemCount;
-		cudaMalloc(result, storeElemSize);
-		cudaMemcpy(*result, &average, storeElemSize, cudaMemcpyDeviceToDevice);
+	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
+	gpuElem init;
+	init.value = 0;
+	gpuElem average = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, sum_gpu_elem());
+	average.value /= elemCount;
+	cudaMalloc(result, storeElemSize);
+	cudaMemcpy(*result, &average, storeElemSize, cudaMemcpyDeviceToDevice);
 
-		return storeElemSize;
+	return storeElemSize;
+}
+
+template <typename T>
+struct variance_gpu_elem
+{
+	store_value_type n;
+	store_value_type mean;
+	store_value_type M2;
+
+    void initialize() { n = mean = M2 = 0; }
+    T variance() { return T(0,0,0, M2 / (n - 1) ); }
+    T variance_n() { return T(0,0,0, M2 / n ); }
+    T stdDeviation()
+    {
+    	return T(0,0,0, std::sqrt(M2 / (n - 1)) );
+    }
+};
+
+template <typename T>
+struct variance_unary_op
+{
+	__host__ __device__
+	variance_gpu_elem<T> operator()(const T& x) const
+	{
+		variance_gpu_elem<T> result;
+		result.n = 1;
+		result.mean = x.value;
+		result.M2 = 0;
+		return result;
+	}
+};
+
+template <typename T>
+struct variance_binary_op
+    : public thrust::binary_function<const variance_gpu_elem<T>&,
+                                     const variance_gpu_elem<T>&,
+                                     variance_gpu_elem<T> >
+{
+    __host__ __device__
+    variance_gpu_elem<T> operator()(const variance_gpu_elem<T>& x, const variance_gpu_elem <T>& y) const
+    {
+    	variance_gpu_elem<T> result;
+
+    	store_value_type n = x.n + y.n;
+    	store_value_type delta = y.mean - x.mean;
+    	store_value_type delta2 = delta * delta;
+        result.n = n;
+        result.mean = x.mean + delta * y.n / n;
+        result.M2 = x.M2 + y.M2;
+        result.M2 += delta2 * x.n * y.n / n;
+
+        return result;
+    }
+};
+
+size_t gpu_stdDeviation_from_values(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeElement** result)
+{
+	size_t storeElemSize = sizeof(ddj::store::storeElement);
+	int elemCount = dataSize / storeElemSize;
+
+	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
+
+	variance_unary_op<gpuElem> unary_op;
+	variance_binary_op<gpuElem> binary_op;
+	variance_gpu_elem<gpuElem> init;
+	init.initialize();
+
+	variance_gpu_elem<gpuElem> variance = thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op);
+	gpuElem stdDev = variance.stdDeviation();
+
+	cudaMalloc(result, storeElemSize);
+	cudaMemcpy(*result, &stdDev, storeElemSize, cudaMemcpyHostToDevice);
+
+	return storeElemSize;
 }

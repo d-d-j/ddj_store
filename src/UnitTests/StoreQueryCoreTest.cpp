@@ -795,9 +795,9 @@ namespace store {
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
 			hostData[0].value = 5;
-			hostData[0].value = 6;
-			hostData[0].value = 8;
-			hostData[0].value = 9;
+			hostData[1].value = 6;
+			hostData[2].value = 8;
+			hostData[3].value = 9;
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 			storeElement* deviceResult;
 			storeElement hostResult;

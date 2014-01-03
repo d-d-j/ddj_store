@@ -174,6 +174,8 @@ namespace store {
 
 	size_t StoreQueryCore::stdDeviation(storeElement* elements, size_t dataSize, storeElement** result)
 	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_stdDeviation_from_values(elements, dataSize, result);
 		return 0;
 	}
 
