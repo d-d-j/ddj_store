@@ -1,10 +1,9 @@
 #include "gpu.h"
-#include <stdio.h>
 
 // celowe rozwinięcie pętli
 // id - id bloku do dekompresji
 // off o ile przesunac dane
-#define FETCH_DATA1(level, data, id, off) __fetch(level, data, id, 0, off); 
+#define FETCH_DATA1(level, data, id, off) __fetch(level, data, id, 0, off);
 #define FETCH_DATA2(level, data, id, off) __fetch(level, data, id, 0, off); __fetch(level, data, id, 1, off);
 #define FETCH_DATA3(level, data, id, off) __fetch(level, data, id, 0, off); __fetch(level, data, id, 1, off); __fetch(level, data, id, 2, off );
 #define FETCH_DATA4(level, data, id, off) __fetch(level, data, id, 0, off); __fetch(level, data, id, 1, off); __fetch(level, data, id, 2, off ); __fetch(level, data, id, 3, off);
@@ -18,7 +17,7 @@ texture<int> tex_compressed_data_in;
 typedef void (*decompress_func) (int, int, int *, int *, int *);
 
 __device__ decompress_func pfor_func[15] = {
-    gpu_decompress2,  gpu_decompress3,  gpu_decompress4,  gpu_decompress5, 
+    gpu_decompress2,  gpu_decompress3,  gpu_decompress4,  gpu_decompress5,
     gpu_decompress6,  gpu_decompress7,  gpu_decompress8,  gpu_decompress9,
     gpu_decompress10, gpu_decompress11, gpu_decompress12, gpu_decompress13,
     gpu_decompress14, gpu_decompress15, gpu_decompress16,
@@ -27,7 +26,7 @@ __device__ decompress_func pfor_func[15] = {
 typedef void (*compress_func) (int *, char*);
 
 __device__ compress_func var_compress_func[15] = {
-    compress2,  compress3,  compress4,  compress5, 
+    compress2,  compress3,  compress4,  compress5,
     compress6,  compress7,  compress8,  compress9,
     compress10, compress11, compress12, compress13,
     compress14, compress15, compress16,
@@ -40,10 +39,10 @@ __global__ void compress_var (int bl, int *in, char *out)
     char b_out[32];
 
     for(int i =0; i < 8; i++)
-        b_in[i] = *(in + id * 8 + i); 
+        b_in[i] = *(in + id * 8 + i);
 
     var_compress_func[bl-2](b_in, b_out);
-   
+
     for(int i =0; i < bl; i++)
         out[id*bl+i] = b_out[i];
 }
@@ -54,7 +53,7 @@ __global__ void decompress_var (int bl, int *out)
     int tmp1[8], tmp2[8]; // tymczasowe tablice do dekompresji
 
     // dekompresja bloku id, uzywa do dekompresji tablic, wyniki skladuje w data + id * 8
-    pfor_func[bl-2](id, 0, tmp1, tmp2, tmp2); 
+    pfor_func[bl-2](id, 0, tmp1, tmp2, tmp2);
 
     for (int i = 0; i < 8; i++) {
         out[id*8+i] = tmp2[i];
