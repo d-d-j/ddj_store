@@ -1,7 +1,7 @@
-#ifndef STOREQUERY_H_
-#define STOREQUERY_H_
+#ifndef QUERY_H_
+#define QUERY_H_
 
-#include "StoreAggregationType.h"
+#include "AggregationType.h"
 #include "../Core/UllintPair.h"
 #include <boost/container/vector.hpp>
 #include <boost/foreach.hpp>
@@ -9,23 +9,23 @@
 #include <sstream>
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	struct storeQuery : public boost::noncopyable
+	struct Query : public boost::noncopyable
 	{
 		boost::container::vector<metric_type> metrices;
 		boost::container::vector<int> tags;
 		boost::container::vector<ullintPair> timePeriods;
 		AggregationType aggregationType;
 
-		storeQuery():aggregationType(None){}
-		storeQuery(void* queryData);
-		~storeQuery(){}
+		Query():aggregationType(None){}
+		Query(void* queryData);
+		~Query(){}
 
 		std::string toString();
 	};
 
 } /* namespace ddj */
-} /* namespace store */
+} /* namespace query */
 
-#endif /* STOREQUERY_H_ */
+#endif /* QUERY_H_ */

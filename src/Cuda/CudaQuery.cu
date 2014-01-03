@@ -115,7 +115,7 @@ __global__ void cuda_produce_stencil_using_tag_and_time(
 	return;
 }
 
-size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::store::storeQuery* query)
+size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::query::Query* query)
 {
 	// CREATE STENCIL
 	int elemCount = dataSize/sizeof(ddj::store::storeElement);

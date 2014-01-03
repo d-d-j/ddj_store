@@ -1,17 +1,10 @@
-/*
- * StoreQueryCoreTest.h
- *
- *  Created on: 17-12-2013
- *      Author: ghash
- */
-
 #ifndef STOREQUERYCORETEST_H_
-#define STOREQUERYCORETEST_H_
+#define QUERYCORETEST_H_
 
 #define _USE_MATH_DEFINES
-#define STORE_QUERY_CORE_TEST_MEM_SIZE 1024
+#define QUERY_CORE_TEST_MEM_SIZE 1024
 
-#include "../Store/StoreQueryCore.h"
+#include "../Query/QueryCore.h"
 #include "../Cuda/CudaController.h"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaIncludes.h"
@@ -25,14 +18,16 @@
 #include <thrust/version.h>
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	class StoreQueryCoreTest : public ::testing::Test
+using namespace store;
+
+	class QueryCoreTest : public ::testing::Test
 	{
 		int _devId;
 
 	protected:
-		StoreQueryCoreTest()
+		QueryCoreTest()
 		{
 			const char* argv = "";
 			_devId = findCudaDevice(0, &argv);
@@ -43,7 +38,7 @@ namespace store {
 		virtual void SetUp()
 		{
 			_cudaController = new CudaController(3,3,_devId);
-			_queryCore = new StoreQueryCore(_cudaController);
+			_queryCore = new QueryCore(_cudaController);
 		}
 		virtual void TearDown()
 		{
@@ -54,10 +49,10 @@ namespace store {
 		void createSimpleCharTestData();
 		void createTestDataWithStoreElements();
 
-		StoreQueryCore* _queryCore;
+		QueryCore* _queryCore;
 		CudaController* _cudaController;
 	};
 
-} /* namespace store */
+} /* namespace query */
 } /* namespace ddj */
-#endif /* STOREQUERYCORETEST_H_ */
+#endif /* QUERYCORETEST_H_ */

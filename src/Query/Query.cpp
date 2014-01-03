@@ -1,9 +1,9 @@
-#include "StoreQuery.h"
+#include "Query.h"
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	storeQuery::storeQuery(void* queryData)
+	Query::Query(void* queryData)
 	{
 		int position = 0;
 		int size = 0;
@@ -44,7 +44,7 @@ namespace store {
 		aggregationType = (AggregationType)type;
 	}
 
-	std::string storeQuery::toString()
+	std::string Query::toString()
 	{
 		 std::ostringstream stream;
 
@@ -70,4 +70,4 @@ namespace store {
 	}
 
 } /* namespace ddj */
-} /* namespace store */
+} /* namespace query */

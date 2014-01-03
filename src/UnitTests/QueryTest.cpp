@@ -1,8 +1,8 @@
-#include "StoreQueryTest.h"
+#include "QueryTest.h"
 namespace ddj {
-namespace store {
+namespace query {
 
-	TEST_F(StoreQueryTest, Constructor)
+	TEST_F(QueryTest, Constructor)
 	{
 		char input[] = {1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		auto actual = storeQuery((void*)input).toString();

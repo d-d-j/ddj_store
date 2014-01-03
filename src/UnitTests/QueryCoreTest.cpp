@@ -1,19 +1,12 @@
-/*
- * StoreQueryCoreTest.cpp
- *
- *  Created on: 17-12-2013
- *      Author: ghash
- */
-
-#include "StoreQueryCoreTest.h"
+#include "QueryCoreTest.h"
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	void StoreQueryCoreTest::createSimpleCharTestData()
+	void QueryCoreTest::createSimpleCharTestData()
 	{
 		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
-		size_t size = STORE_QUERY_CORE_TEST_MEM_SIZE;
+		size_t size = QUERY_CORE_TEST_MEM_SIZE;
 		char* testArray = new char[size];
 		// FILL TAST ARRAY WITH CHARACTERS
 		for(unsigned long i=0; i<size; i++)
@@ -23,10 +16,10 @@ namespace store {
 		_cudaController->SetMainMemoryOffset(size);
 	}
 
-	void StoreQueryCoreTest::createTestDataWithStoreElements()
+	void QueryCoreTest::createTestDataWithStoreElements()
 	{
 		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
-		size_t size = STORE_QUERY_CORE_TEST_MEM_SIZE;
+		size_t size = QUERY_CORE_TEST_MEM_SIZE;
 		storeElement* testArray = new storeElement[size];
 
 		// FILL TAST ARRAY WITH STORE ELEMENTS
@@ -43,7 +36,7 @@ namespace store {
 	}
 
 	// check thrust version
-	TEST_F(StoreQueryCoreTest, ThrustVersion)
+	TEST_F(QueryCoreTest, ThrustVersion)
 	{
 		int major = THRUST_MAJOR_VERSION;
 		int minor = THRUST_MINOR_VERSION;
@@ -59,7 +52,7 @@ namespace store {
 
 	//mapData
 
-		TEST_F(StoreQueryCoreTest, mapData_AllData)
+		TEST_F(QueryCoreTest, mapData_AllData)
 		{
 			// PREPARE
 			createSimpleCharTestData();
@@ -70,7 +63,7 @@ namespace store {
 			size_t size = _queryCore->mapData((void**)&deviceData);
 
 			// CHECK
-			ASSERT_EQ(STORE_QUERY_CORE_TEST_MEM_SIZE, size);
+			ASSERT_EQ(QUERY_CORE_TEST_MEM_SIZE, size);
 
 			hostData = new char[size];
 			CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
@@ -83,7 +76,7 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceData) );
 		}
 
-		TEST_F(StoreQueryCoreTest, mapData_ChooseOneTrunk)
+		TEST_F(QueryCoreTest, mapData_ChooseOneTrunk)
 		{
 			// PREPARE
 			createSimpleCharTestData();
@@ -109,7 +102,7 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceData) );
 		}
 
-		TEST_F(StoreQueryCoreTest, mapData_ChooseManyTrunks)
+		TEST_F(QueryCoreTest, mapData_ChooseManyTrunks)
 		{
 			// PREPARE
 			createSimpleCharTestData();
@@ -148,7 +141,7 @@ namespace store {
 
 	//filterData
 
-		TEST_F(StoreQueryCoreTest, filterData_AllData)
+		TEST_F(QueryCoreTest, filterData_AllData)
 		{
 			// PREPARE
 			int N = 100;
@@ -160,7 +153,7 @@ namespace store {
 				hostElements[i].time = i;
 				hostElements[i].value = 666.666;
 			}
-			storeQuery query;
+			Query query;
 			storeElement* deviceElements = nullptr;
 			CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
 			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
@@ -185,7 +178,7 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-		TEST_F(StoreQueryCoreTest, filterData_ExistingTags)
+		TEST_F(QueryCoreTest, filterData_ExistingTags)
 		{
 			// PREPARE
 			int N = 100;
@@ -197,7 +190,7 @@ namespace store {
 				hostElements[i].time = 696969;
 				hostElements[i].value = 666.666;
 			}
-			storeQuery query;
+			Query query;
 			query.tags.push_back(4);	// 5 times
 			query.tags.push_back(12);	// 5 times
 			query.tags.push_back(17);	// 5 times
@@ -232,7 +225,7 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-		TEST_F(StoreQueryCoreTest, filterData_NonExistingTags)
+		TEST_F(QueryCoreTest, filterData_NonExistingTags)
 		{
 			// PREPARE
 			int N = 100;
@@ -244,7 +237,7 @@ namespace store {
 				hostElements[i].time = 696969;
 				hostElements[i].value = 666.666;
 			}
-			storeQuery query;
+			Query query;
 			query.tags.push_back(24);	// 0 times
 			query.tags.push_back(32);	// 0 times
 			query.tags.push_back(7777);	// 0 times
@@ -263,7 +256,7 @@ namespace store {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-		TEST_F(StoreQueryCoreTest, filterData_ExistingTags_FromTimePeriod)
+		TEST_F(QueryCoreTest, filterData_ExistingTags_FromTimePeriod)
 		{
 			// PREPARE
 			int N = 100;
@@ -276,7 +269,7 @@ namespace store {
 				hostElements[i].value = 666.666;
 			}
 
-			storeQuery query;
+			Query query;
 			query.timePeriods.push_back(ullintPair{20,35});
 			query.timePeriods.push_back(ullintPair{35,60});
 			query.tags.push_back(4);	// 2 times in 20 to 60 time period
@@ -319,12 +312,12 @@ namespace store {
 
 	//selectData
 
-		TEST_F(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
+		TEST_F(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
 		{
 			// PREPARE
 			createSimpleCharTestData();
 			char* hostData;
-			storeQuery query;
+			Query query;
 			query.aggregationType = AggregationType::None;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 			dataLocationInfo->push_back(ullintPair{64,127});
@@ -341,15 +334,15 @@ namespace store {
 			free( hostData );
 		}
 
-		TEST_F(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation)
+		TEST_F(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation)
 		{
 			// PREPARE
 			createTestDataWithStoreElements();
 			storeElement* hostData;
-			storeQuery query;
+			Query query;
 			query.aggregationType = AggregationType::None;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{0,STORE_QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			dataLocationInfo->push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
 			query.tags.push_back(1);	// 52 elements
 			query.tags.push_back(6);	// 51 elements
 			query.tags.push_back(11);	// 51 elements
@@ -396,15 +389,15 @@ namespace store {
 			free( hostData );
 		}
 
-		TEST_F(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation)
+		TEST_F(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation)
 		{
 			// PREPARE
 			createTestDataWithStoreElements();
 			storeElement* hostData;
-			storeQuery query;
+			Query query;
 			query.aggregationType = AggregationType::Add;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{0,STORE_QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			dataLocationInfo->push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
 			query.tags.push_back(1);	// 52 elements
 			query.tags.push_back(6);	// 51 elements
 			query.tags.push_back(11);	// 51 elements
@@ -435,7 +428,7 @@ namespace store {
 
 	//add
 
-		TEST_F(StoreQueryCoreTest, add_Empty)
+		TEST_F(QueryCoreTest, add_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -453,7 +446,7 @@ namespace store {
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(StoreQueryCoreTest, add_EvenNumberOfValues)
+		TEST_F(QueryCoreTest, add_EvenNumberOfValues)
 		{
 			// PREPARE
 			int numberOfValues = 123;
@@ -483,7 +476,7 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(StoreQueryCoreTest, add_OddNumberOfValues)
+		TEST_F(QueryCoreTest, add_OddNumberOfValues)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -515,7 +508,7 @@ namespace store {
 
 	//max
 
-		TEST_F(StoreQueryCoreTest, max_Empty)
+		TEST_F(QueryCoreTest, max_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -533,7 +526,7 @@ namespace store {
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(StoreQueryCoreTest, max_Positive)
+		TEST_F(QueryCoreTest, max_Positive)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -565,7 +558,7 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(StoreQueryCoreTest, max_Negative)
+		TEST_F(QueryCoreTest, max_Negative)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -599,7 +592,7 @@ namespace store {
 
 	//min
 
-		TEST_F(StoreQueryCoreTest, min_Empty)
+		TEST_F(QueryCoreTest, min_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -617,7 +610,7 @@ namespace store {
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(StoreQueryCoreTest, min_Positive)
+		TEST_F(QueryCoreTest, min_Positive)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -649,7 +642,7 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(StoreQueryCoreTest, min_Negative)
+		TEST_F(QueryCoreTest, min_Negative)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -683,7 +676,7 @@ namespace store {
 
 	//average
 
-		TEST_F(StoreQueryCoreTest, average_Empty)
+		TEST_F(QueryCoreTest, average_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -701,7 +694,7 @@ namespace store {
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(StoreQueryCoreTest, average_Linear)
+		TEST_F(QueryCoreTest, average_Linear)
 		{
 			// PREPARE
 			int numberOfValues = 2001;
@@ -734,7 +727,7 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(StoreQueryCoreTest, average_Sinusoidal)
+		TEST_F(QueryCoreTest, average_Sinusoidal)
 		{
 			// PREPARE
 			int numberOfValues = 2001;
@@ -768,7 +761,7 @@ namespace store {
 
 	//stdDeviation
 
-		TEST_F(StoreQueryCoreTest, stdDeviation_Empty)
+		TEST_F(QueryCoreTest, stdDeviation_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -786,7 +779,7 @@ namespace store {
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(StoreQueryCoreTest, stdDeviation_Simple)
+		TEST_F(QueryCoreTest, stdDeviation_Simple)
 		{
 			// PREPARE
 			int numberOfValues = 4;
@@ -826,7 +819,7 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(StoreQueryCoreTest, stdDeviation_Linear)
+		TEST_F(QueryCoreTest, stdDeviation_Linear)
 		{
 			// PREPARE
 			int numberOfValues = 2001;
@@ -865,5 +858,156 @@ namespace store {
 			cudaFree(deviceData);
 		}
 
-} /* namespace store */
+	//count
+
+		TEST_F(QueryCoreTest, count_Empty)
+		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
+
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Count](elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
+		}
+
+		TEST_F(QueryCoreTest, count_NonEmpty)
+		{
+			// PREPARE
+			int numberOfValues = 2001;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value = 2*i;
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			size_t expected_size = sizeof(storeElement);
+			float expected_count = 2001.0f;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Count](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_count, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+	//variance
+
+		TEST_F(QueryCoreTest, variance_Empty)
+		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
+
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Variance](elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
+		}
+
+		TEST_F(QueryCoreTest, variance_Simple)
+		{
+			// PREPARE
+			int numberOfValues = 4;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			hostData[0].value = 5;
+			hostData[1].value = 6;
+			hostData[2].value = 8;
+			hostData[3].value = 9;
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			/*
+			 * number of values: n = 4
+			 * values: {5, 6, 8, 9}
+			 * average: a = 7
+			 * standard deviation: s = sqrt[1/(n-1) * SUM[i=0 to 3: (values[i] - a)^2] ]
+			 * s = sqrt[1/3 * (4+1+1+4)] = sqrt[10/3]
+			 */
+			size_t expected_size = sizeof(storeElement);
+			float expected_stdDeviation = std::sqrt(10.0f/3.0f);
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_stdDeviation, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+		TEST_F(QueryCoreTest, variance_Linear)
+		{
+			// PREPARE
+			int numberOfValues = 2001;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value = i;	// 0,1,2,3,...,2000
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			/*
+			 * number of values: n = 2001
+			 * values: {0, 1,..., 1999, 2000}
+			 * average: a = 1000
+			 * standard deviation: s = sqrt[1/2000 * SUM[i=0 to 2000: (values[i] - 1000)^2] ]
+			 * s = sqrt[667667/2]
+			 */
+			size_t expected_size = sizeof(storeElement);
+			float expected_stdDeviation = std::sqrt(667667.0f/2.0f);
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_stdDeviation, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+} /* namespace query */
 } /* namespace ddj */

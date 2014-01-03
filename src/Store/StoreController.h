@@ -22,8 +22,8 @@
 
 #include "StoreBuffer.h"
 #include "StoreElement.h"
-#include "StoreQueryCore.h"
-#include "StoreQuery.h"
+#include "../Query/QueryCore.h"
+#include "../Query/Query.h"
 #include "StoreInfoCore.h"
 #include "../Cuda/CudaController.h"
 #include "../Task/Task.h"
@@ -39,6 +39,8 @@
 namespace ddj {
 namespace store {
 
+using namespace query;
+
 class StoreController : public boost::noncopyable
 {
     /* TYPEDEFS */
@@ -51,7 +53,7 @@ class StoreController : public boost::noncopyable
     	int _gpuDeviceId;
     	CudaController* _cudaController;
     	StoreUploadCore* _uploadCore;
-    	StoreQueryCore* _queryCore;
+    	QueryCore* _queryCore;
     	StoreInfoCore* _infoCore;
 
     	/* BUFFERS */

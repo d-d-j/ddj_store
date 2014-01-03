@@ -1,24 +1,17 @@
-/*
- * QueryCore.cpp
- *
- *  Created on: 19-09-2013
- *      Author: ghashd
- */
-
-#include "StoreQueryCore.h"
+#include "QueryCore.h"
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	StoreQueryCore::StoreQueryCore(CudaController* cudaController)
+	QueryCore::QueryCore(CudaController* cudaController)
 	{
 		this->_cudaController = cudaController;
 		propagateAggregationMethods();
 	}
 
-	StoreQueryCore::~StoreQueryCore(){}
+	QueryCore::~QueryCore(){}
 
-	size_t StoreQueryCore::ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo)
+	size_t QueryCore::ExecuteQuery(void** queryResult, Query* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
 		void* tempDataBuffer = nullptr;
@@ -46,7 +39,7 @@ namespace store {
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
-	size_t StoreQueryCore::aggregateData(storeElement** elements, size_t dataSize, storeQuery* query)
+	size_t QueryCore::aggregateData(storeElement** elements, size_t dataSize, Query* query)
 	{
 		if (dataSize == 0)
 		{
@@ -66,7 +59,7 @@ namespace store {
 		return dataSize;
 	}
 
-	size_t StoreQueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
+	size_t QueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		void* mainGpuArray = _cudaController->GetMainMemoryPointer();
 		size_t size = 0;
@@ -104,12 +97,12 @@ namespace store {
 		return size;
 	}
 
-	storeElement* StoreQueryCore::decompressData(void* data, size_t* size)
+	storeElement* QueryCore::decompressData(void* data, size_t* size)
 	{
 		return nullptr;
 	}
 
-	size_t StoreQueryCore::filterData(storeElement* elements, size_t dataSize, storeQuery* query)
+	size_t QueryCore::filterData(storeElement* elements, size_t dataSize, Query* query)
 	{
 		if(query && (query->tags.size() || query->timePeriods.size()))
 		{
@@ -122,82 +115,82 @@ namespace store {
 	/* AGGREGATION MATHODS */
 	/***********************/
 
-	void StoreQueryCore::propagateAggregationMethods()
+	void QueryCore::propagateAggregationMethods()
 	{
 		// ADD
-		this->_aggregationFunctions.insert({ AggregationType::Add, boost::bind(&StoreQueryCore::add, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Add, boost::bind(&QueryCore::add, this, _1, _2, _3) });
 		// MIN
-		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&StoreQueryCore::min, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&QueryCore::min, this, _1, _2, _3) });
 		// MAX
-		this->_aggregationFunctions.insert({ AggregationType::Max, boost::bind(&StoreQueryCore::max, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Max, boost::bind(&QueryCore::max, this, _1, _2, _3) });
 		// AVERAGE
-		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&StoreQueryCore::average, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&QueryCore::average, this, _1, _2, _3) });
 		// STDDEVIATION
-		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&StoreQueryCore::stdDeviation, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryCore::stdDeviation, this, _1, _2, _3) });
 		// COUNT
-		this->_aggregationFunctions.insert({ AggregationType::Count, boost::bind(&StoreQueryCore::count, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Count, boost::bind(&QueryCore::count, this, _1, _2, _3) });
 		// VARIANCE
-		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&StoreQueryCore::variance, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
 		// DIFFERENTIAL
-		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&StoreQueryCore::differential, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&QueryCore::differential, this, _1, _2, _3) });
 		// INTEGRAL
-		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&StoreQueryCore::integral, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryCore::integral, this, _1, _2, _3) });
 	}
 
-	size_t StoreQueryCore::add(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::add(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_add_values(elements, dataSize, result);
 		else return 0;
 	}
 
-	size_t StoreQueryCore::min(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::min(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_min_from_values(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t StoreQueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::max(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t StoreQueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::average(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_average_from_values(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t StoreQueryCore::stdDeviation(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::stdDeviation(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_stdDeviation_from_values(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t StoreQueryCore::count(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::count(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		return 0;
 	}
 
-	size_t StoreQueryCore::variance(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::variance(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		return 0;
 	}
 
-	size_t StoreQueryCore::differential(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::differential(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		return 0;
 	}
 
-	size_t StoreQueryCore::integral(storeElement* elements, size_t dataSize, storeElement** result)
+	size_t QueryCore::integral(storeElement* elements, size_t dataSize, storeElement** result)
 	{
 		return 0;
 	}
 
-} /* namespace store */
+} /* namespace query */
 } /* namespace ddj */

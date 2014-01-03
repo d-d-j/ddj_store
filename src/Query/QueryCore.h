@@ -1,15 +1,8 @@
-/*
- * QueryCore.h
- *
- *  Created on: 19-09-2013
- *      Author: ghashd
- */
-
 #ifndef QUERYCORE_H_
 #define QUERYCORE_H_
 
-#include "StoreQuery.h"
-#include "StoreElement.h"
+#include "Query.h"
+#include "../Store/StoreElement.h"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
@@ -19,9 +12,11 @@
 #include <boost/unordered_map.hpp>
 
 namespace ddj {
-namespace store {
+namespace query {
 
-	class StoreQueryCore : public boost::noncopyable
+using namespace store;
+
+	class QueryCore : public boost::noncopyable
 	{
 		typedef boost::function<size_t (storeElement* elements, size_t size, storeElement** result)> aggregationFunc;
 
@@ -31,8 +26,8 @@ namespace store {
 		boost::unordered_map<int, aggregationFunc> _aggregationFunctions;
 
 	public:
-		StoreQueryCore(CudaController* cudaController);
-		virtual ~StoreQueryCore();
+		QueryCore(CudaController* cudaController);
+		virtual ~QueryCore();
 
 		/*
 		 * Description:
@@ -43,7 +38,7 @@ namespace store {
 		 * Output:
 		 * 	result of query is returned to queryResult parameter
 		 */
-		size_t ExecuteQuery(void** queryResult, storeQuery* query, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
+		size_t ExecuteQuery(void** queryResult, Query* query, boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
 	private:
 		/***************************/
@@ -60,7 +55,7 @@ namespace store {
 		 * Output:
 		 *  aggregated data is returned as elements array (old one is released)
 		 */
-		size_t aggregateData(storeElement** elements, size_t dataSize, storeQuery* query);
+		size_t aggregateData(storeElement** elements, size_t dataSize, Query* query);
 
 		/*
 		 * Description:
@@ -86,7 +81,7 @@ namespace store {
 		 * Output:
 		 *  changed elements array
 		 */
-		size_t filterData(storeElement* elements, size_t dataSize, storeQuery* query);
+		size_t filterData(storeElement* elements, size_t dataSize, Query* query);
 
 		storeElement* decompressData(void* data, size_t* size);
 
@@ -107,52 +102,57 @@ namespace store {
 		size_t integral(storeElement* elements, size_t dataSize, storeElement** result);
 
 	private:
-		friend class StoreQueryCoreTest;
+		friend class QueryCoreTest;
 
 		/*********/
 		/* TESTS */
 		/*********/
 
 	//mapData
-		FRIEND_TEST(StoreQueryCoreTest, mapData_AllData);
-		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseOneTrunk);
-		FRIEND_TEST(StoreQueryCoreTest, mapData_ChooseManyTrunks);
+		FRIEND_TEST(QueryCoreTest, mapData_AllData);
+		FRIEND_TEST(QueryCoreTest, mapData_ChooseOneTrunk);
+		FRIEND_TEST(QueryCoreTest, mapData_ChooseManyTrunks);
 	//filterData
-		FRIEND_TEST(StoreQueryCoreTest, filterData_AllData);
-		FRIEND_TEST(StoreQueryCoreTest, filterData_ExistingTags);
-		FRIEND_TEST(StoreQueryCoreTest, filterData_NonExistingTags);
-		FRIEND_TEST(StoreQueryCoreTest, filterData_ExistingTags_FromTimePeriod);
+		FRIEND_TEST(QueryCoreTest, filterData_AllData);
+		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags);
+		FRIEND_TEST(QueryCoreTest, filterData_NonExistingTags);
+		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags_FromTimePeriod);
 	//selectData
-		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
-		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
-		FRIEND_TEST(StoreQueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
+		FRIEND_TEST(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
+		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
+		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
 	//add
-		FRIEND_TEST(StoreQueryCoreTest, add_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, add_EvenNumberOfValues);
-		FRIEND_TEST(StoreQueryCoreTest, add_OddNumberOfValues);
+		FRIEND_TEST(QueryCoreTest, add_Empty);
+		FRIEND_TEST(QueryCoreTest, add_EvenNumberOfValues);
+		FRIEND_TEST(QueryCoreTest, add_OddNumberOfValues);
 	//min
-		FRIEND_TEST(StoreQueryCoreTest, min_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, min_Positive);
-		FRIEND_TEST(StoreQueryCoreTest, min_Negative);
+		FRIEND_TEST(QueryCoreTest, min_Empty);
+		FRIEND_TEST(QueryCoreTest, min_Positive);
+		FRIEND_TEST(QueryCoreTest, min_Negative);
 	//max
-		FRIEND_TEST(StoreQueryCoreTest, max_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, max_Positive);
-		FRIEND_TEST(StoreQueryCoreTest, max_Negative);
+		FRIEND_TEST(QueryCoreTest, max_Empty);
+		FRIEND_TEST(QueryCoreTest, max_Positive);
+		FRIEND_TEST(QueryCoreTest, max_Negative);
 	//average
-		FRIEND_TEST(StoreQueryCoreTest, average_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, average_Linear);
-		FRIEND_TEST(StoreQueryCoreTest, average_Sinusoidal);
+		FRIEND_TEST(QueryCoreTest, average_Empty);
+		FRIEND_TEST(QueryCoreTest, average_Linear);
+		FRIEND_TEST(QueryCoreTest, average_Sinusoidal);
 	//stdDeviation
-		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Empty);
-		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Simple);
-		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Linear);
+		FRIEND_TEST(QueryCoreTest, stdDeviation_Empty);
+		FRIEND_TEST(QueryCoreTest, stdDeviation_Simple);
+		FRIEND_TEST(QueryCoreTest, stdDeviation_Linear);
 	//count
+		FRIEND_TEST(QueryCoreTest, count_Empty);
+		FRIEND_TEST(QueryCoreTest, count_NonEmpty);
 	//variance
+		FRIEND_TEST(QueryCoreTest, variance_Empty);
+		FRIEND_TEST(QueryCoreTest, variance_Simple);
+		FRIEND_TEST(QueryCoreTest, variance_Linear);
 	//differential
 	//integral
 
 	};
 
-} /* namespace store */
+} /* namespace query */
 } /* namespace ddj */
 #endif /* QUERYCORE_H_ */

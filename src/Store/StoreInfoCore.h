@@ -12,14 +12,12 @@
 namespace ddj{
 namespace store{
 
-	// TODO: Move this class to Core/ and rename it to NodeInfo or InfoCore
 	class StoreInfoCore
 	{
         Logger _logger;
 		Config* _config;
 		store::CudaCommons _cudaCommons;
 		CudaController* _cudaController;
-
 
 	public:
 		StoreInfoCore(CudaController* cudaController) : _logger(Logger::getRoot()), _config(Config::GetInstance()), _cudaController(cudaController) {};

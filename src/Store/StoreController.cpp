@@ -38,7 +38,7 @@ namespace store {
 		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"), gpuDeviceId);
 
 		// CREATE STORE QUERY CORE
-		this->_queryCore = new StoreQueryCore(this->_cudaController);
+		this->_queryCore = new QueryCore(this->_cudaController);
 
 		// CREATE STORE UPLOAD CORE
 		this->_uploadCore = new StoreUploadCore(this->_cudaController);
@@ -153,7 +153,7 @@ namespace store {
 			this->_cudaController->SetProperDevice();
 
 			// Create query from task data
-			storeQuery* query = new storeQuery(task->GetData());
+			Query* query = new Query(task->GetData());
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
 
 			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;
