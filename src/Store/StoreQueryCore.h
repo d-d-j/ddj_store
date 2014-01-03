@@ -143,6 +143,9 @@ namespace store {
 		FRIEND_TEST(StoreQueryCoreTest, average_Linear);
 		FRIEND_TEST(StoreQueryCoreTest, average_Sinusoidal);
 	//stdDeviation
+		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Empty);
+		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Simple);
+		FRIEND_TEST(StoreQueryCoreTest, stdDeviation_Linear);
 	//count
 	//variance
 	//differential

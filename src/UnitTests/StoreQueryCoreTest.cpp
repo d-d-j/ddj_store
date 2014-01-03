@@ -719,7 +719,7 @@ namespace store {
 
 			// EXPECTED
 			size_t expected_size = sizeof(storeElement);
-			float expected_min = 0.0f;
+			float expected_average = 0.0f;
 
 			// TEST
 			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
@@ -727,7 +727,7 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+			EXPECT_FLOAT_EQ(expected_average, hostResult.value);
 
 			// CLEAN
 			delete [] hostData;
@@ -751,7 +751,7 @@ namespace store {
 
 			// EXPECTED
 			size_t expected_size = sizeof(storeElement);
-			float expected_min = 0.0f;
+			float expected_average = 0.0f;
 
 			// TEST
 			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
@@ -759,7 +759,106 @@ namespace store {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_min, hostResult.value);
+			EXPECT_FLOAT_EQ(expected_average, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+	//stdDeviation
+
+		TEST_F(StoreQueryCoreTest, stdDeviation_Empty)
+		{
+			// PREPARE
+			storeElement* elements = nullptr;
+			size_t dataSize = 0;
+			storeElement* result;
+
+			// EXPECTED
+			size_t expected_size = 0;
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
+		}
+
+		TEST_F(StoreQueryCoreTest, stdDeviation_Simple)
+		{
+			// PREPARE
+			int numberOfValues = 4;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			hostData[0].value = 5;
+			hostData[0].value = 6;
+			hostData[0].value = 8;
+			hostData[0].value = 9;
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			/*
+			 * number of values: n = 4
+			 * values: {5, 6, 8, 9}
+			 * average: a = 7
+			 * standard deviation: s = sqrt[1/(n-1) * SUM[i=0 to 3: (values[i] - a)^2] ]
+			 * s = sqrt[1/3 * (4+1+1+4)] = sqrt[10/3]
+			 */
+			size_t expected_size = sizeof(storeElement);
+			float expected_stdDeviation = std::sqrt(10.0f/3.0f);
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_stdDeviation, hostResult.value);
+
+			// CLEAN
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+		TEST_F(StoreQueryCoreTest, stdDeviation_Linear)
+		{
+			// PREPARE
+			int numberOfValues = 2001;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			storeElement* hostData = new storeElement[numberOfValues];
+			for(int i=0; i < numberOfValues; i++) {
+				hostData[i].value = i;	// 0,1,2,3,...,2000
+			}
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+			storeElement* deviceResult;
+			storeElement hostResult;
+
+			// EXPECTED
+			/*
+			 * number of values: n = 2001
+			 * values: {0, 1,..., 1999, 2000}
+			 * average: a = 1000
+			 * standard deviation: s = sqrt[1/2000 * SUM[i=0 to 2000: (values[i] - 1000)^2] ]
+			 * s = sqrt[667667/2]
+			 */
+			size_t expected_size = sizeof(storeElement);
+			float expected_stdDeviation = std::sqrt(667667.0f/2.0f);
+
+			// TEST
+			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, &deviceResult);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
+			EXPECT_FLOAT_EQ(expected_stdDeviation, hostResult.value);
 
 			// CLEAN
 			delete [] hostData;
