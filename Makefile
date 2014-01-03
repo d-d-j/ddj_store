@@ -59,6 +59,7 @@ DDJ_Store: $(OBJS)
 
 test: all
 	./DDJ_Store --test 2> /dev/null
+	
 leak-check: all
 	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
 
