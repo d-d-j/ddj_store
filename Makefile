@@ -33,7 +33,7 @@ all: DDJ_Store
 debug: COMPILER += -DDEBUG -g
 debug: all
 
-.src/%.o: ./.src/%.cpp ./.src/%.h
+.src/%.o: ./.src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER)'
 	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -o "$@" "$<"
