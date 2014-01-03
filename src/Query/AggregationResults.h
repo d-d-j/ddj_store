@@ -21,7 +21,7 @@ namespace results {
 
 	struct averageResult
 	{
-		double sum;
+		float sum;
 		int32_t count;
 
 		bool operator== (const averageResult& rhs) const

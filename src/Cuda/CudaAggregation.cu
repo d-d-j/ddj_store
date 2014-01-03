@@ -97,18 +97,20 @@ size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, 
 
 size_t gpu_average_from_values(ddj::store::storeElement* elements, size_t dataSize, void** result)
 {
-	size_t storeElemSize = sizeof(ddj::store::storeElement);
-	int elemCount = dataSize / storeElemSize;
+	size_t averageSize = sizeof(ddj::query::results::averageResult);
+	int elemCount = dataSize / sizeof(ddj::store::storeElement);
 
 	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
 	gpuElem init;
 	init.value = 0;
-	gpuElem average = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, sum_gpu_elem());
-	average.value /= elemCount;
-	cudaMalloc(result, storeElemSize);
-	cudaMemcpy(*result, &average, storeElemSize, cudaMemcpyDeviceToDevice);
+	gpuElem sum = thrust::reduce(elem_ptr, elem_ptr+elemCount, init, sum_gpu_elem());
+	ddj::query::results::averageResult average;
+	average.sum = sum.value;
+	average.count = elemCount;
+	cudaMalloc(result, averageSize);
+	cudaMemcpy(*result, &average, averageSize, cudaMemcpyHostToDevice);
 
-	return storeElemSize;
+	return averageSize;
 }
 
 template <typename T>

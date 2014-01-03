@@ -3,6 +3,7 @@
 
 #include "../Store/StoreElement.h"
 #include "../Query/Query.h"
+#include "../Query/AggregationResults.h"
 #include "../Store/StoreTypedefs.h"
 
 // TODO: Move this define to config

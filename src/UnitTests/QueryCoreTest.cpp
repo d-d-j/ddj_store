@@ -712,7 +712,7 @@ namespace query {
 
 			// EXPECTED
 			size_t expected_size = sizeof(results::averageResult);
-			double expected_sum = 0.0f;
+			float expected_sum = 0.0f;
 			int32_t expected_count = 2001;
 
 			// TEST
@@ -721,7 +721,7 @@ namespace query {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
-			EXPECT_DOUBLE_EQ(expected_sum, hostResult.sum);
+			EXPECT_FLOAT_EQ(expected_sum, hostResult.sum);
 			EXPECT_EQ(expected_count, hostResult.count);
 
 			// CLEAN
@@ -737,10 +737,8 @@ namespace query {
 			storeElement* deviceData;
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
-			double sum = 0;
 			for(int i=0; i < numberOfValues; i++) {
-				hostData[i].value = std::sin(i*M_PI/4);
-				sum += hostData[i].value;
+				hostData[i].value = std::sin(i*M_PI/4.0f);
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 			void* deviceResult;
@@ -748,7 +746,7 @@ namespace query {
 
 			// EXPECTED
 			size_t expected_size = sizeof(results::averageResult);
-			double expected_sum = sum;
+			float expected_sum = 0.0f;
 			int expected_count = 2001;
 
 			// TEST
@@ -757,7 +755,7 @@ namespace query {
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
-			EXPECT_DOUBLE_EQ(expected_sum, hostResult.sum);
+			EXPECT_FLOAT_EQ(expected_sum, hostResult.sum);
 			EXPECT_EQ(expected_count, hostResult.count);
 
 			// CLEAN
