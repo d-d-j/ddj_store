@@ -23,7 +23,7 @@ GENCODE_SM21    := -gencode arch=compute_20,code=sm_21
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
 GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30)
 
-SRC_FILES := $(wildcard .src/*.cpp .src/*/*.cpp .src/*/*.cu)
+SRC_FILES := $(wildcard src/*.cpp src/*/*.cpp src/*/*.cu)
 
 OBJS := $(SRC_FILES:.cpp=.o)
 OBJS := $(OBJS:.cu=.o)
@@ -33,14 +33,14 @@ all: DDJ_Store
 debug: COMPILER += -DDEBUG -g
 debug: all
 
-.src/%.o: ./.src/%.cpp
+src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER)'
 	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-.src/%.o: ./.src/%.cu
+src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
 	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
@@ -50,11 +50,7 @@ debug: all
 run: all
 	./DDJ_Store
 
-copy:
-	rsync -rtvu --delete src/ .src/
-	@echo $(SRCS)
-
-DDJ_Store: copy $(OBJS)
+DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
 	$(COMPILER) -o "DDJ_Store" $(OBJS) $(LIBS)
@@ -67,7 +63,7 @@ leak-check: all
 	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
 
 check:
-	cppcheck --enable=all -j 4 -q ./.src/
+	cppcheck --enable=all -j 4 -q ./src/
 
 clean:
 	-$(RM) $(OBJS) DDJ_Store
