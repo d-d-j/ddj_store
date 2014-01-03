@@ -708,19 +708,21 @@ namespace query {
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 			void* deviceResult;
-			storeElement hostResult;
+			results::averageResult hostResult;
 
 			// EXPECTED
-			size_t expected_size = sizeof(storeElement);
-			float expected_average = 0.0f;
+			size_t expected_size = sizeof(results::averageResult);
+			double expected_sum = 0.0f;
+			int32_t expected_count = 2001;
 
 			// TEST
 			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
-			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_average, hostResult.value);
+			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
+			EXPECT_DOUBLE_EQ(expected_sum, hostResult.sum);
+			EXPECT_EQ(expected_count, hostResult.count);
 
 			// CLEAN
 			delete [] hostData;
@@ -735,24 +737,28 @@ namespace query {
 			storeElement* deviceData;
 			cudaMalloc(&deviceData, dataSize);
 			storeElement* hostData = new storeElement[numberOfValues];
+			double sum = 0;
 			for(int i=0; i < numberOfValues; i++) {
 				hostData[i].value = std::sin(i*M_PI/4);
+				sum += hostData[i].value;
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 			void* deviceResult;
-			storeElement hostResult;
+			results::averageResult hostResult;
 
 			// EXPECTED
-			size_t expected_size = sizeof(storeElement);
-			float expected_average = 0.0f;
+			size_t expected_size = sizeof(results::averageResult);
+			double expected_sum = sum;
+			int expected_count = 2001;
 
 			// TEST
 			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, &deviceResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
-			cudaMemcpy(&hostResult, deviceResult, sizeof(storeElement), cudaMemcpyDeviceToHost);
-			EXPECT_FLOAT_EQ(expected_average, hostResult.value);
+			cudaMemcpy(&hostResult, deviceResult, expected_size, cudaMemcpyDeviceToHost);
+			EXPECT_DOUBLE_EQ(expected_sum, hostResult.sum);
+			EXPECT_EQ(expected_count, hostResult.count);
 
 			// CLEAN
 			delete [] hostData;
