@@ -23,74 +23,24 @@ GENCODE_SM21    := -gencode arch=compute_20,code=sm_21
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
 GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30)
 
-OBJS += \
-./src/UnitTests/TaskMonitorTest.o \
-./src/UnitTests/TaskTest.o \
-./src/UnitTests/StoreElementTest.o \
-./src/UnitTests/StoreQueryCoreTest.o \
-./src/UnitTests/StoreQueryTest.o \
-./src/UnitTests/SemaphoreTest.o \
-./src/UnitTests/BTreeMonitorTest.o \
-./src/BTree/BTreeMonitor.o \
-./src/Core/Config.o \
-./src/Core/Semaphore.o \
-./src/Cuda/CudaQuery.o \
-./src/Cuda/CudaAggregation.o \
-./src/Cuda/CudaCommons.o \
-./src/Cuda/CudaController.o \
-./src/Network/NetworkClient.o \
-./src/Store/StoreBuffer.o \
-./src/Store/StoreController.o \
-./src/Store/StoreQueryCore.o \
-./src/Store/StoreUploadCore.o \
-./src/Store/StoreQuery.o \
-./src/Store/StoreInfoCore.o \
-./src/Task/Task.o \
-./src/Task/TaskMonitor.o \
-./src/Node.o \
-./src/main.o
+SRC_FILES := $(wildcard .src/*.cpp .src/*/*.cpp .src/*/*.cu)
 
-CPP_DEPS += \
-./src/UnitTests/TaskMonitorTest.o \
-./src/UnitTests/TaskTest.d \
-./src/UnitTests/StoreElementTest.d \
-./src/UnitTests/StoreQueryTest.d \
-./src/UnitTests/StoreQueryCoreTest.d \
-./src/UnitTests/SemaphoreTest.d \
-./src/UnitTests/BTreeMonitorTest.d \
-./src/BTree/BTreeMonitor.d \
-./src/Core/Config.d \
-./src/Core/Semaphore.d \
-./src/Cuda/CudaQuery.d \
-./src/Cuda/CudaAggregation.d \
-./src/Cuda/CudaCommons.d \
-./src/Cuda/CudaController.d \
-./src/Network/NetworkClient.d \
-./src/Store/StoreBuffer.d \
-./src/Store/StoreController.d \
-./src/Store/StoreQueryCore.d \
-./src/Store/StoreUploadCore.d \
-./src/Store/StoreQuery.d \
-./src/Store/StoreInfoCore.d \
-./src/Store/StoreNodeInfo.d \
-./src/Task/Task.d \
-./src/Task/TaskMonitor.d \
-./src/Node.d \
-./src/main.d
+OBJS := $(SRC_FILES:.cpp=.o)
+OBJS := $(OBJS:.cu=.o)
 
 all: DDJ_Store
 
 debug: COMPILER += -DDEBUG -g
 debug: all
 
-src/%.o: ./src/%.cpp
+.src/%.o: ./.src/%.cpp ./.src/%.h
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER)'
-	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-src/%.o: ./src/%.cu
+.src/%.o: ./.src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
 	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
@@ -100,10 +50,14 @@ src/%.o: ./src/%.cu
 run: all
 	./DDJ_Store
 
-DDJ_Store: $(OBJS) $(USER_OBJS)
+copy:
+	rsync -rtvu src/ .src/
+	@echo $(SRCS)
+
+DDJ_Store: copy $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	$(COMPILER) -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(COMPILER) -o "DDJ_Store" $(OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -113,10 +67,10 @@ leak-check: all
 	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
 
 check:
-	cppcheck --enable=all -j 4 -q ./src/
+	cppcheck --enable=all -j 4 -q ./.src/
 
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DDJ_Store
+	-$(RM) $(OBJS) DDJ_Store
 	-@echo ' '
 
 .PHONY: all clean dependents
