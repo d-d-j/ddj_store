@@ -21,7 +21,7 @@ VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
 GENCODE_SM21    := -gencode arch=compute_20,code=sm_21
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
-GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30)
+GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30) --relocatable-device-code true
 
 SRC_FILES := $(wildcard src/*.cpp src/*/*.cpp src/*/*.cu)
 
@@ -32,6 +32,9 @@ all: DDJ_Store
 
 debug: COMPILER += -DDEBUG -g
 debug: all
+
+release: COMPILER += -O3
+release: all
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
@@ -53,13 +56,14 @@ run: all
 DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	$(COMPILER) -o "DDJ_Store" $(OBJS) $(LIBS)
+	nvcc $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
+	chmod +x DDJ_Store
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 test: all
 	./DDJ_Store --test 2> /dev/null
-	
+
 leak-check: all
 	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
 
