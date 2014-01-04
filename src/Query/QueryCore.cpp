@@ -23,15 +23,11 @@ namespace query {
 		size_t filteredDataSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
 
 		// Aggregate all mapped and filtered data
-		size_t aggregatedDataSize = this->aggregateData(&tempDataBuffer, filteredDataSize, query);
+		void* aggregatedData;
+		size_t aggregatedDataSize = this->aggregateData((storeElement*)tempDataBuffer, filteredDataSize, query, &aggregatedData);
 
-		// Set queryResult, clean and return result size
-		(*queryResult) = nullptr;
-		if(aggregatedDataSize)
-		{
-			(*queryResult) = malloc(aggregatedDataSize);
-			CUDA_CHECK_RETURN( cudaMemcpy((*queryResult), tempDataBuffer, aggregatedDataSize, cudaMemcpyDeviceToHost) );
-		}
+		// Return results
+		(*queryResult) = aggregatedData;
 		return aggregatedDataSize;
 	}
 
@@ -39,25 +35,25 @@ namespace query {
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
-	size_t QueryCore::aggregateData(void** elements, size_t dataSize, Query* query)
+	size_t QueryCore::aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result)
 	{
 		if (dataSize == 0)
 		{
-			CUDA_CHECK_RETURN( cudaFree(*elements) );
-			(*elements) = nullptr;
+			(*result) = nullptr;
 			return 0;
 		}
-		if(query->aggregationType != AggregationType::None)
+		else if(query->aggregationType == AggregationType::None)
 		{
-			void* aggregatedData = nullptr;
-			size_t aggregatedDataSize =
-					this->_aggregationFunctions[query->aggregationType]((storeElement*)*elements, dataSize, &aggregatedData);
-			CUDA_CHECK_RETURN( cudaFree(*elements) );
-			(*elements) = aggregatedData;
-			return aggregatedDataSize;
+			(*result) = malloc(dataSize);
+			CUDA_CHECK_RETURN( cudaMemcpy((*result), elements, dataSize, cudaMemcpyDeviceToHost) );
+			return dataSize;
 		}
-		return dataSize;
+		else
+		{
+			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result);
+		}
 	}
+
 
 	size_t QueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
@@ -127,8 +123,6 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&QueryCore::average, this, _1, _2, _3) });
 		// STDDEVIATION
 		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryCore::stdDeviation, this, _1, _2, _3) });
-		// COUNT
-		this->_aggregationFunctions.insert({ AggregationType::Count, boost::bind(&QueryCore::count, this, _1, _2, _3) });
 		// VARIANCE
 		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
 		// DIFFERENTIAL
@@ -169,19 +163,6 @@ namespace query {
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_stdDeviation(elements, dataSize, result);
-		return 0;
-	}
-
-	size_t QueryCore::count(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize)
-		{
-			CUDA_CHECK_RETURN( cudaMalloc(result, sizeof(storeElement)) );
-			storeElement elem(0, 0, 0, dataSize / sizeof(storeElement) );
-			CUDA_CHECK_RETURN( cudaMemcpy(*result, &elem, sizeof(storeElement), cudaMemcpyHostToDevice) );
-			return sizeof(storeElement);
-		}
 		return 0;
 	}
 

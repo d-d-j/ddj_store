@@ -47,15 +47,17 @@ using namespace store;
 
 		/*
 		 * Description:
-		 * Method aggregating dataSize data from elements using aggregation defined in query;
-		 * If aggregation type isn't None, method releases elements and sets it to aggregation result;
-		 * If dataSize equals 0 method should set elements to null and returns 0;
+		 * Method aggregates store elements (on device) of dataSize size using aggregation defined in query's aggregation
+		 * type and return aggregated value to result on host;
+		 * Store Elements should be already on device;
+		 * If aggregation type is None, method copies elements from device to aggregation result on host;
+		 * If dataSize equals 0 method should set aggregation result on host to null and returns 0;
 		 * Returns:
 		 *  returns size of new elements data
 		 * Output:
 		 *  aggregated data is returned as elements array (old one is released)
 		 */
-		size_t aggregateData(void** elements, size_t dataSize, Query* query);
+		size_t aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result);
 
 		/*
 		 * Description:
@@ -96,7 +98,6 @@ using namespace store;
 		size_t max(storeElement* elements, size_t dataSize, void** result);
 		size_t average(storeElement* elements, size_t dataSize, void** result);
 		size_t stdDeviation(storeElement* elements, size_t dataSize, void** result);
-		size_t count(storeElement* elements, size_t dataSize, void** result);
 		size_t variance(storeElement* elements, size_t dataSize, void** result);
 		size_t differential(storeElement* elements, size_t dataSize, void** result);
 		size_t integral(storeElement* elements, size_t dataSize, void** result);
@@ -141,9 +142,6 @@ using namespace store;
 		FRIEND_TEST(QueryCoreTest, stdDeviation_Empty);
 		FRIEND_TEST(QueryCoreTest, stdDeviation_Simple);
 		FRIEND_TEST(QueryCoreTest, stdDeviation_Linear);
-	//count
-		FRIEND_TEST(QueryCoreTest, count_Empty);
-		FRIEND_TEST(QueryCoreTest, count_NonEmpty);
 	//variance
 		FRIEND_TEST(QueryCoreTest, variance_Empty);
 		FRIEND_TEST(QueryCoreTest, variance_Simple);
