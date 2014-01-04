@@ -179,9 +179,11 @@ namespace store {
 			// Execute query with optional data locations using StoreQueryCore
 			void* queryResult = nullptr;
 			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
+			delete dataLocationInfo;
 
 			// Set task result and return
 			task->SetResult(true, nullptr, queryResult, size);
+			delete queryResult;
 		}
 		catch(std::exception& ex)
 		{

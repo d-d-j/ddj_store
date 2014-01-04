@@ -57,7 +57,12 @@ using namespace store;
 		 * Output:
 		 *  aggregated data is returned as elements array (old one is released)
 		 */
-		size_t aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result);
+		size_t aggregateData(
+				storeElement* elements,
+				size_t dataSize,
+				Query* query,
+				void** result,
+				boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
 		/*
 		 * Description:
@@ -83,7 +88,11 @@ using namespace store;
 		 * Output:
 		 *  changed elements array
 		 */
-		size_t filterData(storeElement* elements, size_t dataSize, Query* query);
+		size_t filterData(
+				storeElement* elements,
+				size_t dataSize,
+				Query* query,
+				boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
 		storeElement* decompressData(void* data, size_t* size);
 

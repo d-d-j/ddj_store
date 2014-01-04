@@ -117,14 +117,25 @@ __global__ void cuda_produce_stencil_using_tag_and_time(
 	return;
 }
 
-size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query* query)
+__global__ void sum_stencil_in_trunks(int* stencil, size_t elemSize, ddj::ullintPair* locations, int count, int* result)
 {
-	// CREATE STENCIL
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= count) return;
+	int i = locations[idx].first/elemSize;
+	int end = locations[idx].second/elemSize;
+	int sum = 0;
+	for(; i<end; i++)
+	{
+		sum += stencil[i];
+	}
+	result[idx] = sum;
+}
+
+int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Query* query)
+{
 	int elemCount = dataSize/sizeof(storeElement);
 	int* stencil;
 	cudaMalloc(&stencil, elemCount*sizeof(int));
-
-	// FILL STENCIL
 	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 
 	// CREATE TIME PERIODS VECTOR ON GPU
@@ -161,6 +172,15 @@ size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query
 				stencil);
 	}
 	cudaDeviceSynchronize();
+	return stencil;
+}
+
+size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query* query)
+{
+	int elemCount = dataSize/sizeof(storeElement);
+
+	// CREATE STENCIL
+	int* stencil = gpu_produceStencil(elements, dataSize, query);
 
 	// PARTITION ELEMENTS
 	thrust::device_ptr<storeElement> elem_ptr(elements);
@@ -169,5 +189,50 @@ size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query
 	thrust::partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
+	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
+}
+
+size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* query,
+				ddj::ullintPair* dataLocationInfo, int locationInfoCount)
+{
+	int elemCount = dataSize/sizeof(storeElement);
+
+	// CREATE STENCIL
+	int* stencil = gpu_produceStencil(elements, dataSize, query);
+
+	// CREATE TIME PERIODS VECTOR ON GPU
+	thrust::device_vector<ddj::ullintPair> locations(dataLocationInfo, dataLocationInfo+locationInfoCount);
+
+	// PARTITION ELEMENTS
+	thrust::device_ptr<storeElement> elem_ptr(elements);
+	thrust::device_ptr<int> stencil_ptr(stencil);
+
+	thrust::stable_partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
+
+	// COUNT ELEMENTS IN TRUNKS
+	int* trunkElemCount_device;
+	cudaMalloc(&trunkElemCount_device, locationInfoCount*sizeof(int));
+	int blocksPerGrid = (locationInfoCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+	sum_stencil_in_trunks<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			stencil,
+			sizeof(storeElement),
+			locations.data().get(),
+			locationInfoCount,
+			trunkElemCount_device);
+	cudaDeviceSynchronize();
+
+	// DOWNLOAD TRUNK ELEM COUNT TO HOST
+	int* trunkElemCount_host = new int[locationInfoCount];
+	cudaMemcpy(trunkElemCount_host, trunkElemCount_device, sizeof(int)*locationInfoCount, cudaMemcpyDeviceToHost);
+
+	// SET NEW DATA LOCATION INFO
+	int position = 0;
+	for(int i=0; i < locationInfoCount; i++)
+	{
+		dataLocationInfo[i].first = position;
+		position += trunkElemCount_host[i]*sizeof(storeElement);
+		dataLocationInfo[i].second = position - 1;
+	}
+
 	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
 }

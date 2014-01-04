@@ -49,6 +49,17 @@ namespace results {
 		}
 	};
 
+	struct integralResult
+	{
+		float integral;
+		// left store element
+		float left_value;
+		int64_t left_time;
+		// right store element
+		float right_value;
+		int64_t right_time;
+	};
+
 }
 }
 }

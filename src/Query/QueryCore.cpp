@@ -14,6 +14,7 @@ namespace query {
 	size_t QueryCore::ExecuteQuery(void** queryResult, Query* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
+		// Update dalaLocationInfo to contain info about location in tempDataBuffer
 		storeElement* tempDataBuffer = nullptr;
 		size_t tempDataSize = this->mapData((void**)&tempDataBuffer, dataLocationInfo);
 
@@ -24,7 +25,8 @@ namespace query {
 
 		// Aggregate all mapped and filtered data
 		void* aggregatedData;
-		size_t aggregatedDataSize = this->aggregateData(tempDataBuffer, filteredDataSize, query, &aggregatedData);
+		size_t aggregatedDataSize =
+				this->aggregateData(tempDataBuffer, filteredDataSize, query, &aggregatedData);
 
 		// Return results
 		(*queryResult) = aggregatedData;
@@ -35,7 +37,8 @@ namespace query {
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
-	size_t QueryCore::aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result)
+	size_t QueryCore::aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result,
+			boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		if (dataSize == 0)
 		{
@@ -48,12 +51,16 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaMemcpy((*result), elements, dataSize, cudaMemcpyDeviceToHost) );
 			return dataSize;
 		}
+		else if(query->aggregationType == AggregationType::Integral)
+		{
+			return gpu_trunk_integral(elements, dataSize, result,
+					dataLocationInfo->data(), dataLocationInfo->size());
+		}
 		else
 		{
 			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result);
 		}
 	}
-
 
 	size_t QueryCore::mapData(void** data, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
@@ -71,6 +78,7 @@ namespace query {
 			// Copy fragments of mainGpuArray specified in dataLocationInfo vector to mapped data array
 			// TODO: SPEED UP THIS COPING
 			int position = 0;
+			int oldPosition = 0;
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
 			{
 				CUDA_CHECK_RETURN(
@@ -78,7 +86,11 @@ namespace query {
 						(char*)mainGpuArray+dli.first,
 						(dli.second-dli.first+1),
 						cudaMemcpyDeviceToDevice));
+				oldPosition = position;
 				position += (dli.second-dli.first+1);
+				// set this data location info to location in mapped data array
+				dli.first = oldPosition;
+				dli.second = position;
 			}
 		}
 		else if(dataLocationInfo == nullptr)
@@ -98,10 +110,15 @@ namespace query {
 		return nullptr;
 	}
 
-	size_t QueryCore::filterData(storeElement* elements, size_t dataSize, Query* query)
+	size_t QueryCore::filterData(storeElement* elements, size_t dataSize, Query* query,
+			boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		if(query && (query->tags.size() || query->timePeriods.size()))
 		{
+			if(query->aggregationType == AggregationType::Integral)
+			{
+				return gpu_filterData_in_trunks(elements, dataSize, query, dataLocationInfo->data(), dataLocationInfo->size());
+			}
 			return gpu_filterData(elements, dataSize, query);
 		}
 		else return dataSize;

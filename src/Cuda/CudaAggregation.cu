@@ -176,3 +176,97 @@ size_t gpu_variance(storeElement* elements, size_t dataSize, void** result)
 
 	return sizeof(results::varianceResult);
 }
+
+// TRUNK INTEGRAL
+
+__global__ void calculate_trapezoid_fields(ddj::store::storeElement* elements, int count, float* result)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= count) return;
+
+	int timespan = elements[idx+1].time - elements[idx].time;
+	result[idx] = ( elements[idx].value + elements[idx+1].value ) * timespan / 2;
+}
+
+__global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullintPair* locations, int count, float* result)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= count) return;
+
+	int i = locations[idx].first/elemSize;
+	int end = locations[idx].second/elemSize - 1;
+	float sum = 0;
+	for(; i<end; i++)
+	{
+		sum += fields[i];
+	}
+	result[idx] = sum;
+}
+
+size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,
+		ddj::ullintPair* dataLocationInfo, int locationInfoCount)
+{
+	size_t storeElemSize = sizeof(storeElement);
+	int elemCount = dataSize / storeElemSize;
+
+	// ALLOCATE SPACE FOR RESULTS
+	float* integralSums_device;
+	cudaMalloc(&integralSums_device, sizeof(float)*locationInfoCount);
+	float* trapezoidFields;
+	cudaMalloc(&trapezoidFields, sizeof(float)*(elemCount-1));
+
+	// CREATE TIME PERIODS VECTOR ON GPU
+	thrust::device_vector<ddj::ullintPair> locations(dataLocationInfo, dataLocationInfo+locationInfoCount);
+
+	// CALCULATE TRAPEZOID FIELDS
+	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+	calculate_trapezoid_fields<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount-1, trapezoidFields);
+	cudaDeviceSynchronize();
+
+	// SUM UP FIELDS IN TRUNKS
+	blocksPerGrid = (locationInfoCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+	sum_fields_in_trunks<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+				trapezoidFields,
+				sizeof(storeElement),
+				locations.data().get(),
+				locationInfoCount,
+				integralSums_device);
+	cudaDeviceSynchronize();
+	cudaFree(trapezoidFields);
+
+	// CREATE RESULT
+	float* integralSums_host = new float[locationInfoCount];
+	cudaMemcpy(integralSums_host, integralSums_device, sizeof(float)*locationInfoCount, cudaMemcpyDeviceToHost);
+	cudaFree(integralSums_device);
+	results::integralResult* integral = new results::integralResult[locationInfoCount];
+	for(int i=0; i<locationInfoCount; i++)
+	{
+		integral[i].integral = integralSums_host[i];
+		int left = dataLocationInfo[i].first/storeElemSize;
+		int right = dataLocationInfo[i].second/storeElemSize;
+		integral[i].left_value = elements[left].value;
+		integral[i].left_time= elements[left].time;
+		integral[i].right_value = elements[right].value;
+		integral[i].right_time= elements[right].time;
+	}
+	(*result)=integral;
+	delete [] integralSums_host;
+
+	return locationInfoCount*sizeof(results::integralResult);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
