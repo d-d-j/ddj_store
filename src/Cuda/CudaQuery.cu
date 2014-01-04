@@ -23,6 +23,8 @@
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
 */
 
+using namespace ddj::store;
+
 // TODO: Remove repeating code
 
 struct is_one
@@ -41,7 +43,7 @@ __device__ bool isInside(ullint value, ddj::ullintPair* timePeriod)
 }
 
 __global__ void cuda_produce_stencil_using_tag(
-		ddj::store::storeElement* elements,
+		storeElement* elements,
 		int elemCount,
 		int* tags,
 		int tagsCount,
@@ -63,7 +65,7 @@ __global__ void cuda_produce_stencil_using_tag(
 }
 
 __global__ void cuda_produce_stencil_using_time(
-		ddj::store::storeElement* elements,
+		storeElement* elements,
 		int elemCount,
 		ddj::ullintPair* timePeriods,
 		int timePeriodsCount,
@@ -85,7 +87,7 @@ __global__ void cuda_produce_stencil_using_time(
 }
 
 __global__ void cuda_produce_stencil_using_tag_and_time(
-		ddj::store::storeElement* elements,
+		storeElement* elements,
 		int elemCount,
 		int* tags,
 		int tagsCount,
@@ -115,10 +117,10 @@ __global__ void cuda_produce_stencil_using_tag_and_time(
 	return;
 }
 
-size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::query::Query* query)
+size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query* query)
 {
 	// CREATE STENCIL
-	int elemCount = dataSize/sizeof(ddj::store::storeElement);
+	int elemCount = dataSize/sizeof(storeElement);
 	int* stencil;
 	cudaMalloc(&stencil, elemCount*sizeof(int));
 
@@ -161,11 +163,11 @@ size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::
 	cudaDeviceSynchronize();
 
 	// PARTITION ELEMENTS
-	thrust::device_ptr<gpuElem> elem_ptr((gpuElem*)elements);
+	thrust::device_ptr<storeElement> elem_ptr(elements);
 	thrust::device_ptr<int> stencil_ptr(stencil);
 
 	thrust::partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
-	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(ddj::store::storeElement);
+	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
 }

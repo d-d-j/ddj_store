@@ -4,7 +4,7 @@
 #include "NetworkLoginRequest.h"
 #include "../Task/TaskRequest.h"
 #include "../Task/TaskResult.h"
-#include "../Store/StoreElement.h"
+#include "../Store/StoreElement.cuh"
 #include "../Core/Config.h"
 #include "../Core/Logger.h"
 #include <boost/signals2/signal.hpp>

@@ -1,61 +1,27 @@
 #ifndef CUDAQUERY_CUH_
 #define CUDAQUERY_CUH_
 
-#include "../Store/StoreElement.h"
+#include "../Store/StoreElement.cuh"
+#include "../Query/AggregationResults.cuh"
 #include "../Query/Query.h"
-#include "../Query/AggregationResults.h"
 #include "../Store/StoreTypedefs.h"
 
 // TODO: Move this define to config
 #define CUDA_THREADS_PER_BLOCK 256
 
-// TODO: Move StoreElement to .cuh file and remove gpuElem to use only StoreElement everywhere
-struct gpuElem
-{
-	int32_t tag;
-	int metric;
-	ullint time;
-	store_value_type value;
-
-	__host__ __device__
-	gpuElem()
-	{
-		tag = 0;
-		metric = 0;
-		time = 0;
-		value = 0;
-	}
-
-	__host__ __device__
-	gpuElem(int32_t tag, int metric, ullint time, store_value_type value):
-		tag(tag), metric(metric), time(time), value(value) {}
-
-	gpuElem& operator= (const ddj::store::storeElement& elem)
-	{
-		tag = elem.tag;
-		metric = elem.metric;
-		time = elem.time;
-		value = elem.value;
-		return *this;
-	}
-
-	gpuElem (const ddj::store::storeElement& elem)
-	{
-		tag = elem.tag;
-		metric = elem.metric;
-		time = elem.time;
-		value = elem.value;
-	}
-};
+using namespace ddj::store;
+using namespace ddj::query;
 
 extern "C" {
 
-	size_t gpu_filterData(ddj::store::storeElement* elements, size_t dataSize, ddj::query::Query* query);
-	size_t gpu_add_values(ddj::store::storeElement* elements, size_t dataSize, void** result);
-	size_t gpu_max_from_values(ddj::store::storeElement* elements, size_t dataSize, void** result);
-	size_t gpu_min_from_values(ddj::store::storeElement* elements, size_t dataSize, void** result);
-	size_t gpu_average_from_values(ddj::store::storeElement* elements, size_t dataSize, void** result);
-	size_t gpu_stdDeviation_from_values(ddj::store::storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_filterData(storeElement* elements, size_t dataSize, Query* query);
+
+	// AGGREGATION
+	size_t gpu_sum(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_max(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_min(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_average(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_stdDeviation(storeElement* elements, size_t dataSize, void** result);
 
 }
 

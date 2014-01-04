@@ -395,7 +395,7 @@ namespace query {
 			createTestDataWithStoreElements();
 			storeElement* hostData;
 			Query query;
-			query.aggregationType = AggregationType::Add;
+			query.aggregationType = AggregationType::Sum;
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 			dataLocationInfo->push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
 			query.tags.push_back(1);	// 52 elements
@@ -426,9 +426,9 @@ namespace query {
 	/* AGGREGATION MATHODS */
 	/***********************/
 
-	//add
+	//sum
 
-		TEST_F(QueryCoreTest, add_Empty)
+		TEST_F(QueryCoreTest, sum_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -439,14 +439,14 @@ namespace query {
 			size_t expected_size = 0;
 
 			// TEST
-			size_t actual_size = _queryCore->add(elements, dataSize, &result);
+			size_t actual_size = _queryCore->sum(elements, dataSize, &result);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(QueryCoreTest, add_EvenNumberOfValues)
+		TEST_F(QueryCoreTest, sum_EvenNumberOfValues)
 		{
 			// PREPARE
 			int numberOfValues = 123;
@@ -464,7 +464,7 @@ namespace query {
 			float expected_sum = 3*123;
 
 			// TEST
-			size_t actual_size = _queryCore->add(deviceData, dataSize, &deviceResult);
+			size_t actual_size = _queryCore->sum(deviceData, dataSize, &deviceResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
@@ -476,7 +476,7 @@ namespace query {
 			cudaFree(deviceData);
 		}
 
-		TEST_F(QueryCoreTest, add_OddNumberOfValues)
+		TEST_F(QueryCoreTest, sum_OddNumberOfValues)
 		{
 			// PREPARE
 			int numberOfValues = 2000;
@@ -494,7 +494,7 @@ namespace query {
 			float expected_sum = 4.2f*2000;
 
 			// TEST
-			size_t actual_size = _queryCore->add(deviceData, dataSize, &deviceResult);
+			size_t actual_size = _queryCore->sum(deviceData, dataSize, &deviceResult);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);

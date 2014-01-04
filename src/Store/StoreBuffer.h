@@ -20,7 +20,7 @@
 #ifndef DDJ_Store__DDJ_StoreBuffer_h
 #define DDJ_Store__DDJ_StoreBuffer_h
 
-#include "StoreElement.h"
+#include "StoreElement.cuh"
 #include "StoreTrunkInfo.h"
 #include "StoreUploadCore.h"
 #include "../BTree/BTreeMonitor.h"

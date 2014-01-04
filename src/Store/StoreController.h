@@ -21,7 +21,7 @@
 #define DDJ_Store_DDJ_StoreController_h
 
 #include "StoreBuffer.h"
-#include "StoreElement.h"
+#include "StoreElement.cuh"
 #include "../Query/QueryCore.h"
 #include "../Query/Query.h"
 #include "StoreInfoCore.h"

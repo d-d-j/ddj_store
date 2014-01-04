@@ -1,7 +1,7 @@
 #ifndef STORE_ELEMENT_TEST_H_
 #define STORE_ELEMENT_TEST_H_
 
-#include "../Store/StoreElement.h"
+#include "../Store/StoreElement.cuh"
 #include <gtest/gtest.h>
 
 namespace ddj {

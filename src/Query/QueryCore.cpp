@@ -118,7 +118,7 @@ namespace query {
 	void QueryCore::propagateAggregationMethods()
 	{
 		// ADD
-		this->_aggregationFunctions.insert({ AggregationType::Add, boost::bind(&QueryCore::add, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::Sum, boost::bind(&QueryCore::sum, this, _1, _2, _3) });
 		// MIN
 		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&QueryCore::min, this, _1, _2, _3) });
 		// MAX
@@ -137,38 +137,38 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryCore::integral, this, _1, _2, _3) });
 	}
 
-	size_t QueryCore::add(storeElement* elements, size_t dataSize, void** result)
+	size_t QueryCore::sum(storeElement* elements, size_t dataSize, void** result)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_add_values(elements, dataSize, result);
+		if(dataSize) return gpu_sum(elements, dataSize, result);
 		else return 0;
 	}
 
 	size_t QueryCore::min(storeElement* elements, size_t dataSize, void** result)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_min_from_values(elements, dataSize, result);
+		if(dataSize) return gpu_min(elements, dataSize, result);
 		return 0;
 	}
 
 	size_t QueryCore::max(storeElement* elements, size_t dataSize, void** result)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_max_from_values(elements, dataSize, result);
+		if(dataSize) return gpu_max(elements, dataSize, result);
 		return 0;
 	}
 
 	size_t QueryCore::average(storeElement* elements, size_t dataSize, void** result)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_average_from_values(elements, dataSize, result);
+		if(dataSize) return gpu_average(elements, dataSize, result);
 		return 0;
 	}
 
 	size_t QueryCore::stdDeviation(storeElement* elements, size_t dataSize, void** result)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_stdDeviation_from_values(elements, dataSize, result);
+		if(dataSize) return gpu_stdDeviation(elements, dataSize, result);
 		return 0;
 	}
 

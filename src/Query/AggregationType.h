@@ -7,7 +7,7 @@ namespace ddj {
 	{
 		// Values aggregation
 		None = 0,
-		Add = 1,
+		Sum = 1,
 		Min = 2,
 		Max = 3,
 		Average = 4,
@@ -18,7 +18,7 @@ namespace ddj {
 		Integral = 9,
 		// Series aggregation
 		None_Series = 10,
-		Add_Series = 11,
+		Sum_Series = 11,
 		Min_Series = 12,
 		MAx_Series = 13,
 		Average_Series = 14,

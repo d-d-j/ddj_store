@@ -9,7 +9,7 @@
 #define GPUUPLOADCORE_H_
 
 #include "StoreTrunkInfo.h"
-#include "StoreElement.h"
+#include "StoreElement.cuh"
 #include "../Cuda/CudaController.h"
 #include <boost/thread.hpp>
 

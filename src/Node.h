@@ -13,7 +13,7 @@
 #include "Task/TaskResult.h"
 #include "Task/TaskMonitor.h"
 #include "Store/StoreController.h"
-#include "Store/StoreElement.h"
+#include "Store/StoreElement.cuh"
 #include "Cuda/CudaCommons.h"
 #include "Core/Logger.h"
 #include "Core/Config.h"

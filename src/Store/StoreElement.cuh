@@ -6,6 +6,14 @@
 #include <sstream>
 #include <cstring>
 
+#ifdef __CUDACC__
+#define HOST __host__
+#define DEVICE __device__
+#else
+#define HOST
+#define DEVICE
+#endif
+
 namespace ddj {
 namespace store {
 
@@ -16,7 +24,7 @@ namespace store {
 	 	time series event. It contains time as unsigned long long int, is tagged, has
 	 	a value and belongs to certain series.
 	 */
-	typedef struct storeElement
+	struct storeElement
 	{
 		public:
 			/* FIELDS */
@@ -26,9 +34,13 @@ namespace store {
 			store_value_type value;
 
 			/* CONSTRUCTORS */
+
+			HOST DEVICE
 			storeElement(){ tag = 0; metric = 0; time = 0; value = 0; }
+			HOST DEVICE
 			storeElement(int _tag, metric_type _metric, ullint _time, store_value_type _value)
 			: tag(_tag), metric(_metric), time(_time), value(_value) {}
+			HOST DEVICE
 			storeElement(const storeElement& elem)
 			{
 				this->tag = elem.tag;
@@ -36,7 +48,18 @@ namespace store {
 				this->time = elem.time;
 				this->value = elem.value;
 			}
+			HOST DEVICE
 			~storeElement(){}
+
+			HOST DEVICE
+			storeElement& operator= (const storeElement& elem)
+			{
+				tag = elem.tag;
+				metric = elem.metric;
+				time = elem.time;
+				value = elem.value;
+				return *this;
+			}
 
 			std::string toString()
 			{
@@ -44,7 +67,7 @@ namespace store {
 				 stream << "[" << tag << ", " << metric << ", " << time << ", " << value << "]";
 			     return  stream.str();
 			}
-	} storeElement;
+	};
 
 	struct OrderStoreElementByTimeAsc {
   		bool operator() (const storeElement &x, const storeElement &y) { return x.time < y.time; }

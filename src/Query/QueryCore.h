@@ -2,7 +2,7 @@
 #define QUERYCORE_H_
 
 #include "Query.h"
-#include "../Store/StoreElement.h"
+#include "../Store/StoreElement.cuh"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
@@ -91,7 +91,7 @@ using namespace store;
 
 		void propagateAggregationMethods();
 
-		size_t add(storeElement* elements, size_t dataSize, void** result);
+		size_t sum(storeElement* elements, size_t dataSize, void** result);
 		size_t min(storeElement* elements, size_t dataSize, void** result);
 		size_t max(storeElement* elements, size_t dataSize, void** result);
 		size_t average(storeElement* elements, size_t dataSize, void** result);
@@ -121,10 +121,10 @@ using namespace store;
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
-	//add
-		FRIEND_TEST(QueryCoreTest, add_Empty);
-		FRIEND_TEST(QueryCoreTest, add_EvenNumberOfValues);
-		FRIEND_TEST(QueryCoreTest, add_OddNumberOfValues);
+	//sum
+		FRIEND_TEST(QueryCoreTest, sum_Empty);
+		FRIEND_TEST(QueryCoreTest, sum_EvenNumberOfValues);
+		FRIEND_TEST(QueryCoreTest, sum_OddNumberOfValues);
 	//min
 		FRIEND_TEST(QueryCoreTest, min_Empty);
 		FRIEND_TEST(QueryCoreTest, min_Positive);
