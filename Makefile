@@ -53,7 +53,7 @@ run: all
 DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	nvlink  --arch='sm_35' $(LIBS)  -o "DDJ_Store" $(OBJS)
+	nvcc $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
 	chmod +x DDJ_Store
 	@echo 'Finished building target: $@'
 	@echo ' '
