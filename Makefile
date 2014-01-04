@@ -33,6 +33,9 @@ all: DDJ_Store
 debug: COMPILER += -DDEBUG -g
 debug: all
 
+release: COMPILER += -O3
+release: all
+
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER)'
