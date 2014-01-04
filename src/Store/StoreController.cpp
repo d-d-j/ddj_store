@@ -106,7 +106,7 @@ namespace store {
 			this->_cudaController->SetProperDevice();
 
 			// GET store element from task data
-			storeElement* element = (storeElement*)(task->GetData());
+			storeElement* element = static_cast<storeElement*>(task->GetData());
 
 			// Create buffer with element's metric if not exists
 			{

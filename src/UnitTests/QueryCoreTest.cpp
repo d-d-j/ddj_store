@@ -835,7 +835,6 @@ namespace query {
 				hostData[i].value = i;	// 0,1,2,3,...,2000
 			}
 			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-			void* deviceResult;
 			storeElement hostResult;
 
 			// EXPECTED

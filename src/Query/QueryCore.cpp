@@ -14,17 +14,17 @@ namespace query {
 	size_t QueryCore::ExecuteQuery(void** queryResult, Query* query, boost::container::vector<ullintPair>* dataLocationInfo)
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
-		void* tempDataBuffer = nullptr;
-		size_t tempDataSize = this->mapData(&tempDataBuffer, dataLocationInfo);
+		storeElement* tempDataBuffer = nullptr;
+		size_t tempDataSize = this->mapData((void**)&tempDataBuffer, dataLocationInfo);
 
 		// TODO: Decompress temporary data buffer
 
 		// Filter to set of tags and time periods specified in query (only if set is not empty)
-		size_t filteredDataSize = this->filterData((storeElement*)tempDataBuffer, tempDataSize, query);
+		size_t filteredDataSize = this->filterData(tempDataBuffer, tempDataSize, query);
 
 		// Aggregate all mapped and filtered data
 		void* aggregatedData;
-		size_t aggregatedDataSize = this->aggregateData((storeElement*)tempDataBuffer, filteredDataSize, query, &aggregatedData);
+		size_t aggregatedDataSize = this->aggregateData(tempDataBuffer, filteredDataSize, query, &aggregatedData);
 
 		// Return results
 		(*queryResult) = aggregatedData;
