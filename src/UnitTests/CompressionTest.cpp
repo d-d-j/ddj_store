@@ -1,0 +1,50 @@
+#include "CompressionTest.h"
+namespace ddj
+{
+namespace store
+{
+
+void big_random_block( int size, int limit , int *data) {
+    for (int i=0; i<size; i++)
+        data[i] = rand() % limit;
+}
+
+TEST_F(CompressionTest, Compress_And_Decompress_Data)
+{
+
+	int max_size = 800000;
+	char *dev_out;
+	int *dev_data;
+
+	int *host_data, *host_data2;
+	char *host_out;
+
+	cudaMallocHost((void**) &host_data, max_size * sizeof(int));
+	cudaMallocHost((void**) &host_data2, max_size * sizeof(int));
+	cudaMallocHost((void**) &host_out, max_size);
+
+	big_random_block(max_size, 10, host_data);
+
+	cudaMalloc((void **) &dev_out, max_size);
+
+	cudaMalloc((void **) &dev_data, max_size * sizeof(int));
+	cudaMemcpy(dev_data, host_data, max_size * sizeof(int),
+			cudaMemcpyHostToDevice);
+
+	compressVar(max_size, 5, dev_data, dev_out);
+
+	decompressVar(max_size, 5, dev_data, dev_out);
+
+	cudaMemcpy(host_data2, dev_data, max_size * sizeof(int),
+			cudaMemcpyDeviceToHost);
+	cudaFree(dev_out);
+	cudaFree(dev_data);
+
+	for (int i = 0; i < max_size; i++)
+	{
+		EXPECT_EQ(host_data[i], host_data2[i]);
+	}
+}
+
+}
+}
