@@ -122,7 +122,7 @@ namespace query {
 		// AVERAGE
 		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&QueryCore::average, this, _1, _2, _3) });
 		// STDDEVIATION
-		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryCore::stdDeviation, this, _1, _2, _3) });
+		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
 		// VARIANCE
 		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
 		// DIFFERENTIAL
@@ -159,15 +159,10 @@ namespace query {
 		return 0;
 	}
 
-	size_t QueryCore::stdDeviation(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_stdDeviation(elements, dataSize, result);
-		return 0;
-	}
-
 	size_t QueryCore::variance(storeElement* elements, size_t dataSize, void** result)
 	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_variance(elements, dataSize, result);
 		return 0;
 	}
 

@@ -759,9 +759,9 @@ namespace query {
 			cudaFree(deviceData);
 		}
 
-	//stdDeviation
+	//stdDeviation or Variance
 
-		TEST_F(QueryCoreTest, stdDeviation_Empty)
+		TEST_F(QueryCoreTest, stdDeviationOrVariance_Empty)
 		{
 			// PREPARE
 			storeElement* elements = nullptr;
@@ -772,14 +772,23 @@ namespace query {
 			size_t expected_size = 0;
 
 			// TEST
-			size_t actual_size = _queryCore->_aggregationFunctions[AggregationType::StdDeviation](elements, dataSize, &result);
+			size_t actual_size =
+					_queryCore->_aggregationFunctions[AggregationType::StdDeviation](elements, dataSize, &result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(nullptr, result);
+
+			// TEST
+			actual_size =
+					_queryCore->_aggregationFunctions[AggregationType::Variance](elements, dataSize, &result);
 
 			// CHECK
 			ASSERT_EQ(expected_size, actual_size);
 			EXPECT_EQ(nullptr, result);
 		}
 
-		TEST_F(QueryCoreTest, stdDeviation_Simple)
+		TEST_F(QueryCoreTest, stdDeviationOrVariance_Simple)
 		{
 			// PREPARE
 			int numberOfValues = 4;
@@ -819,11 +828,24 @@ namespace query {
 
 			// CLEAN
 			delete result;
+
+			// TEST
+			actual_size
+				= _queryCore->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(expected_count, result->count);
+			EXPECT_FLOAT_EQ(expected_mean, result->mean);
+			EXPECT_FLOAT_EQ(expected_M2, result->M2);
+
+			// CLEAN
+			delete result;
 			delete [] hostData;
 			cudaFree(deviceData);
 		}
 
-		TEST_F(QueryCoreTest, stdDeviation_Linear)
+		TEST_F(QueryCoreTest, stdDeviationOrVariance_Linear)
 		{
 			// PREPARE
 			int numberOfValues = 2001;
@@ -863,25 +885,21 @@ namespace query {
 
 			// CLEAN
 			delete result;
+
+			// TEST
+			actual_size
+				= _queryCore->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_EQ(expected_count, result->count);
+			EXPECT_FLOAT_EQ(expected_mean, result->mean);
+			EXPECT_FLOAT_EQ(expected_M2, result->M2);
+
+			// CLEAN
+			delete result;
 			delete [] hostData;
 			cudaFree(deviceData);
-		}
-
-	//variance
-
-		TEST_F(QueryCoreTest, variance_Empty)
-		{
-
-		}
-
-		TEST_F(QueryCoreTest, variance_Simple)
-		{
-
-		}
-
-		TEST_F(QueryCoreTest, variance_Linear)
-		{
-
 		}
 
 } /* namespace query */

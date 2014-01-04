@@ -21,7 +21,7 @@ extern "C" {
 	size_t gpu_max(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_min(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_average(storeElement* elements, size_t dataSize, void** result);
-	size_t gpu_stdDeviation(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_variance(storeElement* elements, size_t dataSize, void** result);
 
 }
 

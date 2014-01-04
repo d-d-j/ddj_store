@@ -138,14 +138,10 @@ using namespace store;
 		FRIEND_TEST(QueryCoreTest, average_Empty);
 		FRIEND_TEST(QueryCoreTest, average_Linear);
 		FRIEND_TEST(QueryCoreTest, average_Sinusoidal);
-	//stdDeviation
-		FRIEND_TEST(QueryCoreTest, stdDeviation_Empty);
-		FRIEND_TEST(QueryCoreTest, stdDeviation_Simple);
-		FRIEND_TEST(QueryCoreTest, stdDeviation_Linear);
-	//variance
-		FRIEND_TEST(QueryCoreTest, variance_Empty);
-		FRIEND_TEST(QueryCoreTest, variance_Simple);
-		FRIEND_TEST(QueryCoreTest, variance_Linear);
+	//stdDeviation or Variance
+		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Empty);
+		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Simple);
+		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Linear);
 	//differential
 	//integral
 

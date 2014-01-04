@@ -159,7 +159,7 @@ struct variance_binary_op
     }
 };
 
-size_t gpu_stdDeviation(storeElement* elements, size_t dataSize, void** result)
+size_t gpu_variance(storeElement* elements, size_t dataSize, void** result)
 {
 	size_t storeElemSize = sizeof(storeElement);
 	int elemCount = dataSize / storeElemSize;
