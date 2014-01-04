@@ -14,7 +14,6 @@
 
 #define DECOMP( level, id, in, local_out, external_out) decompress##level(in, local_out); copyDecompressed(local_out, external_out);
 
-texture<int> tex_compressed_data_in;
 typedef void (*decompress_func) (int, int, int *, int *, int *, char *);
 
 __device__ decompress_func pfor_func[15] = {
