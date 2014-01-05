@@ -52,7 +52,7 @@ namespace store {
 			~storeElement(){}
 
 			HOST DEVICE
-			storeElement& operator= (const storeElement& elem)
+			storeElement & operator= (const storeElement& elem)
 			{
 				tag = elem.tag;
 				metric = elem.metric;

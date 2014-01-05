@@ -109,7 +109,7 @@ namespace query {
 			size_t size = gpu_histogram_value(elements, dataSize, result, buckets, data->bucketCount);
 
 			//RELEASE BUCKETS
-			delete buckets;
+			delete [] buckets;
 
 			return size;
 		}

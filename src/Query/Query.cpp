@@ -42,6 +42,9 @@ namespace query {
 		int type = 0;
 		memcpy(&type, (char*)queryData+position, sizeof(int32_t));
 		aggregationType = (AggregationType)type;
+
+		// TODO: Initialize aggregationData from queryData
+		aggregationData = nullptr;
 	}
 
 	std::string Query::toString()
