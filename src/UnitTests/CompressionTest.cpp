@@ -9,7 +9,7 @@ void big_random_block( int size, int limit , int *data) {
         data[i] = i % limit;
 }
 
-TEST_F(CompressionTest, Compress_And_Decompress_Data)
+TEST_F(CompressionTest, DISABLED_Compress_And_Decompress_Data)
 {
 
 	int max_size = 800000;

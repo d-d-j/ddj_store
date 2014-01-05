@@ -17,11 +17,11 @@ tar -zxf boost_1_54_0.tar.gz
 rm -f boost_1_54_0.tar.gz
 cd boost_1_54_0
 
-#Compile and install
+#Compile and install (this may not work on multi processors machines)
 ./bootstrap.sh --prefix=/usr/local
 cpuCores=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $4}'`
 echo "Available CPU cores: "$cpuCores
-sudo ./b2 --with=all -j $cpuCores install
+sudo ./b2 --with=all -j 24 install
 cd ..
 rm -rf boost_1_54_0
 

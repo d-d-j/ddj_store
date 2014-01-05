@@ -9,7 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-/*
+
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -21,7 +21,6 @@
                                   blockIdx.y*gridDim.x+blockIdx.x,\
                                   threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
                                   __VA_ARGS__)
-*/
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
 
 
