@@ -33,50 +33,54 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryAggregation::integral, this, _1, _2, _3, _4) });
 	}
 
-	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_sum(elements, dataSize, result);
 		else return 0;
 	}
 
-	size_t QueryAggregation::min(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::min(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_min(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::max(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::max(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_max(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::average(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::average(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_average(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::variance(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::variance(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_variance(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::differential(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::differential(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		return 0;
 	}
 
-	size_t QueryAggregation::integral(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo)
+	size_t QueryAggregation::integral(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
 	{
 		(*result) = nullptr;
-		if(dataSize) return gpu_trunk_integral(elements, dataSize, result, dataLocationInfo->data(), dataLocationInfo->size());
+		if(dataSize)
+		{
+			ullintPairVector* dataLocationInfo = static_cast<ullintPairVector*>(aggregationData);
+			return gpu_trunk_integral(elements, dataSize, result, dataLocationInfo->data(), dataLocationInfo->size());
+		}
 		return 0;
 	}
 

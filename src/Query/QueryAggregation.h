@@ -20,7 +20,7 @@ namespace query {
 									storeElement* elements,
 									size_t size,
 									void** result,
-									ullintPairVector*
+									void*
 									)
 							> aggregationFunc;
 
@@ -35,14 +35,14 @@ namespace query {
 		private:
 			void propagateAggregationMethods();
 
-			size_t sum(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t min(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t max(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t average(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t variance(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t differential(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
-			size_t integral(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t sum(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t min(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t max(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t average(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t variance(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t differential(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t integral(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
 
 			friend class QueryAggregationTest;
 

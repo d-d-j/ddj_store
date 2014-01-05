@@ -20,6 +20,7 @@ extern "C" {
 	size_t gpu_min(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_average(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_variance(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** result);
 
 	// TRUNK AGGREGATION
 	size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,

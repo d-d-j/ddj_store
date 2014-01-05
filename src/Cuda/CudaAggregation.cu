@@ -278,7 +278,12 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 	return locationInfoCount*sizeof(results::integralResult);
 }
 
+// HISTOGRAM
 
+size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** result)
+{
+
+}
 
 
 
