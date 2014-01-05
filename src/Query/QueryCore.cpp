@@ -115,9 +115,10 @@ namespace query {
 						gpu_filterData_in_trunks(elements, dataSize, query, dataLocationInfo->data(), dataLocationInfo->size());
 				for(auto it=dataLocationInfo->begin(); it!=dataLocationInfo->end(); )
 				{
-					if(it->second-it->first == -1) dataLocationInfo->erase(it);
+					if(it->first-it->second == 1) dataLocationInfo->erase(it);
 					else it++;
 				}
+				return size;
 			}
 			return gpu_filterData(elements, dataSize, query);
 		}
