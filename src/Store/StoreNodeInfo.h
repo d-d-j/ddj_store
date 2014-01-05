@@ -15,10 +15,11 @@ namespace store {
 		int32_t mem_free;
 		int32_t gpu_mem_total;
 		int32_t gpu_mem_free;
+		uint64_t db_mem_free;
 
 		storeNodeInfo();
-		storeNodeInfo(int32_t gpuId, int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree)
-			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree) {}
+		storeNodeInfo(int32_t gpuId, int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree, uint64_t dbMemFree)
+			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree), db_mem_free(db_mem_free) {}
 
 		bool operator== (const storeNodeInfo& rhs) const
 		{

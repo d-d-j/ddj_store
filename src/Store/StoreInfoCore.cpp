@@ -15,7 +15,7 @@ size_t StoreInfoCore::GetNodeInfo(storeNodeInfo** result)
 	// TODO: move getting ram info to Node instead of here
 	GetRamInKB(&memTotal, &memFree);
 
-	*result = new storeNodeInfo(gpuId, memTotal, memFree, gpuMemTotal, gpuMemFree);
+	*result = new storeNodeInfo(gpuId, memTotal, memFree, gpuMemTotal, gpuMemFree, _cudaController->GetMainMemoryOffset());
 
 	return sizeof(storeNodeInfo);
 }
