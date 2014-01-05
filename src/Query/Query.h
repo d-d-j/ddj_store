@@ -17,8 +17,9 @@ namespace query {
 		boost::container::vector<int> tags;
 		boost::container::vector<ullintPair> timePeriods;
 		AggregationType aggregationType;
+		void* aggregationData;
 
-		Query():aggregationType(None){}
+		Query():aggregationType(None),aggregationData(NULL){}
 		Query(void* queryData);
 		~Query(){}
 

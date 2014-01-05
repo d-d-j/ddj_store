@@ -525,6 +525,10 @@ namespace query {
 		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 		dataLocationInfo->push_back(ullintPair{0,numberOfValues*sizeof(storeElement)-1});
 
+		// QUERY
+		Query query;
+		query.aggregationData = dataLocationInfo;
+
 		// EXPECTED
 		size_t expected_size = dataLocationInfo->size()*sizeof(results::integralResult);
 		float expected_integral = 100.0f;
@@ -536,7 +540,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, dataLocationInfo);
+				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, &query);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -549,6 +553,7 @@ namespace query {
 		// CLEAN
 		delete result;
 		delete [] hostData;
+		delete dataLocationInfo;
 		cudaFree(deviceData);
 	}
 
@@ -572,6 +577,10 @@ namespace query {
 		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 		dataLocationInfo->push_back(ullintPair{0,numberOfValues*sizeof(storeElement)-1});
 
+		// QUERY
+		Query query;
+		query.aggregationData = dataLocationInfo;
+
 		// EXPECTED
 		size_t expected_size = dataLocationInfo->size()*sizeof(results::integralResult);
 		float expected_integral = 0.0f;
@@ -583,7 +592,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, dataLocationInfo);
+				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, &query);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -596,6 +605,7 @@ namespace query {
 		// CLEAN
 		delete result;
 		delete [] hostData;
+		delete dataLocationInfo;
 		cudaFree(deviceData);
 	}
 
@@ -627,6 +637,10 @@ namespace query {
 		dataLocationInfo->push_back(ullintPair{2*oneTrunkSize,3*oneTrunkSize-1});
 		dataLocationInfo->push_back(ullintPair{3*oneTrunkSize,4*oneTrunkSize-1});
 
+		// QUERY
+		Query query;
+		query.aggregationData = dataLocationInfo;
+
 		// EXPECTED
 		size_t expected_size = numberOfTrunks*sizeof(results::integralResult);
 		float expected_integral = 27.0f;
@@ -636,7 +650,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, dataLocationInfo);
+				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, &query);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -652,6 +666,7 @@ namespace query {
 		// CLEAN
 		delete result;
 		delete [] hostData;
+		delete dataLocationInfo;
 		cudaFree(deviceData);
 	}
 

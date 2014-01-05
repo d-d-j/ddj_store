@@ -2,12 +2,14 @@
 #define QUERYAGGREGATION_H_
 
 #include "AggregationType.h"
+#include "AggregationData.h"
 #include "../Store/StoreElement.cuh"
 #include "../Cuda/CudaAggregation.cuh"
 #include <gtest/gtest.h>
 #include <boost/unordered_map.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <vector_types.h>
 
 namespace ddj {
 namespace query {
@@ -20,7 +22,7 @@ namespace query {
 									storeElement* elements,
 									size_t size,
 									void** result,
-									void*
+									Query*
 									)
 							> aggregationFunc;
 
@@ -35,14 +37,15 @@ namespace query {
 		private:
 			void propagateAggregationMethods();
 
-			size_t sum(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t min(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t max(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t average(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t variance(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t differential(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
-			size_t integral(storeElement* elements, size_t dataSize, void** result, void* aggregationData = nullptr);
+			size_t sum(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t min(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t max(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t average(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t variance(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t differential(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t integral(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t histogramValue(storeElement* elements, size_t dataSize, void** result, Query* query);
 
 			friend class QueryAggregationTest;
 

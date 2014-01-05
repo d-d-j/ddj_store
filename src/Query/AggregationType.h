@@ -15,6 +15,8 @@ namespace ddj {
 		Variance = 6,
 		Differential = 7,
 		Integral = 8,
+		Histogram_Value = 9,
+		Histogram_Time = 10,
 		// Series aggregation
 		Sum_Series = 11,
 		Min_Series = 12,

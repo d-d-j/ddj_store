@@ -31,55 +31,87 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&QueryAggregation::differential, this, _1, _2, _3, _4) });
 		// INTEGRAL
 		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryAggregation::integral, this, _1, _2, _3, _4) });
+		// HISTOGRAM ON VALUES
+		this->_aggregationFunctions.insert({ AggregationType::Histogram_Value, boost::bind(&QueryAggregation::histogramValue, this, _1, _2, _3, _4) });
 	}
 
-	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_sum(elements, dataSize, result);
 		else return 0;
 	}
 
-	size_t QueryAggregation::min(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::min(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_min(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::max(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::max(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_max(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::average(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::average(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_average(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::variance(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::variance(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_variance(elements, dataSize, result);
 		return 0;
 	}
 
-	size_t QueryAggregation::differential(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::differential(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		return 0;
 	}
 
-	size_t QueryAggregation::integral(storeElement* elements, size_t dataSize, void** result, void* aggregationData)
+	size_t QueryAggregation::integral(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
 		if(dataSize)
 		{
-			ullintPairVector* dataLocationInfo = static_cast<ullintPairVector*>(aggregationData);
+			ullintPairVector* dataLocationInfo = static_cast<ullintPairVector*>(query->aggregationData);
 			return gpu_trunk_integral(elements, dataSize, result, dataLocationInfo->data(), dataLocationInfo->size());
+		}
+		return 0;
+	}
+
+	size_t QueryAggregation::histogramValue(storeElement* elements, size_t dataSize, void** result, Query* query)
+	{
+		(*result) = nullptr;
+		if(dataSize)
+		{
+			data::histogramData* data = static_cast<data::histogramData*>(query->aggregationData);
+
+			//CREATE BUCKETS
+			float2* buckets = new float2[data->bucketCount];
+			float bucketSize = (data->max - data->min) / (float)data->bucketCount;
+			float value = data->min;
+			for(int i=0; i<data->bucketCount; i++)
+			{
+				buckets[i].x = value;
+				value+=bucketSize;
+				buckets[i].y = value;
+				value+=bucketSize;
+			}
+
+			//CALCULATE HISTOGRAM
+			size_t size = gpu_histogram_value(elements, dataSize, result, buckets, data->bucketCount);
+
+			//RELEASE BUCKETS
+			delete buckets;
+
+			return size;
 		}
 		return 0;
 	}

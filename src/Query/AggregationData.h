@@ -1,6 +1,8 @@
 #ifndef AGGREGATIONDATA_H_
 #define AGGREGATIONDATA_H_
 
+#include <cstdlib>
+
 namespace ddj {
 namespace query {
 namespace data {

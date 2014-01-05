@@ -20,15 +20,14 @@ namespace query {
 		// TODO: Decompress temporary data buffer
 
 		// Filter to set of tags and time periods specified in query (only if set is not empty)
-		size_t filteredDataSize = this->filterData(tempDataBuffer, tempDataSize, query);
+		size_t filteredDataSize = this->filterData(tempDataBuffer, tempDataSize, query, dataLocationInfo);
 
 		// Aggregate all mapped and filtered data
-		void* aggregatedData;
 		size_t aggregatedDataSize =
-				this->aggregateData(tempDataBuffer, filteredDataSize, query, &aggregatedData);
+				this->aggregateData(tempDataBuffer, filteredDataSize, query, queryResult);
 
-		// Return results
-		(*queryResult) = aggregatedData;
+		cudaFree( tempDataBuffer );
+
 		return aggregatedDataSize;
 	}
 
@@ -36,8 +35,7 @@ namespace query {
 	/* DATA MANAGEMENT METHODS */
 	/***************************/
 
-	size_t QueryCore::aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result,
-			boost::container::vector<ullintPair>* dataLocationInfo)
+	size_t QueryCore::aggregateData(storeElement* elements, size_t dataSize, Query* query, void** result)
 	{
 		if (dataSize == 0)
 		{
@@ -52,7 +50,7 @@ namespace query {
 		}
 		else
 		{
-			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result, dataLocationInfo);
+			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result, query);
 		}
 	}
 
@@ -111,13 +109,18 @@ namespace query {
 		{
 			if(query->aggregationType == AggregationType::Integral)
 			{
-				size_t size =
-						gpu_filterData_in_trunks(elements, dataSize, query, dataLocationInfo->data(), dataLocationInfo->size());
+				size_t size = gpu_filterData_in_trunks(
+						elements,
+						dataSize,
+						query,
+						dataLocationInfo->data(),
+						dataLocationInfo->size());
 				for(auto it=dataLocationInfo->begin(); it!=dataLocationInfo->end(); )
 				{
 					if(it->first-it->second == 1) dataLocationInfo->erase(it);
 					else it++;
 				}
+				query->aggregationData = dataLocationInfo;
 				return size;
 			}
 			return gpu_filterData(elements, dataSize, query);
