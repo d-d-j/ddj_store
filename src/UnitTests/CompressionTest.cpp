@@ -6,7 +6,7 @@ namespace store
 
 void big_random_block( int size, int limit , int *data) {
     for (int i=0; i<size; i++)
-        data[i] = rand() % limit;
+        data[i] = i % limit;
 }
 
 TEST_F(CompressionTest, Compress_And_Decompress_Data)
@@ -20,7 +20,7 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 	cudaMallocHost((void**) &host_data, max_size * sizeof(int));
 	cudaMallocHost((void**) &host_data2, max_size * sizeof(int));
 
-	big_random_block(max_size, 10, host_data);
+	big_random_block(max_size, max_size, host_data);
 
 	cudaMalloc((void **) &dev_out, max_size * sizeof(int));
 	cudaMalloc((void **) &dev_data, max_size * sizeof(int));
