@@ -15,13 +15,15 @@
 #include <assert.h>
 // CUDA runtime
 #include <cuda_runtime.h>
-#include "cuPrintf.cu"
+#include "cuPrintf.cuh"
+
 #define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
                                   blockIdx.y*gridDim.x+blockIdx.x,\
                                   threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
                                   __VA_ARGS__)
-// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
 */
+// CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
+
 
 using namespace ddj::store;
 

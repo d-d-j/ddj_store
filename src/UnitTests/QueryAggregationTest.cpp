@@ -20,7 +20,7 @@ namespace query {
 		size_t expected_size = 0;
 
 		// TEST
-		size_t actual_size = _queryAggregation->sum(elements, dataSize, &result);
+		size_t actual_size = _queryAggregation->sum(elements, dataSize, &result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -44,7 +44,7 @@ namespace query {
 		results::sumResult* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->sum(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->sum(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -73,7 +73,7 @@ namespace query {
 		results::sumResult* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->sum(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->sum(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -98,7 +98,7 @@ namespace query {
 		size_t expected_size = 0;
 
 		// TEST
-		size_t actual_size = _queryAggregation->max(elements, dataSize, &result);
+		size_t actual_size = _queryAggregation->max(elements, dataSize, &result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -124,7 +124,7 @@ namespace query {
 		storeElement* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->max(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->max(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -155,7 +155,7 @@ namespace query {
 		storeElement* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->max(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->max(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -180,7 +180,7 @@ namespace query {
 		size_t expected_size = 0;
 
 		// TEST
-		size_t actual_size = _queryAggregation->min(elements, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->min(elements, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -206,7 +206,7 @@ namespace query {
 		storeElement* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->min(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->min(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -237,7 +237,7 @@ namespace query {
 		storeElement* result;
 
 		// TEST
-		size_t actual_size = _queryAggregation->min(deviceData, dataSize, (void**)&result);
+		size_t actual_size = _queryAggregation->min(deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -262,7 +262,7 @@ namespace query {
 		size_t expected_size = 0;
 
 		// TEST
-		size_t actual_size = _queryAggregation->_aggregationFunctions[AggregationType::Average](elements, dataSize, &result);
+		size_t actual_size = _queryAggregation->_aggregationFunctions[AggregationType::Average](elements, dataSize, &result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -291,7 +291,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&result);
+				_queryAggregation->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -325,7 +325,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size
-		= _queryAggregation->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&result);
+		= _queryAggregation->_aggregationFunctions[AggregationType::Average](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -352,7 +352,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](elements, dataSize, &result);
+				_queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](elements, dataSize, &result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -360,7 +360,7 @@ namespace query {
 
 		// TEST
 		actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::Variance](elements, dataSize, &result);
+				_queryAggregation->_aggregationFunctions[AggregationType::Variance](elements, dataSize, &result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -397,7 +397,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size
-			= _queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, (void**)&result);
+			= _queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -410,7 +410,7 @@ namespace query {
 
 		// TEST
 		actual_size
-			= _queryAggregation->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result);
+			= _queryAggregation->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -454,7 +454,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size
-			= _queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, (void**)&result);
+			= _queryAggregation->_aggregationFunctions[AggregationType::StdDeviation](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
@@ -467,13 +467,84 @@ namespace query {
 
 		// TEST
 		actual_size
-			= _queryAggregation->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result);
+			= _queryAggregation->_aggregationFunctions[AggregationType::Variance](deviceData, dataSize, (void**)&result, nullptr);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(expected_count, result->count);
 		EXPECT_FLOAT_EQ(expected_mean, result->mean);
 		EXPECT_FLOAT_EQ(expected_M2, result->M2);
+
+		// CLEAN
+		delete result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
+
+//integral
+
+	TEST_F(QueryAggregationTest, integral_Empty)
+	{
+		// PREPARE
+		storeElement* elements = nullptr;
+		size_t dataSize = 0;
+		void* result;
+
+		// EXPECTED
+		size_t expected_size = 0;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::Integral](elements, dataSize, &result, nullptr);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, integral_Simple_OneTrunk)
+	{
+		/////////////////
+		//// PREPARE ////
+		/////////////////
+		int numberOfValues = 4;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		hostData[0].value = 2.0f; hostData[0].time = 10; // (10,2)
+		hostData[1].value = 4.0f; hostData[1].time = 20; // (20,4)
+		hostData[2].value = 4.0f; hostData[2].time = 30; // (30,4)
+		hostData[3].value = 2.0f; hostData[3].time = 40; // (40,2)
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		// DATA LOCATION INFO
+		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+		dataLocationInfo->push_back(ullintPair{0,numberOfValues*sizeof(storeElement)-1});
+
+		// EXPECTED
+		size_t expected_size = dataLocationInfo->size()*sizeof(results::integralResult);
+		float expected_integral = 100.0f;
+		float expected_left_value = 2.0f;
+		float expected_right_value = 2.0f;
+		int64_t expected_left_time = 10;
+		int64_t expected_right_time = 40;
+		results::integralResult* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, dataLocationInfo);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_FLOAT_EQ(expected_integral, result->integral);
+		EXPECT_FLOAT_EQ(expected_left_value, result->left_value);
+		EXPECT_FLOAT_EQ(expected_right_value, result->right_value);
+		EXPECT_EQ(expected_left_time, result->left_time);
+		EXPECT_EQ(expected_right_time, result->right_time);
 
 		// CLEAN
 		delete result;

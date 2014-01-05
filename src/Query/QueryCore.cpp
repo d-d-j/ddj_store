@@ -50,14 +50,9 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaMemcpy((*result), elements, dataSize, cudaMemcpyDeviceToHost) );
 			return dataSize;
 		}
-		else if(query->aggregationType == AggregationType::Integral)
-		{
-			return gpu_trunk_integral(elements, dataSize, result,
-					dataLocationInfo->data(), dataLocationInfo->size());
-		}
 		else
 		{
-			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result);
+			return this->_aggregationFunctions[query->aggregationType](elements, dataSize, result, dataLocationInfo);
 		}
 	}
 

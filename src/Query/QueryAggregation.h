@@ -14,7 +14,15 @@ namespace query {
 
 	using namespace store;
 
-	typedef boost::function<size_t (storeElement* elements, size_t size, void** result)> aggregationFunc;
+	typedef boost::container::vector<ullintPair> ullintPairVector;
+
+	typedef boost::function<size_t (
+									storeElement* elements,
+									size_t size,
+									void** result,
+									ullintPairVector*
+									)
+							> aggregationFunc;
 
 	class QueryAggregation {
 		public:
@@ -27,14 +35,14 @@ namespace query {
 		private:
 			void propagateAggregationMethods();
 
-			size_t sum(storeElement* elements, size_t dataSize, void** result);
-			size_t min(storeElement* elements, size_t dataSize, void** result);
-			size_t max(storeElement* elements, size_t dataSize, void** result);
-			size_t average(storeElement* elements, size_t dataSize, void** result);
-			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result);
-			size_t variance(storeElement* elements, size_t dataSize, void** result);
-			size_t differential(storeElement* elements, size_t dataSize, void** result);
-			size_t integral(storeElement* elements, size_t dataSize, void** result);
+			size_t sum(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t min(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t max(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t average(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t variance(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t differential(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
+			size_t integral(storeElement* elements, size_t dataSize, void** result, ullintPairVector* dataLocationInfo = nullptr);
 
 			friend class QueryAggregationTest;
 
@@ -64,6 +72,8 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, stdDeviationOrVariance_Linear);
 			//differential
 			//integral
+				FRIEND_TEST(QueryAggregationTest, integral_Empty);
+				FRIEND_TEST(QueryAggregationTest, integral_Simple_OneTrunk);
 	};
 
 } /* namespace query */

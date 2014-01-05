@@ -7,20 +7,24 @@
 #include <thrust/functional.h>
 #include <cmath>
 
+
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-/*
+
 // System includes
 #include <stdio.h>
 #include <assert.h>
 // CUDA runtime
 #include <cuda_runtime.h>
-#include "cuPrintf.cu"
+#include "cuPrintf.cuh"
+
 #define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
                                   blockIdx.y*gridDim.x+blockIdx.x,\
                                   threadIdx.z*blockDim.x*blockDim.y+threadIdx.y*blockDim.x+threadIdx.x,\
                                   __VA_ARGS__)
+
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-*/
+
+
 
 // MIN AND MAX
 
@@ -184,8 +188,10 @@ __global__ void calculate_trapezoid_fields(ddj::store::storeElement* elements, i
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= count) return;
 
-	int timespan = elements[idx+1].time - elements[idx].time;
+	ullint timespan = elements[idx+1].time - elements[idx].time;
+	CUPRINTF("\tIDX[%d] elements[idx+1].time = %llu and elements[idx].time = %llu and timespan = %llu \n",idx, elements[idx+1].time, elements[idx].time, timespan);
 	result[idx] = ( elements[idx].value + elements[idx+1].value ) * timespan / 2;
+	CUPRINTF("\tIDX[%d] elements[idx+1].value = %f and elements[idx].value = %f and timespan = %llu \n",idx, elements[idx+1].value, elements[idx].value, timespan);
 }
 
 __global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullintPair* locations, int count, float* result)
@@ -194,13 +200,34 @@ __global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullint
 	if(idx >= count) return;
 
 	int i = locations[idx].first/elemSize;
-	int end = locations[idx].second/elemSize - 1;
+	int end = locations[idx].second/elemSize;
 	float sum = 0;
 	for(; i<end; i++)
 	{
 		sum += fields[i];
 	}
 	result[idx] = sum;
+	CUPRINTF("\tSum = %f\n", sum);
+}
+
+__global__ void fill_integralResults(
+		results::integralResult* result,
+		storeElement* elements,
+		size_t elemSize,
+		float* integralSums,
+		ddj::ullintPair* locations,
+		int count)
+{
+	unsigned int i = blockIdx.x *blockDim.x + threadIdx.x;
+	if(i >= count) return;
+
+	result[i].integral = integralSums[i];
+	int left = locations[i].first/elemSize;
+	int right = locations[i].second/elemSize;
+	result[i].left_value = elements[left].value;
+	result[i].left_time= elements[left].time;
+	result[i].right_value = elements[right].value;
+	result[i].right_time= elements[right].time;
 }
 
 size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,
@@ -210,8 +237,8 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 	int elemCount = dataSize / storeElemSize;
 
 	// ALLOCATE SPACE FOR RESULTS
-	float* integralSums_device;
-	cudaMalloc(&integralSums_device, sizeof(float)*locationInfoCount);
+	float* integralSums;
+	cudaMalloc(&integralSums, sizeof(float)*locationInfoCount);
 	float* trapezoidFields;
 	cudaMalloc(&trapezoidFields, sizeof(float)*(elemCount-1));
 
@@ -230,28 +257,27 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 				sizeof(storeElement),
 				locations.data().get(),
 				locationInfoCount,
-				integralSums_device);
+				integralSums);
 	cudaDeviceSynchronize();
 	cudaFree(trapezoidFields);
 
 	// CREATE RESULT
-	float* integralSums_host = new float[locationInfoCount];
-	cudaMemcpy(integralSums_host, integralSums_device, sizeof(float)*locationInfoCount, cudaMemcpyDeviceToHost);
-	cudaFree(integralSums_device);
 	results::integralResult* integral = new results::integralResult[locationInfoCount];
-	for(int i=0; i<locationInfoCount; i++)
-	{
-		integral[i].integral = integralSums_host[i];
-		int left = dataLocationInfo[i].first/storeElemSize;
-		int right = dataLocationInfo[i].second/storeElemSize;
-		integral[i].left_value = elements[left].value;
-		integral[i].left_time= elements[left].time;
-		integral[i].right_value = elements[right].value;
-		integral[i].right_time= elements[right].time;
-	}
-	(*result)=integral;
-	delete [] integralSums_host;
+	results::integralResult* integral_on_device;
+	cudaMalloc((void**)&integral_on_device, sizeof(results::integralResult)*locationInfoCount);
+	fill_integralResults<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			integral_on_device,
+			elements,
+			storeElemSize,
+			integralSums,
+			locations.data().get(),
+			locationInfoCount);
+	cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost);
+	cudaFree(integral_on_device);
+	cudaFree(integralSums);
 
+	// RETURN RESULT
+	(*result)=integral;
 	return locationInfoCount*sizeof(results::integralResult);
 }
 
