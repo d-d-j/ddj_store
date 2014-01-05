@@ -34,8 +34,8 @@ namespace results {
 
 	struct averageResult
 	{
-		float sum;
 		int32_t count;
+		float sum;
 
 		__host__ __device__
 		averageResult():sum(0),count(0){}
