@@ -14,7 +14,7 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 
 	int max_size = 800000;
 	char *dev_out;
-	int *dev_data,*dev_data2;
+	int *dev_data, *dev_data2;
 
 	int *host_data, *host_data2;
 
@@ -41,7 +41,7 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 
 	for (int i = 0; i < max_size; i++)
 	{
-		EXPECT_EQ(host_data[i], host_data2[i]);
+		ASSERT_EQ(host_data[i], host_data2[i]);
 	}
 }
 
