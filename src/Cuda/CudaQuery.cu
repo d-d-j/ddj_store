@@ -124,7 +124,7 @@ __global__ void sum_stencil_in_trunks(int* stencil, size_t elemSize, ddj::ullint
 	int i = locations[idx].first/elemSize;
 	int end = locations[idx].second/elemSize;
 	int sum = 0;
-	for(; i<end; i++)
+	for(; i<=end; i++)
 	{
 		sum += stencil[i];
 	}
@@ -189,7 +189,9 @@ size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query
 	thrust::partition(thrust::device, elem_ptr, elem_ptr+elemCount, stencil, is_one());
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
-	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
+	size_t resultSize = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
+	cudaFree(stencil);
+	return resultSize;
 }
 
 size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* query,
@@ -224,6 +226,7 @@ size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* 
 	// DOWNLOAD TRUNK ELEM COUNT TO HOST
 	int* trunkElemCount_host = new int[locationInfoCount];
 	cudaMemcpy(trunkElemCount_host, trunkElemCount_device, sizeof(int)*locationInfoCount, cudaMemcpyDeviceToHost);
+	cudaFree(trunkElemCount_device);
 
 	// SET NEW DATA LOCATION INFO
 	int position = 0;
@@ -233,6 +236,8 @@ size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* 
 		position += trunkElemCount_host[i]*sizeof(storeElement);
 		dataLocationInfo[i].second = position - 1;
 	}
-
-	return thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
+	delete [] trunkElemCount_host;
+	size_t resultSize = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
+	cudaFree(stencil);
+	return resultSize;
 }

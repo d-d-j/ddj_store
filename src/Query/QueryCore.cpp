@@ -90,7 +90,7 @@ namespace query {
 				position += (dli.second-dli.first+1);
 				// set this data location info to location in mapped data array
 				dli.first = oldPosition;
-				dli.second = position;
+				dli.second = position-1;
 			}
 		}
 		else if(dataLocationInfo == nullptr)

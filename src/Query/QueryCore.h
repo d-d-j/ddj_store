@@ -127,6 +127,8 @@ using namespace store;
 		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags);
 		FRIEND_TEST(QueryCoreTest, filterData_NonExistingTags);
 		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags_FromTimePeriod);
+	//mapAndFilterData
+		FRIEND_TEST(QueryCoreTest, mapData_and_filterData_InTrunks_WithExistingTags_FromTimePeriod);
 	//selectData
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);

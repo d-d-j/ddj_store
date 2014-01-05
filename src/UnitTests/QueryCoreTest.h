@@ -49,6 +49,7 @@ using namespace store;
 
 		void createSimpleCharTestData();
 		void createTestDataWithStoreElements();
+		void createTestDataWithStoreElements_100Elem();
 
 		QueryCore* _queryCore;
 		CudaController* _cudaController;

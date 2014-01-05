@@ -35,6 +35,23 @@ namespace query {
 		_cudaController->SetMainMemoryOffset(size*sizeof(storeElement));
 	}
 
+	void QueryCoreTest::createTestDataWithStoreElements_100Elem()
+	{
+		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
+		int size = 100;
+		storeElement* testArray = new storeElement[size];
+		for(int i=0; i<size; i++)
+		{
+			testArray[i].metric = 1;
+			testArray[i].tag = i%20;
+			testArray[i].time = i;
+			testArray[i].value = 666.666;
+		}
+
+		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size*sizeof(storeElement), cudaMemcpyHostToDevice) );
+		_cudaController->SetMainMemoryOffset(size*sizeof(storeElement));
+	}
+
 	// check thrust version
 	TEST_F(QueryCoreTest, ThrustVersion)
 	{
@@ -307,6 +324,86 @@ namespace query {
 
 			// CLEAN
 			delete [] hostElements;
+			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+		}
+
+	//mapAndFilterData
+
+		TEST_F(QueryCoreTest, mapData_and_filterData_InTrunks_WithExistingTags_FromTimePeriod)
+		{
+			///////////////////////
+			//////// PREPARE //////
+			///////////////////////
+			createTestDataWithStoreElements_100Elem();
+			// CREATE QUERY
+			Query query;
+			// AGGREGATION
+			query.aggregationType = AggregationType::Integral;
+			// TIME PERIODS
+			query.timePeriods.push_back(ullintPair{20,35});		// 15 elements
+			query.timePeriods.push_back(ullintPair{35,60});		// 25 elements
+			// TAGS
+			query.tags.push_back(4);	// 2 times in 20 to 60 time period
+			query.tags.push_back(12);	// 2 times in 20 to 60 time period
+			query.tags.push_back(17);	// 2 times in 20 to 60 time period
+
+			// CREATE DATA LOCATION INFO
+			size_t elemSize = sizeof(storeElement);
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{15*elemSize,30*elemSize-1});	// 15 elements in trunk
+			dataLocationInfo->push_back(ullintPair{30*elemSize,45*elemSize-1}); // 15 elements in trunk
+			dataLocationInfo->push_back(ullintPair{45*elemSize,60*elemSize-1}); // 15 elements in trunk
+
+			// EXPECTED RESULTS
+			int expected_size = 6;
+			storeElement* hostElements = nullptr;
+			storeElement* deviceElements = nullptr;
+
+			// TEST MAP
+			size_t mappedDataSize = _queryCore->mapData((void**)&deviceElements, dataLocationInfo);
+
+			// CHECK MAP
+			ASSERT_EQ(45*elemSize, mappedDataSize);
+			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
+			EXPECT_EQ(15*elemSize-1, (*dataLocationInfo)[0].second);
+			EXPECT_EQ(15*elemSize, (*dataLocationInfo)[1].first);
+			EXPECT_EQ(30*elemSize-1, (*dataLocationInfo)[1].second);
+			EXPECT_EQ(30*elemSize, (*dataLocationInfo)[2].first);
+			EXPECT_EQ(45*elemSize-1, (*dataLocationInfo)[2].second);
+
+			// TEST FILTER
+			size_t size = _queryCore->filterData(deviceElements, mappedDataSize, &query, dataLocationInfo);
+
+			// CHECK FILTER
+			ASSERT_EQ(expected_size*sizeof(storeElement), size);
+			hostElements = new storeElement[expected_size];
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
+			auto checkTagFunc = [&] (const int& tag)
+				{
+				if (tag == 4 || tag == 12 || tag == 17)
+					return ::testing::AssertionSuccess();
+				  else
+					return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
+				};
+			for(int i=0; i<expected_size; i++)
+			{
+				EXPECT_EQ(1, hostElements[i].metric);
+				EXPECT_TRUE(checkTagFunc(hostElements[i].tag));
+				EXPECT_LE(20, hostElements[i].time);
+				EXPECT_GE(60, hostElements[i].time);
+				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
+			}
+			// CHECK DATA LOCATION INFO AFTER FILTER
+			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
+			EXPECT_EQ(1*elemSize-1, (*dataLocationInfo)[0].second);
+			EXPECT_EQ(1*elemSize, (*dataLocationInfo)[1].first);
+			EXPECT_EQ(4*elemSize-1, (*dataLocationInfo)[1].second);
+			EXPECT_EQ(4*elemSize, (*dataLocationInfo)[2].first);
+			EXPECT_EQ(6*elemSize-1, (*dataLocationInfo)[2].second);
+
+			// CLEAN
+			delete [] hostElements;
+			delete dataLocationInfo;
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
