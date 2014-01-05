@@ -6,7 +6,6 @@ namespace query {
 	QueryCore::QueryCore(CudaController* cudaController)
 	{
 		this->_cudaController = cudaController;
-		propagateAggregationMethods();
 	}
 
 	QueryCore::~QueryCore(){}
@@ -122,75 +121,6 @@ namespace query {
 			return gpu_filterData(elements, dataSize, query);
 		}
 		else return dataSize;
-	}
-
-	/***********************/
-	/* AGGREGATION MATHODS */
-	/***********************/
-
-	void QueryCore::propagateAggregationMethods()
-	{
-		// ADD
-		this->_aggregationFunctions.insert({ AggregationType::Sum, boost::bind(&QueryCore::sum, this, _1, _2, _3) });
-		// MIN
-		this->_aggregationFunctions.insert({ AggregationType::Min, boost::bind(&QueryCore::min, this, _1, _2, _3) });
-		// MAX
-		this->_aggregationFunctions.insert({ AggregationType::Max, boost::bind(&QueryCore::max, this, _1, _2, _3) });
-		// AVERAGE
-		this->_aggregationFunctions.insert({ AggregationType::Average, boost::bind(&QueryCore::average, this, _1, _2, _3) });
-		// STDDEVIATION
-		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
-		// VARIANCE
-		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&QueryCore::variance, this, _1, _2, _3) });
-		// DIFFERENTIAL
-		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&QueryCore::differential, this, _1, _2, _3) });
-		// INTEGRAL
-		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryCore::integral, this, _1, _2, _3) });
-	}
-
-	size_t QueryCore::sum(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_sum(elements, dataSize, result);
-		else return 0;
-	}
-
-	size_t QueryCore::min(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_min(elements, dataSize, result);
-		return 0;
-	}
-
-	size_t QueryCore::max(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_max(elements, dataSize, result);
-		return 0;
-	}
-
-	size_t QueryCore::average(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_average(elements, dataSize, result);
-		return 0;
-	}
-
-	size_t QueryCore::variance(storeElement* elements, size_t dataSize, void** result)
-	{
-		(*result) = nullptr;
-		if(dataSize) return gpu_variance(elements, dataSize, result);
-		return 0;
-	}
-
-	size_t QueryCore::differential(storeElement* elements, size_t dataSize, void** result)
-	{
-		return 0;
-	}
-
-	size_t QueryCore::integral(storeElement* elements, size_t dataSize, void** result)
-	{
-		return 0;
 	}
 
 } /* namespace query */

@@ -1,6 +1,14 @@
 #ifndef AGGREGATIONRESULTS_H_
 #define AGGREGATIONRESULTS_H_
 
+#ifdef __CUDACC__
+#define HOST __host__
+#define DEVICE __device__
+#else
+#define HOST
+#define DEVICE
+#endif
+
 namespace ddj {
 namespace query {
 namespace results {
@@ -19,11 +27,11 @@ namespace results {
 		float mean;
 		float M2;
 
-		__host__ __device__
+		HOST DEVICE
 		varianceResult():count(0),mean(0),M2(0){}
-		__host__ __device__
+		HOST DEVICE
 		varianceResult(int count, float mean, float M2):count(count),mean(mean),M2(M2){}
-		__host__ __device__
+		HOST DEVICE
 		varianceResult(const varianceResult& result)
 		{
 			count = result.count;
@@ -37,11 +45,11 @@ namespace results {
 		int32_t count;
 		float sum;
 
-		__host__ __device__
+		HOST DEVICE
 		averageResult():count(0), sum(0) {}
-		__host__ __device__
+		HOST DEVICE
 		averageResult(float sum, int count):count(count), sum(sum) {}
-		__host__ __device__
+		HOST DEVICE
 		averageResult(const averageResult& result)
 		{
 			sum = result.sum;

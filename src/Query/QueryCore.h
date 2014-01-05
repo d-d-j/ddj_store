@@ -2,28 +2,25 @@
 #define QUERYCORE_H_
 
 #include "Query.h"
+#include "QueryAggregation.h"
 #include "../Store/StoreElement.cuh"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
 #include "../Cuda/CudaQuery.cuh"
-#include <gtest/gtest.h>
 #include <boost/foreach.hpp>
-#include <boost/unordered_map.hpp>
+
 
 namespace ddj {
 namespace query {
 
-using namespace store;
+	using namespace store;
 
-	class QueryCore : public boost::noncopyable
+	class QueryCore : public boost::noncopyable, public QueryAggregation
 	{
-		typedef boost::function<size_t (storeElement* elements, size_t size, void** result)> aggregationFunc;
-
 	private:
 		CudaController* _cudaController;
 		Logger _logger = Logger::getRoot();
-		boost::unordered_map<int, aggregationFunc> _aggregationFunctions;
 
 	public:
 		QueryCore(CudaController* cudaController);
@@ -96,21 +93,6 @@ using namespace store;
 
 		storeElement* decompressData(void* data, size_t* size);
 
-		/***********************/
-		/* AGGREGATION MATHODS */
-		/***********************/
-
-		void propagateAggregationMethods();
-
-		size_t sum(storeElement* elements, size_t dataSize, void** result);
-		size_t min(storeElement* elements, size_t dataSize, void** result);
-		size_t max(storeElement* elements, size_t dataSize, void** result);
-		size_t average(storeElement* elements, size_t dataSize, void** result);
-		size_t stdDeviation(storeElement* elements, size_t dataSize, void** result);
-		size_t variance(storeElement* elements, size_t dataSize, void** result);
-		size_t differential(storeElement* elements, size_t dataSize, void** result);
-		size_t integral(storeElement* elements, size_t dataSize, void** result);
-
 	private:
 		friend class QueryCoreTest;
 
@@ -133,29 +115,6 @@ using namespace store;
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
-	//sum
-		FRIEND_TEST(QueryCoreTest, sum_Empty);
-		FRIEND_TEST(QueryCoreTest, sum_EvenNumberOfValues);
-		FRIEND_TEST(QueryCoreTest, sum_OddNumberOfValues);
-	//min
-		FRIEND_TEST(QueryCoreTest, min_Empty);
-		FRIEND_TEST(QueryCoreTest, min_Positive);
-		FRIEND_TEST(QueryCoreTest, min_Negative);
-	//max
-		FRIEND_TEST(QueryCoreTest, max_Empty);
-		FRIEND_TEST(QueryCoreTest, max_Positive);
-		FRIEND_TEST(QueryCoreTest, max_Negative);
-	//average
-		FRIEND_TEST(QueryCoreTest, average_Empty);
-		FRIEND_TEST(QueryCoreTest, average_Linear);
-		FRIEND_TEST(QueryCoreTest, average_Sinusoidal);
-	//stdDeviation or Variance
-		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Empty);
-		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Simple);
-		FRIEND_TEST(QueryCoreTest, stdDeviationOrVariance_Linear);
-	//differential
-	//integral
-
 	};
 
 } /* namespace query */

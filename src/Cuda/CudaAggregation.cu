@@ -1,4 +1,4 @@
-#include "CudaQuery.cuh"
+#include "CudaAggregation.cuh"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/device_ptr.h>
