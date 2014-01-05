@@ -17,11 +17,9 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 	int *dev_data;
 
 	int *host_data, *host_data2;
-	char *host_out;
 
 	cudaMallocHost((void**) &host_data, max_size * sizeof(int));
 	cudaMallocHost((void**) &host_data2, max_size * sizeof(int));
-	cudaMallocHost((void**) &host_out, max_size);
 
 	big_random_block(max_size, 10, host_data);
 
