@@ -109,6 +109,7 @@ namespace query {
 		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags);
 		FRIEND_TEST(QueryCoreTest, filterData_NonExistingTags);
 		FRIEND_TEST(QueryCoreTest, filterData_ExistingTags_FromTimePeriod);
+		FRIEND_TEST(QueryCoreTest, filterData_inTrunks_Empty_Trunk);
 	//mapAndFilterData
 		FRIEND_TEST(QueryCoreTest, mapData_and_filterData_InTrunks_WithExistingTags_FromTimePeriod);
 	//selectData

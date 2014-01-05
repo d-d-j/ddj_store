@@ -111,7 +111,13 @@ namespace query {
 		{
 			if(query->aggregationType == AggregationType::Integral)
 			{
-				return gpu_filterData_in_trunks(elements, dataSize, query, dataLocationInfo->data(), dataLocationInfo->size());
+				size_t size =
+						gpu_filterData_in_trunks(elements, dataSize, query, dataLocationInfo->data(), dataLocationInfo->size());
+				for(auto it=dataLocationInfo->begin(); it!=dataLocationInfo->end(); )
+				{
+					if(it->second-it->first == -1) dataLocationInfo->erase(it);
+					else it++;
+				}
 			}
 			return gpu_filterData(elements, dataSize, query);
 		}

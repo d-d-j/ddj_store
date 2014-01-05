@@ -327,6 +327,78 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
+		TEST_F(QueryCoreTest, filterData_inTrunks_Empty_Trunk)
+		{
+			// PREPARE
+			int N = 100;
+			storeElement* hostElements = new storeElement[N];
+			for(int i=0; i<N; i++)
+			{
+				hostElements[i].metric = 1;
+				if(i>=40 && i<60) hostElements[i].tag = 20;
+				else hostElements[i].tag = i%20;
+				hostElements[i].time = 696969;
+				hostElements[i].value = 666.666;
+			}
+			// COPY ELEMENTS TO DEVICE
+			storeElement* deviceElements = nullptr;
+			CUDA_CHECK_RETURN( cudaMalloc(&deviceElements, N*sizeof(storeElement)) );
+			CUDA_CHECK_RETURN( cudaMemcpy(deviceElements, hostElements, N*sizeof(storeElement), cudaMemcpyHostToDevice) )
+
+			// CREATE QUERY
+			Query query;
+			// AGGREGATION
+			query.aggregationType = AggregationType::Integral;
+			// TAGS
+			query.tags.push_back(4);	// 4 elements
+			query.tags.push_back(12);	// 4 elements
+			query.tags.push_back(17);	// 4 elements
+
+			// CREATE DATA LOCATION INFO
+			size_t elemSize = sizeof(storeElement);
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{0*elemSize,40*elemSize-1});	// 6 elements
+			dataLocationInfo->push_back(ullintPair{40*elemSize,60*elemSize-1});	// 0 elements
+			dataLocationInfo->push_back(ullintPair{60*elemSize,100*elemSize-1});// 6 elements
+
+			// EXPECTED RESULT
+			int expected_elements_count = 12;
+			size_t expected_size = expected_elements_count*sizeof(storeElement);
+
+			// TEST
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(expected_size, size);
+			CUDA_CHECK_RETURN( cudaMemcpy(hostElements, deviceElements, size, cudaMemcpyDeviceToHost) )
+			auto checkTagFunc = [&] (const int& tag)
+				{
+				if (tag == 4 || tag == 12 || tag == 17)
+					return ::testing::AssertionSuccess();
+				  else
+					return ::testing::AssertionFailure() << "Expected: tag=4|12|17\nActual: tag=" << tag;
+				};
+
+			for(int i=0; i<expected_elements_count; i++)
+			{
+				EXPECT_EQ(1, hostElements[i].metric);
+				EXPECT_TRUE(checkTagFunc(hostElements[i].tag));
+				EXPECT_EQ(696969, hostElements[i].time);
+				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
+			}
+
+			// CHECK DATA LOCATION INFO
+			ASSERT_EQ(2, dataLocationInfo->size());
+			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
+			EXPECT_EQ(6*elemSize-1, (*dataLocationInfo)[0].second);
+			EXPECT_EQ(6*elemSize, (*dataLocationInfo)[1].first);
+			EXPECT_EQ(12*elemSize-1, (*dataLocationInfo)[1].second);
+
+			// CLEAN
+			delete [] hostElements;
+			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
+		}
+
 	//mapAndFilterData
 
 		TEST_F(QueryCoreTest, mapData_and_filterData_InTrunks_WithExistingTags_FromTimePeriod)
