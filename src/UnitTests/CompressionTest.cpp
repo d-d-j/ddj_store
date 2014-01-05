@@ -15,7 +15,6 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 	int max_size = 800000;
 	char *dev_out;
 	int *dev_data, *dev_data2;
-
 	int *host_data, *host_data2;
 
 	cudaMallocHost((void**) &host_data, max_size * sizeof(int));
@@ -24,8 +23,9 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 	big_random_block(max_size, 10, host_data);
 
 	cudaMalloc((void **) &dev_out, max_size);
-	cudaMalloc((void **) &dev_data2, max_size * sizeof(int));
+
 	cudaMalloc((void **) &dev_data, max_size * sizeof(int));
+	cudaMalloc((void **) &dev_data2, max_size * sizeof(int));
 	cudaMemcpy(dev_data, host_data, max_size * sizeof(int),
 			cudaMemcpyHostToDevice);
 
