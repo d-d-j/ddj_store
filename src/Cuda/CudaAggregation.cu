@@ -280,9 +280,71 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 
 // HISTOGRAM
 
-size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** result)
+__device__ int find_bucket(float2* buckets, int bucketCount, float value)
 {
+	int leftIndex = 0;
+	int rightIndex = bucketCount-1;
+	int middleIndex;
+	if(value < buckets[leftIndex].x || value > buckets[rightIndex].y) return -1;
+	while(bucketCount != 1)
+	{
+		middleIndex = leftIndex+bucketCount/2;
+		if(value > buckets[middleIndex].y) leftIndex = middleIndex;
+		else if(value < buckets[middleIndex].x) rightIndex = middleIndex;
+		else return middleIndex;
+		bucketCount = rightIndex - leftIndex + 1;
+	}
+	return 0;
+}
 
+__global__ void calculate_histogram(storeElement* elements, int count, int* results, float2* buckets, int bucketCount)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= count) return;
+
+	float value = elements[idx].value;
+	int bucketNumber = find_bucket(buckets, bucketCount, value);
+	if(bucketNumber != -1)
+	{
+		atomicAdd(results+bucketNumber,1);
+	}
+}
+
+size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** result, float2* buckets, int bucketCount)
+{
+	size_t storeElemSize = sizeof(storeElement);
+	int elemCount = dataSize / storeElemSize;
+	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+
+	// ALLOCATE GPU MEMORY
+	float2* buckets_device;
+	cudaMalloc(&buckets_device, sizeof(float2)*bucketCount);
+	int* histogram_device;
+	cudaMalloc(&histogram_device, sizeof(int)*bucketCount);
+
+	// COPY BUCKETS TO DEVICE
+	cudaMemcpy(buckets_device, buckets, sizeof(float2)*bucketCount, cudaMemcpyHostToDevice);
+
+	// LAUNCH KERNEL
+	calculate_histogram<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			elements,
+			elemCount,
+			histogram_device,
+			buckets_device,
+			bucketCount
+			);
+
+	// COPY HISTOGRAM TO CPU MEMORY
+	int* histogram_host = new int[bucketCount];
+	cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost);
+
+	// CLEAN UP
+	cudaFree( histogram_device );
+	cudaFree( buckets_device );
+
+	//RETURN RESULT
+	(*result) = histogram_host;
+	return sizeof(int)*bucketCount;
 }
 
 
