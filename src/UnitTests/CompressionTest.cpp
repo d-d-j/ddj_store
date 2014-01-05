@@ -22,10 +22,14 @@ TEST_F(CompressionTest, Compress_And_Decompress_Data)
 
 	big_random_block(max_size, 10, host_data);
 
-	cudaMalloc((void **) &dev_out, max_size);
-
+	cudaMalloc((void **) &dev_out, max_size * sizeof(int));
 	cudaMalloc((void **) &dev_data, max_size * sizeof(int));
 	cudaMalloc((void **) &dev_data2, max_size * sizeof(int));
+
+	cudaMemset(dev_data,0,max_size * sizeof(int));
+	cudaMemset(dev_data2,0,max_size * sizeof(int));
+	cudaMemset(dev_out,0,max_size * sizeof(int));
+
 	cudaMemcpy(dev_data, host_data, max_size * sizeof(int),
 			cudaMemcpyHostToDevice);
 
