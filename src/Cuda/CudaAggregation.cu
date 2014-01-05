@@ -9,7 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-
+/*
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -23,7 +23,7 @@
                                   __VA_ARGS__)
 
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-
+*/
 
 
 // MIN AND MAX
@@ -189,9 +189,7 @@ __global__ void calculate_trapezoid_fields(ddj::store::storeElement* elements, i
 	if(idx >= count) return;
 
 	ullint timespan = elements[idx+1].time - elements[idx].time;
-	CUPRINTF("\tIDX[%d] elements[idx+1].time = %llu and elements[idx].time = %llu and timespan = %llu \n",idx, elements[idx+1].time, elements[idx].time, timespan);
 	result[idx] = ( elements[idx].value + elements[idx+1].value ) * timespan / 2;
-	CUPRINTF("\tIDX[%d] elements[idx+1].value = %f and elements[idx].value = %f and timespan = %llu \n",idx, elements[idx+1].value, elements[idx].value, timespan);
 }
 
 __global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullintPair* locations, int count, float* result)
@@ -207,7 +205,6 @@ __global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullint
 		sum += fields[i];
 	}
 	result[idx] = sum;
-	CUPRINTF("\tSum = %f\n", sum);
 }
 
 __global__ void fill_integralResults(
