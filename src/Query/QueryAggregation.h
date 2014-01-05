@@ -74,6 +74,7 @@ namespace query {
 			//integral
 				FRIEND_TEST(QueryAggregationTest, integral_Empty);
 				FRIEND_TEST(QueryAggregationTest, integral_Simple_OneTrunk);
+				FRIEND_TEST(QueryAggregationTest, integral_Simple_ManyTrunks_EqualTrunks);
 	};
 
 } /* namespace query */

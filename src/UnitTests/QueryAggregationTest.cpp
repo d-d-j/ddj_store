@@ -503,18 +503,69 @@ namespace query {
 	}
 
 	TEST_F(QueryAggregationTest, integral_Simple_OneTrunk)
+		{
+			/////////////////
+			//// PREPARE ////
+			/////////////////
+			int numberOfValues = 4;
+			size_t dataSize = numberOfValues*sizeof(storeElement);
+
+			storeElement* hostData = new storeElement[numberOfValues];
+			hostData[0].value = 2.0f; hostData[0].time = 10; // (10,2)
+			hostData[1].value = 4.0f; hostData[1].time = 20; // (20,4)
+			hostData[2].value = 4.0f; hostData[2].time = 30; // (30,4)
+			hostData[3].value = 2.0f; hostData[3].time = 40; // (40,2)
+
+			// COPY TO DEVICE
+			storeElement* deviceData;
+			cudaMalloc(&deviceData, dataSize);
+			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+			// DATA LOCATION INFO
+			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
+			dataLocationInfo->push_back(ullintPair{0,numberOfValues*sizeof(storeElement)-1});
+
+			// EXPECTED
+			size_t expected_size = dataLocationInfo->size()*sizeof(results::integralResult);
+			float expected_integral = 100.0f;
+			float expected_left_value = 2.0f;
+			float expected_right_value = 2.0f;
+			int64_t expected_left_time = 10;
+			int64_t expected_right_time = 40;
+			results::integralResult* result;
+
+			// TEST
+			size_t actual_size =
+					_queryAggregation->_aggregationFunctions[AggregationType::Integral](deviceData, dataSize, (void**)&result, dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(expected_size, actual_size);
+			EXPECT_FLOAT_EQ(expected_integral, result->integral);
+			EXPECT_FLOAT_EQ(expected_left_value, result->left_value);
+			EXPECT_FLOAT_EQ(expected_right_value, result->right_value);
+			EXPECT_EQ(expected_left_time, result->left_time);
+			EXPECT_EQ(expected_right_time, result->right_time);
+
+			// CLEAN
+			delete result;
+			delete [] hostData;
+			cudaFree(deviceData);
+		}
+
+	TEST_F(QueryAggregationTest, integral_Simple_ManyTrunks_EqualTrunks)
 	{
 		/////////////////
 		//// PREPARE ////
 		/////////////////
-		int numberOfValues = 4;
+		int numberOfValues = 40;	// 40 elements with 4 trunks (10,10,10,10) - number of elements in each trunk
+		int numberOfTrunks = 4;
 		size_t dataSize = numberOfValues*sizeof(storeElement);
 
 		storeElement* hostData = new storeElement[numberOfValues];
-		hostData[0].value = 2.0f; hostData[0].time = 10; // (10,2)
-		hostData[1].value = 4.0f; hostData[1].time = 20; // (20,4)
-		hostData[2].value = 4.0f; hostData[2].time = 30; // (30,4)
-		hostData[3].value = 2.0f; hostData[3].time = 40; // (40,2)
+		for(int i=0; i< numberOfValues; i++)
+		{
+			hostData[i].value = (i%2)+1; hostData[i].time = 2*i; // (1,0),(2,2),(1,4),(2,6),...
+		}
 
 		// COPY TO DEVICE
 		storeElement* deviceData;
@@ -523,15 +574,17 @@ namespace query {
 
 		// DATA LOCATION INFO
 		boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-		dataLocationInfo->push_back(ullintPair{0,numberOfValues*sizeof(storeElement)-1});
+		size_t oneTrunkSize = (numberOfValues/numberOfTrunks)*sizeof(storeElement);
+		dataLocationInfo->push_back(ullintPair{0*oneTrunkSize,1*oneTrunkSize-1});
+		dataLocationInfo->push_back(ullintPair{1*oneTrunkSize,2*oneTrunkSize-1});
+		dataLocationInfo->push_back(ullintPair{2*oneTrunkSize,3*oneTrunkSize-1});
+		dataLocationInfo->push_back(ullintPair{3*oneTrunkSize,4*oneTrunkSize-1});
 
 		// EXPECTED
-		size_t expected_size = dataLocationInfo->size()*sizeof(results::integralResult);
-		float expected_integral = 100.0f;
-		float expected_left_value = 2.0f;
+		size_t expected_size = numberOfTrunks*sizeof(results::integralResult);
+		float expected_integral = 27.0f;
+		float expected_left_value = 1.0f;
 		float expected_right_value = 2.0f;
-		int64_t expected_left_time = 10;
-		int64_t expected_right_time = 40;
 		results::integralResult* result;
 
 		// TEST
@@ -540,11 +593,14 @@ namespace query {
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
-		EXPECT_FLOAT_EQ(expected_integral, result->integral);
-		EXPECT_FLOAT_EQ(expected_left_value, result->left_value);
-		EXPECT_FLOAT_EQ(expected_right_value, result->right_value);
-		EXPECT_EQ(expected_left_time, result->left_time);
-		EXPECT_EQ(expected_right_time, result->right_time);
+		for(int j=0; j<numberOfTrunks; j++)
+		{
+			EXPECT_FLOAT_EQ(expected_integral, result[j].integral);
+			EXPECT_FLOAT_EQ(expected_left_value, result[j].left_value);
+			EXPECT_FLOAT_EQ(expected_right_value, result[j].right_value);
+			EXPECT_EQ(j*20, result[j].left_time);
+			EXPECT_EQ(j*20+18, result[j].right_time);
+		}
 
 		// CLEAN
 		delete result;
