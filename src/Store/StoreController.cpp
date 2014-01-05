@@ -183,7 +183,7 @@ namespace store {
 
 			// Set task result and return
 			task->SetResult(true, nullptr, queryResult, size);
-			delete queryResult;
+			delete static_cast<char*>(queryResult);
 		}
 		catch(std::exception& ex)
 		{

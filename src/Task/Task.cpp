@@ -35,7 +35,7 @@ namespace task {
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
 
-		delete this->_taskData;
+		delete static_cast<char*>(this->_taskData);
 		delete this->_message;
 		free(this->_resultData);
 		delete this->_result;

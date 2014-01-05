@@ -38,9 +38,9 @@ namespace results {
 		float sum;
 
 		__host__ __device__
-		averageResult():sum(0),count(0){}
+		averageResult():count(0), sum(0) {}
 		__host__ __device__
-		averageResult(float sum, int count):sum(sum),count(count){}
+		averageResult(float sum, int count):count(count), sum(sum) {}
 		__host__ __device__
 		averageResult(const averageResult& result)
 		{
