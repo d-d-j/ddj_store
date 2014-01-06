@@ -19,7 +19,7 @@ namespace store {
 
 		storeNodeInfo();
 		storeNodeInfo(int32_t gpuId, int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree, uint64_t dbMemFree)
-			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree), db_mem_free(db_mem_free) {}
+			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree), db_mem_free(dbMemFree) {}
 
 		bool operator== (const storeNodeInfo& rhs) const
 		{
@@ -34,7 +34,7 @@ namespace store {
 		std::string toString()
 		{
 			 std::ostringstream stream;
-			 stream << "RAM: "<<mem_free<<"/"<<mem_total<<"\t GPU: "<<gpu_mem_free<<"/"<<gpu_mem_total;
+			 stream << "RAM: "<<mem_free<<"/"<<mem_total<<"\t GPU: "<<gpu_mem_free<<"/"<<gpu_mem_total<<"\tDB: "<<db_mem_free;
 			 return  stream.str();
 		}
 	};
