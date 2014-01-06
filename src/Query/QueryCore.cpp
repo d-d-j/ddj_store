@@ -116,11 +116,12 @@ namespace query {
 						dataLocationInfo->data(),
 						dataLocationInfo->size());
 
-				std::remove_if(
+				auto it = std::remove_if(
 					dataLocationInfo->begin(),
 					dataLocationInfo->end(),
 					[](const ullintPair &pair){ return (pair.first - pair.second) == 1; }
 				);
+				dataLocationInfo->resize(it- dataLocationInfo->begin());
 
 				query->aggregationData = dataLocationInfo;
 				return size;
