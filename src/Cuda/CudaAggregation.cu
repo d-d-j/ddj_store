@@ -9,7 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-/*
+
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -23,7 +23,7 @@
                                   __VA_ARGS__)
 
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-*/
+
 
 
 // MIN AND MAX
@@ -217,7 +217,6 @@ __global__ void fill_integralResults(
 {
 	unsigned int i = blockIdx.x *blockDim.x + threadIdx.x;
 	if(i >= count) return;
-
 	result[i].integral = integralSums[i];
 	int left = locations[i].first/elemSize;
 	int right = locations[i].second/elemSize;
@@ -225,6 +224,7 @@ __global__ void fill_integralResults(
 	result[i].left_time= elements[left].time;
 	result[i].right_value = elements[right].value;
 	result[i].right_time= elements[right].time;
+	CUPRINTF("\tIdx: %d, integral: %f, left: %d/%llu, right: %d/%llu\n", i, integralSums[i], left, elements[left].time, right, elements[right].time);
 }
 
 size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,
@@ -245,7 +245,7 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 	// CALCULATE TRAPEZOID FIELDS
 	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 	calculate_trapezoid_fields<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount-1, trapezoidFields);
-	cudaDeviceSynchronize();
+	if(cudaSuccess != cudaDeviceSynchronize()) printf("\n\nERROR\n\n");
 
 	// SUM UP FIELDS IN TRUNKS
 	blocksPerGrid = (locationInfoCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
@@ -255,8 +255,7 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 				locations.data().get(),
 				locationInfoCount,
 				integralSums);
-	cudaDeviceSynchronize();
-	cudaFree(trapezoidFields);
+	if(cudaSuccess != cudaDeviceSynchronize()) printf("\n\nERROR\n\n");
 
 	// CREATE RESULT
 	results::integralResult* integral = new results::integralResult[locationInfoCount];
@@ -269,12 +268,20 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 			integralSums,
 			locations.data().get(),
 			locationInfoCount);
-	cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost);
-	cudaFree(integral_on_device);
-	cudaFree(integralSums);
+	if(cudaSuccess != cudaDeviceSynchronize()) printf("ERROR");
+	if(cudaSuccess != cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost)) printf("ERROR");
+
+	for(int i=0; i<locationInfoCount; i++)
+	{
+		printf("Result[%d] = int: %f, left: %ld, right: %ld\n", i, integral[i].integral, integral[i].left_time, integral[i].right_time);
+	}
 
 	// RETURN RESULT
 	(*result)=integral;
+
+	cudaFree(integral_on_device);
+	cudaFree(integralSums);
+	cudaFree(trapezoidFields);
 	return locationInfoCount*sizeof(results::integralResult);
 }
 
