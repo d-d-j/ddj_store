@@ -9,7 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-
+/*
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -23,7 +23,7 @@
                                   __VA_ARGS__)
 
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-
+*/
 
 
 // MIN AND MAX
@@ -105,8 +105,6 @@ size_t gpu_sum(storeElement* elements, size_t dataSize, void** result)
 			new results::sumResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, thrust::plus<float>()));
 	(*result) = sum;
 
-	printf("Sum result = %f\n", sum->sum);
-
 	return sizeof(results::sumResult);
 }
 
@@ -123,8 +121,6 @@ size_t gpu_average(ddj::store::storeElement* elements, size_t dataSize, void** r
 	results::averageResult* average =
 			new results::averageResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, thrust::plus<float>()), elemCount);
 	(*result) = average;
-
-	printf("Average result = %f\n", average->sum/average->count);
 
 	return sizeof(results::averageResult);
 }

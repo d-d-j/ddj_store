@@ -42,10 +42,10 @@ namespace ddj {
 
 		bool isIntersecting(ullintPair rhs)
 		{
-			if(first > rhs.first && first < rhs.second) return true;
-			if(second > rhs.first && second < rhs.second) return true;
-			if(rhs.first > first && rhs.first < second) return true;
-			if(rhs.second > first && rhs.second < second) return true;
+			if(first >= rhs.first && first <= rhs.second) return true;
+			if(second >= rhs.first && second <= rhs.second) return true;
+			if(rhs.first >= first && rhs.first <= second) return true;
+			if(rhs.second >= first && rhs.second <= second) return true;
 			return false;
 		}
 
