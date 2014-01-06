@@ -27,6 +27,35 @@ namespace query {
 		EXPECT_EQ(nullptr, result);
 	}
 
+	TEST_F(QueryAggregationTest, sum_OneElement)
+	{
+		// PREPARE
+		int numberOfValues = 1;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		storeElement* hostData = new storeElement[numberOfValues];
+		hostData[0].value = 3.7425f;
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		// EXPECTED
+		size_t expected_size = sizeof(results::sumResult);
+		float expected_sum = 3.7425f;
+		results::sumResult* result;
+
+		// TEST
+		size_t actual_size = _queryAggregation->sum(deviceData, dataSize, (void**)&result, nullptr);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_FLOAT_EQ(expected_sum, result->sum);
+
+		// CLEAN
+		delete result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
+
 	TEST_F(QueryAggregationTest, sum_EvenNumberOfValues)
 	{
 		// PREPARE

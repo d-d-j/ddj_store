@@ -58,6 +58,7 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, sum_Empty);
 				FRIEND_TEST(QueryAggregationTest, sum_EvenNumberOfValues);
 				FRIEND_TEST(QueryAggregationTest, sum_OddNumberOfValues);
+				FRIEND_TEST(QueryAggregationTest, sum_OneElement);
 			//min
 				FRIEND_TEST(QueryAggregationTest, min_Empty);
 				FRIEND_TEST(QueryAggregationTest, min_Positive);

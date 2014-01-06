@@ -24,8 +24,6 @@
 
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
 
-
-
 // MIN AND MAX
 
 struct min_gpu_elem
