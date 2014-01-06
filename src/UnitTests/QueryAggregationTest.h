@@ -31,6 +31,11 @@ using namespace store;
 		{
 			delete _queryAggregation;
 		}
+		virtual void SetUp()
+		{
+			const char* argv = "";
+			cudaSetDevice(findCudaDevice(0, &argv));
+		}
 
 		QueryAggregation* _queryAggregation;
 	};

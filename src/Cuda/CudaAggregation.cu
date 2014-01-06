@@ -9,7 +9,7 @@
 
 
 // HOW TO PRINT STH TO CONSOLE IN KERNEL
-/*
+
 // System includes
 #include <stdio.h>
 #include <assert.h>
@@ -23,7 +23,7 @@
                                   __VA_ARGS__)
 
 // CUPRINTF("\tIdx: %d, tag: %d, metric: %d, val: %f, Value is:%d\n", idx, tag, elements[idx].metric, elements[idx].value, 1);
-*/
+
 
 
 // MIN AND MAX
@@ -280,30 +280,87 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 
 // HISTOGRAM
 
-__device__ int find_bucket(float2* buckets, int bucketCount, float value)
+__device__ int find_bucket_value(float2* buckets, int bucketCount, float value)
 {
+	if(bucketCount == 1) return 0;
+
 	int leftIndex = 0;
 	int rightIndex = bucketCount-1;
 	int middleIndex;
+
 	if(value < buckets[leftIndex].x || value > buckets[rightIndex].y) return -1;
-	while(bucketCount != 1)
+
+
+	while(bucketCount != 2)
 	{
 		middleIndex = leftIndex+bucketCount/2;
-		if(value > buckets[middleIndex].y) leftIndex = middleIndex;
-		else if(value < buckets[middleIndex].x) rightIndex = middleIndex;
-		else return middleIndex;
+
+		if(value >= buckets[middleIndex].y)
+			leftIndex = middleIndex;
+		else if(value < buckets[middleIndex].x)
+			rightIndex = middleIndex;
+		else
+			return middleIndex;
+
 		bucketCount = rightIndex - leftIndex + 1;
 	}
-	return 0;
+	// bucketCount == 2
+	if(value < buckets[leftIndex].y) return leftIndex;
+	if(value < buckets[rightIndex].y) return rightIndex;
+	return -1;
 }
 
-__global__ void calculate_histogram(storeElement* elements, int count, int* results, float2* buckets, int bucketCount)
+__device__ int find_bucket_time(ullint2* buckets, int bucketCount, ullint value)
+{
+	if(bucketCount == 1) return 0;
+
+	int leftIndex = 0;
+	int rightIndex = bucketCount-1;
+	int middleIndex;
+
+	if(value < buckets[leftIndex].x || value > buckets[rightIndex].y) return -1;
+
+
+	while(bucketCount != 2)
+	{
+		middleIndex = leftIndex+bucketCount/2;
+
+		if(value >= buckets[middleIndex].y)
+			leftIndex = middleIndex;
+		else if(value < buckets[middleIndex].x)
+			rightIndex = middleIndex;
+		else
+			return middleIndex;
+
+		bucketCount = rightIndex - leftIndex + 1;
+	}
+	// bucketCount == 2
+	if(value < buckets[leftIndex].y) return leftIndex;
+	if(value < buckets[rightIndex].y) return rightIndex;
+	return -1;
+}
+
+__global__ void calculate_histogram_value(storeElement* elements, int count, int* results, float2* buckets, int bucketCount)
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= count) return;
 
 	float value = elements[idx].value;
-	int bucketNumber = find_bucket(buckets, bucketCount, value);
+	int bucketNumber = find_bucket_value(buckets, bucketCount, value);
+	if(bucketNumber != -1)
+	{
+		atomicAdd(results+bucketNumber,1);
+
+	}
+}
+
+__global__ void calculate_histogram_time(storeElement* elements, int count, int* results, ullint2* buckets, int bucketCount)
+{
+	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	if(idx >= count) return;
+
+	ullint value = elements[idx].time;
+	int bucketNumber = find_bucket_time(buckets, bucketCount, value);
 	if(bucketNumber != -1)
 	{
 		atomicAdd(results+bucketNumber,1);
@@ -321,18 +378,21 @@ size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** resul
 	cudaMalloc(&buckets_device, sizeof(float2)*bucketCount);
 	int* histogram_device;
 	cudaMalloc(&histogram_device, sizeof(int)*bucketCount);
+	cudaMemset(histogram_device, 0, sizeof(int)*bucketCount);
 
 	// COPY BUCKETS TO DEVICE
 	cudaMemcpy(buckets_device, buckets, sizeof(float2)*bucketCount, cudaMemcpyHostToDevice);
 
 	// LAUNCH KERNEL
-	calculate_histogram<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+	calculate_histogram_value<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 			elements,
 			elemCount,
 			histogram_device,
 			buckets_device,
 			bucketCount
 			);
+	cudaDeviceSynchronize();
+	//if(cudaSuccess != cudaGetLastError()) throw std::runtime_error("calculate_histogram_value kernel error");
 
 	// COPY HISTOGRAM TO CPU MEMORY
 	int* histogram_host = new int[bucketCount];
@@ -347,12 +407,45 @@ size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** resul
 	return sizeof(int)*bucketCount;
 }
 
+size_t gpu_histogram_time(storeElement* elements, size_t dataSize, void** result, ullint2* buckets, int bucketCount)
+{
+	size_t storeElemSize = sizeof(storeElement);
+	int elemCount = dataSize / storeElemSize;
+	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 
+	// ALLOCATE GPU MEMORY
+	ullint2* buckets_device;
+	cudaMalloc(&buckets_device, sizeof(ullint2)*bucketCount);
+	int* histogram_device;
+	cudaMalloc(&histogram_device, sizeof(int)*bucketCount);
+	cudaMemset(histogram_device, 0, sizeof(int)*bucketCount);
 
+	// COPY BUCKETS TO DEVICE
+	cudaMemcpy(buckets_device, buckets, sizeof(ullint2)*bucketCount, cudaMemcpyHostToDevice);
 
+	// LAUNCH KERNEL
+	calculate_histogram_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			elements,
+			elemCount,
+			histogram_device,
+			buckets_device,
+			bucketCount
+			);
+	cudaDeviceSynchronize();
+	//if(cudaSuccess != cudaGetLastError()) throw std::runtime_error("calculate_histogram_time kernel error");
 
+	// COPY HISTOGRAM TO CPU MEMORY
+	int* histogram_host = new int[bucketCount];
+	cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost);
 
+	// CLEAN UP
+	cudaFree( histogram_device );
+	cudaFree( buckets_device );
 
+	//RETURN RESULT
+	(*result) = histogram_host;
+	return sizeof(int)*bucketCount;
+}
 
 
 

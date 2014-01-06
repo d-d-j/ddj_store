@@ -46,6 +46,7 @@ namespace query {
 			size_t differential(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t integral(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t histogramValue(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t histogramTime(storeElement* elements, size_t dataSize, void** result, Query* query);
 
 			friend class QueryAggregationTest;
 
@@ -79,7 +80,16 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, integral_Simple_OneTrunk);
 				FRIEND_TEST(QueryAggregationTest, integral_Simple_OneTrunk_SingleElement);
 				FRIEND_TEST(QueryAggregationTest, integral_Simple_ManyTrunks_EqualTrunks);
-
+			//histogram on Value
+				FRIEND_TEST(QueryAggregationTest, histogram_Value_Empty);
+				FRIEND_TEST(QueryAggregationTest, histogram_Value_Simple_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Value_ValuesOnBucketsEdges_LeftInclusive_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Value_ValuesOnBucketsEdges_RightExclusive_4Buckets);
+			//histogram on Time
+				FRIEND_TEST(QueryAggregationTest, histogram_Time_Empty);
+				FRIEND_TEST(QueryAggregationTest, histogram_Time_Simple_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_LeftInclusive_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_RightExclusive_4Buckets);
 	};
 
 } /* namespace query */

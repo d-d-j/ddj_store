@@ -33,6 +33,8 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Integral, boost::bind(&QueryAggregation::integral, this, _1, _2, _3, _4) });
 		// HISTOGRAM ON VALUES
 		this->_aggregationFunctions.insert({ AggregationType::Histogram_Value, boost::bind(&QueryAggregation::histogramValue, this, _1, _2, _3, _4) });
+		// HISTOGRAM ON TIME
+		this->_aggregationFunctions.insert({ AggregationType::Histogram_Time, boost::bind(&QueryAggregation::histogramTime, this, _1, _2, _3, _4) });
 	}
 
 	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, Query* query)
@@ -91,7 +93,7 @@ namespace query {
 		(*result) = nullptr;
 		if(dataSize)
 		{
-			data::histogramData* data = static_cast<data::histogramData*>(query->aggregationData);
+			data::histogramValueData* data = static_cast<data::histogramValueData*>(query->aggregationData);
 
 			//CREATE BUCKETS
 			float2* buckets = new float2[data->bucketCount];
@@ -102,11 +104,39 @@ namespace query {
 				buckets[i].x = value;
 				value+=bucketSize;
 				buckets[i].y = value;
-				value+=bucketSize;
 			}
 
 			//CALCULATE HISTOGRAM
 			size_t size = gpu_histogram_value(elements, dataSize, result, buckets, data->bucketCount);
+
+			//RELEASE BUCKETS
+			delete [] buckets;
+
+			return size;
+		}
+		return 0;
+	}
+
+	size_t QueryAggregation::histogramTime(storeElement* elements, size_t dataSize, void** result, Query* query)
+	{
+		(*result) = nullptr;
+		if(dataSize)
+		{
+			data::histogramTimeData* data = static_cast<data::histogramTimeData*>(query->aggregationData);
+
+			//CREATE BUCKETS
+			ullint2* buckets = new ullint2[data->bucketCount];
+			ullint bucketSize = (data->max - data->min) / (ullint)data->bucketCount;
+			ullint value = data->min;
+			for(int i=0; i<data->bucketCount; i++)
+			{
+				buckets[i].x = value;
+				value+=bucketSize;
+				buckets[i].y = value;
+			}
+
+			//CALCULATE HISTOGRAM
+			size_t size = gpu_histogram_time(elements, dataSize, result, buckets, data->bucketCount);
 
 			//RELEASE BUCKETS
 			delete [] buckets;
