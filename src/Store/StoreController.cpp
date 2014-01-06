@@ -157,6 +157,7 @@ namespace store {
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
 
 			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;
+			boost::container::vector<ullintPair>* locations = nullptr;
 
 			// if query should be filtered ask StoreBuffer for data location on GPU
 			if(query->metrices.size())
@@ -166,11 +167,22 @@ namespace store {
 				{
 					if(_buffers->count(m))	// if elements with such a metric exist in store
 					{
-						boost::container::vector<ullintPair>* locations = (*_buffers)[m]->Select(query->timePeriods);
+						locations = (*_buffers)[m]->Select(query->timePeriods);
 						dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
 						delete locations;
 						locations = nullptr;
 					}
+				}
+			}
+			else // all dataLocationInfos should be returned
+			{
+				dataLocationInfo = new boost::container::vector<ullintPair>();
+				for(auto it=_buffers->begin(); it!=_buffers->end(); it++)
+				{
+					locations = it->second->Select(query->timePeriods);
+					dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+					delete locations;
+					locations = nullptr;
 				}
 			}
 
