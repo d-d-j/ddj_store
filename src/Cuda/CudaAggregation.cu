@@ -128,33 +128,33 @@ template <typename T>
 struct variance_unary_op
 {
 	__host__ __device__
-	results::statisticResult operator()(const T& x) const
+	results::varianceResult operator()(const T& x) const
 	{
-		results::statisticResult result;
+		results::varianceResult result;
 		result.count = 1;
 		result.mean = x.value;
-		result.factor = 0;
+		result.m2 = 0;
 		return result;
 	}
 };
 
 struct variance_binary_op
-    : public thrust::binary_function<const results::statisticResult&,
-                                     const results::statisticResult&,
-                                     results::statisticResult >
+    : public thrust::binary_function<const results::varianceResult&,
+                                     const results::varianceResult&,
+                                     results::varianceResult >
 {
     __host__ __device__
-    results::statisticResult operator()(const results::statisticResult& x, const results::statisticResult& y) const
+    results::varianceResult operator()(const results::varianceResult& x, const results::varianceResult& y) const
     {
-    	results::statisticResult result;
+    	results::varianceResult result;
 
     	float count = x.count + y.count;
     	float delta = y.mean - x.mean;
     	float delta2 = delta * delta;
         result.count = count;
         result.mean = x.mean + delta * y.count / count;
-        result.factor = x.factor + y.factor;
-        result.factor += delta2 * x.count * y.count / count;
+        result.m2 = x.m2 + y.m2;
+        result.m2 += delta2 * x.count * y.count / count;
 
         return result;
     }
@@ -169,13 +169,13 @@ size_t gpu_variance(storeElement* elements, size_t dataSize, void** result)
 
 	variance_unary_op<storeElement> unary_op;
 	variance_binary_op binary_op;
-	results::statisticResult init;
+	results::varianceResult init;
 
-	results::statisticResult* variance =
-			new results::statisticResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op));
+	results::varianceResult* variance =
+			new results::varianceResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op));
 	(*result) = variance;
 
-	return sizeof(results::statisticResult);
+	return sizeof(results::varianceResult);
 }
 
 // TRUNK INTEGRAL
