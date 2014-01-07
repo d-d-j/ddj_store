@@ -418,11 +418,11 @@ namespace query {
 		 * standard deviation: s = sqrt[1/(n-1) * SUM[i=0 to 3: (values[i] - a)^2] ]
 		 * s = sqrt[1/3 * (4+1+1+4)] = sqrt[10/3]
 		 */
-		size_t expected_size = sizeof(results::varianceResult);
+		size_t expected_size = sizeof(results::statisticResult);
 		int expected_count = 4;
 		float expected_mean = 7.0f;
 		float expected_M2 = 10.0f;
-		results::varianceResult* result;
+		results::statisticResult* result;
 
 		// TEST
 		size_t actual_size
@@ -432,7 +432,7 @@ namespace query {
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(expected_count, result->count);
 		EXPECT_FLOAT_EQ(expected_mean, result->mean);
-		EXPECT_FLOAT_EQ(expected_M2, result->M2);
+		EXPECT_FLOAT_EQ(expected_M2, result->factor);
 
 		// CLEAN
 		delete result;
@@ -445,7 +445,7 @@ namespace query {
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(expected_count, result->count);
 		EXPECT_FLOAT_EQ(expected_mean, result->mean);
-		EXPECT_FLOAT_EQ(expected_M2, result->M2);
+		EXPECT_FLOAT_EQ(expected_M2, result->factor);
 
 		// CLEAN
 		delete result;
@@ -475,11 +475,11 @@ namespace query {
 		 * standard deviation: s = sqrt[1/2000 * SUM[i=0 to 2000: (values[i] - 1000)^2] ]
 		 * s = sqrt[667667/2]
 		 */
-		size_t expected_size = sizeof(results::varianceResult);
+		size_t expected_size = sizeof(results::statisticResult);
 		int expected_count = 2001;
 		float expected_mean = 1000.0f;
 		float expected_M2 = 667667000.0f;
-		results::varianceResult* result;
+		results::statisticResult* result;
 
 		// TEST
 		size_t actual_size
@@ -489,7 +489,7 @@ namespace query {
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(expected_count, result->count);
 		EXPECT_FLOAT_EQ(expected_mean, result->mean);
-		EXPECT_FLOAT_EQ(expected_M2, result->M2);
+		EXPECT_FLOAT_EQ(expected_M2, result->factor);
 
 		// CLEAN
 		delete result;
@@ -502,7 +502,7 @@ namespace query {
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(expected_count, result->count);
 		EXPECT_FLOAT_EQ(expected_mean, result->mean);
-		EXPECT_FLOAT_EQ(expected_M2, result->M2);
+		EXPECT_FLOAT_EQ(expected_M2, result->factor);
 
 		// CLEAN
 		delete result;

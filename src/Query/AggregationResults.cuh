@@ -21,22 +21,22 @@ namespace results {
 		sumResult(float sum):sum(sum){}
 	};
 
-	struct varianceResult
+	struct statisticResult
 	{
 		int32_t count;
 		float mean;
-		float M2;
+		float factor;
 
 		HOST DEVICE
-		varianceResult():count(0),mean(0),M2(0){}
+		statisticResult():count(0),mean(0),factor(0){}
 		HOST DEVICE
-		varianceResult(int count, float mean, float M2):count(count),mean(mean),M2(M2){}
+		statisticResult(int count, float mean, float M2):count(count),mean(mean),factor(M2){}
 		HOST DEVICE
-		varianceResult(const varianceResult& result)
+		statisticResult(const statisticResult& result)
 		{
 			count = result.count;
 			mean = result.mean;
-			M2 = result.M2;
+			factor = result.factor;
 		}
 	};
 
