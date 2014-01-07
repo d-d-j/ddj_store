@@ -43,6 +43,8 @@ namespace query {
 			size_t average(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t stdDeviation(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t variance(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t skewness(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t kurtosis(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t differential(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t integral(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t histogramValue(storeElement* elements, size_t dataSize, void** result, Query* query);

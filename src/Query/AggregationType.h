@@ -5,7 +5,6 @@ namespace ddj {
 
 	enum AggregationType
 	{
-		// Values aggregation
 		None = 0,
 		Sum = 1,
 		Min = 2,
@@ -17,15 +16,8 @@ namespace ddj {
 		Integral = 8,
 		Histogram_Value = 9,
 		Histogram_Time = 10,
-		// Series aggregation
-		Sum_Series = 11,
-		Min_Series = 12,
-		MAx_Series = 13,
-		Average_Series = 14,
-		StdDeviation_Series = 15,
-		Variance_Series = 16,
-		Differential_Series = 17,
-		Integral_Series = 18
+		Skewness = 11,
+		Kurtosis = 12
 	};
 
 } /* namespace ddj */

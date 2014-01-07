@@ -27,6 +27,10 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::StdDeviation, boost::bind(&QueryAggregation::variance, this, _1, _2, _3, _4) });
 		// VARIANCE
 		this->_aggregationFunctions.insert({ AggregationType::Variance, boost::bind(&QueryAggregation::variance, this, _1, _2, _3, _4) });
+		// SKEWNESS
+		this->_aggregationFunctions.insert({ AggregationType::Skewness, boost::bind(&QueryAggregation::skewness, this, _1, _2, _3, _4) });
+		// KURTOSIS
+		this->_aggregationFunctions.insert({ AggregationType::Kurtosis, boost::bind(&QueryAggregation::kurtosis, this, _1, _2, _3, _4) });
 		// DIFFERENTIAL
 		this->_aggregationFunctions.insert({ AggregationType::Differential, boost::bind(&QueryAggregation::differential, this, _1, _2, _3, _4) });
 		// INTEGRAL
@@ -69,6 +73,20 @@ namespace query {
 	{
 		(*result) = nullptr;
 		if(dataSize) return gpu_variance(elements, dataSize, result);
+		return 0;
+	}
+
+	size_t QueryAggregation::skewness(storeElement* elements, size_t dataSize, void** result, Query* query)
+	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_skewness(elements, dataSize, result);
+		return 0;
+	}
+
+	size_t QueryAggregation::kurtosis(storeElement* elements, size_t dataSize, void** result, Query* query)
+	{
+		(*result) = nullptr;
+		if(dataSize) return gpu_kurtosis(elements, dataSize, result);
 		return 0;
 	}
 

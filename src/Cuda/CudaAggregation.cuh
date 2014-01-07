@@ -21,6 +21,8 @@ extern "C" {
 	size_t gpu_min(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_average(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_variance(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_skewness(storeElement* elements, size_t dataSize, void** result);
+	size_t gpu_kurtosis(storeElement* elements, size_t dataSize, void** result);
 	size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** result, float2* buckets, int bucketCount);
 	size_t gpu_histogram_time(storeElement* elements, size_t dataSize, void** result, ullint2* buckets, int bucketCount);
 	size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,

@@ -122,7 +122,7 @@ size_t gpu_average(ddj::store::storeElement* elements, size_t dataSize, void** r
 	return sizeof(results::averageResult);
 }
 
-// STD DEVIATION AND VARIANCE
+// STD DEVIATION OR VARIANCE, SKEWNESS, KURTOSIS
 
 template <typename T>
 struct variance_unary_op
@@ -176,6 +176,143 @@ size_t gpu_variance(storeElement* elements, size_t dataSize, void** result)
 	(*result) = variance;
 
 	return sizeof(results::varianceResult);
+}
+
+template <typename T>
+struct skewness_unary_op
+{
+	__host__ __device__
+	results::skewnessResult operator()(const T& x) const
+	{
+		results::skewnessResult result;
+		result.count = 1;
+		result.mean = x.value;
+		result.m2 = 0;
+		result.m3 = 0;
+		return result;
+	}
+};
+
+struct skewness_binary_op
+    : public thrust::binary_function<const results::skewnessResult&,
+                                     const results::skewnessResult&,
+                                     results::skewnessResult >
+{
+    __host__ __device__
+    results::skewnessResult operator()(const results::skewnessResult& x, const results::skewnessResult& y) const
+    {
+    	results::skewnessResult result;
+
+        float count  = x.count + y.count;
+        float count2 = count  * count;
+
+    	float delta  = y.mean - x.mean;
+		float delta2 = delta  * delta;
+		float delta3 = delta2 * delta;
+
+    	result.count = count;
+    	result.mean = x.mean + delta * y.count / count;
+
+		result.m2  = x.m2 + y.m2;
+		result.m2 += delta2 * x.count * y.count / count;
+
+		result.m3  = x.m3 + y.m3;
+		result.m3 += delta3 * x.count * y.count * (x.count - y.count) / count2;
+		result.m3 += 3.0f * delta * (x.count * y.m2 - y.count * x.m2) / count;
+
+        return result;
+    }
+};
+
+size_t gpu_skewness(storeElement* elements, size_t dataSize, void** result)
+{
+	size_t storeElemSize = sizeof(storeElement);
+	int elemCount = dataSize / storeElemSize;
+
+	thrust::device_ptr<storeElement> elem_ptr(elements);
+
+	skewness_unary_op<storeElement> unary_op;
+	skewness_binary_op binary_op;
+	results::skewnessResult init;
+
+	results::skewnessResult* variance =
+			new results::skewnessResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op));
+	(*result) = variance;
+
+	return sizeof(results::skewnessResult);
+}
+
+template <typename T>
+struct kurtosis_unary_op
+{
+	__host__ __device__
+	results::kurtosisResult operator()(const T& x) const
+	{
+		results::kurtosisResult result;
+		result.count = 1;
+		result.mean = x.value;
+		result.m2 = 0;
+		result.m3 = 0;
+		result.m4 = 0;
+		return result;
+	}
+};
+
+struct kurtosis_binary_op
+    : public thrust::binary_function<const results::kurtosisResult&,
+                                     const results::kurtosisResult&,
+                                     results::kurtosisResult >
+{
+    __host__ __device__
+    results::kurtosisResult operator()(const results::kurtosisResult& x, const results::kurtosisResult& y) const
+    {
+    	results::kurtosisResult result;
+
+    	float count  = x.count + y.count;
+    	float count2 = count  * count;
+    	float count3 = count2 * count;
+
+    	float delta  = y.mean - x.mean;
+    	float delta2 = delta  * delta;
+    	float delta3 = delta2 * delta;
+    	float delta4 = delta3 * delta;
+
+		result.count = count;
+
+		result.mean = x.mean + delta * y.count / count;
+
+		result.m2  = x.m2 + y.m2;
+		result.m2 += delta2 * x.count * y.count / count;
+
+		result.m3  = x.m3 + y.m3;
+		result.m3 += delta3 * x.count * y.count * (x.count - y.count) / count2;
+		result.m3 += 3.0f * delta * (x.count * y.m2 - y.count * x.m2) / count;
+
+		result.m4  = x.m4 + y.m4;
+		result.m4 += delta4 * x.count * y.count * (x.count * x.count - x.count * y.count + y.count * y.count) / count3;
+		result.m4 += 6.0f * delta2 * (x.count * x.count * y.m2 + y.count * y.count * x.m2) / count2;
+		result.m4 += 4.0f * delta * (x.count * y.m3 - y.count * x.m3) / count;
+
+        return result;
+    }
+};
+
+size_t gpu_kurtosis(storeElement* elements, size_t dataSize, void** result)
+{
+	size_t storeElemSize = sizeof(storeElement);
+	int elemCount = dataSize / storeElemSize;
+
+	thrust::device_ptr<storeElement> elem_ptr(elements);
+
+	kurtosis_unary_op<storeElement> unary_op;
+	kurtosis_binary_op binary_op;
+	results::kurtosisResult init;
+
+	results::kurtosisResult* variance =
+			new results::kurtosisResult(thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op));
+	(*result) = variance;
+
+	return sizeof(results::kurtosisResult);
 }
 
 // TRUNK INTEGRAL
@@ -450,10 +587,3 @@ size_t gpu_histogram_time(storeElement* elements, size_t dataSize, void** result
 	(*result) = histogram_host;
 	return sizeof(int)*bucketCount;
 }
-
-
-
-
-
-
-
