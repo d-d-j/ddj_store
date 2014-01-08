@@ -13,7 +13,7 @@ namespace query {
 
 	struct Query : public boost::noncopyable
 	{
-		boost::container::vector<metric_type> metrices;
+		boost::container::vector<metric_type> metrics;
 		boost::container::vector<int> tags;
 		boost::container::vector<ullintPair> timePeriods;
 		AggregationType aggregationType;

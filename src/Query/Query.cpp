@@ -16,7 +16,7 @@ namespace query {
 		metric_type* mt = (metric_type*)((char*)queryData+position);
 		position+=size*sizeof(metric_type);
 		while(size--)
-			this->metrices.push_back(mt[size]);
+			this->metrics.push_back(mt[size]);
 
 		// Get size
 		memcpy(&size, (char*)queryData+position, sizeof(int32_t));
@@ -54,7 +54,7 @@ namespace query {
 		 stream << "query[";
 		 stream << "aggregationType: " << this->aggregationType;
 		 stream << "; metrics:";
-		 BOOST_FOREACH(metric_type &m, this->metrices)
+		 BOOST_FOREACH(metric_type &m, this->metrics)
 		 {
 			 stream << " " << m;
 		 }

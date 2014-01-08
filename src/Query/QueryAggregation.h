@@ -94,6 +94,12 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_Simple_4Buckets);
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_LeftInclusive_4Buckets);
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_RightExclusive_4Buckets);
+			//series sum
+				FRIEND_TEST(QueryAggregationTest, series_Sum_Empty);
+				FRIEND_TEST(QueryAggregationTest, series_Sum_WrongQuery_NoTimePeriods);
+				FRIEND_TEST(QueryAggregationTest, series_Sum_WrongQuery_NoTags);
+				FRIEND_TEST(QueryAggregationTest, series_Sum_WrongQuery_NoMetrics);
+				FRIEND_TEST(QueryAggregationTest, series_Sum_Simple_3tags1metric_EqualValues_ConsistentTimeIntervals);
 	};
 
 } /* namespace query */

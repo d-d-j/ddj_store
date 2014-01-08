@@ -160,10 +160,10 @@ namespace store {
 			boost::container::vector<ullintPair>* locations = nullptr;
 
 			// if query should be filtered ask StoreBuffer for data location on GPU
-			if(query->metrices.size())
+			if(query->metrics.size())
 			{
 				dataLocationInfo = new boost::container::vector<ullintPair>();
-				BOOST_FOREACH(metric_type &m, query->metrices)
+				BOOST_FOREACH(metric_type &m, query->metrics)
 				{
 					if(_buffers->count(m))	// if elements with such a metric exist in store
 					{

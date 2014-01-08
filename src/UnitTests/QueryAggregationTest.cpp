@@ -1053,6 +1053,150 @@ namespace query {
 		cudaFree(deviceData);
 	}
 
+//sum series
 
+	TEST_F(QueryAggregationTest, series_Sum_Empty)
+	{
+		// PREPARE
+		storeElement* elements = nullptr;
+		size_t dataSize = 0;
+		void* result;
+
+		// EXPECTED
+		size_t expected_size = 0;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](elements, dataSize, &result, nullptr);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, series_Sum_WrongQuery_NoTimePeriods)
+	{
+		// PREPARE
+		storeElement* elements = nullptr;
+		size_t dataSize = 0;
+		void* result;
+		Query query;
+		query.metrics.push_back(0);
+		query.tags.push_back(0);
+		query.aggregationData = new data::interpolatedAggregationData(4);
+
+		// EXPECTED
+		size_t expected_size = 0;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](elements, dataSize, &result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, series_Sum_WrongQuery_NoTags)
+	{
+		// PREPARE
+		storeElement* elements = nullptr;
+		size_t dataSize = 0;
+		void* result;
+		Query query;
+		query.metrics.push_back(0);
+		query.timePeriods.push_back({1,12});
+		query.aggregationData = new data::interpolatedAggregationData(4);
+
+		// EXPECTED
+		size_t expected_size = 0;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](elements, dataSize, &result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, series_Sum_WrongQuery_NoMetrics)
+	{
+		// PREPARE
+		storeElement* elements = nullptr;
+		size_t dataSize = 0;
+		void* result;
+		Query query;
+		query.tags.push_back(0);
+		query.timePeriods.push_back({1,12});
+		query.aggregationData = new data::interpolatedAggregationData(4);
+
+		// EXPECTED
+		size_t expected_size = 0;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](elements, dataSize, &result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, series_Sum_Simple_3tags1metric_EqualValues_ConsistentTimeIntervals)
+	{
+		// PREPARE
+		const int numberOfSeries = 3;
+		const int numberOfTimePoints = 4;
+		const int numberOfValuesInOneSeries = 12;
+		const int numberOfValues = numberOfSeries*numberOfValuesInOneSeries;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		for(int i=0; i<numberOfValues; i++)
+		{
+			hostData[i].metric = 0;
+			hostData[i].value = 3.0f;
+			hostData[i].time = (i%numberOfValuesInOneSeries) + 1;
+			if(i%3 == 0) hostData[i].tag = 0;
+			if(i%3 == 1) hostData[i].tag = 11;
+			if(i%3 == 2) hostData[i].tag = 333;
+		}
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		Query query;
+		query.tags.push_back(0);
+		query.tags.push_back(11);
+		query.tags.push_back(333);
+		query.metrics.push_back(0);
+		// 1,5,9,12 - time points
+		query.timePeriods.push_back({1,numberOfValuesInOneSeries});
+		query.aggregationData = new data::interpolatedAggregationData(numberOfTimePoints);
+
+		// EXPECTED
+		size_t expected_size = numberOfTimePoints*sizeof(float);
+		float expected_results[numberOfTimePoints] = {9.0f, 9.0f, 9.0f, 9.0f};
+		float* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](hostData, dataSize, (void**)&result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		for(int j=0; j<numberOfTimePoints; j++)
+		{
+			EXPECT_EQ(expected_results[j], result[j]);
+		}
+
+		// CLEAN
+		delete [] result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
 } /* namespace query */
 } /* namespace ddj */

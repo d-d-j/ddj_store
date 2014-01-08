@@ -175,7 +175,7 @@ namespace query {
 	{
 		(*result) = nullptr;
 		//CHECK FOR QUERY CORRECTNESS
-		if(dataSize && query->tags.size() && query->metrices.size() && query->timePeriods.size() == 1)
+		if(dataSize && query->tags.size() && query->metrics.size() && query->timePeriods.size() == 1)
 		{
 			data::interpolatedAggregationData* data = static_cast<data::interpolatedAggregationData*>(query->aggregationData);
 
@@ -196,8 +196,8 @@ namespace query {
 					result,
 					timePoints,
 					data->timePointsCount,
-					query->metrices.data(),
-					query->metrices.size(),
+					query->metrics.data(),
+					query->metrics.size(),
 					query->tags.data(),
 					query->tags.size());
 
