@@ -41,10 +41,31 @@ namespace query {
 		// Get aggregationType
 		int type = 0;
 		memcpy(&type, (char*)queryData+position, sizeof(int32_t));
+		position += sizeof(int32_t);
 		aggregationType = (AggregationType)type;
 
-		// TODO: Initialize aggregationData from queryData
 		aggregationData = nullptr;
+		if (aggregationType == AggregationType::Histogram_Time) {
+			auto d = new data::histogramTimeData(0, 0, 0);
+			memcpy(&d->min, (int64_t*)((char*)queryData+position), sizeof(int64_t));
+			position += sizeof(int64_t);
+			memcpy(&d->max, (int64_t*)((char*)queryData+position), sizeof(int64_t));
+			position += sizeof(int64_t);
+			memcpy(&d->bucketCount, (int32_t*)((char*)queryData+position), sizeof(int32_t));
+			position += sizeof(int32_t);
+			aggregationData = d;
+		}
+		else if (aggregationType == AggregationType::Histogram_Value) {
+			auto d = new data::histogramValueData(0, 0, 0);
+			memcpy(&d->min, (float*)((char*)queryData+position), sizeof(float));
+			position += sizeof(float);
+			memcpy(&d->max, (float*)((char*)queryData+position), sizeof(float));
+			position += sizeof(float);
+			memcpy(&d->bucketCount, (int32_t*)((char*)queryData+position), sizeof(int32_t));
+			position += sizeof(int32_t);
+			aggregationData = d;
+		}
+
 	}
 
 	std::string Query::toString()

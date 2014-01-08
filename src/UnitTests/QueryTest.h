@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "../Query/Query.h"
+#include "../Query/AggregationData.h"
 
 namespace ddj {
 namespace query {

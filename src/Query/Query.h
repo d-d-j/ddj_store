@@ -5,6 +5,7 @@
 #include "../Core/UllintPair.h"
 #include <boost/container/vector.hpp>
 #include <boost/foreach.hpp>
+#include "AggregationData.h"
 #include <string>
 #include <sstream>
 
