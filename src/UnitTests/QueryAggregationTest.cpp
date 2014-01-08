@@ -1198,5 +1198,70 @@ namespace query {
 		delete [] hostData;
 		cudaFree(deviceData);
 	}
+
+	TEST_F(QueryAggregationTest, series_Sum_Simple_3tags3metrics_LinearValues_ConsistentTimePeriodsButDifferentTimePoints)
+	{
+		// PREPARE
+		const int numberOfMetrics = 3;
+		const int numberOfTags = 3;
+		const int numberOfTimePoints = 4;
+		const int numberOfValuesInOneSeries = 12;
+		const int numberOfSeries = numberOfMetrics*numberOfTags;
+		const int numberOfValues = numberOfSeries*numberOfValuesInOneSeries;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		for(int i=0; i<numberOfValuesInOneSeries; i++)
+		{
+			for(int j=0; j<numberOfMetrics; j++)
+			{
+				for(int k=0; k<numberOfTags; k++)
+				{
+					hostData[i*9+j*3+k].metric = j;
+					hostData[i*9+j*3+k].tag = k;
+					hostData[i*9+j*3+k].value = (i+1)*1.0f;
+					hostData[i*9+j*3+k].time = i+1;
+				}
+			}
+		}
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		Query query;
+		query.tags.push_back(0);
+		query.tags.push_back(1);
+		query.tags.push_back(2);
+		query.metrics.push_back(0);
+		query.metrics.push_back(1);
+		query.metrics.push_back(2);
+		// 1,5,9,12 - time points
+		query.timePeriods.push_back({1,numberOfValuesInOneSeries});
+		query.aggregationData = new data::interpolatedAggregationData(numberOfTimePoints);
+
+		// EXPECTED
+		size_t expected_size = numberOfTimePoints*sizeof(float);
+		float expected_results[numberOfTimePoints] = {9.0f, 36.0f, 63.0f, 90.0f};
+		float* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](deviceData, dataSize, (void**)&result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		for(int j=0; j<numberOfTimePoints; j++)
+		{
+			EXPECT_EQ(expected_results[j], result[j]);
+		}
+
+		// CLEAN
+		delete [] result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
+
 } /* namespace query */
 } /* namespace ddj */

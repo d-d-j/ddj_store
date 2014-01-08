@@ -100,6 +100,7 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, series_Sum_WrongQuery_NoTags);
 				FRIEND_TEST(QueryAggregationTest, series_Sum_WrongQuery_NoMetrics);
 				FRIEND_TEST(QueryAggregationTest, series_Sum_Simple_3tags1metric_EqualValues_ConsistentTimeIntervals);
+				FRIEND_TEST(QueryAggregationTest, series_Sum_Simple_3tags3metrics_LinearValues_ConsistentTimePeriodsButDifferentTimePoints);
 	};
 
 } /* namespace query */

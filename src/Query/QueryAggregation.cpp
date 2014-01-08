@@ -182,7 +182,7 @@ namespace query {
 			//CREATE TIME POINTS
 			ullint* timePoints = new ullint[data->timePointsCount];
 			ullint point = query->timePeriods[0].first;
-			ullint gap = (query->timePeriods[0].second - point) / (data->timePointsCount - 1);
+			ullint gap = (query->timePeriods[0].second - point + 1) / (data->timePointsCount);
 			for(int i=0; i<data->timePointsCount; i++)
 			{
 				timePoints[i] = point;
