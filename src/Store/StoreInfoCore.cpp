@@ -7,15 +7,19 @@ namespace store
 size_t StoreInfoCore::GetNodeInfo(storeNodeInfo** result)
 {
 	size_t gpuMemFree, gpuMemTotal;
-	int memTotal, memFree, gpuId;
+	int memTotal, memFree;
 
-	gpuId = _cudaController->GetCudaDeviceId();
 	_cudaCommons.GetMemoryCount(&gpuMemFree, &gpuMemTotal);
 
 	// TODO: move getting ram info to Node instead of here
 	GetRamInKB(&memTotal, &memFree);
 
-	*result = new storeNodeInfo(gpuId, memTotal, memFree, gpuMemTotal, gpuMemFree, _cudaController->GetMainMemoryOffset());
+	(*result)->db_mem_free = _cudaController->GetMainMemoryOffset();
+	(*result)->gpu_id =  _cudaController->GetCudaDeviceId();
+	(*result)->mem_free = memFree;
+	(*result)->mem_total = memTotal;
+	(*result)->gpu_mem_free = gpuMemFree;
+	(*result)->gpu_mem_total = gpuMemTotal;
 
 	return sizeof(storeNodeInfo);
 }

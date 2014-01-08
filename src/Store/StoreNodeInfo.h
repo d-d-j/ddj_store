@@ -17,7 +17,7 @@ namespace store {
 		int32_t gpu_mem_free;
 		uint64_t db_mem_free;
 
-		storeNodeInfo();
+		storeNodeInfo() :gpu_id(0), mem_total(0), mem_free(0), gpu_mem_total(0), gpu_mem_free(0), db_mem_free(0){};
 		storeNodeInfo(int32_t gpuId, int32_t memTotal, int32_t memFree, int32_t gpuMemTotal, int32_t gpuMemFree, uint64_t dbMemFree)
 			:gpu_id(gpuId), mem_total(memTotal), mem_free(memFree), gpu_mem_total(gpuMemTotal), gpu_mem_free(gpuMemFree), db_mem_free(dbMemFree) {}
 

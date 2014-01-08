@@ -250,15 +250,16 @@ namespace store {
 	void StoreController::infoTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
-		storeNodeInfo* queryResult;
 		try
 		{
+			storeNodeInfo* queryResult = new storeNodeInfo();
 			// SET DEVICE TODO: Can be done once per thread
 			this->_cudaController->SetProperDevice();
 
 			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
 			task->SetResult(true, nullptr, (void*)queryResult, sizeOfResult);
 			LOG4CPLUS_DEBUG(this->_logger, queryResult->toString());
+			delete queryResult;
 		}
 		catch (std::exception& ex)
 		{
