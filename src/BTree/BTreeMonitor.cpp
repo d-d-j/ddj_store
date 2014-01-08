@@ -75,7 +75,7 @@ namespace btree {
 			/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
 			 * are inside selected time period and if it is not and end of data from B+Tree
 			 */
-			while(it->first.first < tp.second && it != this->_bufferInfoTree->end())
+			while(it->first.first <= tp.second && it != this->_bufferInfoTree->end())
 			{
 				result->push_back(it->second);
 				it++;
