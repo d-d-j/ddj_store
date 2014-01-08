@@ -106,6 +106,11 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 	cudaMalloc(&interpolation, sizeof(float)*timePointCount);
 	cudaMemset(interpolation, 0, sizeof(float)*timePointCount);
 
+	// ALLOCATE TIME POINTS ON DEVICE AND COPY THEM FROM HOST
+	ullint* timePoints_device;
+	cudaMalloc(&timePoints_device, sizeof(ullint)*timePointCount);
+	cudaMemcpy(timePoints_device, timePoints, sizeof(ullint)*timePointCount, cudaMemcpyHostToDevice);
+
 	for(int i=0; i<metricCount; i++)
 	{
 		for(int j=0; j<tagCount; j++)
@@ -131,7 +136,7 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 			cuda_sum_series_with_interpolation<<<blocksPerGrid_interpolation, CUDA_THREADS_PER_BLOCK>>>(
 					elements,
 					seriesElemCount,
-					timePoints,
+					timePoints_device,
 					timePointCount,
 					interpolation);
 			cudaDeviceSynchronize();

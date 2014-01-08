@@ -40,15 +40,15 @@ release: all
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
-	@echo 'Invoking: $(COMPILER)'
+	@echo 'Invoking: $(COMPILER) Compiler'
 	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(GCC_DEBUG_FLAGS) $(STANDART) -MMD -MP -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
-	@echo 'Invoking: NVCC Compiler'
-	nvcc $(NVCC_DEBUG_FLAGS) $(GENCODE_FLAGS) $(INCLUDES) -c $(GCC_DEBUG_FLAGS) -o "$@" "$<"
+	@echo 'Invoking: $(NVCC) Compiler'
+	$(NVCC) $(GENCODE_FLAGS) $(INCLUDES) -c $(GCC_DEBUG_FLAGS) -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -57,8 +57,8 @@ run: all
 
 DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C++ Linker'
-	nvcc $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
+	@echo 'Invoking: $(NVCC) Linker'
+	$(NVCC) $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
 	chmod +x DDJ_Store
 	@echo 'Finished building target: $@'
 	@echo ' '

@@ -1158,9 +1158,9 @@ namespace query {
 			hostData[i].metric = 0;
 			hostData[i].value = 3.0f;
 			hostData[i].time = (i%numberOfValuesInOneSeries) + 1;
-			if(i%3 == 0) hostData[i].tag = 0;
-			if(i%3 == 1) hostData[i].tag = 11;
-			if(i%3 == 2) hostData[i].tag = 333;
+			if(i < 12) hostData[i].tag = 0;
+			if(i >= 12 && i < 24) hostData[i].tag = 11;
+			if(i >= 24) hostData[i].tag = 333;
 		}
 
 		// COPY TO DEVICE
@@ -1184,7 +1184,7 @@ namespace query {
 
 		// TEST
 		size_t actual_size =
-				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](hostData, dataSize, (void**)&result, &query);
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](deviceData, dataSize, (void**)&result, &query);
 
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
