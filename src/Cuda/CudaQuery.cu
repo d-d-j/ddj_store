@@ -37,10 +37,9 @@ struct is_one
 	}
 };
 
-__device__ bool isInside(ullint value, ddj::ullintPair* timePeriod)
+__device__ bool isInside(ullint value, const ddj::ullintPair & timePeriod)
 {
-	if(value >= timePeriod->first && value <= timePeriod->second) return true;
-	else return false;
+	return (value >= timePeriod.first && value <= timePeriod.second);
 }
 
 __global__ void cuda_produce_stencil_using_tag(
@@ -78,7 +77,7 @@ __global__ void cuda_produce_stencil_using_time(
 	stencil[idx] = 0;
 	while(timePeriodsCount--)
 	{
-		if(isInside(time, &timePeriods[timePeriodsCount]))
+		if(isInside(time, timePeriods[timePeriodsCount]))
 		{
 			stencil[idx] = 1;
 			return;
@@ -107,7 +106,7 @@ __global__ void cuda_produce_stencil_using_tag_and_time(
 		{
 			while(timePeriodsCount--)
 			{
-				if(isInside(time, &timePeriods[timePeriodsCount]))
+				if(isInside(time, timePeriods[timePeriodsCount]))
 				{
 					stencil[idx] = 1;
 					return;

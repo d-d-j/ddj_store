@@ -63,7 +63,7 @@ namespace query {
 			// Calculate mapped data size and create new device array for mapped data
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
 			{
-				size += (dli.second-dli.first+1);
+				size += dli.length();
 			}
 			CUDA_CHECK_RETURN( cudaMalloc(data, size) );
 
@@ -73,13 +73,17 @@ namespace query {
 			int oldPosition = 0;
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
 			{
+				ullint length = dli.length();
+				char* source = (char*)(*data)+position;
+				char* target = (char*)mainGpuArray+dli.first;
 				CUDA_CHECK_RETURN(
-						cudaMemcpy((char*)(*data)+position,
-						(char*)mainGpuArray+dli.first,
-						(dli.second-dli.first+1),
-						cudaMemcpyDeviceToDevice));
+						cudaMemcpy(	source,
+									target,
+									length * sizeof(char),
+									cudaMemcpyDeviceToDevice)
+				);
 				oldPosition = position;
-				position += (dli.second-dli.first+1);
+				position += length;
 				// set this data location info to location in mapped data array
 				dli.first = oldPosition;
 				dli.second = position-1;
