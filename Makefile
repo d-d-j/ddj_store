@@ -1,13 +1,13 @@
 RM := rm -rf
 OS := $(shell uname)
 
+NVCC := nvcc
+COMPILER := g++
 ifeq ($(OS),Darwin)
 	COMPILER := clang++
 	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++11 -stdlib=libc++
 else
-	#you can use g++ or clang or color-gcc
-	COMPILER := g++
 	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++0x
 endif
@@ -23,9 +23,6 @@ GENCODE_SM21    := -gencode arch=compute_20,code=sm_21
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
 GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30) --relocatable-device-code true
 
-NVCC_DEBUG_FLAGS	:= #-G
-GCC_DEBUG_FLAGS 	:= #-g
-
 SRC_FILES := $(wildcard src/*.cpp src/*/*.cpp src/*/*.cu)
 
 OBJS := $(SRC_FILES:.cpp=.o)
@@ -34,9 +31,11 @@ OBJS := $(OBJS:.cu=.o)
 all: DDJ_Store
 
 debug: COMPILER += -DDEBUG -g
+debug: NVCC += --debug --device-debug
 debug: all
 
 release: COMPILER += -O3
+release: NVCC += -03
 release: all
 
 src/%.o: ./src/%.cpp
@@ -77,4 +76,4 @@ clean:
 	-$(RM) $(OBJS) DDJ_Store
 	-@echo ' '
 
-.PHONY: all clean dependents
+.PHONY: all clean
