@@ -35,7 +35,7 @@ debug: NVCC += --debug --device-debug
 debug: all
 
 release: COMPILER += -O3
-release: NVCC += -03
+release: NVCC += -O3
 release: all
 
 src/%.o: ./src/%.cpp
