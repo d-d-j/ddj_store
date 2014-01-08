@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
-
 	if (argc >= 2 && !strcmp(argv[1], "--test"))
 	{
 		Logger::getRoot().getHierarchy().disableAll();

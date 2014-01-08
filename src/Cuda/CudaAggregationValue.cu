@@ -358,7 +358,7 @@ __global__ void fill_integralResults(
 	result[i].left_time= elements[left].time;
 	result[i].right_value = elements[right].value;
 	result[i].right_time= elements[right].time;
-	CUPRINTF("\tIdx: %d, integral: %f, left: %d/%llu, right: %d/%llu\n", i, integralSums[i], left, elements[left].time, right, elements[right].time);
+	//CUPRINTF("\tIdx: %d, integral: %f, left: %d/%llu, right: %d/%llu\n", i, integralSums[i], left, elements[left].time, right, elements[right].time);
 }
 
 size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result,
@@ -405,11 +405,6 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 	if(cudaSuccess != cudaDeviceSynchronize()) printf("ERROR");
 	if(cudaSuccess != cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost)) printf("ERROR");
 
-	for(int i=0; i<locationInfoCount; i++)
-	{
-		printf("Result[%d] = int: %f, left: %ld, right: %ld\n", i, integral[i].integral, integral[i].left_time, integral[i].right_time);
-	}
-
 	// RETURN RESULT
 	(*result)=integral;
 
@@ -423,14 +418,12 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 
 __device__ int find_bucket_value(float2* buckets, int bucketCount, float value)
 {
-	if(bucketCount == 1) return 0;
-
 	int leftIndex = 0;
 	int rightIndex = bucketCount-1;
 	int middleIndex;
 
-	if(value < buckets[leftIndex].x || value > buckets[rightIndex].y) return -1;
-
+	if(value < buckets[leftIndex].x || value >= buckets[rightIndex].y) return -1;
+	if(bucketCount == 1) return 0;
 
 	while(bucketCount != 2)
 	{
@@ -453,14 +446,12 @@ __device__ int find_bucket_value(float2* buckets, int bucketCount, float value)
 
 __device__ int find_bucket_time(ullint2* buckets, int bucketCount, ullint value)
 {
-	if(bucketCount == 1) return 0;
-
 	int leftIndex = 0;
 	int rightIndex = bucketCount-1;
 	int middleIndex;
 
-	if(value < buckets[leftIndex].x || value > buckets[rightIndex].y) return -1;
-
+	if(value < buckets[leftIndex].x || value >= buckets[rightIndex].y) return -1;
+	if(bucketCount == 1) return 0;
 
 	while(bucketCount != 2)
 	{

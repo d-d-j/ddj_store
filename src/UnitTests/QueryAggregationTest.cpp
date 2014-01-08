@@ -720,6 +720,52 @@ namespace query {
 		EXPECT_EQ(nullptr, result);
 	}
 
+	TEST_F(QueryAggregationTest, histogram_Value_Simple_1Bucket)
+	{
+		/////////////////
+		//// PREPARE ////
+		/////////////////
+		const int numberOfValues = 500;
+		const int numberOfBuckets = 1;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		for(int i=0; i<numberOfValues; i++)
+		{
+			hostData[i].value = i;
+		}
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		// CREATE HISTOGRAM DATA
+		data::histogramValueData data(100.0f, 300.0f, numberOfBuckets);
+
+		// QUERY
+		Query query;
+		query.aggregationData = &data;
+
+		// EXPECTED
+		size_t expected_size = numberOfBuckets*sizeof(int);
+		int expected_result = 200;
+		int* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::Histogram_Value](deviceData, dataSize, (void**)&result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(expected_result, result[0]);
+
+		// CLEAN
+		delete result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
+
 	TEST_F(QueryAggregationTest, histogram_Value_Simple_4Buckets)
 	{
 		/////////////////
@@ -895,6 +941,53 @@ namespace query {
 		// CHECK
 		ASSERT_EQ(expected_size, actual_size);
 		EXPECT_EQ(nullptr, result);
+	}
+
+	TEST_F(QueryAggregationTest, histogram_Time_Simple_1Bucket)
+	{
+		/////////////////
+		//// PREPARE ////
+		/////////////////
+		const int numberOfValues = 500;
+		const int numberOfBuckets = 1;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		for(int i=0; i<numberOfValues; i++)
+		{
+			hostData[i].time = i;
+		}
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		// CREATE HISTOGRAM DATA
+		data::histogramTimeData data(100, 300, numberOfBuckets);
+
+		// QUERY
+		Query query;
+		query.aggregationData = &data;
+		query.timePeriods.push_back({100,300});
+
+		// EXPECTED
+		size_t expected_size = numberOfBuckets*sizeof(int);
+		int expected_result = 200;
+		int* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::Histogram_Time](deviceData, dataSize, (void**)&result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		EXPECT_EQ(expected_result, result[0]);
+
+		// CLEAN
+		delete result;
+		delete [] hostData;
+		cudaFree(deviceData);
 	}
 
 	TEST_F(QueryAggregationTest, histogram_Time_Simple_4Buckets)

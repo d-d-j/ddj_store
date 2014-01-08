@@ -151,7 +151,7 @@ namespace query {
 
 			//CREATE BUCKETS
 			ullint2* buckets = new ullint2[data->bucketCount];
-			ullint bucketSize = (data->max - data->min) / (ullint)data->bucketCount;
+			ullint bucketSize = (int)(data->max - data->min) / data->bucketCount;
 			ullint value = data->min;
 			for(int i=0; i<data->bucketCount; i++)
 			{

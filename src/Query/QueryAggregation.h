@@ -87,11 +87,13 @@ namespace query {
 			//histogram on Value
 				FRIEND_TEST(QueryAggregationTest, histogram_Value_Empty);
 				FRIEND_TEST(QueryAggregationTest, histogram_Value_Simple_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Value_Simple_1Bucket);
 				FRIEND_TEST(QueryAggregationTest, histogram_Value_ValuesOnBucketsEdges_LeftInclusive_4Buckets);
 				FRIEND_TEST(QueryAggregationTest, histogram_Value_ValuesOnBucketsEdges_RightExclusive_4Buckets);
 			//histogram on Time
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_Empty);
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_Simple_4Buckets);
+				FRIEND_TEST(QueryAggregationTest, histogram_Time_Simple_1Bucket);
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_LeftInclusive_4Buckets);
 				FRIEND_TEST(QueryAggregationTest, histogram_Time_ValuesOnBucketsEdges_RightExclusive_4Buckets);
 			//series sum
