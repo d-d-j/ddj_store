@@ -15,6 +15,8 @@ namespace query {
 
 	void QueryAggregation::propagateAggregationMethods()
 	{
+		/* AGGREGATION OF VALUES */
+
 		// ADD
 		this->_aggregationFunctions.insert({ AggregationType::Sum, boost::bind(&QueryAggregation::sum, this, _1, _2, _3, _4) });
 		// MIN
@@ -39,6 +41,11 @@ namespace query {
 		this->_aggregationFunctions.insert({ AggregationType::Histogram_Value, boost::bind(&QueryAggregation::histogramValue, this, _1, _2, _3, _4) });
 		// HISTOGRAM ON TIME
 		this->_aggregationFunctions.insert({ AggregationType::Histogram_Time, boost::bind(&QueryAggregation::histogramTime, this, _1, _2, _3, _4) });
+
+		/* AGGREGATION OF SERIES */
+
+		// SERIES SUM
+		this->_aggregationFunctions.insert({ AggregationType::SumSeries, boost::bind(&QueryAggregation::sumSeries, this, _1, _2, _3, _4) });
 	}
 
 	size_t QueryAggregation::sum(storeElement* elements, size_t dataSize, void** result, Query* query)
@@ -158,6 +165,44 @@ namespace query {
 
 			//RELEASE BUCKETS
 			delete [] buckets;
+
+			return size;
+		}
+		return 0;
+	}
+
+	size_t QueryAggregation::sumSeries(storeElement* elements, size_t dataSize, void** result, Query* query)
+	{
+		(*result) = nullptr;
+		//CHECK FOR QUERY CORRECTNESS
+		if(dataSize && query->tags.size() && query->metrices.size() && query->timePeriods.size() == 1)
+		{
+			data::interpolatedAggregationData* data = static_cast<data::interpolatedAggregationData*>(query->aggregationData);
+
+			//CREATE TIME POINTS
+			ullint* timePoints = new ullint[data->timePointsCount];
+			ullint point = query->timePeriods[0].first;
+			ullint gap = (query->timePeriods[0].second - point) / (data->timePointsCount - 1);
+			for(int i=0; i<data->timePointsCount; i++)
+			{
+				timePoints[i] = point;
+				point += gap;
+			}
+
+			//CALCULATE AGGREGATION
+			size_t size = gpu_sum_series(
+					elements,
+					dataSize,
+					result,
+					timePoints,
+					data->timePointsCount,
+					query->metrices.data(),
+					query->metrices.size(),
+					query->tags.data(),
+					query->tags.size());
+
+			//RELEASE TIME POINTS
+			delete [] timePoints;
 
 			return size;
 		}

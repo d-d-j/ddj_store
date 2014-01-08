@@ -43,6 +43,21 @@ namespace data {
 		}
 		~histogramTimeData(){}
 	};
+
+	struct interpolatedAggregationData
+	{
+		int timePointsCount;
+
+	public:
+		interpolatedAggregationData(int count)
+				:timePointsCount(count){}
+		interpolatedAggregationData(const interpolatedAggregationData& rhs)
+		{
+			timePointsCount = rhs.timePointsCount;
+		}
+		~interpolatedAggregationData(){}
+	};
+
 }
 }
 }

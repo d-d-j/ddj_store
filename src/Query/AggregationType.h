@@ -17,7 +17,8 @@ namespace ddj {
 		Histogram_Value = 9,
 		Histogram_Time = 10,
 		Skewness = 11,
-		Kurtosis = 12
+		Kurtosis = 12,
+		SumSeries = 13
 	};
 
 } /* namespace ddj */

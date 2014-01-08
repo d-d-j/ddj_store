@@ -49,6 +49,7 @@ namespace query {
 			size_t integral(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t histogramValue(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t histogramTime(storeElement* elements, size_t dataSize, void** result, Query* query);
+			size_t sumSeries(storeElement* elements, size_t dataSize, void** result, Query* query);
 
 			friend class QueryAggregationTest;
 
