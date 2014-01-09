@@ -65,16 +65,25 @@ namespace query {
 			position += sizeof(int32_t);
 			aggregationData = d;
 		}
+		else if (aggregationType == AggregationType::SumSeries) {
+			int32_t samples;
+			memcpy(&samples, (int32_t*)((char*)queryData+position), sizeof(int32_t));
+			aggregationData = new data::interpolatedAggregationData(samples);
+			position += sizeof(int32_t);
+		}
 	}
 
 	Query::~Query()
 	{
-		if(aggregationData == nullptr) return;
+		if (aggregationData == nullptr) return;
 		if (aggregationType == AggregationType::Histogram_Time) {
-			data::histogramTimeData* htd = static_cast<data::histogramTimeData*>(aggregationData);
+			auto htd = static_cast<data::histogramTimeData*>(aggregationData);
 			delete htd;
 		} else if(aggregationType == AggregationType::Histogram_Value){
-			data::histogramValueData* hvd = static_cast<data::histogramValueData*>(aggregationData);
+			auto hvd = static_cast<data::histogramValueData*>(aggregationData);
+			delete hvd;
+		} else if(aggregationType == AggregationType::SumSeries){
+			auto hvd = static_cast<data::interpolatedAggregationData*>(aggregationData);
 			delete hvd;
 		}
 	}
