@@ -51,11 +51,12 @@ namespace query {
 			size_t histogramTime(storeElement* elements, size_t dataSize, void** result, Query* query);
 			size_t sumSeries(storeElement* elements, size_t dataSize, void** result, Query* query);
 
-			friend class QueryAggregationTest;
 
-			/*********/
-			/* TESTS */
-			/*********/
+			/**************/
+			/* UNIT TESTS */
+			/**************/
+
+			friend class QueryAggregationTest;
 
 			//sum
 				FRIEND_TEST(QueryAggregationTest, sum_Empty);
@@ -106,6 +107,15 @@ namespace query {
 				FRIEND_TEST(QueryAggregationTest, series_Sum_Simple_3tags1metric_LinearValues_InterpolationNeeded);
 				FRIEND_TEST(QueryAggregationTest, series_Sum_Normal_2tags1metrics_SinCosValues_ConsistentTimeIntervals);
 				FRIEND_TEST(QueryAggregationTest, series_Sum_Normal_2tags1metrics_SinCosValues_InterpolationNeeded);
+
+			/*********************/
+			/* PERFORMANCE TESTS */
+			/*********************/
+
+				friend class QueryAggregationPerformance;
+
+				FRIEND_TEST(QueryAggregationPerformance, SumAggregation_EqualIntegerValues);
+
 	};
 
 } /* namespace query */

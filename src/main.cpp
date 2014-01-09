@@ -32,10 +32,19 @@ int main(int argc, char* argv[])
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
-	if (argc >= 2 && !strcmp(argv[1], "--test"))
+	if (argc >= 2)
 	{
 		Logger::getRoot().getHierarchy().disableAll();
 		::testing::InitGoogleTest(&argc, argv);
+		if(!strcmp(argv[1], "--test"))
+		{
+			::testing::GTEST_FLAG(filter) = "*Test*";
+		}
+		else if(!strcmp(argv[1], "--performance"))
+		{
+			::testing::GTEST_FLAG(filter) = "*Performance*";
+			::testing::FLAGS_gtest_repeat = 1;
+		}
 		return RUN_ALL_TESTS();
 	}
 
