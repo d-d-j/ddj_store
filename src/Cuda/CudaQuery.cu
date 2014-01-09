@@ -1,4 +1,5 @@
 #include "CudaQuery.cuh"
+#include "CudaIncludes.h"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/reduce.h>
@@ -135,7 +136,7 @@ int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Que
 {
 	int elemCount = dataSize/sizeof(storeElement);
 	int* stencil;
-	cudaMalloc(&stencil, elemCount*sizeof(int));
+	CUDA_CHECK_RETURN( cudaMalloc(&stencil, elemCount*sizeof(int)) );
 	int blocksPerGrid = (elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 
 	// CREATE TIME PERIODS VECTOR ON GPU
@@ -171,7 +172,7 @@ int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Que
 				timePeriods.size(),
 				stencil);
 	}
-	cudaDeviceSynchronize();
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 	return stencil;
 }
 
@@ -190,7 +191,8 @@ size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query
 
 	// RETURN NUMBER OF ELEMENTS WITH TAG FROM QUERY'S TAGS
 	size_t resultSize = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
-	cudaFree(stencil);
+
+	CUDA_CHECK_RETURN( cudaFree(stencil) );
 	return resultSize;
 }
 
@@ -213,7 +215,7 @@ size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* 
 
 	// COUNT ELEMENTS IN TRUNKS
 	int* trunkElemCount_device;
-	cudaMalloc(&trunkElemCount_device, locationInfoCount*sizeof(int));
+	CUDA_CHECK_RETURN( cudaMalloc(&trunkElemCount_device, locationInfoCount*sizeof(int)) );
 	int blocksPerGrid = (locationInfoCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 	sum_stencil_in_trunks<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 			stencil,
@@ -225,8 +227,7 @@ size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* 
 
 	// DOWNLOAD TRUNK ELEM COUNT TO HOST
 	int* trunkElemCount_host = new int[locationInfoCount];
-	cudaMemcpy(trunkElemCount_host, trunkElemCount_device, sizeof(int)*locationInfoCount, cudaMemcpyDeviceToHost);
-	cudaFree(trunkElemCount_device);
+	CUDA_CHECK_RETURN( cudaMemcpy(trunkElemCount_host, trunkElemCount_device, sizeof(int)*locationInfoCount, cudaMemcpyDeviceToHost) );
 
 	// SET NEW DATA LOCATION INFO
 	int position = 0;
@@ -236,8 +237,11 @@ size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* 
 		position += trunkElemCount_host[i]*sizeof(storeElement);
 		dataLocationInfo[i].second = position - 1;
 	}
-	delete [] trunkElemCount_host;
 	size_t resultSize = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1) * sizeof(storeElement);
-	cudaFree(stencil);
+
+	// CLEAN AND RETURN
+	delete [] trunkElemCount_host;
+	CUDA_CHECK_RETURN( cudaFree(trunkElemCount_device) );
+	CUDA_CHECK_RETURN( cudaFree(stencil) );
 	return resultSize;
 }

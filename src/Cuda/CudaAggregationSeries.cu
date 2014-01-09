@@ -1,4 +1,5 @@
 #include "CudaAggregation.cuh"
+#include "CudaIncludes.h"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/device_ptr.h>
@@ -37,8 +38,7 @@ __global__ void cuda_produce_stencil_for_series(
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= elemCount) return;
-	tag == elements[idx].tag && metric == elements[idx].metric ?
-		stencil[idx] = 1 : stencil[idx] = 0;
+	stencil[idx] = (tag == elements[idx].tag && metric == elements[idx].metric) ? 1 : 0;
 }
 
 __device__ int cuda_find_elements_for_interpolation(
@@ -74,15 +74,22 @@ __global__ void cuda_sum_series_with_interpolation(
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= timePointCount) return;
+
 	ullint time = timePoints[idx];
 	int leftIndex = cuda_find_elements_for_interpolation(elements, elemCount, time);
 	if(leftIndex == -1) return;
+
 	float leftValue = elements[leftIndex].value;
 	ullint leftTime = elements[leftIndex].time;
+	if(leftTime == time)
+	{
+		result[idx] += leftValue;
+		return;
+	}
+	// interpolate f(x) = y0 + (y1-y0)*(x-x0)/(x1-x0)
 	float rightValue = elements[leftIndex+1].value;
 	ullint rightTime = elements[leftIndex+1].time;
-	if(leftTime == time) result[idx] += leftValue;
-	else	// interpolate f(x) = y0 + (y1-y0)*(x-x0)/(x1-x0)
+	if(leftTime != rightTime)
 		result[idx] += leftValue + (rightValue-leftValue)*(time-leftTime)/(rightTime-leftTime);
 }
 
@@ -98,18 +105,18 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 
 	// ALLOCATE STENCIL
 	int* stencil;
-	cudaMalloc(&stencil, elemCount*sizeof(int));
+	CUDA_CHECK_RETURN( cudaMalloc(&stencil, elemCount*sizeof(int)) );
 	thrust::device_ptr<int> stencil_ptr(stencil);
 
 	// ALLOCATE INTERPOLATION
 	float* interpolation;
-	cudaMalloc(&interpolation, sizeof(float)*timePointCount);
-	cudaMemset(interpolation, 0, sizeof(float)*timePointCount);
+	CUDA_CHECK_RETURN( cudaMalloc(&interpolation, sizeof(float)*timePointCount) );
+	CUDA_CHECK_RETURN( cudaMemset(interpolation, 0, sizeof(float)*timePointCount) );
 
 	// ALLOCATE TIME POINTS ON DEVICE AND COPY THEM FROM HOST
 	ullint* timePoints_device;
-	cudaMalloc(&timePoints_device, sizeof(ullint)*timePointCount);
-	cudaMemcpy(timePoints_device, timePoints, sizeof(ullint)*timePointCount, cudaMemcpyHostToDevice);
+	CUDA_CHECK_RETURN( cudaMalloc(&timePoints_device, sizeof(ullint)*timePointCount) );
+	CUDA_CHECK_RETURN( cudaMemcpy(timePoints_device, timePoints, sizeof(ullint)*timePointCount, cudaMemcpyHostToDevice) );
 
 	for(int i=0; i<metricCount; i++)
 	{
@@ -122,7 +129,7 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 						tags[j],
 						metrics[i],
 						stencil);
-			cudaDeviceSynchronize();
+			CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 			// MOVE SERIES TO FRONT
 			thrust::stable_partition(
@@ -131,6 +138,7 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 					stencil_ptr,
 					thrust::identity<int>());
 			seriesElemCount = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1);
+			CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 			// INTERPOLATE AND ADD SERIES
 			cuda_sum_series_with_interpolation<<<blocksPerGrid_interpolation, CUDA_THREADS_PER_BLOCK>>>(
@@ -139,17 +147,24 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 					timePoints_device,
 					timePointCount,
 					interpolation);
-			cudaDeviceSynchronize();
+			CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 		}
 	}
 
 	// COPY RESULT TO HOST
 	float* interpolation_sum_host = new float[timePointCount];
-	cudaMemcpy(interpolation_sum_host, interpolation, sizeof(float)*timePointCount, cudaMemcpyDeviceToHost);
+	CUDA_CHECK_RETURN( cudaMemcpy(interpolation_sum_host, interpolation, sizeof(float)*timePointCount, cudaMemcpyDeviceToHost) );
+
+//	printf("timePointCount = %d\n", timePointCount);
+//	for(int i=0; i<timePointCount; i++)
+//	{
+//		printf("Sum series[%d] = %f\n", i, interpolation_sum_host[i]);
+//	}
 
 	// CLEAN AND RETURN RESULT
 	(*result) = interpolation_sum_host;
-	cudaFree(stencil);
-	cudaFree(interpolation);
+	CUDA_CHECK_RETURN( cudaFree(stencil) );
+	CUDA_CHECK_RETURN( cudaFree(interpolation) );
+	CUDA_CHECK_RETURN( cudaFree(timePoints_device) );
 	return sizeof(float)*timePointCount;
 }

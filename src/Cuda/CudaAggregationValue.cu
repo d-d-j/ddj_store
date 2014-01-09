@@ -1,4 +1,5 @@
 #include "CudaAggregation.cuh"
+#include "CudaIncludes.h"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/device_ptr.h>
@@ -369,9 +370,9 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 
 	// ALLOCATE SPACE FOR RESULTS
 	float* integralSums;
-	cudaMalloc(&integralSums, sizeof(float)*locationInfoCount);
+	CUDA_CHECK_RETURN( cudaMalloc(&integralSums, sizeof(float)*locationInfoCount) );
 	float* trapezoidFields;
-	cudaMalloc(&trapezoidFields, sizeof(float)*(elemCount-1));
+	CUDA_CHECK_RETURN( cudaMalloc(&trapezoidFields, sizeof(float)*(elemCount-1)) );
 
 	// CREATE TIME PERIODS VECTOR ON GPU
 	thrust::device_vector<ddj::ullintPair> locations(dataLocationInfo, dataLocationInfo+locationInfoCount);
@@ -379,7 +380,7 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 	// CALCULATE TRAPEZOID FIELDS
 	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 	calculate_trapezoid_fields<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount-1, trapezoidFields);
-	if(cudaSuccess != cudaDeviceSynchronize()) printf("\n\nERROR\n\n");
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 	// SUM UP FIELDS IN TRUNKS
 	blocksPerGrid = (locationInfoCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
@@ -389,12 +390,12 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 				locations.data().get(),
 				locationInfoCount,
 				integralSums);
-	if(cudaSuccess != cudaDeviceSynchronize()) printf("\n\nERROR\n\n");
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 	// CREATE RESULT
 	results::integralResult* integral = new results::integralResult[locationInfoCount];
 	results::integralResult* integral_on_device;
-	cudaMalloc((void**)&integral_on_device, sizeof(results::integralResult)*locationInfoCount);
+	CUDA_CHECK_RETURN( cudaMalloc((void**)&integral_on_device, sizeof(results::integralResult)*locationInfoCount) );
 	fill_integralResults<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 			integral_on_device,
 			elements,
@@ -402,15 +403,15 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 			integralSums,
 			locations.data().get(),
 			locationInfoCount);
-	if(cudaSuccess != cudaDeviceSynchronize()) printf("ERROR");
-	if(cudaSuccess != cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost)) printf("ERROR");
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
+	CUDA_CHECK_RETURN( cudaMemcpy(integral, integral_on_device, sizeof(results::integralResult)*locationInfoCount, cudaMemcpyDeviceToHost) );
 
 	// RETURN RESULT
 	(*result)=integral;
 
-	cudaFree(integral_on_device);
-	cudaFree(integralSums);
-	cudaFree(trapezoidFields);
+	CUDA_CHECK_RETURN( cudaFree(integral_on_device) );
+	CUDA_CHECK_RETURN( cudaFree(integralSums) );
+	CUDA_CHECK_RETURN( cudaFree(trapezoidFields) );
 	return locationInfoCount*sizeof(results::integralResult);
 }
 
@@ -507,13 +508,13 @@ size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** resul
 
 	// ALLOCATE GPU MEMORY
 	float2* buckets_device;
-	cudaMalloc(&buckets_device, sizeof(float2)*bucketCount);
 	int* histogram_device;
-	cudaMalloc(&histogram_device, sizeof(int)*bucketCount);
-	cudaMemset(histogram_device, 0, sizeof(int)*bucketCount);
+	CUDA_CHECK_RETURN( cudaMalloc(&buckets_device, sizeof(float2)*bucketCount) );
+	CUDA_CHECK_RETURN( cudaMalloc(&histogram_device, sizeof(int)*bucketCount) );
+	CUDA_CHECK_RETURN( cudaMemset(histogram_device, 0, sizeof(int)*bucketCount) );
 
 	// COPY BUCKETS TO DEVICE
-	cudaMemcpy(buckets_device, buckets, sizeof(float2)*bucketCount, cudaMemcpyHostToDevice);
+	CUDA_CHECK_RETURN( cudaMemcpy(buckets_device, buckets, sizeof(float2)*bucketCount, cudaMemcpyHostToDevice) );
 
 	// LAUNCH KERNEL
 	calculate_histogram_value<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
@@ -523,16 +524,15 @@ size_t gpu_histogram_value(storeElement* elements, size_t dataSize, void** resul
 			buckets_device,
 			bucketCount
 			);
-	cudaDeviceSynchronize();
-	//if(cudaSuccess != cudaGetLastError()) throw std::runtime_error("calculate_histogram_value kernel error");
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 	// COPY HISTOGRAM TO CPU MEMORY
 	int* histogram_host = new int[bucketCount];
-	cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost);
+	CUDA_CHECK_RETURN( cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost) );
 
 	// CLEAN UP
-	cudaFree( histogram_device );
-	cudaFree( buckets_device );
+	CUDA_CHECK_RETURN( cudaFree( histogram_device ) );
+	CUDA_CHECK_RETURN( cudaFree( buckets_device ) );
 
 	//RETURN RESULT
 	(*result) = histogram_host;
@@ -547,13 +547,13 @@ size_t gpu_histogram_time(storeElement* elements, size_t dataSize, void** result
 
 	// ALLOCATE GPU MEMORY
 	ullint2* buckets_device;
-	cudaMalloc(&buckets_device, sizeof(ullint2)*bucketCount);
 	int* histogram_device;
-	cudaMalloc(&histogram_device, sizeof(int)*bucketCount);
-	cudaMemset(histogram_device, 0, sizeof(int)*bucketCount);
+	CUDA_CHECK_RETURN( cudaMalloc(&buckets_device, sizeof(ullint2)*bucketCount) );
+	CUDA_CHECK_RETURN( cudaMalloc(&histogram_device, sizeof(int)*bucketCount) );
+	CUDA_CHECK_RETURN( cudaMemset(histogram_device, 0, sizeof(int)*bucketCount) );
 
 	// COPY BUCKETS TO DEVICE
-	cudaMemcpy(buckets_device, buckets, sizeof(ullint2)*bucketCount, cudaMemcpyHostToDevice);
+	CUDA_CHECK_RETURN( cudaMemcpy(buckets_device, buckets, sizeof(ullint2)*bucketCount, cudaMemcpyHostToDevice) );
 
 	// LAUNCH KERNEL
 	calculate_histogram_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
@@ -563,16 +563,15 @@ size_t gpu_histogram_time(storeElement* elements, size_t dataSize, void** result
 			buckets_device,
 			bucketCount
 			);
-	cudaDeviceSynchronize();
-	//if(cudaSuccess != cudaGetLastError()) throw std::runtime_error("calculate_histogram_time kernel error");
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 	// COPY HISTOGRAM TO CPU MEMORY
 	int* histogram_host = new int[bucketCount];
-	cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost);
+	CUDA_CHECK_RETURN( cudaMemcpy(histogram_host, histogram_device, sizeof(int)*bucketCount, cudaMemcpyDeviceToHost) );
 
 	// CLEAN UP
-	cudaFree( histogram_device );
-	cudaFree( buckets_device );
+	CUDA_CHECK_RETURN( cudaFree(histogram_device) );
+	CUDA_CHECK_RETURN( cudaFree(buckets_device) );
 
 	//RETURN RESULT
 	(*result) = histogram_host;
