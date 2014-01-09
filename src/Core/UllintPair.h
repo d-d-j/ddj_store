@@ -29,8 +29,7 @@ namespace ddj {
 
 		bool operator< (const ullintPair& rhs) const
 		{
-			if(first < rhs.first && second < rhs.second) return true;
-			else return false;
+			return ((first < rhs.first) || (first == rhs.first && second < rhs.second));
 		}
 
 		bool operator== (const ullintPair& rhs) const
