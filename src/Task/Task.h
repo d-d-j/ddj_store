@@ -2,6 +2,8 @@
 #define STORETASK_H_
 
 #include "TaskResult.h"
+#include "TaskReducer.h"
+#include "../Query/Query.h"
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
@@ -28,6 +30,7 @@ namespace task {
 		int _currentResultCount;
 		int _expectedResultCount;
 		taskResult* _result;
+		query::Query* _query;
 
 		/* MONITOR */
 		boost::condition_variable* _condResponseReady;
@@ -48,6 +51,8 @@ namespace task {
 				const char* message = nullptr,
 				void* resultData = nullptr,
 				size_t resultSize = 0);
+
+		void SetQuery(query::Query* query);
 
 		taskResult* GetResult();
 

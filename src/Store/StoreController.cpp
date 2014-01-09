@@ -154,6 +154,7 @@ namespace store {
 
 			// Create query from task data
 			Query* query = new Query(task->GetData());
+			task->SetQuery(query);
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
 
 			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;

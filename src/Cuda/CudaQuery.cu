@@ -136,7 +136,7 @@ int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Que
 	int elemCount = dataSize/sizeof(storeElement);
 	int* stencil;
 	cudaMalloc(&stencil, elemCount*sizeof(int));
-	int blocksPerGrid =(elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
+	int blocksPerGrid = (elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 
 	// CREATE TIME PERIODS VECTOR ON GPU
 	thrust::device_vector<ddj::ullintPair> timePeriods(query->timePeriods.begin(), query->timePeriods.end());

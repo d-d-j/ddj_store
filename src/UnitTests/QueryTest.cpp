@@ -24,7 +24,8 @@ namespace query {
 		auto expected = "query[aggregationType: 10; metrics: 1; tags: 1 0; timePeriods: (11,21) (5,7)]";
 		EXPECT_EQ(expected, actual);
 
-		auto data = (data::histogramTimeData*)Query((void*)input).aggregationData;
+		Query query((void*)input);
+		auto data = static_cast<data::histogramTimeData*>(query.aggregationData);
 		ASSERT_FALSE(data == nullptr);
 		EXPECT_EQ( 5, data->min);
 		EXPECT_EQ(10, data->max);
@@ -44,7 +45,8 @@ namespace query {
 		auto expected = "query[aggregationType: 9; metrics: 1; tags: 1 0; timePeriods: (11,21) (5,7)]";
 		EXPECT_EQ(expected, actual);
 
-		auto data = (data::histogramValueData*)Query((void*)input).aggregationData;
+		Query query((void*)input);
+		auto data = static_cast<data::histogramValueData*>(query.aggregationData);
 		ASSERT_FALSE(data == nullptr);
 		EXPECT_EQ( 5, data->min);
 		EXPECT_EQ(10, data->max);

@@ -22,7 +22,7 @@ namespace query {
 
 		Query():aggregationType(None),aggregationData(NULL){}
 		Query(void* queryData);
-		~Query(){}
+		~Query();
 
 		std::string toString();
 	};

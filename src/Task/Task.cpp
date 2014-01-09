@@ -29,6 +29,7 @@ namespace task {
 		this->_currentResultCount = 0;
 		this->_expectedResultCount = expectedResultCount;
 		this->_result = nullptr;
+		this->_query = nullptr;
 	}
 
 	Task::~Task()
@@ -39,6 +40,7 @@ namespace task {
 		delete this->_message;
 		free(this->_resultData);
 		delete this->_result;
+		delete this->_query;
 	}
 
 	void Task::appendMessage(const char* message)
@@ -93,7 +95,16 @@ namespace task {
 		this->_currentResultCount++;
 		if(this->_currentResultCount == this->_expectedResultCount)
 		{
-			// TODO: REDUCE TASK RESULTS
+			// REDUCE TASK RESULTS
+			/*
+			void* reducedResult;
+			TaskReducer::Reduce(this->_query, this->_resultData, this->_expectedResultCount, &reducedResult);
+			if(reducedResult != nullptr)
+			{
+				delete this->_resultData;
+				this->_resultData = reducedResult;
+			}
+			*/
 
 			// SET TASK RESULT
 			this->_result = new taskResult(
@@ -105,6 +116,12 @@ namespace task {
 			this->_isCompleated = true;
 			this->_condResponseReady->notify_one();
 		}
+	}
+
+	void Task::SetQuery(query::Query* query)
+	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+		this->_query = query;
 	}
 
 	taskResult* Task::GetResult()

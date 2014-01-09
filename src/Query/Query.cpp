@@ -7,8 +7,7 @@ namespace query {
 	{
 		int position = 0;
 		int size = 0;
-		try
-		{
+
 		// Get size
 		memcpy(&size, (char*)queryData+position, sizeof(int32_t));
 		position+=sizeof(int32_t);
@@ -66,9 +65,17 @@ namespace query {
 			position += sizeof(int32_t);
 			aggregationData = d;
 		}
-		}catch(...)
-		{
-			printf("\n\nIam here\n\n");
+	}
+
+	Query::~Query()
+	{
+		if(aggregationData == nullptr) return;
+		if (aggregationType == AggregationType::Histogram_Time) {
+			data::histogramTimeData* htd = static_cast<data::histogramTimeData*>(aggregationData);
+			delete htd;
+		} else if(aggregationType == AggregationType::Histogram_Value){
+			data::histogramValueData* hvd = static_cast<data::histogramValueData*>(aggregationData);
+			delete hvd;
 		}
 	}
 
