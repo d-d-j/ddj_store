@@ -395,5 +395,32 @@ namespace btree {
 		delete elem4;
 	}
 
+	/*
+	period			  <-------->
+	trunks	|---------|
+	*/
+	TEST_F(BTreeMonitorTest, Select_OneOne_TimePeriodLeftOneElemIntersect)
+	{
+		// PREAPRE
+		store::storeTrunkInfo* elem = new store::storeTrunkInfo(1, 4, 10, 0, 7);
+		ullintPair period{10,15};
+		boost::container::vector<ullintPair> timePeriods;
+		timePeriods.push_back(period);
+		_monitor->Insert(elem);
+
+		// TEST
+		auto result = _monitor->Select(timePeriods);
+
+		// CHECK
+		ASSERT_EQ(1, result->size());
+		EXPECT_EQ(0, (*result)[0].first);
+		EXPECT_EQ(7, (*result)[0].second);
+
+		// CLEAN
+		delete result;
+		delete elem;
+	}
+
+
 } /* namespace btree */
 } /* namespace ddj */
