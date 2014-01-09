@@ -96,15 +96,19 @@ namespace task {
 		if(this->_currentResultCount == this->_expectedResultCount)
 		{
 			// REDUCE TASK RESULTS
-			/*
-			void* reducedResult;
-			TaskReducer::Reduce(this->_query, this->_resultData, this->_expectedResultCount, &reducedResult);
-			if(reducedResult != nullptr)
+
+			if(this->_query != nullptr)
 			{
-				delete this->_resultData;
-				this->_resultData = reducedResult;
+				void* reducedResult;
+				size_t newResultSize =
+						TaskReducer::Reduce(this->_query, this->_resultData, this->_resultSize, &reducedResult);
+				if(reducedResult != nullptr)
+				{
+					delete this->_resultData;
+					this->_resultData = reducedResult;
+					this->_resultSize = newResultSize;
+				}
 			}
-			*/
 
 			// SET TASK RESULT
 			this->_result = new taskResult(
