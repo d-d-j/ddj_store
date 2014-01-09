@@ -10,9 +10,9 @@
 namespace ddj {
 namespace query {
 
-INSTANTIATE_TEST_CASE_P(TestOneInst,
+INSTANTIATE_TEST_CASE_P(SumEqualIntegersInst,
 						QueryAggregationPerformance,
-                        ::testing::Values(100, 10000, 1000000, 5000000, 10000000, 20000000, 30000000));
+                        ::testing::Values(1, 100, 10000, 1000000, 5000000, 10000000, 20000000));
 
 TEST_P(QueryAggregationPerformance, SumAggregation_EqualIntegerValues)
 {
@@ -21,12 +21,12 @@ TEST_P(QueryAggregationPerformance, SumAggregation_EqualIntegerValues)
 	storeElement* deviceData;
 	cudaMalloc(&deviceData, dataSize);
 	storeElement* hostData = new storeElement[N];
-	for(int i=0; i < N; i++) hostData[i].value = 0.01;
+	for(int i=0; i < N; i++) hostData[i].value = 0.001;
 	cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
 
 	// EXPECTED
 	size_t expected_size = sizeof(results::sumResult);
-	float expected_sum = N;
+	float expected_sum = N*0.001;
 	results::sumResult* result;
 
 	// TEST
@@ -34,7 +34,7 @@ TEST_P(QueryAggregationPerformance, SumAggregation_EqualIntegerValues)
 
 	// CHECK
 	ASSERT_EQ(expected_size, actual_size);
-	EXPECT_FLOAT_EQ(expected_sum, result->sum);
+	EXPECT_NEAR(expected_sum, result->sum, 0.000001*N);
 
 	// CLEAN
 	delete result;
