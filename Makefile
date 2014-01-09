@@ -27,6 +27,7 @@ SRC_FILES := $(wildcard src/*.cpp src/*/*.cpp src/*/*.cu)
 
 OBJS := $(SRC_FILES:.cpp=.o)
 OBJS := $(OBJS:.cu=.o)
+DEP := $(OBJS:.o=.d)
 
 all: DDJ_Store
 
@@ -73,7 +74,7 @@ check:
 	cppcheck --enable=all -j 4 -q ./src/
 
 clean:
-	-$(RM) $(OBJS) DDJ_Store
+	-$(RM) $(OBJS) $(DEP) DDJ_Store
 	-@echo ' '
 
 .PHONY: all clean
