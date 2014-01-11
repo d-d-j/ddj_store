@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	Logger logger = Logger::getRoot();
 	if (argc >= 2)
 	{
-		Logger::getRoot().getHierarchy().disableAll();
+		Logger::getRoot().removeAllAppenders();
 		::testing::InitGoogleTest(&argc, argv);
 		if(!strcmp(argv[1], "--test"))
 		{
@@ -46,6 +46,10 @@ int main(int argc, char* argv[])
 			::testing::FLAGS_gtest_repeat = 1;
 		}
 		return RUN_ALL_TESTS();
+	}
+	else
+	{
+		Logger::getInstance(LOG4CPLUS_TEXT("test")).removeAllAppenders();
 	}
 
 	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
