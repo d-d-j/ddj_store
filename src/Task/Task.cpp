@@ -96,32 +96,29 @@ namespace task {
 		if(this->_currentResultCount == this->_expectedResultCount)
 		{
 			this->_isCompleated = true;
-			if(_type != Insert)
+
+			// REDUCE TASK RESULTS
+			if(this->_query != nullptr)
 			{
-
-				// REDUCE TASK RESULTS
-				if(this->_query != nullptr)
+				void* reducedResult;
+				size_t newResultSize =
+						TaskReducer::Reduce(this->_query, this->_resultData, this->_resultSize, &reducedResult);
+				if(reducedResult != nullptr)
 				{
-					void* reducedResult;
-					size_t newResultSize =
-							TaskReducer::Reduce(this->_query, this->_resultData, this->_resultSize, &reducedResult);
-					if(reducedResult != nullptr)
-					{
-						delete this->_resultData;
-						this->_resultData = reducedResult;
-						this->_resultSize = newResultSize;
-					}
+					delete this->_resultData;
+					this->_resultData = reducedResult;
+					this->_resultSize = newResultSize;
 				}
-
-				// SET TASK RESULT
-				this->_result = new taskResult(
-						this->_taskId,
-						this->_type,
-						this->_resultData,
-						this->_resultSize
-						);
-
 			}
+
+			// SET TASK RESULT
+			this->_result = new taskResult(
+					this->_taskId,
+					this->_type,
+					this->_resultData,
+					this->_resultSize
+					);
+
 			this->_condResponseReady->notify_one();
 		}
 	}
