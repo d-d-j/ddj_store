@@ -1,4 +1,5 @@
 #include "QueryAggregationPerformance.h"
+#include <cmath>
 
 namespace ddj {
 namespace query {
@@ -60,14 +61,14 @@ using namespace std::chrono;
 		duration<double, milli> D;
 		int numberOfValues = GetParam();	// 40 elements with 4 trunks (10,10,10,10) - number of elements in each trunk
 		int trunkSize = 200;
-		int trunkCount = (numberOfValues - 1 + trunkSize - 1) / trunkSize;
+		int trunkCount = (numberOfValues + trunkSize - 1) / trunkSize;
 		size_t dataSize = numberOfValues*sizeof(storeElement);
 		for(int k=0; k<X; k++)
 		{
 			storeElement* hostData = new storeElement[numberOfValues];
 			for(int i=0; i< numberOfValues; i++)
 			{
-				hostData[i].value = std::sin((i*1.0f)/100.0f*M_PI);
+				hostData[i].value = std::sin(i/100.0f*M_PI);
 				hostData[i].time = 2*i;
 			}
 
@@ -79,11 +80,11 @@ using namespace std::chrono;
 			// DATA LOCATION INFO
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 			size_t oneTrunkSize = trunkSize*sizeof(storeElement);
-			size_t lastTrunkSize = numberOfValues%oneTrunkSize;
+			size_t lastTrunkSize = (numberOfValues%oneTrunkSize)*sizeof(storeElement);
 			lastTrunkSize = lastTrunkSize ? lastTrunkSize : oneTrunkSize;
 			for(int i=0; i<trunkCount; i++)
 			{
-				if(i != trunkCount - 2)
+				if(i != trunkCount - 1)
 					dataLocationInfo->push_back(ullintPair{i*oneTrunkSize,(i+1)*oneTrunkSize-1});
 				else
 					dataLocationInfo->push_back(ullintPair{i*oneTrunkSize,i*oneTrunkSize+lastTrunkSize-1});
@@ -96,7 +97,7 @@ using namespace std::chrono;
 			// EXPECTED
 			size_t expected_size = trunkCount*sizeof(results::integralResult);
 			float expected_integral = 0.0f;
-			float eps = 0.001f * numberOfValues;
+			float eps = 0.1f ;
 			results::integralResult* result;
 
 			// TEST
@@ -110,7 +111,8 @@ using namespace std::chrono;
 			ASSERT_EQ(expected_size, actual_size);
 			for(int j=0; j<trunkCount; j++)
 			{
-				EXPECT_NEAR(expected_integral, result[j].integral, eps);
+				if(numberOfValues%oneTrunkSize == 0 || j < trunkCount-1 )
+					EXPECT_NEAR(expected_integral, result[j].integral, eps);
 			}
 
 			// CLEAN

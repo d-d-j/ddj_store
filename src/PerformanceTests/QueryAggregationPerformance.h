@@ -33,7 +33,7 @@ namespace query {
 		QueryAggregationPerformance()
 		{
 			SetCudaDeviceWithMaxFreeMem();
-			LogDeviceMemory();
+			//LogDeviceMemory();
 			_resultFile.open("./src/PerformanceTests/Results/QueryAggregationPerformanceResult.txt",
 					std::ofstream::app);
 			if(!_resultFile.is_open())
@@ -78,7 +78,7 @@ namespace query {
 
 		virtual void TearDown()
 		{
-			LogDeviceMemory();
+			//LogDeviceMemory();
 		}
 
 		virtual ~QueryAggregationPerformance()
