@@ -14,6 +14,9 @@ namespace query {
 
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size, cudaMemcpyHostToDevice) );
 		_cudaController->SetMainMemoryOffset(size);
+
+		// CLEAN
+		delete [] testArray;
 	}
 
 	void QueryCoreTest::createTestDataWithStoreElements()
@@ -33,6 +36,9 @@ namespace query {
 
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size*sizeof(storeElement), cudaMemcpyHostToDevice) );
 		_cudaController->SetMainMemoryOffset(size*sizeof(storeElement));
+
+		// CLEAN
+		delete [] testArray;
 	}
 
 	void QueryCoreTest::createTestDataWithStoreElements_100Elem()
@@ -50,6 +56,9 @@ namespace query {
 
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, testArray, size*sizeof(storeElement), cudaMemcpyHostToDevice) );
 		_cudaController->SetMainMemoryOffset(size*sizeof(storeElement));
+
+		// CLEAN
+		delete [] testArray;
 	}
 
 	// check thrust version
@@ -125,21 +134,19 @@ namespace query {
 			createSimpleCharTestData();
 			char* deviceData;
 			char* hostData;
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{64,127});	// length 64
-			dataLocationInfo->push_back(ullintPair{256,383});	// length 128
-			dataLocationInfo->push_back(ullintPair{601,728});	// length 128
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{64,127});	// length 64
+			dataLocationInfo.push_back(ullintPair{256,383});	// length 128
+			dataLocationInfo.push_back(ullintPair{601,728});	// length 128
 
 			// TEST
-			size_t size = _queryCore->mapData((void**)&deviceData, dataLocationInfo);
+			size_t size = _queryCore->mapData((void**)&deviceData, &dataLocationInfo);
 
 			// CHECK
 			ASSERT_EQ(64+128+128, size);
 
 			hostData = new char[size];
 			CUDA_CHECK_RETURN( cudaMemcpy(hostData, deviceData, size, cudaMemcpyDeviceToHost) );
-
-
 
 			unsigned long i = 0;
 			for(i=0; i<64; i++)
@@ -356,17 +363,17 @@ namespace query {
 
 			// CREATE DATA LOCATION INFO
 			size_t elemSize = sizeof(storeElement);
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{0*elemSize,40*elemSize-1});	// 6 elements
-			dataLocationInfo->push_back(ullintPair{40*elemSize,60*elemSize-1});	// 0 elements
-			dataLocationInfo->push_back(ullintPair{60*elemSize,100*elemSize-1});// 6 elements
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{0*elemSize,40*elemSize-1});	// 6 elements
+			dataLocationInfo.push_back(ullintPair{40*elemSize,60*elemSize-1});	// 0 elements
+			dataLocationInfo.push_back(ullintPair{60*elemSize,100*elemSize-1});// 6 elements
 
 			// EXPECTED RESULT
 			int expected_elements_count = 12;
 			size_t expected_size = expected_elements_count*sizeof(storeElement);
 
 			// TEST
-			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query, dataLocationInfo);
+			size_t size = _queryCore->filterData(deviceElements, N*sizeof(storeElement), &query, &dataLocationInfo);
 
 			// CHECK
 			ASSERT_EQ(expected_size, size);
@@ -388,11 +395,11 @@ namespace query {
 			}
 
 			// CHECK DATA LOCATION INFO
-			ASSERT_EQ(2, dataLocationInfo->size());
-			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
-			EXPECT_EQ(6*elemSize-1, (*dataLocationInfo)[0].second);
-			EXPECT_EQ(6*elemSize, (*dataLocationInfo)[1].first);
-			EXPECT_EQ(12*elemSize-1, (*dataLocationInfo)[1].second);
+			ASSERT_EQ(2, dataLocationInfo.size());
+			EXPECT_EQ(0*elemSize, dataLocationInfo[0].first);
+			EXPECT_EQ(6*elemSize-1, dataLocationInfo[0].second);
+			EXPECT_EQ(6*elemSize, dataLocationInfo[1].first);
+			EXPECT_EQ(12*elemSize-1, dataLocationInfo[1].second);
 
 			// CLEAN
 			delete [] hostElements;
@@ -421,10 +428,10 @@ namespace query {
 
 			// CREATE DATA LOCATION INFO
 			size_t elemSize = sizeof(storeElement);
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{15*elemSize,30*elemSize-1});	// 15 elements in trunk
-			dataLocationInfo->push_back(ullintPair{30*elemSize,45*elemSize-1}); // 15 elements in trunk
-			dataLocationInfo->push_back(ullintPair{45*elemSize,60*elemSize-1}); // 15 elements in trunk
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{15*elemSize,30*elemSize-1});	// 15 elements in trunk
+			dataLocationInfo.push_back(ullintPair{30*elemSize,45*elemSize-1}); // 15 elements in trunk
+			dataLocationInfo.push_back(ullintPair{45*elemSize,60*elemSize-1}); // 15 elements in trunk
 
 			// EXPECTED RESULTS
 			int expected_size = 6;
@@ -432,19 +439,19 @@ namespace query {
 			storeElement* deviceElements = nullptr;
 
 			// TEST MAP
-			size_t mappedDataSize = _queryCore->mapData((void**)&deviceElements, dataLocationInfo);
+			size_t mappedDataSize = _queryCore->mapData((void**)&deviceElements, &dataLocationInfo);
 
 			// CHECK MAP
 			ASSERT_EQ(45*elemSize, mappedDataSize);
-			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
-			EXPECT_EQ(15*elemSize-1, (*dataLocationInfo)[0].second);
-			EXPECT_EQ(15*elemSize, (*dataLocationInfo)[1].first);
-			EXPECT_EQ(30*elemSize-1, (*dataLocationInfo)[1].second);
-			EXPECT_EQ(30*elemSize, (*dataLocationInfo)[2].first);
-			EXPECT_EQ(45*elemSize-1, (*dataLocationInfo)[2].second);
+			EXPECT_EQ(0*elemSize, dataLocationInfo[0].first);
+			EXPECT_EQ(15*elemSize-1, dataLocationInfo[0].second);
+			EXPECT_EQ(15*elemSize, dataLocationInfo[1].first);
+			EXPECT_EQ(30*elemSize-1, dataLocationInfo[1].second);
+			EXPECT_EQ(30*elemSize, dataLocationInfo[2].first);
+			EXPECT_EQ(45*elemSize-1, dataLocationInfo[2].second);
 
 			// TEST FILTER
-			size_t size = _queryCore->filterData(deviceElements, mappedDataSize, &query, dataLocationInfo);
+			size_t size = _queryCore->filterData(deviceElements, mappedDataSize, &query, &dataLocationInfo);
 
 			// CHECK FILTER
 			ASSERT_EQ(expected_size*sizeof(storeElement), size);
@@ -466,16 +473,15 @@ namespace query {
 				EXPECT_FLOAT_EQ(666.666, hostElements[i].value);
 			}
 			// CHECK DATA LOCATION INFO AFTER FILTER
-			EXPECT_EQ(0*elemSize, (*dataLocationInfo)[0].first);
-			EXPECT_EQ(1*elemSize-1, (*dataLocationInfo)[0].second);
-			EXPECT_EQ(1*elemSize, (*dataLocationInfo)[1].first);
-			EXPECT_EQ(4*elemSize-1, (*dataLocationInfo)[1].second);
-			EXPECT_EQ(4*elemSize, (*dataLocationInfo)[2].first);
-			EXPECT_EQ(6*elemSize-1, (*dataLocationInfo)[2].second);
+			EXPECT_EQ(0*elemSize, dataLocationInfo[0].first);
+			EXPECT_EQ(1*elemSize-1, dataLocationInfo[0].second);
+			EXPECT_EQ(1*elemSize, dataLocationInfo[1].first);
+			EXPECT_EQ(4*elemSize-1, dataLocationInfo[1].second);
+			EXPECT_EQ(4*elemSize, dataLocationInfo[2].first);
+			EXPECT_EQ(6*elemSize-1, dataLocationInfo[2].second);
 
 			// CLEAN
 			delete [] hostElements;
-			delete dataLocationInfo;
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
@@ -488,11 +494,11 @@ namespace query {
 			char* hostData;
 			Query query;
 			query.aggregationType = AggregationType::None;
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{64,127});
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{64,127});
 
 			// TEST
-			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, dataLocationInfo);
+			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, &dataLocationInfo);
 
 			// CHECK
 			ASSERT_EQ(64, size);
@@ -510,8 +516,8 @@ namespace query {
 
 			Query query;
 			query.aggregationType = AggregationType::None;
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
 			query.tags.push_back(1);	// 52 elements
 			query.tags.push_back(6);	// 51 elements
 			query.tags.push_back(11);	// 51 elements
@@ -543,7 +549,7 @@ namespace query {
 
 
 			// TEST
-			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, dataLocationInfo);
+			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
 			ASSERT_EQ(expected_elements_size, size);
@@ -566,8 +572,8 @@ namespace query {
 
 			Query query;
 			query.aggregationType = AggregationType::Sum;
-			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
-			dataLocationInfo->push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{0,QUERY_CORE_TEST_MEM_SIZE*sizeof(storeElement)});	// all
 			query.tags.push_back(1);	// 52 elements
 			query.tags.push_back(6);	// 51 elements
 			query.tags.push_back(11);	// 51 elements
@@ -583,7 +589,7 @@ namespace query {
 			results::sumResult* result;
 
 			// TEST
-			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, dataLocationInfo);
+			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
 			ASSERT_EQ(expected_elements_size, size);

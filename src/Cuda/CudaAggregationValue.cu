@@ -369,16 +369,11 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 {
 	size_t storeElemSize = sizeof(storeElement);
 	int elemCount = dataSize / storeElemSize;
-	if(elemCount <= 1)
-	{
-		(*result) = NULL;
-		return 0;
-	}
 
 	// ALLOCATE SPACE FOR RESULTS
+	float* trapezoidFields;
 	float* integralSums;
 	CUDA_CHECK_RETURN( cudaMalloc(&integralSums, sizeof(float)*locationInfoCount) );
-	float* trapezoidFields;
 	CUDA_CHECK_RETURN( cudaMalloc(&trapezoidFields, sizeof(float)*(elemCount-1)) );
 
 	// CREATE TIME PERIODS VECTOR ON GPU

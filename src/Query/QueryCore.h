@@ -20,7 +20,6 @@ namespace query {
 	{
 	private:
 		CudaController* _cudaController;
-		Logger _logger = Logger::getRoot();
 
 	public:
 		QueryCore(CudaController* cudaController);

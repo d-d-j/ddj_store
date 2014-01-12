@@ -79,9 +79,14 @@ using namespace std::chrono;
 			// DATA LOCATION INFO
 			boost::container::vector<ullintPair>* dataLocationInfo = new boost::container::vector<ullintPair>();
 			size_t oneTrunkSize = trunkSize*sizeof(storeElement);
+			size_t lastTrunkSize = numberOfValues%oneTrunkSize;
+			lastTrunkSize = lastTrunkSize ? lastTrunkSize : oneTrunkSize;
 			for(int i=0; i<trunkCount; i++)
 			{
-				dataLocationInfo->push_back(ullintPair{i*oneTrunkSize,(i+1)*oneTrunkSize-1});
+				if(i != trunkCount - 2)
+					dataLocationInfo->push_back(ullintPair{i*oneTrunkSize,(i+1)*oneTrunkSize-1});
+				else
+					dataLocationInfo->push_back(ullintPair{i*oneTrunkSize,i*oneTrunkSize+lastTrunkSize-1});
 			}
 
 			// QUERY
