@@ -64,7 +64,7 @@ namespace query {
 				}
 			}
 			cudaSetDevice(deviceId);
-			LOG4CPLUS_INFO(_logger, LOG4CPLUS_TEXT("Setting cuda device ") << deviceId);
+			//LOG4CPLUS_INFO(_logger, LOG4CPLUS_TEXT("Setting cuda device ") << deviceId);
 		}
 
 		void LogDeviceMemory()

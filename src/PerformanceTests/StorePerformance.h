@@ -27,6 +27,9 @@ namespace task {
 		{
 
 		}
+
+		store::StoreController* _storeController;
+		TaskMonitor* _taskMonitor;
 	};
 
 } /* namespace task */

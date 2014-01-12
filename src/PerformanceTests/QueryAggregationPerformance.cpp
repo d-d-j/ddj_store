@@ -45,13 +45,13 @@ using namespace std::chrono;
 			cudaFree(deviceData);
 		}
 
-		LOG4CPLUS_INFO(_logger,
-				LOG4CPLUS_TEXT("Sum test [N = ")
-				<< N
-				<< LOG4CPLUS_TEXT("] duration: ")
-				<< D.count()/X
-				<< LOG4CPLUS_TEXT(" ms"));
-
+//		LOG4CPLUS_INFO(_logger,
+//				LOG4CPLUS_TEXT("Sum test [N = ")
+//				<< N
+//				<< LOG4CPLUS_TEXT("] duration: ")
+//				<< D.count()/X
+//				<< LOG4CPLUS_TEXT(" ms"));
+		printf("[SumEqualIntegers|%d] (%f ms)\n", N, D.count()/X);
 		_resultFile << "Sum " << N << " " << D.count()/X << std::endl;
 	}
 
@@ -121,13 +121,13 @@ using namespace std::chrono;
 			delete dataLocationInfo;
 			cudaFree(deviceData);
 		}
-		LOG4CPLUS_INFO(_logger,
-						LOG4CPLUS_TEXT("Integral SinTrunk200 test [N = ")
-						<< numberOfValues
-						<< LOG4CPLUS_TEXT("] duration: ")
-						<< D.count()/X
-						<< LOG4CPLUS_TEXT(" ms"));
-
+//		LOG4CPLUS_INFO(_logger,
+//						LOG4CPLUS_TEXT("Integral SinTrunk200 test [N = ")
+//						<< numberOfValues
+//						<< LOG4CPLUS_TEXT("] duration: ")
+//						<< D.count()/X
+//						<< LOG4CPLUS_TEXT(" ms"));
+		printf("[SinTrunk200|%d] (%f ms)\n", numberOfValues, D.count()/X);
 		_resultFile << "Integral_SinTrunk200 " << numberOfValues << " " << D.count()/X << std::endl;
 	}
 
