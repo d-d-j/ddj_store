@@ -320,24 +320,26 @@ size_t gpu_kurtosis(storeElement* elements, size_t dataSize, void** result)
 
 __global__ void calculate_trapezoid_fields(ddj::store::storeElement* elements, int count, float* result)
 {
-	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= count) return;
 
 	ullint timespan = elements[idx+1].time - elements[idx].time;
 	result[idx] = ( elements[idx].value + elements[idx+1].value ) * timespan / 2;
+	//CUPRINTF("\tIdx: %d, result: %f\n", idx, result[idx]);
 }
 
-__global__ void sum_fields_in_trunks(float* fields, size_t elemSize, ddj::ullintPair* locations, int count, float* result)
+__global__ void sum_fields_in_trunks(float* trapezoidFields, size_t elemSize, ddj::ullintPair* locations, int count, float* result)
 {
-	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
+	int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= count) return;
 
 	int i = locations[idx].first/elemSize;
 	int end = locations[idx].second/elemSize;
 	float sum = 0;
+
 	for(; i<end; i++)
 	{
-		sum += fields[i];
+		sum += trapezoidFields[i];
 	}
 	result[idx] = sum;
 }
@@ -367,6 +369,11 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 {
 	size_t storeElemSize = sizeof(storeElement);
 	int elemCount = dataSize / storeElemSize;
+	if(elemCount <= 1)
+	{
+		(*result) = NULL;
+		return 0;
+	}
 
 	// ALLOCATE SPACE FOR RESULTS
 	float* integralSums;
@@ -379,7 +386,10 @@ size_t gpu_trunk_integral(storeElement* elements, size_t dataSize, void** result
 
 	// CALCULATE TRAPEZOID FIELDS
 	int blocksPerGrid = (elemCount - 1 + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
-	calculate_trapezoid_fields<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(elements, elemCount-1, trapezoidFields);
+	calculate_trapezoid_fields<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
+			elements,
+			elemCount-1,
+			trapezoidFields);
 	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
 	// SUM UP FIELDS IN TRUNKS

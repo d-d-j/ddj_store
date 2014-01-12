@@ -1475,68 +1475,68 @@ namespace query {
 	}
 
 	TEST_F(QueryAggregationTest, series_Sum_Normal_2tags1metrics_SinCosValues_InterpolationNeeded)
+	{
+		// PREPARE
+		const int numberOfMetrics = 1;
+		const int numberOfTags = 2;
+		const int numberOfTimePoints = 400;
+		const int numberOfValuesInOneSeries = 1200;
+		const int numberOfSeries = numberOfMetrics*numberOfTags;
+		const int numberOfValues = numberOfSeries*numberOfValuesInOneSeries;
+		size_t dataSize = numberOfValues*sizeof(storeElement);
+
+		storeElement* hostData = new storeElement[numberOfValues];
+		for(int i=0; i<numberOfValuesInOneSeries; i++)
 		{
-			// PREPARE
-			const int numberOfMetrics = 1;
-			const int numberOfTags = 2;
-			const int numberOfTimePoints = 400;
-			const int numberOfValuesInOneSeries = 1200;
-			const int numberOfSeries = numberOfMetrics*numberOfTags;
-			const int numberOfValues = numberOfSeries*numberOfValuesInOneSeries;
-			size_t dataSize = numberOfValues*sizeof(storeElement);
-
-			storeElement* hostData = new storeElement[numberOfValues];
-			for(int i=0; i<numberOfValuesInOneSeries; i++)
+			if(i%2)
 			{
-				if(i%2)
-				{
-					hostData[i].value = std::pow(std::sin((i*1.0f)/100.0f*M_PI),2);
-					hostData[i].tag = 11;
-				}
-				else
-				{
-					hostData[i].value = std::pow(std::cos((i*1.0f)/100.0f*M_PI),2);
-					hostData[i].tag = 99;
-				}
-				hostData[i].metric = 0;
-				hostData[i].time = 2*i;
+				hostData[i].value = std::pow(std::sin((i*1.0f)/100.0f*M_PI),2);
+				hostData[i].tag = 11;
 			}
-
-			// COPY TO DEVICE
-			storeElement* deviceData;
-			cudaMalloc(&deviceData, dataSize);
-			cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
-
-			Query query;
-			query.tags.push_back(11);
-			query.tags.push_back(99);
-			query.metrics.push_back(0);
-			// 1,5,9,12 - time points
-			query.timePeriods.push_back({200,1400});
-			query.aggregationData = new data::interpolatedAggregationData(numberOfTimePoints);
-
-			// EXPECTED
-			size_t expected_size = numberOfTimePoints*sizeof(float);
-			float expected_result = 1.0f;
-			float eps_error = 0.001f;
-			float* result;
-
-			// TEST
-			size_t actual_size =
-					_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](deviceData, dataSize, (void**)&result, &query);
-
-			// CHECK
-			ASSERT_EQ(expected_size, actual_size);
-			for(int j=0; j<numberOfTimePoints; j++)
+			else
 			{
-				EXPECT_NEAR(expected_result, result[j], eps_error);
+				hostData[i].value = std::pow(std::cos((i*1.0f)/100.0f*M_PI),2);
+				hostData[i].tag = 99;
 			}
-
-			// CLEAN
-			delete [] result;
-			delete [] hostData;
-			cudaFree(deviceData);
+			hostData[i].metric = 0;
+			hostData[i].time = 2*i;
 		}
+
+		// COPY TO DEVICE
+		storeElement* deviceData;
+		cudaMalloc(&deviceData, dataSize);
+		cudaMemcpy(deviceData, hostData, dataSize, cudaMemcpyHostToDevice);
+
+		Query query;
+		query.tags.push_back(11);
+		query.tags.push_back(99);
+		query.metrics.push_back(0);
+		// 1,5,9,12 - time points
+		query.timePeriods.push_back({200,1400});
+		query.aggregationData = new data::interpolatedAggregationData(numberOfTimePoints);
+
+		// EXPECTED
+		size_t expected_size = numberOfTimePoints*sizeof(float);
+		float expected_result = 1.0f;
+		float eps_error = 0.001f;
+		float* result;
+
+		// TEST
+		size_t actual_size =
+				_queryAggregation->_aggregationFunctions[AggregationType::SumSeries](deviceData, dataSize, (void**)&result, &query);
+
+		// CHECK
+		ASSERT_EQ(expected_size, actual_size);
+		for(int j=0; j<numberOfTimePoints; j++)
+		{
+			EXPECT_NEAR(expected_result, result[j], eps_error);
+		}
+
+		// CLEAN
+		delete [] result;
+		delete [] hostData;
+		cudaFree(deviceData);
+	}
 
 } /* namespace query */
 } /* namespace ddj */

@@ -105,7 +105,7 @@ namespace query {
 	size_t QueryAggregation::integral(storeElement* elements, size_t dataSize, void** result, Query* query)
 	{
 		(*result) = nullptr;
-		if(dataSize)
+		if(dataSize && dataSize != sizeof(storeElement))
 		{
 			ullintPairVector* dataLocationInfo = static_cast<ullintPairVector*>(query->aggregationData);
 			return gpu_trunk_integral(elements, dataSize, result, dataLocationInfo->data(), dataLocationInfo->size());
