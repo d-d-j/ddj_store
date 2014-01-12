@@ -32,8 +32,8 @@ namespace query {
 	protected:
 		QueryAggregationPerformance()
 		{
-			SetCudaDeviceWithMaxFreeMem();
-			//LogDeviceMemory();
+			CudaCommons cudaC;
+			cudaC.SetCudaDeviceWithMaxFreeMem();
 			_resultFile.open("./src/PerformanceTests/Results/QueryAggregationPerformanceResult.txt",
 					std::ofstream::app);
 			if(!_resultFile.is_open())
@@ -43,30 +43,6 @@ namespace query {
 			_queryAggregation = new QueryAggregation();
 		}
 
-		void SetCudaDeviceWithMaxFreeMem()
-		{
-			const char* argv = "";
-			int deviceId = 0;
-			CudaCommons cudaC;
-			int devCount = cudaC.CudaGetDevicesCount();
-			size_t free;
-			size_t total;
-			size_t max_free = 0;
-			//cudaC.GetMemoryCount(&free, &total);
-			for(int i=0; i<devCount; i++)
-			{
-				cudaSetDevice(i);
-				cudaC.GetMemoryCount(&free, &total);
-				if(free > max_free)
-				{
-					max_free = free;
-					deviceId = i;
-				}
-			}
-			cudaSetDevice(deviceId);
-			//LOG4CPLUS_INFO(_logger, LOG4CPLUS_TEXT("Setting cuda device ") << deviceId);
-		}
-
 		void LogDeviceMemory()
 		{
 			CudaCommons cudaC;
@@ -74,11 +50,6 @@ namespace query {
 			size_t total;
 			cudaC.GetMemoryCount(&free, &total);
 			LOG4CPLUS_INFO_FMT(_logger, LOG4CPLUS_TEXT("Device memory: %f/%f MB"), (float)free/1048576, (float)total/1048576);
-		}
-
-		virtual void TearDown()
-		{
-			//LogDeviceMemory();
 		}
 
 		virtual ~QueryAggregationPerformance()

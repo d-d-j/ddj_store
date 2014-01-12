@@ -62,6 +62,7 @@ namespace task {
 		int GetDevice();
 		bool IsCompleated();
 		int64_t GetId();
+		int GetCurrentResultCount();
 
 	private:
 		void appendMessage(const char* message);

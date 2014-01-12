@@ -34,6 +34,7 @@ public:
 	/* CUDA MALLOC */
 	cudaError_t CudaAllocateArray(size_t size, void** array);
 	void CudaFreeMemory(void* devPtr);
+	int SetCudaDeviceWithMaxFreeMem();
 };
 
 } /* namespace store */

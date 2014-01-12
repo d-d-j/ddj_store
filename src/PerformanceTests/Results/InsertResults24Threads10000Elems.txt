@@ -1,0 +1,10 @@
+InsertEqualElem 10000 24 8 404.99
+InsertEqualElem 10000 24 16 204.789
+InsertEqualElem 10000 24 32 101.883
+InsertEqualElem 10000 24 64 109.56
+InsertEqualElem 10000 24 128 278.584
+InsertEqualElem 10000 24 256 276.727
+InsertEqualElem 10000 24 512 267.885
+InsertEqualElem 10000 24 1024 265.765
+InsertEqualElem 10000 24 2048 265.659
+InsertEqualElem 10000 24 4096 264.245

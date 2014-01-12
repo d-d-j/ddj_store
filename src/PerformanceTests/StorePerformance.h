@@ -8,7 +8,12 @@
 #ifndef STOREPERFORMANCE_H_
 #define STOREPERFORMANCE_H_
 
+#include "../Store/StoreController.h"
+#include "../Task/TaskMonitor.h"
 #include "../Core/Logger.h"
+#include "../Core/Config.h"
+#include "../Cuda/CudaCommons.h"
+#include "../Cuda/CudaIncludes.h"
 #include <gtest/gtest.h>
 #include <cmath>
 #include <chrono>
@@ -20,16 +25,33 @@ namespace task {
 	class StorePerformance : public ::testing::TestWithParam<int>
 	{
 	protected:
-		StorePerformance();
-		virtual ~StorePerformance();
-
-		virtual void SetUp()
+		StorePerformance()
 		{
-
+			CudaCommons cudaC;
+			int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+			_storeController = new store::StoreController(devId);
+			_taskMonitor = new task::TaskMonitor(&_taskCond);
+			_resultFile.open("./src/PerformanceTests/Results/StorePerformanceResult.txt", std::ofstream::app);
+			if(!_resultFile.is_open())
+			{
+				LOG4CPLUS_FATAL(_logger, LOG4CPLUS_TEXT("Unable to open file"));
+			}
 		}
 
+		virtual ~StorePerformance()
+		{
+			this->_resultFile.close();
+			delete _storeController;
+			delete _taskMonitor;
+		}
+
+
+		ofstream _resultFile;
+		Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));
+		Config* _config = Config::GetInstance();
 		store::StoreController* _storeController;
 		TaskMonitor* _taskMonitor;
+		boost::condition_variable _taskCond;
 	};
 
 } /* namespace task */

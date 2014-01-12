@@ -94,5 +94,26 @@ namespace store {
 		cudaMemGetInfo(freeMemory, totalMemory);
 	}
 
+	int CudaCommons::SetCudaDeviceWithMaxFreeMem()
+	{
+		int deviceId = 0;
+		size_t free;
+		size_t total;
+		size_t max_free = 0;
+		int devCount = CudaGetDevicesCount();
+		for(int i=0; i<devCount; i++)
+		{
+			cudaSetDevice(i);
+			GetMemoryCount(&free, &total);
+			if(free > max_free)
+			{
+				max_free = free;
+				deviceId = i;
+			}
+		}
+		cudaSetDevice(deviceId);
+		return deviceId;
+	}
+
 } /* namespace store */
 } /* namespace ddj */
