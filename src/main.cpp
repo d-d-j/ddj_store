@@ -20,6 +20,8 @@
 #include "Core/Logger.h"
 #include "Core/Config.h"
 #include <gtest/gtest.h>
+#include <cmath>
+#include "Cuda/CudaCommons.h"
 
 void InitializeLogger() {
 	log4cplus::initialize();
@@ -27,25 +29,76 @@ void InitializeLogger() {
 	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
 }
 
+// TODO: Refactor!!
+void loadExampleData(ddj::Node* node)
+{
+	int N = 2000000;
+	ddj::store::storeElement* elem = nullptr;
+	ddj::store::CudaCommons cudaC;
+	int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+	for(int i=0; i<N; i++)
+	{
+		elem = new ddj::store::storeElement(0, 0, i, std::sin(i/100.0f*M_PI));
+		ddj::task::taskRequest req1(0*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		node->CreateTask(req1);
+		if(i%99999==0) printf("Inserted %d from %d elements\n", 0*N+i+1, 4*N);
+	}
+	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+	for(int i=0; i<N; i++)
+	{
+		elem = new ddj::store::storeElement(1, 0, i, std::cos(i/100.0f*M_PI));
+		ddj::task::taskRequest req2(1*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		node->CreateTask(req2);
+		if(i%99999==0) printf("Inserted %d from %d elements\n", 1*N+i+1, 4*N);
+	}
+	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+	for(int i=0; i<N; i++)
+	{
+		elem = new ddj::store::storeElement(2, 1, i, 1.0f);
+		ddj::task::taskRequest req3(2*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		node->CreateTask(req3);
+		if(i%99999==0) printf("Inserted %d from %d elements\n", 2*N+i+1, 4*N);
+	}
+	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+	for(int i=0; i<N; i++)
+	{
+		elem = new ddj::store::storeElement(3, 1, i, i*1.0f);
+		ddj::task::taskRequest req4(3*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		node->CreateTask(req4);
+		if(i%99999==0) printf("Inserted %d from %d elements\n", 3*N+i+1, 4*N);
+	}
+	printf("All data inserted!\n");
+}
+
+// TODO: Refactor!!
 int main(int argc, char* argv[])
 {
 	ddj::Config::GetInstance();
 	InitializeLogger();
 	Logger logger = Logger::getRoot();
+	bool enableExampleData = false;
+
 	if (argc >= 2)
 	{
-		Logger::getRoot().removeAllAppenders();
-		::testing::InitGoogleTest(&argc, argv);
-		if(!strcmp(argv[1], "--test"))
+		if(!strcmp(argv[1], "--exampleData"))
 		{
-			::testing::GTEST_FLAG(filter) = "*Test*";
+			enableExampleData = true;
 		}
-		else if(!strcmp(argv[1], "--performance"))
+		else
 		{
-			::testing::GTEST_FLAG(filter) = "*StorePerformance*";
-			::testing::FLAGS_gtest_repeat = 1;
+			Logger::getRoot().removeAllAppenders();
+			::testing::InitGoogleTest(&argc, argv);
+			if(!strcmp(argv[1], "--test"))
+			{
+				::testing::GTEST_FLAG(filter) = "*Test*";
+			}
+			else if(!strcmp(argv[1], "--performance"))
+			{
+				::testing::GTEST_FLAG(filter) = "*StorePerformance*";
+				::testing::FLAGS_gtest_repeat = 1;
+			}
+			return RUN_ALL_TESTS();
 		}
-		return RUN_ALL_TESTS();
 	}
 	else
 	{
@@ -55,7 +108,7 @@ int main(int argc, char* argv[])
 	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
 
 	ddj::Node n;
-
+	if(enableExampleData) loadExampleData(&n);
 	getchar();
 	return EXIT_SUCCESS;
 }

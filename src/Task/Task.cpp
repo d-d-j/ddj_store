@@ -22,7 +22,7 @@ namespace task {
 		this->_taskData = taskData;
 		this->_condResponseReady = cond;
 		this->_isCompleated = false;
-		this->_isSuccessfull = false;
+		this->_isSuccessfull = true;
 		this->_message = nullptr;
 		this->_resultData = nullptr;
 		this->_resultSize = 0;
