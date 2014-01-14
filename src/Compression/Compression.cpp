@@ -1,22 +1,16 @@
-/*
- * Compression.cpp
- *
- *  Created on: 14-01-2014
- *      Author: ghash
- */
-
 #include "Compression.h"
 
 namespace ddj {
-namespace task {
+namespace compression {
 
-Compression::Compression() {
-	// TODO Auto-generated constructor stub
-
+size_t Compression::CompressTrunk(storeElement* elements, size_t size, void** result)
+{
+	return CompressLightweight(elements, size, (unsigned char**)result);
 }
 
-Compression::~Compression() {
-	// TODO Auto-generated destructor stub
+size_t Compression::DecompressTrunk(void* data, size_t size, storeElement** result)
+{
+	return DecompressLightweight(static_cast<unsigned char*>(data), size, result);;
 }
 
 } /* namespace task */

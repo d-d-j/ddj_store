@@ -1,22 +1,20 @@
-/*
- * Compression.h
- *
- *  Created on: 14-01-2014
- *      Author: ghash
- */
-
 #ifndef COMPRESSION_H_
 #define COMPRESSION_H_
 
+#include "CompressionLightweight.cuh"
+
 namespace ddj {
-namespace task {
+namespace compression {
 
-class Compression {
-public:
-	Compression();
-	virtual ~Compression();
-};
+	using namespace ddj::store;
 
-} /* namespace task */
+	class Compression
+	{
+	public:
+		size_t CompressTrunk(storeElement* elements, size_t size, void** result);
+		size_t DecompressTrunk(void* data, size_t size, storeElement** result);
+	};
+
+} /* namespace compression */
 } /* namespace ddj */
 #endif /* COMPRESSION_H_ */

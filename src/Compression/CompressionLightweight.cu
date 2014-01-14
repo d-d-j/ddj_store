@@ -62,7 +62,7 @@ void DecodeKernel(unsigned char * in_d, storeElement * out_d) {
 	out_d[index].value = c.toFloat;
 }
 
-size_t CompressTrunk(storeElement* elements, size_t size, unsigned char** result)
+size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result)
 {
 	//prepare compression output
 	unsigned char *compressionOutput_device;	//output space for compressed data
@@ -78,7 +78,7 @@ size_t CompressTrunk(storeElement* elements, size_t size, unsigned char** result
 	return COMPRESSED_DATA_SIZE;
 }
 
-size_t DecompressTrunk(unsigned char* data, size_t size, storeElement** result)
+size_t DecompressLightweight(unsigned char* data, size_t size, storeElement** result)
 {
 	// prepare decompression output
 	storeElement* decompressionOutput_device;	//output space for decompressed data

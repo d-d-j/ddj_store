@@ -18,8 +18,8 @@ using namespace ddj::store;
 
 extern "C"
 {
-	size_t CompressTrunk(storeElement* elements, size_t size, unsigned char** result);
-	size_t DecompressTrunk(unsigned char* data, size_t size, storeElement** result);
+	size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result);
+	size_t DecompressLightweight(unsigned char* data, size_t size, storeElement** result);
 }
 
 #endif
