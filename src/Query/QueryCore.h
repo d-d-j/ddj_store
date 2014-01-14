@@ -4,6 +4,7 @@
 #include "Query.h"
 #include "QueryAggregation.h"
 #include "QueryFilter.cuh"
+#include "../Compression/Compression.h"
 #include "../Store/StoreElement.cuh"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
@@ -82,7 +83,7 @@ namespace query {
 		size_t filterData(storeElement* elements, size_t dataSize, Query* query,
 				boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
-		storeElement* decompressData(void* data, size_t* size);
+		size_t decompressData(void* data, size_t size, storeElement** elements);
 
 	private:
 		friend class QueryCoreTest;

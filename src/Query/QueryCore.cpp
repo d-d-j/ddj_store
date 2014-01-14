@@ -101,9 +101,10 @@ namespace query {
 		return size;
 	}
 
-	storeElement* QueryCore::decompressData(void* data, size_t* size)
+	size_t QueryCore::decompressData(void* data, size_t size, storeElement** elements)
 	{
-		return nullptr;
+		compression::Compression c;
+		return c.DecompressTrunk(data, size, elements);
 	}
 
 	size_t QueryCore::filterData(storeElement* elements, size_t dataSize, Query* query,
