@@ -61,7 +61,7 @@ __device__ int cuda_find_elements_for_interpolation(
 		else right = middle;
 
 		elemCount = right - left + 1;
-		CUPRINTF("\telemCount: %d\n", elemCount);
+		//CUPRINTF("\telemCount: %d\n", elemCount);
 	}
 	return left;
 }
