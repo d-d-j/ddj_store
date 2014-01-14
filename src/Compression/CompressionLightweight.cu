@@ -1,4 +1,4 @@
-#include "CudaCompression.cuh"
+#include "CompressionLightweight.cuh"
 
 union converter {
 	int32_t toInt, fromInt;

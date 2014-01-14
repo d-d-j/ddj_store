@@ -3,11 +3,11 @@
 
 #include "Query.h"
 #include "QueryAggregation.h"
+#include "QueryFilter.cuh"
 #include "../Store/StoreElement.cuh"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
-#include "../Cuda/CudaQuery.cuh"
 #include <boost/foreach.hpp>
 
 

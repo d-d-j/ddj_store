@@ -2,7 +2,8 @@
 #define COMPRESSIONTEST_H
 
 #include <gtest/gtest.h>
-#include "../Cuda/CudaCompression.cuh"
+#include "../Compression/Compression.h"
+#include "../Store/StoreElement.cuh"
 
 namespace ddj {
 namespace store {

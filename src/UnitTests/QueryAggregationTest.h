@@ -2,7 +2,7 @@
 #define QUERYAGGREGATIONTEST_H_
 
 #include "../Query/QueryAggregation.h"
-#include "../Query/AggregationResults.cuh"
+#include "../Query/QueryAggregationResults.cuh"
 #include "../Cuda/CudaController.h"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaIncludes.h"
