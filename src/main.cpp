@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 #include "Cuda/CudaCommons.h"
+#include "signal.h"
 
 void InitializeLogger() {
 	log4cplus::initialize();
@@ -113,7 +114,14 @@ int main(int argc, char* argv[])
 
 	ddj::Node n;
 	if(enableExampleData) loadExampleData(&n);
-	getchar();
+
+	//wait for SIGINT
+	int sig_number;
+	sigset_t signal_set;
+	sigemptyset (&signal_set);
+	sigaddset (&signal_set, SIGINT);
+	sigwait (&signal_set, &sig_number);
+
 	return EXIT_SUCCESS;
 }
 
