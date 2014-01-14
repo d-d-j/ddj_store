@@ -38,7 +38,7 @@ __global__ void cuda_produce_stencil_for_series(
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
 	if(idx >= elemCount) return;
-	stencil[idx] = (tag == elements[idx].tag && metric == elements[idx].metric) ? 1 : 0;
+	stencil[idx] = (tag == elements[idx].tag && metric == elements[idx].metric);
 }
 
 __device__ int cuda_find_elements_for_interpolation(
@@ -61,6 +61,7 @@ __device__ int cuda_find_elements_for_interpolation(
 		else right = middle;
 
 		elemCount = right - left + 1;
+		CUPRINTF("\telemCount: %d\n", elemCount);
 	}
 	return left;
 }
@@ -73,7 +74,7 @@ __global__ void cuda_sum_series_with_interpolation(
 		float* result)
 {
 	unsigned int idx = blockIdx.x *blockDim.x + threadIdx.x;
-	if(idx >= timePointCount) return;
+	if(idx >= timePointCount || elemCount<2) return;
 
 	ullint time = timePoints[idx];
 	int leftIndex = cuda_find_elements_for_interpolation(elements, elemCount, time);
@@ -86,9 +87,11 @@ __global__ void cuda_sum_series_with_interpolation(
 		result[idx] += leftValue;
 		return;
 	}
+
 	// interpolate f(x) = y0 + (y1-y0)*(x-x0)/(x1-x0)
 	float rightValue = elements[leftIndex+1].value;
 	ullint rightTime = elements[leftIndex+1].time;
+
 	if(leftTime != rightTime)
 		result[idx] += leftValue + (rightValue-leftValue)*(time-leftTime)/(rightTime-leftTime);
 }
@@ -140,14 +143,17 @@ size_t gpu_sum_series(storeElement* elements, size_t dataSize, void** result, ul
 			seriesElemCount = thrust::count(stencil_ptr, stencil_ptr+elemCount, 1);
 			CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 
-			// INTERPOLATE AND ADD SERIES
-			cuda_sum_series_with_interpolation<<<blocksPerGrid_interpolation, CUDA_THREADS_PER_BLOCK>>>(
-					elements,
-					seriesElemCount,
-					timePoints_device,
-					timePointCount,
-					interpolation);
-			CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
+			if(seriesElemCount != 0)
+			{
+				// INTERPOLATE AND ADD SERIES
+				cuda_sum_series_with_interpolation<<<blocksPerGrid_interpolation, CUDA_THREADS_PER_BLOCK>>>(
+						elements,
+						seriesElemCount,
+						timePoints_device,
+						timePointCount,
+						interpolation);
+				CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
+			}
 		}
 	}
 
