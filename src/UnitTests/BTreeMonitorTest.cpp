@@ -421,6 +421,88 @@ namespace btree {
 		delete elem;
 	}
 
+	/*
+	period		<------------>
+	trunks	|---------| |--------|
+			|---------| |--------|
+			|---------| |--------|
+	*/
+	TEST_F(BTreeMonitorTest, Select_ManySeries_SimeTimePeriodsOfTrunks)
+	{
+		// PREAPRE
+		ullintPair period{0,1000};
+		boost::container::vector<ullintPair> timePeriods;
+		timePeriods.push_back(period);
+
+		store::storeTrunkInfo* elem0 = new store::storeTrunkInfo(1, 0, 511, 0, 99);
+		store::storeTrunkInfo* elem1 = new store::storeTrunkInfo(1, 0, 511, 100, 199);
+		store::storeTrunkInfo* elem2 = new store::storeTrunkInfo(1, 0, 511, 200, 299);
+		store::storeTrunkInfo* elem3 = new store::storeTrunkInfo(1, 512, 1023, 300, 399);
+		store::storeTrunkInfo* elem4 = new store::storeTrunkInfo(1, 512, 1023, 400, 499);
+		store::storeTrunkInfo* elem5 = new store::storeTrunkInfo(1, 512, 1023, 500, 599);
+		_monitor->Insert(elem0);
+		_monitor->Insert(elem1);
+		_monitor->Insert(elem2);
+		_monitor->Insert(elem3);
+		_monitor->Insert(elem4);
+		_monitor->Insert(elem5);
+
+		// TEST
+		auto result = _monitor->Select(timePeriods);
+
+		// CHECK
+		ASSERT_EQ(6, result->size());
+
+		// CLEAN
+		delete result;
+		delete elem0;
+		delete elem1;
+		delete elem2;
+		delete elem3;
+		delete elem4;
+		delete elem5;
+	}
+
+	/*
+	period	<-------------------------->
+	trunks	|---------| |--------| |--------|
+			|---------| |--------| |--------|
+	*/
+	TEST_F(BTreeMonitorTest, Select_ManySeries_SimeTimePeriodsOfTrunks2)
+	{
+		// PREAPRE
+		ullintPair period{0,1200};
+		boost::container::vector<ullintPair> timePeriods;
+		timePeriods.push_back(period);
+
+		store::storeTrunkInfo* elem0 = new store::storeTrunkInfo(1, 0, 511, 0, 99);
+		store::storeTrunkInfo* elem1 = new store::storeTrunkInfo(1, 0, 511, 100, 199);
+		store::storeTrunkInfo* elem2 = new store::storeTrunkInfo(1, 512, 1023, 200, 299);
+		store::storeTrunkInfo* elem3 = new store::storeTrunkInfo(1, 512, 1023, 300, 399);
+		store::storeTrunkInfo* elem4 = new store::storeTrunkInfo(1, 1024, 1535, 400, 499);
+		store::storeTrunkInfo* elem5 = new store::storeTrunkInfo(1, 1024, 1535, 500, 599);
+		_monitor->Insert(elem0);
+		_monitor->Insert(elem1);
+		_monitor->Insert(elem2);
+		_monitor->Insert(elem3);
+		_monitor->Insert(elem4);
+		_monitor->Insert(elem5);
+
+		// TEST
+		auto result = _monitor->Select(timePeriods);
+
+		// CHECK
+		ASSERT_EQ(6, result->size());
+
+		// CLEAN
+		delete result;
+		delete elem0;
+		delete elem1;
+		delete elem2;
+		delete elem3;
+		delete elem4;
+		delete elem5;
+	}
 
 } /* namespace btree */
 } /* namespace ddj */

@@ -67,15 +67,19 @@ namespace btree {
 			 * 	A2 will be returned as lower_bound so we must check if A1 isn't intersecting with tp
 			 */
 			it--;
-			if(it->first.isIntersecting(tp))
+			while(it->first.isIntersecting(tp) && it != this->_bufferInfoTree->begin())
 			{
-				result->push_back(it->second);
+				it--;
 			}
-			it++;
+			// now it is not intersecting tp or it is begin
+			if(!it->first.isIntersecting(tp))
+			{
+				it++;
+			}
 			/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
 			 * are inside selected time period and if it is not and end of data from B+Tree
 			 */
-			while(it->first.first <= tp.second && it != this->_bufferInfoTree->end())
+			while(it != this->_bufferInfoTree->end() && it->first.isIntersecting(tp))
 			{
 				result->push_back(it->second);
 				it++;

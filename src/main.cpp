@@ -36,36 +36,40 @@ void loadExampleData(ddj::Node* node)
 	ddj::store::storeElement* elem = nullptr;
 	ddj::store::CudaCommons cudaC;
 	int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(int i=0; i<N; i++)
+	int i1 = 0;
+	int i2 = 0;
+	int i3 = 0;
+	int i4 = 0;
+	for(; i1<N; i1++)
 	{
-		elem = new ddj::store::storeElement(0, 0, i, std::sin(i/100.0f*M_PI));
-		ddj::task::taskRequest req1(0*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		elem = new ddj::store::storeElement(0, 0, i1, std::sin(i1/100.0f*M_PI));
+		ddj::task::taskRequest req1(0*N+i1, ddj::task::Insert, devId, sizeof(storeElement), elem);
 		node->CreateTask(req1);
-		if(i%99999==0) printf("Inserted %d from %d elements\n", 0*N+i+1, 4*N);
+		if(i1%99999==0) printf("Inserted %d from %d elements\n", 0*N+i1+1, 4*N);
 	}
 	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(int i=0; i<N; i++)
+	for(; i2<N; i2++)
 	{
-		elem = new ddj::store::storeElement(1, 0, i, std::cos(i/100.0f*M_PI));
-		ddj::task::taskRequest req2(1*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		elem = new ddj::store::storeElement(1, 0, i2, std::cos(i2/100.0f*M_PI));
+		ddj::task::taskRequest req2(1*N+i2, ddj::task::Insert, devId, sizeof(storeElement), elem);
 		node->CreateTask(req2);
-		if(i%99999==0) printf("Inserted %d from %d elements\n", 1*N+i+1, 4*N);
+		if(i2%99999==0) printf("Inserted %d from %d elements\n", 1*N+i2+1, 4*N);
 	}
 	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(int i=0; i<N; i++)
+	for(; i3<N; i3++)
 	{
-		elem = new ddj::store::storeElement(2, 1, i, 1.0f);
-		ddj::task::taskRequest req3(2*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		elem = new ddj::store::storeElement(2, 1, i3, 1.0f);
+		ddj::task::taskRequest req3(2*N+i3, ddj::task::Insert, devId, sizeof(storeElement), elem);
 		node->CreateTask(req3);
-		if(i%99999==0) printf("Inserted %d from %d elements\n", 2*N+i+1, 4*N);
+		if(i3%99999==0) printf("Inserted %d from %d elements\n", 2*N+i3+1, 4*N);
 	}
 	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(int i=0; i<N; i++)
+	for(; i4<N; i4++)
 	{
-		elem = new ddj::store::storeElement(3, 1, i, i*1.0f);
-		ddj::task::taskRequest req4(3*N+i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		elem = new ddj::store::storeElement(3, 1, i4, i4*1.0f);
+		ddj::task::taskRequest req4(3*N+i4, ddj::task::Insert, devId, sizeof(storeElement), elem);
 		node->CreateTask(req4);
-		if(i%99999==0) printf("Inserted %d from %d elements\n", 3*N+i+1, 4*N);
+		if(i4%99999==0) printf("Inserted %d from %d elements\n", 3*N+i4+1, 4*N);
 	}
 	printf("All data inserted!\n");
 }

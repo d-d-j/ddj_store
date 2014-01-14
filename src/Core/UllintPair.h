@@ -11,6 +11,7 @@
 #include "../Store/StoreTypedefs.h"
 #include <string>
 #include <sstream>
+#include <stdio.h>
 
 namespace ddj {
 
@@ -29,7 +30,7 @@ namespace ddj {
 
 		bool operator< (const ullintPair& rhs) const
 		{
-			return ((first < rhs.first) || (first == rhs.first && second < rhs.second));
+			return (first < rhs.first || (first == rhs.first && second < rhs.second));
 		}
 
 		bool operator== (const ullintPair& rhs) const
@@ -41,11 +42,13 @@ namespace ddj {
 
 		bool isIntersecting(const ullintPair& rhs)
 		{
-			if(first >= rhs.first && first <= rhs.second) return true;
-			if(second >= rhs.first && second <= rhs.second) return true;
-			if(rhs.first >= first && rhs.first <= second) return true;
-			if(rhs.second >= first && rhs.second <= second) return true;
-			return false;
+			bool result = false;
+			if(first >= rhs.first && first <= rhs.second) result = true;
+			if(second >= rhs.first && second <= rhs.second) result = true;
+			if(rhs.first >= first && rhs.first <= second) result = true;
+			if(rhs.second >= first && rhs.second <= second) result = true;
+			//printf("Check if (%llu,%llu) is intersecting (%llu,%llu) => result = %d\n", first, second, rhs.first, rhs.second, result);
+			return result;
 		}
 
 		ullint length()
