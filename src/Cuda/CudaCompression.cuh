@@ -1,17 +1,25 @@
 #ifndef CUDACOMPRESSION_H_
 #define CUDACOMPRESSION_H_
 
-#include "CudaIncludes.h"
-#include "../Core/Logger.h"
-#include "../Core/Config.h"
-#include "../Compression/gpu.h"
+#include "../Store/StoreElement.cuh"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <cuda.h>
 
+#define BLOCKS 50
+#define THREADS 100
+#define ELEMENTS_COUNT (BLOCKS*THREADS)
+#define DATA_SIZE (ELEMENTS_COUNT * sizeof(storeElement))
+#define COMPRESSED_ELEMENT_SIZE 10
+#define COMPRESSED_DATA_SIZE (ELEMENTS_COUNT*COMPRESSED_ELEMENT_SIZE+4)
+
+using namespace ddj::store;
 
 extern "C"
 {
-void compressVar(int max_size, int bl, int *dev_data, char *dev_out);
-
-void decompressVar(int max_size, int bl, int *dev_data, char* dev_out);
+	size_t CompressTrunk(storeElement* elements, size_t size, void** result);
+	size_t DecompressTrunk(void* data, size_t size, storeElement* result);
 }
 
 #endif

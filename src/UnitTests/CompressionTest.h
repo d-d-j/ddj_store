@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 #include "../Cuda/CudaCompression.cuh"
-#include "../Compression/gpu.h"
-#include "../Compression/cpu.h"
 
 namespace ddj {
 namespace store {
