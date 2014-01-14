@@ -47,8 +47,9 @@ namespace store {
 			btree::BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
 			StoreUploadCore* _uploadCore;			/**< protects access to GpuUploadCore class */
 
-			/* LOGGER */
+			/* LOGGER & CONFIG */
 			Logger _logger;
+			Config* _config;
 
 			/* BUFFERS */
 			int _bufferElementsCount;		/**< how many elements are now in _buffer */

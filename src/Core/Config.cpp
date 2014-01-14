@@ -69,6 +69,7 @@ namespace ddj
 					("THREAD_POOL_SIZE", po::value<int>()->default_value(1000), "number of threads in thread pool for tasks")
 					("SIMUL_QUERY_COUNT", po::value<int>()->default_value(3), "number of simultaneous queries")
 					("MASTER_IP_ADDRESS", po::value<string>()->default_value("127.0.0.1"), "address of master server")
+					("ENABLE_COMPRESSION", po::value<int>()->default_value(1), "1 if compression enabled, 0 otherwise")
 					("MASTER_LOGIN_PORT", po::value<string>()->default_value("8080"), "port of master server login service");
 
 

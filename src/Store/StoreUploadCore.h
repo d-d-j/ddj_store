@@ -11,6 +11,7 @@
 #include "StoreTrunkInfo.h"
 #include "StoreElement.cuh"
 #include "../Cuda/CudaController.h"
+#include "../Compression/Compression.h"
 #include <boost/thread.hpp>
 
 namespace ddj {
@@ -20,6 +21,11 @@ namespace store {
 	{
 		CudaController* _cudaController;
 		boost::mutex _mutex;
+		bool _enableCompression;
+
+		/* LOGGER & CONFIG */
+		Logger _logger;
+		Config* _config;
 
 	public:
 		StoreUploadCore(CudaController* cudaController);

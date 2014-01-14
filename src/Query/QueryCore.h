@@ -21,7 +21,11 @@ namespace query {
 	{
 	private:
 		CudaController* _cudaController;
+		bool _enableCompression;
 
+		/* LOGGER & CONFIG */
+		Logger _logger;
+		Config* _config;
 	public:
 		QueryCore(CudaController* cudaController);
 		virtual ~QueryCore();
@@ -83,7 +87,8 @@ namespace query {
 		size_t filterData(storeElement* elements, size_t dataSize, Query* query,
 				boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
-		size_t decompressData(void* data, size_t size, storeElement** elements);
+		size_t decompressData(void* data, size_t size, storeElement** elements,
+				boost::container::vector<ullintPair>* dataLocationInfo);
 
 	private:
 		friend class QueryCoreTest;
