@@ -485,7 +485,7 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-	//selectData
+	//selectData without compression
 
 		TEST_F(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
 		{
@@ -498,6 +498,7 @@ namespace query {
 			dataLocationInfo.push_back(ullintPair{64,127});
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, &dataLocationInfo);
 
 			// CHECK
@@ -549,6 +550,7 @@ namespace query {
 
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
@@ -589,6 +591,7 @@ namespace query {
 			results::sumResult* result;
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
