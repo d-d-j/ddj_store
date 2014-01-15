@@ -118,6 +118,10 @@ element:
             <li class="fragment">Elementy są przekazywane do StoreBuffera który zapełnia nimi bufor po stronie CPU. Rozmiar bufora jest konfigurowalny i ma duży wpływ na wydajność poszczególnych elementów systemu. Pełny bufor danych przekazywany dalej nazywamy Trunkiem.</li>
             <li class="fragment">Gotowy trunk jest przetwarzany przez wątek, wkładający ostatni element do bufora. Następuje zamiana buforów aby inne wątki mogły w między czasie używać bufora.</li>
             <li class="fragment">Trunk jest następnie kopiowany do bufora roboczego po stronie GPU. </li>
+        </ul>
+    </section>
+    <section>
+        <ul>
             <li class="fragment">Trunk jest sortowany po czasie</li>
             <li class="fragment">Roboczy bufor po stronie GPU jest odpowiednio kompresowany.</li>
             <li class="fragment">Skompresowany bufor jest synchronicznie dołączany do końca zajętego miejsca w głównej pamięci bazy danych na GPU.</li>
@@ -129,6 +133,20 @@ element:
     </section>
     <section>
         <h3>Wyciąganie danych</h3>
+        <ul>
+            <li class="fragment">Zadanie jest przekazywane do odpowiedniego wątku wykonującego funkcję typu select; Który tworzy obiekt zapytania na podstawie otrzymanych z sieci danych. </li>
+            <li class="fragment">Następnie wątek wykonuje funkcję "Execute Query" klasy Query Core, przekazując do niej obiekt zapytania wraz z pobranymi ze StoreBuffera informacjami o lokalizacji odpowiednich trunków w bazie danych</li>
+            <li class="fragment">Query Core początkowo "mapuje" trunki zgodnie z otrzymanymi lokalizacjami, a następnie je rozkompresowuje używając do tego utworzonego obiektu Compressora</li>
+            <li class="fragment">Rozkompresowane dane jako tablica elementów są następnie filtrowane pod kątem tagów, oraz czasu.</li>
+        </ul>
+    </section>
+    <section>
+        <ul>
+            <li class="fragment">Przesiane dane są kierowane do Agregatora, który jeśli zapytanie tego wymaga redukuje wyciągnięte dane odpowiednią funkcją (np. sumując je)</li>
+            <li class="fragment">Wątek obsługujący dane zadanie ustawia na nim wynik przekazując mu otrzymany rezultat</li>
+            <li class="fragment">Już samo zadanie po otrzymaniu wszystkich rezultatów opcjonalnie je redukuje jeśli funkcja agregacji na to pozwala i oznacza się jako ukończone.</li>
+            <li class="fragment">Ukończone zadania są zbierane a ich wyniki wysyłane do serwera.</li>
+        </ul>   
     </section>
     <section>
         <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/MapReduceNode.png">
