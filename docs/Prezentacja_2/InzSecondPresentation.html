@@ -170,12 +170,28 @@ element:
         <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/integral.png">
     </section>
     <section>
-
+        <p>ZAŁOŻENIA:</p>
+        <ol>
+            <li>Trunki są posortowane</li>
+            <li>Trunki zawierają ciągłe fragmenty szeregów</li>
+            <li>Agregacja całki jest wykonywana na dokładnie jednym szeregu</li>
+            <li>Oraz w jednym przedziale czasowym</li>
+        </ol>
     </section>
     <section>
-        <h3>DZIAŁANIE</h3>
+        <p>MAP:</p>
         <ol>
-            <li></li>
+            <li>Za pomocą B+Drzewa, mapowania trunków w głównej pamięci na GPU, dekompresji oraz filtracji otrzymujemy tablicę elementów danego szeregu oraz informacje o ich ułożeniu w trunkach</li>
+            <li>Dla każdego trunka obliczamy metodą trapezów całki dla elementów z tego trunka</li>
+            <li>Tworzymy odpowiedź jako struktury zawierające całkę pod kawałkiem szeregu zawartym w trunku oraz czas i wartość elementów na lewym i prawym brzegu trunka</li>
+        </ol>
+    </section>
+    <section>
+        <p>REDUCE:</p>
+        <ol>
+            <li>Wszystkie otrzymane tablice otrzymanych struktur łączymy w jedną tablicę</li>
+            <li>Sortujemy struktury względem "czasu lewego elementu"</li>
+            <li>Sumujemy wszystkie całki kawałków szeregów zawartych w strukturach oraz dodajemy do tego pola trapezów powstałych z par prawego czasu i wartości danej struktury z lewym czasem i wartością struktury następnej</li>
         </ol>
     </section>
 </section>
