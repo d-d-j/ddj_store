@@ -94,20 +94,43 @@ element:
     </section>
     <section>
         <h2>Struktura</h2>
+        <ul>
+            <li class="fragment"><strong>Node</strong>
+                <p>Główna klasa w węźle - zarządza kontrolerami oraz przyjmuje i przekazuje zlecenia przychodzące z sieci; Zbiera ukończone zadania i wysyła odpowiedzi do serwera</p>
+            </li>
+            <li class="fragment"><strong>StoreController</strong>
+                <p>Klasa odpowiedzialna za kontrolę pojedyńczej karty graficznej CUDA używanej przez system; Zarządza buforami oraz zleca zadania wątkom roboczym</p>
+            </li>
+            <li class="fragment"><strong>StoreBuffer</strong>
+                <p>Klasa odpowiedzialna za składowanie oraz lokalizację danych o konkretnej metryce na karcie GPU</p>
+            </li>
+            <li class="fragment"><strong>QueryCore</strong>
+                <p>Klasa odpowiedzialna za wykonywanie zapytań na bazie danych mających na celu wyciągnięcie oraz odpowiednie zagregowanie wyciągniętych danych z GPU</p>
+            </li>
+        </ul>
     </section>
     <section>
         <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/DataFlowNode.png">
     </section>
     <section>
-        <h3>Częsci systemu</h3>
-        
+        <h3>Wkładanie danych</h3>
+        <ul>
+            <li class="fragment">Elementy są przekazywane do StoreBuffera który zapełnia nimi bufor po stronie CPU. Rozmiar bufora jest konfigurowalny i ma duży wpływ na wydajność poszczególnych elementów systemu. Pełny bufor danych przekazywany dalej nazywamy Trunkiem.</li>
+            <li class="fragment">Gotowy trunk jest przetwarzany przez wątek, wkładający ostatni element do bufora. Następuje zamiana buforów aby inne wątki mogły w między czasie używać bufora.</li>
+            <li class="fragment">Trunk jest następnie kopiowany do bufora roboczego po stronie GPU. </li>
+            <li class="fragment">Trunk jest sortowany po czasie</li>
+            <li class="fragment">Roboczy bufor po stronie GPU jest odpowiednio kompresowany.</li>
+            <li class="fragment">Skompresowany bufor jest synchronicznie dołączany do końca zajętego miejsca w głównej pamięci bazy danych na GPU.</li>
+            <li class="fragment">Informacja o położeniu oraz minimalnym i maksymalnym czasie elementów w Trunku jest zapisywana w B+Drzewie przez obiekt BTreeMonitor należący do StoreBuffera</li>
+        </ul>
     </section>
     <section>
-        <h3>Wkładanie danych</h3>
         <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/GpuUploadStreams.png">
     </section>
     <section>
         <h3>Wyciąganie danych</h3>
+    </section>
+    <section>
         <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/MapReduceNode.png">
     </section>
 </section>
@@ -141,6 +164,19 @@ element:
     <section>   
         <h3>Testy i wyniki</h3> 
         
+    </section>
+    <section>
+        <h3>STORE - INSERT</h3>
+        <h4>Ilość wkładanych elementów na sekundę w zależności od rozmiaru bufora</h4>
+        <ul>
+            <li>Dane wkładane są bez pośrednictwa serwera głównego a więc bezpośrednio do głównej klasy wrzucającej dane</li>
+            <li>Pomiaru dokonano jako średnią z 10 wyników dla każdej próby dla miliona elementów</li>
+            <li>Maksymalną wartość zanotowano jako 197 000 elementów na sekundę dla bufora o rozmiarze 512 elementów</li>
+            <li>Przedstawione wyniki uzyskano przy dwóch równoległych wątkach wrzucających dane</li>
+        </ul>
+    </section>
+    <section>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/uploadSpeed.png">
     </section>
 </section>
 <section id="exampleUI">
