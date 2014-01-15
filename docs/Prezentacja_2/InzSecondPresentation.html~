@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>DDJ DB</title>
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/default.css" id="theme">
+    <link rel="stylesheet" type="text/css" href="css/zenburn.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+
+    <script type="text/javascript">window.initFuncs = [];</script>
+</head>
+
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+    <h1>Rozproszona baza szeregów czasowych</h1>
+    <h4>na węzłach obliczeniowych CUDA</h4>
+
+    <p class="small">Karol Dzitkowski</p>
+
+    <p class="small">Jakub Dutkowski</p>
+
+    <p class="small">Tomasz Janiszewski</p>
+</section>
+
+<section id="plan-prezentacji">
+    <h3>Plan prezentacji</h3>
+    <ol>
+        <li>Temat pracy inżynierskiej</li>
+        <li>Używane technologie</li>
+        <li>Api dla klientów</li>
+        <li>Struktura systemu</li>
+        <li>Styl "Map-Reduce" w projekcie</li>
+        <li>Wprowadzenie do języka GO</li>
+        <li>Wzorce języka GO</li>
+        <li>Struktura i implementacja serwera głównego</li>
+    </ol>
+</section>
+
+<section id="temat">
+    <section>
+        <h2>Temat pracy inżynierskiej</h2>
+
+        <ul style="list-style: none;">
+            <li class="fragment">Baza danych szeregów czasowych</li>
+
+            <li class="fragment">Przechowywanie danych w pamięci kart graficznych</li>
+
+            <li class="fragment">Rozproszona architektura</li>
+
+            <li class="fragment">Wykorzystanie wydajności kart graficznych</li>
+        </ul>
+    </section>
+    <section>
+        <h3>ZAŁOŻENIA PRACY</h3>
+
+        <ul style="list-style: none;">
+            <li> Rekordy składające się z czasu, wartości liczbowej (float) oraz metryki i tagu</li>
+            <li class="fragment"> Duże obciążenie systemu wpływającymi danymi</li>
+            <li class="fragment"> Realizowanie zapytań w czasie rzeczywistym</li>
+            <li class="fragment"> Flitrowanie oraz agregacja danych</li>
+            <li class="fragment"> Skalowalność systemu</li>
+        </ul>
+
+    </section>
+    <section>
+        <h3>CELE</h3>
+
+        <ul style="list-style: none;">
+            <li> Zapis dużych strumieni danych z wielu źródeł w czasie rzeczywistym</li>
+            <li class="fragment"> Prezentowanie wyników zapytań na bardzo dużym zbiorze danych</li>
+        </ul>
+    </section>
+</section>
+
+<section id="technologie">
+    <section>
+        <h2>Używane technologie</h2>
+        <ul style="list-style: none;">
+            <li> Język programowania C/C++</li>
+            <li> Język programowania GO</li>
+            <li> NVIDIA CUDA</li>
+            <li> BOOST</li>
+            <li> THRUST</li>
+        </ul>
+    </section>
+    <section>
+        <a href="http://www.nvidia.com/object/cuda_home_new.html">
+            <img style="float: right; border: none; background: rgba(255, 255, 255, 0);" id="nvidiaLogo"
+                 title="Visual Computing Leadership from NVIDIA" alt="Visual Computing Leadership from NVIDIA"
+                 src="http://www.nvidia.com/content/includes/redesign2010/images/redesign10/nvidia_logo.png">
+        </a>
+
+        <p>
+            <span style="color: #009900; font-weight:bold;">CUDA</span> to opracowana przez firmę NVIDIA równoległa
+            architektura obliczeniowa, która zapewnia radykalny wzrost wydajności obliczeń, dzięki wykorzystaniu mocy
+            układów GPU.
+        </p>
+
+        <p>
+            <a href="http://www.nvidia.com/object/cuda_home_new.html" target="_blank">www.nvidia.com/object/cuda_home_new</a>
+        </p>
+    </section>
+    <section>
+        <h3>ŚRODOWISKA I PROGRAMY</h3>
+
+        <ul style="list-style: none;">
+            <li> Nvidia Nsight Eclipse Edition - <a href="https://developer.nvidia.com/nsight-eclipse-edition">developer.nvidia.com/nsight</a>
+            </li>
+            <li> JetBRAINS IntelliJ IDEA - <a href="http://www.jetbrains.com/idea/">jetbrains.com/idea</a></li>
+            <li> IntelliJ golang.org support plugin <a href="http://plugins.jetbrains.com/plugin/5047">plugins.jetbrains.com/plugin/5047</a>
+            </li>
+            <li> Jenkins - <a href="http://jenkins-ci.org">jenkins-ci.org</a></li>
+            <li> Redmine - <a href="http://www.redmine.org">redmine.org</a></li>
+        </ul>
+    </section>
+</section>
+
+<section id="api">
+    <section>
+        <h2>Api dla klientów</h2>
+
+        <p>
+            API zrealizowane zgodnie z wzorcem <span style="color: #009900; font-weight:bold;">REST</span>.
+            Komunikacja klienta z serwerem głównym za pomącą żądań HTTP np.
+        <pre>http://ddjDB.mini.pw.edu.pl/data/</pre>
+        </p>
+
+        <p class="fragment">
+            Dane przesyłane w formacie JSON
+        </p>
+    </section>
+    <section>
+        <p>
+            <span style="color: #009900; font-weight:bold;">REST API</span> jest wykorzystywany przez wiele frameworków
+            aplikacji internetowych np. Ruby on Rails, Django czy Apache Sling.
+            Parametry wywołania danej usługi umieszczane są w ścieżce adresu URL.
+        </p>
+
+        <p>
+            </br>
+            Przykłady:
+        </p>
+
+        <p style="text-align: center;">
+        <pre>
+        <span style="text-align: center;">http://ddjDB.mini.pw.edu.pl/ddj_data/metric/5/agregated/summed</span>
+        <span></span>
+        <span style="text-align: center;">/ddj_data/all/filtered/timeFrom/22222/timeFrom/33333</span>
+        </pre>
+        </p>
+    </section>
+</section>
+
+<section id="struktura">
+    <section>
+        <h2>Struktura systemu</h2>
+
+        <ol>
+            <li> Serwera główny - Master</li>
+            <li> Program serwerów bazodanowych - Node</li>
+        </ol>
+        <p>
+            Komunikacja pomiędzy serwerem głównym a węzłami będzie odbywać się za pomocą TCP/IP po sieci wewnętrznej.
+        </p>
+
+        <p class="fragment">
+            Klienci komunikują się tylko z serwerem głównym, który wystawia im REST'owe API.
+        </p>
+    </section>
+    <section>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="images/SimpleDeployment.png">
+    </section>
+    <section>
+        <h3>MASTER (serwer główny) zajmuje się: </h3>
+        <ul style="list-style: none;">
+            <li class="fragment"> Odbieraniem zapytań od klientów, kolejkowaniem ich oraz zlecaniem ich wykonania przez węzły.</li>
+            <li class="fragment"> Zarządzaniem oraz monitorowaniem węzłów, sprawdzając ich parametry oraz stan.</li>
+            <li class="fragment"> Nadzorowaniem wykonania wszystkich zapytań oraz zbieraniem ich wyników.</li>
+            <li class="fragment"> Wykonywaniem agregacji otrzymanych wyników i przekazywaniem gotowych odpowiedzi do klienta.</li>
+        </ul>
+    </section>
+    <section>
+        <h3>NODE (węzeł) zajmuje się: </h3>
+        <ul style="list-style: none;">
+            <li class="fragment"> Składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA.</li>
+            <li class="fragment"> Wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU.</li>
+            <li class="fragment"> Pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać</li>
+            <li class="fragment"> Przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia</li>
+        </ul>
+    </section>
+    <section>
+        <h3>AGREGOWANIE I FILTRACJA DANYCH</h3>
+
+        <p>
+            Baza danych będzie zwracała dane z zadanych okresów czasu oraz dla wyspecyfikowanych kwalifikatorów
+            (metryka, tag).
+        </p>
+
+        <p class="fragment">
+            Dane zwracane będą jako lista rekordów zawierających tag, serię, czas i wartość, lub jako
+            lista wartości zagregowana przy pomocy predefiniowanych funkcji.
+        </p>
+    </section>
+    <section>
+        <h3>PRZEWIDYWANE FUNKCJE AGREGUJĄCE</h3>
+        <ul style="list-style: none;">
+            <li> suma</li>
+            <li> średnia</li>
+            <li> max i min</li>
+            <li> odchylenie standardowe</li>
+            <li> wariancja</li>
+            <li> całka</li>
+            <li> różniczka</li>
+            <li> histogram</li>
+            <li> liczba rekordów o wartościach z przedziału</li>
+        </ul>
+    </section>
+    <section>
+        <h3>PRACA W CZASIE RZECZYWISTYM</h3>
+
+        <ul style="list-style: none;">
+            <li>Operacje na danych będą wykonywane w czasie rzeczywistym - bez preagregacji</li>
+            <li class="fragment">Wszystkie zadania będą wykonywane na danych aktualnie znajdujących się na GPU</li>
+            <li class="fragment">Istnieje możliwość, że dane zostaną pominięte w zapytaniu, jeżeli nie zdążą być
+                zapisane na karcie
+            </li>
+        </ul>
+    </section>
+    <section>
+        <h3>PRACA BADAWCZA</h3>
+
+        <p>
+            Ponieważ jest to praca “badawcza” program będzie w łatwy sposób konfigurowalny i dający możliwość badania
+            uzyskanej przepustowości zarówno ze względu na ilość przepływających zadań jak i zapytań. Będziemy badać
+            wydajność takiego rozwiązania bazy danych.
+        </p>
+    </section>
+</section>
+
+<section id="map-reduce">
+    <section>
+        <h2>"Map-Reduce"</h2>
+
+        <p>
+            Zaletą systemu będzie implementacja modelu programowania Map-Reduce, jako że jest to rozproszona baza
+            danych. Systemy typu "map-reduce" są coraz częściej stosowane w zastosowaniach bazodanowych i charakteryzują
+            się ogromną skalowalnością.
+        </p>
+    </section>
+    <section>
+        <h3>SCHEMAT MAP-REDUCE W PROJEKCIE</h3>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="MapReduce" title="MapReduce Diagram"
+             alt="MapReduce Diagram" src="images/MapReduce.png">
+    </section>
+    <section>
+        <h3>DZIAŁANIE</h3>
+
+        <ol>
+            <li> Węzły wyszukują w swojej bazie odpowiednie fragmenty danych i wykonują na nich operację Map tj.
+                filtrują dane pod kątem pewnych kryteriów.
+            </li>
+            <li> Jeśli to możliwe węzły wykonują dwie operacje Compose (Redukcja na poziomie węzłów)</li>
+            <li> Pierwsza operacja Compose odbywa się jako agregacja danych z jednej karty GPU (wykonywana na tej karcie
+                z użyciem CUDA)
+            </li>
+            <li> Druga operacja Compose wykonuje się na węźle jako agregacja wyników uzyskanych ze wszystkich
+                posiadanych kart
+            </li>
+            <li> Ostatnim etapem jest wykonanie operacji Reduce na wynikach uzyskanych ze wszystkich węzłów</li>
+        </ol>
+    </section>
+</section>
+
+<section id="GO-wprowadzenie">
+    <section>
+        <h2>Wprowadzenie do języka GO</h2>
+        <img src="http://1-ps.googleusercontent.com/x/s.golang-org.appspot.com/talks.golang.org/2012/simple/xgopher.jpg.pagespeed.ic.rcVvkAdRfG.jpg">
+    </section>
+    <section>
+        <h3>GO - CECHY</h3>
+
+        <p>
+        <ul>
+            <li> Młody i nowoczesny język programowania - Marzec 2012</li>
+            <li> Obiektowy (ale nie tak zwyczajnie)</li>
+            <li> Statycznie typowany</li>
+            <li> Kompilowany do asemblera</li>
+            <li> "Odśmiecany" (Garbage Collected)</li>
+            <li> Wielowątkowość i synchronizacja ma wbudowana w język</li>
+            <li> Kompozycja poprzez interfejsy</li>
+            <li> Open Source na licencji BSD</li>
+        </ul>
+        </p>
+    </section>
+    <section>
+        <h3>HELLO WORLD</h3>
+        <p>
+            </br>
+        </p>
+        <div class="code playground" contentEditable="true" spellcheck="false">
+            <pre><span>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello World!")
+}</span></pre>
+        </div>
+    </section>
+    <section>
+        <h3>SKŁADNIA</h3>
+        <span style="text-align: left;">Deklaracja zmiennych:</span>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="false" contenteditable="false" class="go">
+var name int32 = 10 // var nazwa typ = wartość
+x := 5.5 // deklaracja x z wartością 5.5 i odpowiednim typem
+y,s,err := foo(x) // deklaracja y,s,err z wartościami zwracanymi przez foo(x)
+            </code>
+        </pre>
+        <span style="text-align: left;">Funkcje:</span>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="false" contenteditable="false" class="go">
+import "fmt" // zamiast #include - powoduje dołączenie paczki o nazwie fmt
+func foo(x,y int32, path string, sth interface{}) (int, float, error) {...}
+return x + y, x-y // zwracanie wielu zmiennych
+fmt.Println(add(42, 13)) // wywołanie funkcji Println z pakietu fmt
+            </code>
+        </pre>
+    </section>
+    <section>
+        <span style="text-align: left;">Przykład:</span>
+        <div class="code playground" contentEditable="true" spellcheck="false" data-trim="false">
+            <pre data-trim="false">
+                <span>
+package main
+
+import "fmt"
+
+func addAndsub(x int, y int) (int, int) {
+    return x + y, x-y
+}
+func main() {
+
+    fmt.Println(addAndsub(40, 10))
+}
+                </span>
+            </pre>
+        </div>
+    </section>
+    <section>
+        <div style="text-align: left;">
+            <span style="text-align: left;">Struktury i Interfejsy:</span>
+              <pre style="width: 100%; margin: 0px; box-shadow: none;">
+                <code data-trim="" contenteditable="false" class="go">
+// Tworzenie struktury o dwóch polach publicznych typu float 64-bit
+type Vertex struct {
+    X, Y float64
+}
+// Tworzenie interfejsu z funkcją Abs() zwracającą float64
+type Abser interface {
+    Abs() float64
+}
+// Jeśli Vertex posiada funkcję wymaganą przez interfejs
+// to automatycznie go implementuje (Vertex implementuje Abser)
+func (v *Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+                </code>
+              </pre>
+            <span style="text-align: left;">Przykład:</span>
+            <div class="code playground" contentEditable="true" spellcheck="false" data-trim="false">
+                <pre style="display: none">
+                    <span>
+                        package main
+                        import "fmt"
+                        import "math"
+                        type Vertex struct {
+                            X, Y float64
+                        }
+                        type Abser interface {
+                            Abs() float64
+                        }
+                        func (v *Vertex) Abs() float64 {
+                            return math.Sqrt(v.X*v.X + v.Y*v.Y)
+                        }
+                    </span>
+                </pre>
+                <pre data-trim="false"><span>func main() {
+    var a Abser
+    v := Vertex{3, 4}
+    a = &v
+    fmt.Println(a.Abs())
+}</span></pre>
+            </div>
+        </div>
+    </section>
+</section>
+
+<section id="GO-wzorce">
+<section>   
+    <h3>NUDNY PRZYKŁAD</h3> 
+    <div class="code playground" contenteditable="true" spellcheck="false">
+        <pre style="display: none">
+            <span>
+                package main
+
+                import (
+                  "fmt"
+                  "math/rand"
+                  "time"
+                )
+            </span>
+        </pre>
+        <pre><span>func foo(msg string) &lt;-chan string {
+    c := make(chan string)
+    <b>go func() {</b>
+    for i := 0; ; i++ {
+        c &lt;- fmt.Sprintf("%s %d", msg, i)
+        time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+        }
+    }()
+    return c
+}
+
+func main() {
+    <b>c := foo("nudy!")</b>
+    for i := 0; i &lt; 5; i++ {
+        fmt.Printf("Ale %s\n", &lt;-c)
+    }
+    fmt.Println("To jest nudne! Koniec!")
+}</span></pre>
+    </div>
+</section>
+<section>
+    <h3>I/O TIMEOUT</h3>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none">
+                <span>
+                    package main
+
+                    import (
+                      "fmt"
+                      "math/rand"
+                      "time"
+                    )
+                </span>
+            </pre>
+            <pre><span>func main() {
+    c := foo("A")   // zwraca kanał na który wypisuje "A" co losową liczbę ms
+    for {
+        <b>select {</b>
+        case s := &lt;-c:
+            fmt.Println(s)
+        <b>case &lt;-time.After(1 * time.Second):</b>
+            fmt.Println("You're too slow.")
+            return
+        }
+    }
+}</span></pre>
+            <pre style="display: none">
+                <span>
+                    func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+                      c := make(chan string)
+                      go func() { // We launch the goroutine from inside the function. // HL
+                        for i := 0; ; i++ {
+                          c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                          time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                        }
+                      }()
+                      return c // Return the channel to the caller. // HL
+                    }
+                </span>
+            </pre>
+    </div>
+</section>
+<section>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+        <pre style="display: none">
+            <span>
+                package main
+
+                import (
+                  "fmt"
+                  "math/rand"
+                  "time"
+                )
+            </span>
+        </pre>
+        <pre>
+<span>func fanIn(input1, input2 &lt;-chan string) &lt;-chan string {
+    c := make(chan string)
+    go func() {
+        for {
+            select {
+            case s := &lt;-input1:
+                c &lt;- s
+            case s := &lt;-input2:
+                c &lt;- s
+            }
+        }
+    }()
+    return c
+}
+func main() {
+    <b>c := fanIn(foo("A"), foo("B"))</b>
+    <b>timeout := time.After(5 * time.Second)</b>
+    for {
+        select {
+        case s := &lt;-c:
+            fmt.Println(s)
+        <b>case &lt;-timeout:</b>
+            fmt.Println("You talk too much.")
+            return    
+        }
+    }
+}</span></pre>
+        <pre style="display: none">
+            <span>
+                func foo(msg string) &lt;-chan string { // Returns receive-only channel of strings. // HL
+                  c := make(chan string)
+                  go func() { // We launch the goroutine from inside the function. // HL
+                    for i := 0; ; i++ {
+                      c &lt;- fmt.Sprintf("%s: %d", msg, i)
+                      time.Sleep(time.Duration(rand.Intn(1500)) * time.Millisecond)
+                    }
+                  }()
+                  return c // Return the channel to the caller. // HL
+                }
+            </span>
+        </pre>
+    </div>
+</section>
+<section>
+    <h3>KANAŁ W KANALE</h3>
+    <div class="code playground" contenteditable="true" spellcheck="false">
+            <pre style="display: none">
+                <span>
+                    package main
+
+                    import "fmt"
+                    import "time"
+                </span>
+            </pre>
+<pre><span>func generator(a chan chan int) {
+    i := 0
+    for {
+        select {
+        case get := &lt;-a:
+            get &lt;- i
+            i++
+        }
+    }
+}
+func worker(name string, a chan chan int) {
+    <b>b := make(chan int)</b>
+    for i := 0; i &lt; 10; i++ {
+        <b>a &lt;- b</b>
+        fmt.Println(name, "dostałem", &lt;-b)
+        time.Sleep(time.Second)
+    }
+}
+func main() {
+    c := make(chan chan int)
+    go generator(c)
+    go worker("Jeden", c)
+    go worker("Drugi", c)
+    time.Sleep(10 * time.Second)
+}</span></pre>
+    </div>
+</section>
+</section>
+
+
+<section id="master">
+    <section>
+    <h2>Struktura i implementacja serwera głównego</h2>
+    <ul style="list-style: none;">
+        <li class="fragment">W całości napisany w GO</li>
+        <li class="fragment">Stawiający na wielowątkowość</li>
+    </ul>
+    </section>
+    <section>
+        <img style="border: none; background: rgba(255, 255, 255, 0.8);" id="MasterSimpleDataFlow" title="MasterSimpleDataFlow"
+             alt="MasterSimpleDataFlow Diagram" src="images/MasterSimpleDataFlow.png">
+    </section>
+    <section>
+        <h3>Node Manager</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+var NodeManager = NewManager()  // globalna zmienna (obiekt node managera)
+
+type GetNodeRequest struct {
+    NodeId      int32
+    BackChan    chan<- *Node
+}
+
+type Manager struct {
+    nodes       map[int32]*Node
+    AddChan     chan *Node
+    GetChan     chan GetNodeRequest
+    DelChan     chan int32
+    QuitChan    chan bool
+}
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h3>Node Manager - Manage</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+func (m *Manager) Manage() {
+    log.Info("Node manager started managing")
+    for {
+        select {
+        case get := <-m.GetChan:    // GetNodeRequest
+            if _, ok := m.nodes[get.NodeId]; ok {
+                get.BackChan <- m.nodes[get.NodeId]
+            } else {
+                get.BackChan <- nil
+            }
+        case add := <-m.AddChan:
+            m.nodes[add.Id] = add
+        case del := <-m.DelChan:
+            delete(m.nodes, del)
+        case <-m.QuitChan:
+            log.Info("Node manager stopped managing")
+            return
+        }
+    }
+}
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h3>Worker - Get Node</h3>
+        <pre style="width: 100%; margin: 0px; box-shadow: none;">
+            <code data-trim="" contenteditable="false" class="go">
+    // get node
+    var insertNode *node.Node
+    nodeChan := make(chan *node.Node)
+    nodeReq := node.GetNodeRequest{nodeId, nodeChan}
+    node.NodeManager.GetChan <- nodeReq
+    insertNode = <- nodeChan
+    return insertNode
+            </code>
+        </pre>
+    </section>
+    <section>
+    <h3>Balancer</h3>
+    <pre style="width: 100%; margin: 0px; box-shadow: none;">
+        <code data-trim="" contenteditable="false" class="go">
+type Balancer struct {
+  pool    Pool
+  done    chan *Worker
+}
+
+func (b *Balancer) Balance(work &lt;-chan restApi.RestRequest) {
+    log.Info("Task manager balancer started")
+    for {
+        select {
+        case req := &lt;-work:
+            b.dispatch(req)
+        case w := &lt;-b.done:
+            b.completed(w)
+        }
+    }
+}</code></pre>
+</section>
+<section>
+    <h3>Balancer - dispatch and completed</h3>
+    <pre style="width: 100%; margin: 0px; box-shadow: none;">
+        <code data-trim="" contenteditable="false" class="go">
+func (b *Balancer) dispatch(req restApi.RestRequest) {
+    w := heap.Pop(&amp;(b.pool)).(*Worker)
+    log.Fine("Dispach request to ", w)
+    w.reqChan &lt;- req
+    w.pending++
+    heap.Push(&amp;(b.pool), w)
+}
+
+func (b *Balancer) completed(w *Worker) {
+    w.pending--
+    heap.Remove(&amp;(b.pool), w.index)
+    heap.Push(&amp;(b.pool), w)
+}
+        </code>
+    </pre>
+</section>
+</section>
+<section>
+    <h1>DZIĘKUJEMY</h1>
+</section>
+</div>
+</div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://golang.org/lib/godoc/godocs.js"></script>
+<script src="js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+<script type="text/javascript" src="js/highlight.js"></script>
+<script type="text/javascript" src="js/play.js"></script>
+<script>
+    Reveal.initialize({});
+    hljs.initHighlightingOnLoad();
+</script>
+</body>
+</html>
