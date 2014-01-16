@@ -119,7 +119,6 @@ namespace query {
 		storeElement* trunk;
 		BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
 		{
-
 			trunkSize = c.DecompressTrunk((char*)data+dli.first, dli.length(), &trunk);
 			decompressedTrunks.push_back({trunk, trunkSize});
 			allDataSize += trunkSize;

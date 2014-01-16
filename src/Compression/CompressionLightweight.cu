@@ -1,4 +1,10 @@
 #include "CompressionLightweight.cuh"
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include <thrust/device_ptr.h>
+#include <thrust/reduce.h>
+#include <thrust/transform_reduce.h>
+#include <thrust/functional.h>
 
 union converter {
 	int32_t toInt, fromInt;
@@ -98,4 +104,124 @@ size_t DecompressLightweight(unsigned char* data, size_t size, storeElement** re
 
 	(*result) = decompressionOutput_device;
 	return elemCount * sizeof(storeElement);
+}
+
+struct trunkMinMax
+{
+	int32_t tag_min;
+	int32_t tag_max;
+	int32_t metric_min;
+	int32_t metric_max;
+	int64_t time_min;
+	int64_t time_max;
+
+	void initialize()
+	{
+		tag_min = std::numeric_limits<int32_t>::max();
+		tag_max = std::numeric_limits<int32_t>::min();
+		metric_min = std::numeric_limits<int32_t>::max();
+		metric_max = std::numeric_limits<int32_t>::min();
+		time_min = std::numeric_limits<int64_t>::max();
+		time_max = std::numeric_limits<int64_t>::min();
+	}
+};
+
+template <typename T>
+struct trunkMinMax_unary_op
+{
+	__host__ __device__
+	trunkMinMax operator()(const T& x) const
+	{
+		trunkMinMax result;
+
+		result.tag_min = x.tag;
+		result.tag_max = x.tag;
+
+		result.metric_min = x.metric;
+		result.metric_max = x.metric;
+
+		result.time_min = x.time;
+		result.time_max = x.time;
+
+		return result;
+	}
+};
+
+struct trunkMinMax_binary_op : public thrust::binary_function<const trunkMinMax&, const trunkMinMax&, trunkMinMax>
+{
+    __host__ __device__
+    trunkMinMax operator()(const trunkMinMax& x, const trunkMinMax& y) const
+    {
+    	trunkMinMax result;
+
+    	result.tag_min = thrust::min(x.tag_min, y.tag_min);
+		result.tag_max = thrust::max(x.tag_max, y.tag_max);
+
+		result.metric_min = thrust::min(x.metric_min, y.metric_min);
+    	result.metric_max = thrust::max(x.metric_max, y.metric_max);
+
+    	result.time_min = thrust::min(x.time_min, y.time_min);
+		result.time_max = thrust::max(x.time_max, y.time_max);
+
+		return result;
+    }
+};
+
+unsigned int EasyFindLog2(int32_t v)
+{
+	unsigned int r = 0;
+
+	while (v >>= 1)
+	{
+	  r++;
+	}
+
+	return r;
+}
+
+unsigned int FastFindLog2(int32_t v)
+{
+	const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+	const unsigned int S[] = {1, 2, 4, 8, 16};
+	int i;
+	register unsigned int r = 0;
+
+	for (i = 4; i >= 0; i--)
+	{
+	  if (v & b[i])
+	  {
+	    v >>= S[i];
+	    r |= S[i];
+	  }
+	}
+
+	return r;
+}
+
+trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount)
+{
+	// Produce min and max of trunk data
+	thrust::device_ptr<storeElement> elem_ptr(elements);
+	trunkMinMax_unary_op<storeElement> unary_op;
+	trunkMinMax_binary_op binary_op;
+	trunkMinMax init;
+	init.initialize();
+	trunkMinMax minMax = thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op);
+
+	// Calculate bytes needed for each storeElement field
+	int tag_bytes = (EasyFindLog2(minMax.tag_max - minMax.tag_min) + 7) / 8;
+	int metric_bytes = (EasyFindLog2(minMax.metric_max - minMax.metric_min) + 7) / 8;
+	int64_t timeDifference = minMax.time_max - minMax.time_min;
+	if(timeDifference > std::numeric_limits<int32_t>::max())
+		throw std::runtime_error("time difference in trunk is too big!");
+	int time_bytes = (EasyFindLog2((int32_t)(timeDifference)) + 7) / 8;
+
+	// Fill trunk compress info
+	trunkCompressInfo info;
+	info.tag_min = minMax.tag_min;
+	info.metric_min = minMax.metric_min;
+	info.time_min = minMax.time_min;
+	info.bytes = ((tag_bytes & 0x000000FF) << 24) | ((metric_bytes & 0x000000FF) << 16) | (time_bytes & 0x0000FFFF);
+
+	return info;
 }

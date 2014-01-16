@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "../Compression/Compression.h"
+#include "../Compression/CompressionLightweight.cuh"
 #include "../Store/StoreElement.cuh"
 #include "../Cuda/CudaCommons.h"
 #include "../Cuda/CudaIncludes.h"

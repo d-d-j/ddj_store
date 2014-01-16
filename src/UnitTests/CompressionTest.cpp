@@ -45,5 +45,38 @@ namespace store{
 		CUDA_CHECK_RETURN( cudaFree(decompressedData) );
 	}
 
+	TEST_F(CompressionTest, AnalizeTrunkData_LinearDataTrunk)
+	{
+		//PREPARE
+		const int N = 1000;
+		int min_time = 537;
+		int min_tag = 123;
+		int min_metric = 7;
+		storeElement host_data[N];
+		for(int i=0; i<N; i++)
+		{
+			host_data[i].time = min_time + i;
+			host_data[i].tag = min_tag + (i%5);
+			host_data[i].metric = min_metric + (i%3);
+			host_data[i].value = 3.0f * i;
+		}
+		storeElement* device_data;
+		CUDA_CHECK_RETURN( cudaMalloc(&device_data, sizeof(storeElement)*N) );
+		CUDA_CHECK_RETURN( cudaMemcpy(device_data, host_data, sizeof(storeElement)*N, cudaMemcpyHostToDevice) );
+
+		//TEST
+		trunkCompressInfo info = AnalizeTrunkData(device_data, N);
+
+		//CHECK
+		EXPECT_EQ(min_tag, info.tag_min);
+		EXPECT_EQ(min_metric, info.metric_min);
+		EXPECT_EQ(min_time, info.time_min);
+		EXPECT_EQ(2, info.bytes & 0x0000FFFF);
+		EXPECT_EQ(1, (info.bytes & 0xFF000000) >> 24);
+		EXPECT_EQ(1, (info.bytes & 0x00FF0000) >> 16);
+
+		//CLEAN
+		CUDA_CHECK_RETURN( cudaFree(device_data) );
+	}
 }
 }
