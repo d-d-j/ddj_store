@@ -32,6 +32,7 @@
         <li>Budowa węzła obliczeniowego</li>
         <li>Obliczenia na przykładzie całki</li>
         <li>Proces developerski</li>
+        <li>Główne wyzwania podczas pracy</li>
         <li>Przykładowy interfejs użytkownika</li>
     </ol>
 </section>
@@ -46,22 +47,27 @@
         </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/SimpleDeployment.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/SimpleDeployment.png">
     </section>
 </section>
 <section id="api">
     <section>
         <h2>Jakie api udało nam się stworzyć dotychczas</h2>
+
         <p class="fragment">method: GET</p>
-    	<ul>
-    		<li class="fragment">/data/metric/{metrics}/tag/{tags}/time/{times}/aggregation/{aggr}</li>
-    		<li class="fragment" style="color: lightblue;">/data/metric/{metrics}/tag/{tags}/time/{times}/aggregation/
-                histogramByValue/from/{from}/to/{to}/buckets/{buckets}</li>
+        <ul>
+            <li class="fragment">/data/metric/{metrics}/tag/{tags}/time/{times}/aggregation/{aggr}</li>
+            <li class="fragment" style="color: lightblue;">/data/metric/{metrics}/tag/{tags}/time/{times}/aggregation/
+                histogramByValue/from/{from}/to/{to}/buckets/{buckets}
+            </li>
             <li class="fragment">/data/metric/{metrics}/tag/{tags}/time/{times}/aggregation/
-                histogramByTime/from/{from}/to/{to}/buckets/{buckets}</li>
+                histogramByTime/from/{from}/to/{to}/buckets/{buckets}
+            </li>
             <li class="fragment" style="color: lightblue;">/data/metric/{metrics}/tag/{tags}/time/from/{from}/to/{to}/
-                aggregation/series/sum/samples/{samples}</li>
-    	</ul>
+                aggregation/series/sum/samples/{samples}
+            </li>
+        </ul>
         <p class="fragment">method: POST</p>
         <ul>
             <li class="fragment">/data/</li>
@@ -72,13 +78,13 @@
         <h2>Elementy trzymane w bazie w postaci JSON</h2>
         <pre style="width: 100%; margin: 0px; box-shadow: none;">
             <code data-trim="" contenteditable="false" class="go">
-element:
-{
-"tag":1,            // int32
-"metric":2,         // int32
-"time":1383501407,  // int64
-"value":0.5         // float32
-}
+                element:
+                {
+                "tag":1, // int32
+                "metric":2, // int32
+                "time":1383501407, // int64
+                "value":0.5 // float32
+                }
             </code>
         </pre>
     </section>
@@ -86,10 +92,13 @@ element:
 <section id="strukturaStore">
     <section>
         <h2>Węzeł obliczeniowy - STORE</h2>
+
         <h3>Zajmuje się: </h3>
         <ul style="list-style: none;">
             <li class="fragment"> Składowaniem otrzymanych danych na odpowiednich kartach graficznych NVIDIA.</li>
-            <li class="fragment"> Wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych kartach GPU.</li>
+            <li class="fragment"> Wykonywaniem zleconych przez serwer główny zadań na danych zawartych w posiadanych
+                kartach GPU.
+            </li>
             <li class="fragment"> Pre-agregacją wyników zadań otrzymanych z wielu kart GPU, które może posiadać</li>
             <li class="fragment"> Przekazywaniem swojego stanu do serwera głównego i utrzymywaniem z nim połączenia</li>
         </ul>
@@ -98,79 +107,117 @@ element:
         <h2>Struktura</h2>
         <ul>
             <li class="fragment"><strong>Node</strong>
-                <p>Główna klasa w węźle - zarządza kontrolerami oraz przyjmuje i przekazuje zlecenia przychodzące z sieci; Zbiera ukończone zadania i wysyła odpowiedzi do serwera</p>
+
+                <p>Główna klasa w węźle - zarządza kontrolerami oraz przyjmuje i przekazuje zlecenia przychodzące z
+                    sieci; Zbiera ukończone zadania i wysyła odpowiedzi do serwera</p>
             </li>
             <li class="fragment"><strong>StoreController</strong>
-                <p>Klasa odpowiedzialna za kontrolę pojedyńczej karty graficznej CUDA używanej przez system; Zarządza buforami oraz zleca zadania wątkom roboczym</p>
+
+                <p>Klasa odpowiedzialna za kontrolę pojedyńczej karty graficznej CUDA używanej przez system; Zarządza
+                    buforami oraz zleca zadania wątkom roboczym</p>
             </li>
             <li class="fragment"><strong>StoreBuffer</strong>
+
                 <p>Klasa odpowiedzialna za składowanie oraz lokalizację danych o konkretnej metryce na karcie GPU</p>
             </li>
             <li class="fragment"><strong>QueryCore</strong>
-                <p>Klasa odpowiedzialna za wykonywanie zapytań na bazie danych mających na celu wyciągnięcie oraz odpowiednie zagregowanie wyciągniętych danych z GPU</p>
+
+                <p>Klasa odpowiedzialna za wykonywanie zapytań na bazie danych mających na celu wyciągnięcie oraz
+                    odpowiednie zagregowanie wyciągniętych danych z GPU</p>
             </li>
         </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/DataFlowNode.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/DataFlowNode.png">
     </section>
     <section>
         <h3>Wkładanie danych</h3>
         <ul>
-            <li class="fragment">Elementy są przekazywane do StoreBuffera który zapełnia nimi bufor po stronie CPU. Rozmiar bufora jest konfigurowalny i ma duży wpływ na wydajność poszczególnych elementów systemu. Pełny bufor danych przekazywany dalej nazywamy Trunkiem.</li>
-            <li class="fragment">Gotowy trunk jest przetwarzany przez wątek, wkładający ostatni element do bufora. Następuje zamiana buforów aby inne wątki mogły w między czasie używać bufora.</li>
-            <li class="fragment">Trunk jest następnie kopiowany do bufora roboczego po stronie GPU. </li>
+            <li class="fragment">Elementy są przekazywane do StoreBuffera który zapełnia nimi bufor po stronie CPU.
+                Rozmiar bufora jest konfigurowalny i ma duży wpływ na wydajność poszczególnych elementów systemu. Pełny
+                bufor danych przekazywany dalej nazywamy Trunkiem.
+            </li>
+            <li class="fragment">Gotowy trunk jest przetwarzany przez wątek, wkładający ostatni element do bufora.
+                Następuje zamiana buforów aby inne wątki mogły w między czasie używać bufora.
+            </li>
+            <li class="fragment">Trunk jest następnie kopiowany do bufora roboczego po stronie GPU.</li>
         </ul>
     </section>
     <section>
         <ul>
             <li class="fragment">Trunk jest sortowany po czasie</li>
             <li class="fragment">Roboczy bufor po stronie GPU jest odpowiednio kompresowany.</li>
-            <li class="fragment">Skompresowany bufor jest synchronicznie dołączany do końca zajętego miejsca w głównej pamięci bazy danych na GPU.</li>
-            <li class="fragment">Informacja o położeniu oraz minimalnym i maksymalnym czasie elementów w Trunku jest zapisywana w B+Drzewie przez obiekt BTreeMonitor należący do StoreBuffera</li>
+            <li class="fragment">Skompresowany bufor jest synchronicznie dołączany do końca zajętego miejsca w głównej
+                pamięci bazy danych na GPU.
+            </li>
+            <li class="fragment">Informacja o położeniu oraz minimalnym i maksymalnym czasie elementów w Trunku jest
+                zapisywana w B+Drzewie przez obiekt BTreeMonitor należący do StoreBuffera
+            </li>
         </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/GpuUploadStreams.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/GpuUploadStreams.png">
     </section>
     <section>
         <h3>Wyciąganie danych</h3>
         <ul>
-            <li class="fragment">Zadanie jest przekazywane do odpowiedniego wątku wykonującego funkcję typu select; Który tworzy obiekt zapytania na podstawie otrzymanych z sieci danych. </li>
-            <li class="fragment">Następnie wątek wykonuje funkcję "Execute Query" klasy Query Core, przekazując do niej obiekt zapytania wraz z pobranymi ze StoreBuffera informacjami o lokalizacji odpowiednich trunków w bazie danych</li>
-            <li class="fragment">Query Core początkowo "mapuje" trunki zgodnie z otrzymanymi lokalizacjami, a następnie je rozkompresowuje używając do tego utworzonego obiektu Compressora</li>
-            <li class="fragment">Rozkompresowane dane jako tablica elementów są następnie filtrowane pod kątem tagów, oraz czasu.</li>
+            <li class="fragment">Zadanie jest przekazywane do odpowiedniego wątku wykonującego funkcję typu select;
+                Który tworzy obiekt zapytania na podstawie otrzymanych z sieci danych.
+            </li>
+            <li class="fragment">Następnie wątek wykonuje funkcję "Execute Query" klasy Query Core, przekazując do niej
+                obiekt zapytania wraz z pobranymi ze StoreBuffera informacjami o lokalizacji odpowiednich trunków w
+                bazie danych
+            </li>
+            <li class="fragment">Query Core początkowo "mapuje" trunki zgodnie z otrzymanymi lokalizacjami, a następnie
+                je rozkompresowuje używając do tego utworzonego obiektu Compressora
+            </li>
+            <li class="fragment">Rozkompresowane dane jako tablica elementów są następnie filtrowane pod kątem tagów,
+                oraz czasu.
+            </li>
         </ul>
     </section>
     <section>
         <ul>
-            <li class="fragment">Przesiane dane są kierowane do Agregatora, który jeśli zapytanie tego wymaga redukuje wyciągnięte dane odpowiednią funkcją (np. sumując je)</li>
-            <li class="fragment">Wątek obsługujący dane zadanie ustawia na nim wynik przekazując mu otrzymany rezultat</li>
-            <li class="fragment">Już samo zadanie po otrzymaniu wszystkich rezultatów opcjonalnie je redukuje jeśli funkcja agregacji na to pozwala i oznacza się jako ukończone.</li>
+            <li class="fragment">Przesiane dane są kierowane do Agregatora, który jeśli zapytanie tego wymaga redukuje
+                wyciągnięte dane odpowiednią funkcją (np. sumując je)
+            </li>
+            <li class="fragment">Wątek obsługujący dane zadanie ustawia na nim wynik przekazując mu otrzymany rezultat
+            </li>
+            <li class="fragment">Już samo zadanie po otrzymaniu wszystkich rezultatów opcjonalnie je redukuje jeśli
+                funkcja agregacji na to pozwala i oznacza się jako ukończone.
+            </li>
             <li class="fragment">Ukończone zadania są zbierane a ich wyniki wysyłane do serwera.</li>
         </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/MapReduceNode.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/MapReduceNode.png">
     </section>
     <section>
         <h4>Ilość wkładanych elementów na sekundę w zależności od rozmiaru bufora</h4>
         <ul>
-            <li>Dane wkładane są bez pośrednictwa serwera głównego a więc bezpośrednio do głównej klasy wrzucającej dane</li>
+            <li>Dane wkładane są bez pośrednictwa serwera głównego a więc bezpośrednio do głównej klasy wrzucającej
+                dane
+            </li>
             <li>Pomiaru dokonano jako średnią z 10 wyników dla każdej próby dla miliona elementów</li>
-            <li>Maksymalną wartość zanotowano jako 197 000 elementów na sekundę dla bufora o rozmiarze 512 elementów</li>
+            <li>Maksymalną wartość zanotowano jako 197 000 elementów na sekundę dla bufora o rozmiarze 512 elementów
+            </li>
             <li>Przedstawione wyniki uzyskano przy dwóch równoległych wątkach wrzucających dane</li>
         </ul>
     </section>
     <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/uploadSpeed.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/uploadSpeed.png">
     </section>
 </section>
 
 <section id="agregacja">
     <section>
-        <h2>Aprzykład realizacji agregacji na przykładzie całki</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/integral.png">
+        <h2>Realizacja agregacji na przykładzie całki</h2>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/integral.png">
     </section>
     <section>
         <p>ZAŁOŻENIA:</p>
@@ -184,9 +231,13 @@ element:
     <section>
         <p>MAP:</p>
         <ol>
-            <li>Za pomocą B+Drzewa, mapowania trunków w głównej pamięci na GPU, dekompresji oraz filtracji otrzymujemy tablicę elementów danego szeregu oraz informacje o ich ułożeniu w trunkach</li>
+            <li>Za pomocą B+Drzewa, mapowania trunków w głównej pamięci na GPU, dekompresji oraz filtracji otrzymujemy
+                tablicę elementów danego szeregu oraz informacje o ich ułożeniu w trunkach
+            </li>
             <li>Dla każdego trunka obliczamy metodą trapezów całki dla elementów z tego trunka</li>
-            <li>Tworzymy odpowiedź jako struktury zawierające całkę pod kawałkiem szeregu zawartym w trunku oraz czas i wartość elementów na lewym i prawym brzegu trunka</li>
+            <li>Tworzymy odpowiedź jako struktury zawierające całkę pod kawałkiem szeregu zawartym w trunku oraz czas i
+                wartość elementów na lewym i prawym brzegu trunka
+            </li>
         </ol>
     </section>
     <section>
@@ -194,7 +245,9 @@ element:
         <ol>
             <li>Wszystkie otrzymane tablice otrzymanych struktur łączymy w jedną tablicę</li>
             <li>Sortujemy struktury względem "czasu lewego elementu"</li>
-            <li>Sumujemy wszystkie całki kawałków szeregów zawartych w strukturach oraz dodajemy do tego pola trapezów powstałych z par prawego czasu i wartości danej struktury z lewym czasem i wartością struktury następnej</li>
+            <li>Sumujemy wszystkie całki kawałków szeregów zawartych w strukturach oraz dodajemy do tego pola trapezów
+                powstałych z par prawego czasu i wartości danej struktury z lewym czasem i wartością struktury następnej
+            </li>
         </ol>
     </section>
 </section>
@@ -202,11 +255,12 @@ element:
 <section id="development">
     <section>
         <h2>Jak pracowaliśmy</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram" alt="Deployment Diagram" src="img/work.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/work.png">
     </section>
     <section>
         <p>Hipchat</p>
-                <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/hipchat.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/hipchat.png">
     </section>
     <section>
         <p>Jenkins</p>
@@ -226,19 +280,19 @@ element:
     </section>
     <section>
         <p>Git</p>
-         <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/messy_repo.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/messy_repo.png">
     </section>
     <section>
         <p>Git</p>
-         <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/cleaner_repo.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/cleaner_repo.png">
     </section>
     <section>
         <p>Git</p>
-         <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/default_merging.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/default_merging.png">
     </section>
     <section>
         <p>Git</p>
-         <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/rebase_merging.png">
+        <img style="border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/rebase_merging.png">
     </section>
     <section>
         <p>Codebrag</p>
@@ -246,19 +300,37 @@ element:
     </section>
     <section>
         <p>Code</p>
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/master_comits.png">
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/store_comits.png">
-    </section>
-        <section>
-        <p>Code</p>
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/master_code.png">
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/store_lines.png">
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/master_comits.png">
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/store_comits.png">
     </section>
     <section>
         <p>Code</p>
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/master_punchcard.png">
-        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt="" src="img/store_punchcard.png">
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/master_code.png">
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/store_lines.png">
     </section>
+    <section>
+        <p>Code</p>
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/master_punchcard.png">
+        <img style="width:50%;border: none; background: rgba(255, 255, 255, 0);" title="" alt=""
+             src="img/store_punchcard.png">
+    </section>
+</section>
+
+<section id="wyzwania">
+    <h2>Największe wyzwania i problemy</h2>
+    <ul>
+        <li>Duża złożoność systemu</li>
+        <li>Integracja dwóch części</li>
+        <li>CUDA</li>
+        <li>Duża równoległość</li>
+        <li>Synchronizacja pracy</li>
+        <li>Testy</li>
+    </ul>
 </section>
 
 <section>
