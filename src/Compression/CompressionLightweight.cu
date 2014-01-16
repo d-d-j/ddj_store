@@ -8,17 +8,36 @@
 #include <thrust/transform.h>
 
 union converter {
-	int32_t toInt, fromInt;
+	int64_t toInt64, fromInt64;
+	int32_t toInt32, fromInt32;
 	float toFloat, fromFloat;
-	unsigned char toBytes[4], fromBytes[4];
+	unsigned char toBytes[8], fromBytes[8];
 };
 
+__host__
 __device__
-void copyBytes(unsigned char * dest, const unsigned char * source,
-		const int size) {
+void copyBytes(unsigned char * dest, const unsigned char * source, const int size) {
 	for (int i = 0; i < size; i++) {
 		dest[i] = source[i];
 	}
+}
+
+__host__
+__device__
+void EncodeInt32UsingNBytes(unsigned char* out, int32_t value, int N)
+{
+	converter c;
+	c.fromInt32 = value;
+	copyBytes(out, c.toBytes, N);
+}
+
+__host__
+__device__
+void EncodeInt64UsingNBytes(unsigned char* out, int64_t value, int N)
+{
+	converter c;
+	c.fromInt64 = value;
+	copyBytes(out, c.toBytes, N);
 }
 
 __global__
@@ -29,7 +48,7 @@ void EncodeKernel(storeElement * in_d, unsigned char * out_d) {
 	int32_t position = 10 * index + 4;
 	converter c;
 	if (index == 0) {
-		c.fromInt = high;
+		c.fromInt32 = high;
 		copyBytes(out_d, c.toBytes, 4);
 	}
 	out_d[position] = (unsigned char) in_d[index].tag;
@@ -37,7 +56,7 @@ void EncodeKernel(storeElement * in_d, unsigned char * out_d) {
 	out_d[position] = (unsigned char) in_d[index].metric;
 	position++;
 
-	c.fromInt = low;
+	c.fromInt32 = low;
 	copyBytes(out_d + position, c.toBytes, 4);
 
 	position += 4;
@@ -52,7 +71,7 @@ void DecodeKernel(unsigned char * in_d, storeElement * out_d) {
 	converter c;
 	copyBytes(c.fromBytes, in_d, 4);
 
-	int64_t high = c.toInt;
+	int64_t high = c.toInt32;
 	int32_t position = 10 * index + 4;
 
 	out_d[index].tag = in_d[position];
@@ -61,7 +80,7 @@ void DecodeKernel(unsigned char * in_d, storeElement * out_d) {
 	position++;
 
 	copyBytes(c.fromBytes, in_d + position, 4);
-	out_d[index].time = ((int64_t) c.toInt & 0xFFFFFFFF) | (high << 32);
+	out_d[index].time = ((int64_t) c.toInt32 & 0xFFFFFFFF) | (high << 32);
 
 	position += 4;
 

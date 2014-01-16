@@ -118,5 +118,49 @@ namespace store{
 		//CLEAN
 		CUDA_CHECK_RETURN( cudaFree(device_data) );
 	}
+
+	TEST_F(CompressionTest, EncodeInt32UsingNBytes_ForSmallInt)
+	{
+		int32_t input = 0x24;
+		unsigned char output[2];
+		EncodeInt32UsingNBytes(output, input, 2);
+		int *actual = (int*)output;
+		EXPECT_EQ(input, *actual);
+	}
+
+	TEST_F(CompressionTest, EncodeInt32UsingNBytes_ForSmallInt_With_Overflow)
+	{
+		int32_t input = 0xCAFFE24, expected = 0x24;
+		unsigned char output[1];
+		EncodeInt32UsingNBytes(output, input, 1);
+		EXPECT_EQ(expected, output[0]);
+	}
+
+	TEST_F(CompressionTest, EncodeInt64UsingNBytes_ForSmallInt)
+	{
+		int64_t input = 0xBA5EBALL;
+		unsigned char output[2];
+		EncodeInt64UsingNBytes(output, input, 6);
+		int64_t *actual = (int64_t*)output;
+		EXPECT_EQ(input, *actual);
+	}
+
+	TEST_F(CompressionTest, EncodeInt64UsingNBytes_ForBigInt)
+	{
+		int64_t input = 0xDEADBEEF;
+		unsigned char output[8];
+		EncodeInt64UsingNBytes(output, input, 8);
+		int64_t *actual = (int64_t*)output;
+		EXPECT_EQ(input, *actual);
+	}
+
+	TEST_F(CompressionTest, EncodeInt64UsingNBytes_ForBigInt_With_Overflow)
+	{
+		int64_t input = 0xDEADBEEF , expected = 0xBEEF;
+		unsigned char output[2];
+		EncodeInt64UsingNBytes(output, input, 2);
+		int64_t *actual = (int64_t*)output;
+		EXPECT_EQ(expected, *actual);
+	}
 }
 }
