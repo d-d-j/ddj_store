@@ -27,6 +27,7 @@ extern "C"
 	size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result);
 	size_t DecompressLightweight(unsigned char* data, size_t size, storeElement** result);
 	trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount);
+	void PrepareElementsForCompression(storeElement* elements, int elemCount, trunkCompressInfo info);
 }
 
 #endif

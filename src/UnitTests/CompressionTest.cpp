@@ -78,5 +78,45 @@ namespace store{
 		//CLEAN
 		CUDA_CHECK_RETURN( cudaFree(device_data) );
 	}
+
+	TEST_F(CompressionTest, PrepareElementsForCompression_LinearDataTrunk)
+	{
+		//PREPARE
+		const int N = 1000;
+		int min_time = 537;
+		int min_tag = 123;
+		int min_metric = 7;
+		storeElement host_data[N];
+		for(int i=0; i<N; i++)
+		{
+			host_data[i].time = min_time + i;
+			host_data[i].tag = min_tag + (i%5);
+			host_data[i].metric = min_metric + (i%3);
+			host_data[i].value = 3.0f * i;
+		}
+		storeElement* device_data;
+		CUDA_CHECK_RETURN( cudaMalloc(&device_data, sizeof(storeElement)*N) );
+		CUDA_CHECK_RETURN( cudaMemcpy(device_data, host_data, sizeof(storeElement)*N, cudaMemcpyHostToDevice) );
+		trunkCompressInfo info;
+		info.tag_min = min_tag;
+		info.metric_min = min_metric;
+		info.time_min = min_time;
+
+		//TEST
+		PrepareElementsForCompression(device_data, N, info);
+
+		//CHECK
+		storeElement host_result[N];
+		CUDA_CHECK_RETURN( cudaMemcpy(&host_result, device_data, sizeof(storeElement)*N, cudaMemcpyDeviceToHost) );
+		for(int j=0; j<N; j++)
+		{
+			EXPECT_EQ(j, host_result[j].time);
+			EXPECT_EQ(j%5, host_result[j].tag);
+			EXPECT_EQ(j%3, host_result[j].metric);
+		}
+
+		//CLEAN
+		CUDA_CHECK_RETURN( cudaFree(device_data) );
+	}
 }
 }

@@ -5,6 +5,7 @@
 #include <thrust/reduce.h>
 #include <thrust/transform_reduce.h>
 #include <thrust/functional.h>
+#include <thrust/transform.h>
 
 union converter {
 	int32_t toInt, fromInt;
@@ -196,6 +197,30 @@ unsigned int FastFindLog2(int32_t v)
 	}
 
 	return r;
+}
+
+template <typename T>
+struct trunkCompressInfo_unary_op
+{
+	const trunkCompressInfo info;
+
+	trunkCompressInfo_unary_op(trunkCompressInfo _info) : info(_info) {}
+
+	__host__ __device__
+	T operator()(const T& x) const
+	{
+		T newElement(x.tag-info.tag_min, x.metric-info.metric_min, x.time-info.time_min, x.value);
+		return newElement;
+	}
+};
+
+void PrepareElementsForCompression(storeElement* elements, int elemCount, trunkCompressInfo info)
+{
+	thrust::device_ptr<storeElement> elem_ptr(elements);
+	trunkCompressInfo_unary_op<storeElement> unary_op(info);
+
+	// Transform elements
+	thrust::transform(elem_ptr, elem_ptr+elemCount, elem_ptr, unary_op);
 }
 
 trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount)
