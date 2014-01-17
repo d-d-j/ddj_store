@@ -14,16 +14,14 @@ union converter {
 	unsigned char toBytes[8], fromBytes[8];
 };
 
-__host__
-__device__
+__host__ __device__
 void copyBytes(unsigned char * dest, const unsigned char * source, const int size) {
 	for (int i = 0; i < size; i++) {
 		dest[i] = source[i];
 	}
 }
 
-__host__
-__device__
+__host__ __device__
 void EncodeInt32UsingNBytes(unsigned char* out, int32_t value, int N)
 {
 	converter c;
@@ -31,8 +29,7 @@ void EncodeInt32UsingNBytes(unsigned char* out, int32_t value, int N)
 	copyBytes(out, c.toBytes, N);
 }
 
-__host__
-__device__
+__host__ __device__
 void EncodeInt64UsingNBytes(unsigned char* out, int64_t value, int N)
 {
 	converter c;
@@ -41,87 +38,140 @@ void EncodeInt64UsingNBytes(unsigned char* out, int64_t value, int N)
 }
 
 __global__
-void EncodeKernel(storeElement * in_d, unsigned char * out_d) {
+void EncodeKernel(
+		storeElement * in_d,
+		int elemCount,
+		unsigned char * out_d,
+		int tag_bytes,
+		int metric_bytes,
+		int time_bytes,
+		int compressedElemSize,
+		trunkCompressInfo info)
+{
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	int32_t low = in_d[index].time & 0xFFFFFFFF;
-	int32_t high = (in_d[index].time >> 32) & 0xFFFFFFFF;
-	int32_t position = 10 * index + 4;
+	if(index >= elemCount) return;
+
+	int32_t position = index * compressedElemSize;
 	converter c;
-	if (index == 0) {
-		c.fromInt32 = high;
-		copyBytes(out_d, c.toBytes, 4);
-	}
-	out_d[position] = (unsigned char) in_d[index].tag;
-	position++;
-	out_d[position] = (unsigned char) in_d[index].metric;
-	position++;
-
-	c.fromInt32 = low;
-	copyBytes(out_d + position, c.toBytes, 4);
-
-	position += 4;
-
+	// tag
+	int32_t tag = in_d[index].tag - info.tag_min;
+	EncodeInt32UsingNBytes(out_d+position, tag, tag_bytes);
+	position += tag_bytes;
+	// metric
+	int32_t metric = in_d[index].metric - info.metric_min;
+	EncodeInt32UsingNBytes(out_d+position, metric, metric_bytes);
+	position += metric_bytes;
+	// time
+	int64_t time = in_d[index].time - info.time_min;
+	EncodeInt64UsingNBytes(out_d+position, time, time_bytes);
+	position += time_bytes;
+	// value
 	c.fromFloat = in_d[index].value;
 	copyBytes(out_d + position, c.toBytes, 4);
 }
 
 __global__
-void DecodeKernel(unsigned char * in_d, storeElement * out_d) {
+void DecodeKernel(
+		unsigned char * in_d,
+		int elemCount,
+		storeElement * out_d,
+		int tag_bytes,
+		int metric_bytes,
+		int time_bytes,
+		int compressedElemSize,
+		trunkCompressInfo info)
+{
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if(index >= elemCount) return;
+
+	int32_t position = compressedElemSize * index;
 	converter c;
-	copyBytes(c.fromBytes, in_d, 4);
-
-	int64_t high = c.toInt32;
-	int32_t position = 10 * index + 4;
-
-	out_d[index].tag = in_d[position];
-	position++;
-	out_d[index].metric = in_d[position];
-	position++;
-
-	copyBytes(c.fromBytes, in_d + position, 4);
-	out_d[index].time = ((int64_t) c.toInt32 & 0xFFFFFFFF) | (high << 32);
-
-	position += 4;
-
-	copyBytes(c.fromBytes, in_d + position, 4);
+	//tag
+	c.toInt32 = 0;
+	copyBytes(c.fromBytes, in_d+position, tag_bytes);
+	out_d[index].tag = c.toInt32 + info.tag_min;
+	position += tag_bytes;
+	//metric
+	c.toInt32 = 0;
+	copyBytes(c.fromBytes, in_d+position, metric_bytes);
+	out_d[index].metric = c.toInt32 + info.metric_min;
+	position += metric_bytes;
+	//time
+	c.toInt64 = 0;
+	copyBytes(c.fromBytes, in_d+position, time_bytes);
+	out_d[index].time = c.toInt64 + info.time_min;
+	position += time_bytes;
+	//value
+	copyBytes(c.fromBytes, in_d+position, 4);
 	out_d[index].value = c.toFloat;
 }
 
 size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result)
 {
 	int elemCount = size / sizeof(storeElement);
+	trunkCompressInfo info = AnalizeTrunkData(elements, elemCount);
 
-	//prepare compression output
+	int tagBytes = (info.bytes & 0xFF000000) >> 24;
+	int metricBytes = (info.bytes & 0x00FF0000) >> 16;
+	int timeBytes = info.bytes & 0x0000FFFF;
+	size_t compressedElemSize = tagBytes + metricBytes + timeBytes + 4;
+
+	// prepare compression output
 	unsigned char *compressionOutput_device;	//output space for compressed data
-	cudaMalloc((void**) &compressionOutput_device, COMPRESSED_DATA_SIZE(elemCount));
-	cudaMemset(compressionOutput_device, 0, COMPRESSED_DATA_SIZE(elemCount));
+	size_t outputSize = compressedElemSize*elemCount+sizeof(trunkCompressInfo);
+	cudaMalloc((void**) &compressionOutput_device, outputSize);
+	cudaMemset(compressionOutput_device, 0, outputSize);
+	cudaMemcpy(compressionOutput_device, &info, sizeof(trunkCompressInfo), cudaMemcpyHostToDevice);
 
-	//compress
+	// compress
 	int blocks = (elemCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-	EncodeKernel<<<blocks, THREADS_PER_BLOCK>>>(elements, compressionOutput_device);
+	EncodeKernel<<<blocks, THREADS_PER_BLOCK>>>(
+			elements,
+			elemCount,
+			compressionOutput_device+sizeof(trunkCompressInfo),
+			tagBytes,
+			metricBytes,
+			timeBytes,
+			compressedElemSize,
+			info);
 	cudaDeviceSynchronize();
 
-	//return result
+	// return result
 	(*result) = compressionOutput_device;
-	return COMPRESSED_DATA_SIZE(elemCount);
+	return outputSize;
 }
 
 size_t DecompressLightweight(unsigned char* data, size_t size, storeElement** result)
 {
-	int elemCount = size / COMPRESSED_ELEMENT_SIZE;
+	// get compression info
+	trunkCompressInfo info;
+	cudaMemcpy(&info, data, sizeof(trunkCompressInfo), cudaMemcpyDeviceToHost);
+	int tagBytes = (info.bytes & 0xFF000000) >> 24;
+	int metricBytes = (info.bytes & 0x00FF0000) >> 16;
+	int timeBytes = info.bytes & 0x0000FFFF;
+	size_t compressedElemSize = tagBytes + metricBytes + timeBytes + 4;
+	int elemCount = (size - sizeof(trunkCompressInfo)) / compressedElemSize;
 
 	// prepare decompression output
 	storeElement* decompressionOutput_device;	//output space for decompressed data
 	cudaMalloc((void**) &decompressionOutput_device, elemCount * sizeof(storeElement));
 	cudaMemset(decompressionOutput_device, 0, elemCount * sizeof(storeElement));
 
-	//decompress
+	// decompress
 	int blocks = (elemCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-	unsigned char *decompessionInput_device = data;
-	DecodeKernel<<<blocks, THREADS_PER_BLOCK>>>(decompessionInput_device, decompressionOutput_device);
+	unsigned char *decompessionInput_device = data+sizeof(trunkCompressInfo);
+	DecodeKernel<<<blocks, THREADS_PER_BLOCK>>>(
+			decompessionInput_device,
+			elemCount,
+			decompressionOutput_device,
+			tagBytes,
+			metricBytes,
+			timeBytes,
+			compressedElemSize,
+			info);
 	cudaDeviceSynchronize();
 
+	// return result
 	(*result) = decompressionOutput_device;
 	return elemCount * sizeof(storeElement);
 }
@@ -216,30 +266,6 @@ unsigned int FastFindLog2(int32_t v)
 	}
 
 	return r;
-}
-
-template <typename T>
-struct trunkCompressInfo_unary_op
-{
-	const trunkCompressInfo info;
-
-	trunkCompressInfo_unary_op(trunkCompressInfo _info) : info(_info) {}
-
-	__host__ __device__
-	T operator()(const T& x) const
-	{
-		T newElement(x.tag-info.tag_min, x.metric-info.metric_min, x.time-info.time_min, x.value);
-		return newElement;
-	}
-};
-
-void PrepareElementsForCompression(storeElement* elements, int elemCount, trunkCompressInfo info)
-{
-	thrust::device_ptr<storeElement> elem_ptr(elements);
-	trunkCompressInfo_unary_op<storeElement> unary_op(info);
-
-	// Transform elements
-	thrust::transform(elem_ptr, elem_ptr+elemCount, elem_ptr, unary_op);
 }
 
 trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount)
