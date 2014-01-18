@@ -18,6 +18,8 @@
 #include <cmath>
 #include <chrono>
 #include <fstream>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 namespace ddj {
 namespace task {

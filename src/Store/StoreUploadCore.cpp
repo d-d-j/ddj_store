@@ -18,7 +18,9 @@ namespace store {
 		this->_enableCompression = this->_config->GetIntValue("ENABLE_COMPRESSION");
 	}
 
-	StoreUploadCore::~StoreUploadCore(){}
+	StoreUploadCore::~StoreUploadCore()
+	{
+	}
 
 	storeTrunkInfo* StoreUploadCore::sortTrunkAndPrepareInfo(storeElement* elementsToUpload, int elementsToUploadCount)
 	{

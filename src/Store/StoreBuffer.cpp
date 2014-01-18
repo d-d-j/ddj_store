@@ -44,11 +44,11 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 	StoreBuffer::~StoreBuffer()
 	{
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] destructor [BEGIN]", this->_metric);
+		boost::mutex::scoped_lock lock1(this->_bufferMutex);
+		boost::mutex::scoped_lock lock2(this->_backBufferMutex);
 
 		delete this->_bufferInfoTreeMonitor;
-		delete this->_uploadCore;
 		this->_bufferInfoTreeMonitor = nullptr;
-		this->_uploadCore = nullptr;
 
 		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] destructor [END]", this->_metric);
 	}

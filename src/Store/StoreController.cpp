@@ -64,12 +64,14 @@ namespace store {
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
+		_taskThreadPool.wait();
+		_taskThreadPool.clear();
+
 		delete this->_buffers;
+		delete this->_uploadCore;
 		delete this->_cudaController;
 		this->_buffers = nullptr;
 		this->_cudaController = nullptr;
-		_taskThreadPool.wait();
-		_taskThreadPool.clear();
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}

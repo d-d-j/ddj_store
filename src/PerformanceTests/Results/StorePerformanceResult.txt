@@ -15,3 +15,21 @@ InsertEqualElem 1000 2 512 6.63575
 InsertEqualElem 10000 2 512 54.5957
 InsertEqualElem 100000 2 512 552.581
 InsertEqualElem 1000000 2 512 6239.34
+InsertEqualElem 1000 2 512 8.18141
+InsertEqualElem 10000 2 512 74.8183
+InsertEqualElem 100000 2 512 670.972
+InsertEqualElem 1000000 2 512 5162.99
+InsertEqualElem 1000 2 512 34.4773
+InsertEqualElem 1000 2 512 37.6029
+InsertEqualElem 1000 2 512 35.0182
+InsertEqualElem 1000 2 512 30.4296
+InsertEqualElem 1000 2 512 35.0929
+SelectWithSeriesSumWhileInserting 14059.6
+InsertEqualElem 1000 2 512 32.848
+SelectWithSeriesSumWhileInserting 14481.8
+InsertEqualElem 1000 2 512 40.005
+SelectWithSeriesSumWhileInserting 13667.3
+InsertEqualElem 1000 2 512 29.6177
+SelectWithSeriesSumWhileInserting 14625.4
+InsertEqualElem 1000 2 512 32.9014
+SelectWithSeriesSumWhileInserting 22978.9
