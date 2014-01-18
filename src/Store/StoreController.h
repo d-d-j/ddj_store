@@ -63,7 +63,7 @@ class StoreController : public boost::noncopyable
     	/* TASKS */
         boost::unordered_map<int, taskFunc> _taskFunctions;
         boost::threadpool::fifo_pool _taskThreadPool;
-
+        int _maxLocationsPerJob;
 
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
@@ -76,6 +76,7 @@ class StoreController : public boost::noncopyable
         void ExecuteTask(task::Task_Pointer task);
     private:
         void populateTaskFunctions();
+        boost::container::vector<ullintPair>* getDataLocationInfo(Query* query);
 
 	/* TASK FUNCTIONS */
     private:

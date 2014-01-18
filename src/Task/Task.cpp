@@ -129,6 +129,12 @@ namespace task {
 		this->_query = query;
 	}
 
+	void Task::SetPart(int partialCount)
+	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+		this->_expectedResultCount += partialCount - 1;
+	}
+
 	taskResult* Task::GetResult()
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
