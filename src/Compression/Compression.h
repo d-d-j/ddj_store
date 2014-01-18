@@ -11,7 +11,7 @@ namespace compression {
 	class Compression
 	{
 	public:
-		size_t CompressTrunk(storeElement* elements, size_t size, void** result);
+		size_t CompressTrunk(storeElement* elements, size_t size, void** result, cudaStream_t stream);
 		size_t DecompressTrunk(void* data, size_t size, storeElement** result);
 	};
 

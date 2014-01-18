@@ -81,8 +81,13 @@ namespace query {
 
 		//Compress data and place it in main memory
 		void* device_compressedElements;
+
 		compression::Compression c;
-		size_t compressedDataSize = c.CompressTrunk(device_elementsToCompress, size*sizeof(storeElement), &device_compressedElements);
+		cudaStream_t stream;
+		cudaStreamCreate(&stream);
+		size_t compressedDataSize =
+				c.CompressTrunk(device_elementsToCompress, size*sizeof(storeElement), &device_compressedElements, stream);
+		cudaStreamDestroy(stream);
 		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, device_compressedElements, compressedDataSize, cudaMemcpyDeviceToDevice) );
 
 		_cudaController->SetMainMemoryOffset(compressedDataSize);

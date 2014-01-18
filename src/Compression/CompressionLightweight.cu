@@ -106,7 +106,7 @@ void DecodeKernel(
 	out_d[index].value = c.toFloat;
 }
 
-size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result)
+size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** result, cudaStream_t stream)
 {
 	int elemCount = size / sizeof(storeElement);
 	trunkCompressInfo info = AnalizeTrunkData(elements, elemCount);
@@ -125,7 +125,7 @@ size_t CompressLightweight(storeElement* elements, size_t size, unsigned char** 
 
 	// compress
 	int blocks = (elemCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-	EncodeKernel<<<blocks, THREADS_PER_BLOCK>>>(
+	EncodeKernel<<<blocks, THREADS_PER_BLOCK, 0, stream>>>(
 			elements,
 			elemCount,
 			compressionOutput_device+sizeof(trunkCompressInfo),

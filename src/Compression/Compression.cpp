@@ -3,9 +3,9 @@
 namespace ddj {
 namespace compression {
 
-size_t Compression::CompressTrunk(storeElement* elements, size_t size, void** result)
+size_t Compression::CompressTrunk(storeElement* elements, size_t size, void** result, cudaStream_t stream)
 {
-	return CompressLightweight(elements, size, (unsigned char**)result);
+	return CompressLightweight(elements, size, (unsigned char**)result, stream);
 }
 
 size_t Compression::DecompressTrunk(void* data, size_t size, storeElement** result)

@@ -3,3 +3,15 @@ InsertEqualElem 1000 2 256 9.87901
 InsertEqualElem 10000 2 256 86.2093
 InsertEqualElem 100000 2 256 887.708
 InsertEqualElem 1000000 2 256 9041.29
+InsertEqualElem 1000 2 2048 8.35868
+InsertEqualElem 10000 2 2048 91.1417
+InsertEqualElem 100000 2 2048 913.897
+InsertEqualElem 1000000 2 2048 9328.43
+InsertEqualElem 1000 2 512 8.63033
+InsertEqualElem 10000 2 512 48.7693
+InsertEqualElem 100000 2 512 505.405
+InsertEqualElem 1000000 2 512 4817.52
+InsertEqualElem 1000 2 512 6.63575
+InsertEqualElem 10000 2 512 54.5957
+InsertEqualElem 100000 2 512 552.581
+InsertEqualElem 1000000 2 512 6239.34

@@ -112,7 +112,7 @@ namespace store {
 	{
 		size_t size = sizeof(storeElement)*elemToUploadCount;
 		compression::Compression c;
-		return c.CompressTrunk(deviceBufferPointer, size, result);
+		return c.CompressTrunk(deviceBufferPointer, size, result, stream);
 	}
 
 } /* namespace store */

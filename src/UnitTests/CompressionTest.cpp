@@ -22,7 +22,10 @@ namespace store{
 
 		//TEST
 		void* compressedData;
-		size_t compressed_size = _compression.CompressTrunk(device_data, dataSize, &compressedData);
+		cudaStream_t stream;
+		cudaStreamCreate(&stream);
+		size_t compressed_size = _compression.CompressTrunk(device_data, dataSize, &compressedData, stream);
+		cudaStreamDestroy(stream);
 		storeElement* decompressedData;
 		size_t decompressed_size = _compression.DecompressTrunk(compressedData, compressed_size, &decompressedData);
 
@@ -64,7 +67,10 @@ namespace store{
 
 		//TEST
 		void* compressedData;
-		size_t compressed_size = _compression.CompressTrunk(device_data, dataSize, &compressedData);
+		cudaStream_t stream;
+		cudaStreamCreate(&stream);
+		size_t compressed_size = _compression.CompressTrunk(device_data, dataSize, &compressedData, stream);
+		cudaStreamDestroy(stream);
 		storeElement* decompressedData;
 		size_t decompressed_size = _compression.DecompressTrunk(compressedData, compressed_size, &decompressedData);
 
