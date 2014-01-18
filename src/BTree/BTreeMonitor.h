@@ -1,39 +1,41 @@
-/*
- * BTreeMonitor.h
- *
- *  Created on: Aug 24, 2013
- *      Author: Karol Dzitkowski
- */
-
 #ifndef BTREEMONITOR_H_
 #define BTREEMONITOR_H_
 
-#include "../Store/StoreIncludes.h"
-#include "../Store/infoElement.h"
-#include "../Helpers/Logger.h"
+#include "btree.h"
+#include "../Core/Logger.h"
+#include "../Core/UllintPair.h"
+#include "../Store/StoreTrunkInfo.h"
+#include <boost/thread.hpp>
+#include <boost/container/vector.hpp>
+#include <boost/foreach.hpp>
+#include <stdexcept>
 
 namespace ddj {
-namespace store {
+namespace btree {
+
+	/* TYPEDEFS */
+	typedef stx::btree<ullintPair, ullintPair> tree;
+	typedef tree* tree_pointer;
 
 	/*! \class BTreeMonitor
 	 \brief Protects concurrent access to B+Tree structure using boost::mutex
 	*/
-	class BTreeMonitor
+	class BTreeMonitor : public boost::noncopyable
 	{
 		private:
-			tag_type _tag;	/**< A tag of elements which locations are stored in B+Tree */
-			boost::mutex _mutex;	/**< Mutex used to protect access to b+tree */
+			metric_type _metric;				/**< A metric of elements which locations are stored in B+Tree */
+			boost::mutex _mutex;				/**< Mutex used to protect access to b+tree */
 			tree_pointer _bufferInfoTree;		/**< A pointer to B+Tree structure */
 
 			/* LOGGER */
-			Logger _logger = Logger::getRoot();
+			Logger _logger;
 		public:
 			//! BTreeMonitor constructor.
 			/*!
 			  It sets creates a new instance of B+Tree structure in order to store there
 			  additional info about trunk's location in GPU's store array
 			*/
-			BTreeMonitor(tag_type tag);
+			BTreeMonitor(metric_type metric);
 
 			//! BTreeMonitor destructor.
 			/*!
@@ -45,12 +47,15 @@ namespace store {
 			 * \brief Function inserts infoElement to B+Tree structure
 			 * \param infoElement* a pointer to infoElement to insert to B+Tree structure
 			 */
-			void Insert(infoElement* element);
+			void Insert(store::storeTrunkInfo* element);
+
+			boost::container::vector<ullintPair>* SelectAll();
+			boost::container::vector<ullintPair>* Select(boost::container::vector<ullintPair> timePeriods);
 
 		private:
-			void insertToTree(infoElement* element);
+			bool isIntersecting(ullintPair A, ullintPair B);
 	};
 
 } /* namespace store */
-} /* namespace ddj */
+} /* namespace btree */
 #endif /* BTREEMONITOR_H_ */

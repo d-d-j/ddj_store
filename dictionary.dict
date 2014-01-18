@@ -5,3 +5,6 @@ cuda
 mem
 uploader
 gpu
+metrices
+decompress
+sqrt

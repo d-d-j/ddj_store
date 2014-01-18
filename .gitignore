@@ -2,8 +2,15 @@
 /.metadata
 /Debug
 /Release
+.src
 *.o
 *.d
 *.orig
 DDJ_Store
-/ddj_store.log
+ddj_store.log
+ddj_store.log.*
+*.bak
+
+#Configuration
+config.ini
+ddj_logger.prop

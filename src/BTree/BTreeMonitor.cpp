@@ -1,44 +1,36 @@
-/*
- * BTreeMonitor.cpp
- *
- *  Created on: Aug 24, 2013
- *      Author: parallels
- */
-
 #include "BTreeMonitor.h"
 
 namespace ddj {
-namespace store {
+namespace btree {
 
-	BTreeMonitor::BTreeMonitor(tag_type tag)
+	BTreeMonitor::BTreeMonitor(metric_type metric) :  _logger(Logger::getRoot())
 	{
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [BEGIN]", tag);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [metric=%d] constructor [BEGIN]", metric);
 
-		this->_tag = tag;
+		this->_metric = metric;
 		this->_bufferInfoTree = new tree();
 
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [tag=%d] constructor [END]", tag);
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Btree monitor [metric=%d] constructor [END]", metric);
 	}
 
 	BTreeMonitor::~BTreeMonitor()
 	{
 		delete this->_bufferInfoTree;
+		this->_bufferInfoTree = nullptr;
 	}
 
-	void BTreeMonitor::Insert(infoElement* element)
+	void BTreeMonitor::Insert(store::storeTrunkInfo* element)
 	{
 		boost::lock_guard<boost::mutex> guard(this->_mutex);
-		this->insertToTree(element);
-	}
 
-	void BTreeMonitor::insertToTree(infoElement* element)
-	{
 		try
 		{
-			this->_bufferInfoTree->insert(element->startTime, element->startValue);
-			this->_bufferInfoTree->insert(element->endTime, element->endValue);
-			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%d, endV=%d}",
-					element->tag, element->startTime, element->endTime, element->startValue, element->endValue);
+			this->_bufferInfoTree->insert(
+					ullintPair{element->startTime,element->endTime},
+					ullintPair{element->startValue, element->endValue});
+
+			LOG4CPLUS_DEBUG_FMT(this->_logger, "BTreeMonitor - insert element to b+tree: {tag=%d, startT=%llu, endT=%llu, startV=%llu, endV=%llu}",
+					element->metric, element->startTime, element->endTime, element->startValue, element->endValue);
 		}
 		catch(std::exception& ex)
 		{
@@ -50,5 +42,52 @@ namespace store {
 		}
 	}
 
+	boost::container::vector<ullintPair>* BTreeMonitor::SelectAll()
+	{
+		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
+
+		auto it = this->_bufferInfoTree->begin();
+		for(; it != this->_bufferInfoTree->end(); it++)
+			result->push_back(it->second);
+
+		return result;
+	}
+
+	boost::container::vector<ullintPair>* BTreeMonitor::Select(boost::container::vector<ullintPair> timePeriods)
+	{
+		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
+
+		BOOST_FOREACH(ullintPair &tp, timePeriods)
+		{
+			// get first element from B+Tree with greater or equal key than tp
+			auto it = this->_bufferInfoTree->lower_bound(tp);
+			/* check if the last smaller element isn't intersecting with tp because in this situation
+			 *	tp 						<----------->
+			 * 	elems in tree	|-----A1-----| |-----A2-----|
+			 * 	A2 will be returned as lower_bound so we must check if A1 isn't intersecting with tp
+			 */
+			it--;
+			while(it->first.isIntersecting(tp) && it != this->_bufferInfoTree->begin())
+			{
+				it--;
+			}
+			// now it is not intersecting tp or it is begin
+			if(!it->first.isIntersecting(tp))
+			{
+				it++;
+			}
+			/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
+			 * are inside selected time period and if it is not and end of data from B+Tree
+			 */
+			while(it != this->_bufferInfoTree->end() && it->first.isIntersecting(tp))
+			{
+				result->push_back(it->second);
+				it++;
+			}
+		}
+
+		return result;
+	}
+
 } /* namespace store */
-} /* namespace ddj */
+} /* namespace btree */

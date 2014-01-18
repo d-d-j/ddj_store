@@ -8,12 +8,22 @@
 #ifndef TASKTYPE_H_
 #define TASKTYPE_H_
 
-enum TaskType
-{
-	Error = 0,
-	Insert = 1,
-	SelectAll = 2,
-	Flush = 3
-};
+namespace ddj {
+namespace task {
+
+	enum TaskType
+	{
+		Error = 0,
+		Insert = 1,
+		Select = 2,
+		Flush = 3,
+		Info = 4
+	};
+
+#define	TASK_ALL_DEVICES -1
+
+
+} /* namespace task */
+} /* namespace ddj */
 
 #endif /* TASKTYPE_H_ */

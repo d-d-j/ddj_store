@@ -1,0 +1,103 @@
+// 10 000 elements
+
+InsertEqualElem 10000 4 8 426.323
+InsertEqualElem 10000 4 16 218.794
+InsertEqualElem 10000 4 32 116.702
+InsertEqualElem 10000 4 64 85.7505
+InsertEqualElem 10000 4 128 102.167
+InsertEqualElem 10000 4 256 121.804
+InsertEqualElem 10000 4 512 155.384
+InsertEqualElem 10000 4 1024 151.229
+InsertEqualElem 10000 4 2048 159.736
+InsertEqualElem 10000 4 4096 146.529
+
+InsertEqualElem 10000 8 8 381.962
+InsertEqualElem 10000 8 16 186.635
+InsertEqualElem 10000 8 32 103.44
+InsertEqualElem 10000 8 64 88.2495
+InsertEqualElem 10000 8 128 233.504
+InsertEqualElem 10000 8 256 243.585
+InsertEqualElem 10000 8 512 247.852
+InsertEqualElem 10000 8 1024 243.698
+InsertEqualElem 10000 8 2048 240.222
+InsertEqualElem 10000 8 4096 238.753
+InsertEqualElem 10000 16 8 396.924
+InsertEqualElem 10000 24 8 404.99
+
+InsertEqualElem 10000 16 16 182.443
+InsertEqualElem 10000 16 32 111.281
+InsertEqualElem 10000 16 64 98.5725
+InsertEqualElem 10000 16 128 235.584
+InsertEqualElem 10000 16 256 273.435
+InsertEqualElem 10000 16 256 273.435
+InsertEqualElem 10000 16 512 265.443
+InsertEqualElem 10000 16 1024 266.58
+InsertEqualElem 10000 16 2048 255.253
+InsertEqualElem 10000 16 4096 247.285
+
+InsertEqualElem 10000 24 16 204.789
+InsertEqualElem 10000 24 32 101.883
+InsertEqualElem 10000 24 64 109.56
+InsertEqualElem 10000 24 128 278.584
+InsertEqualElem 10000 24 256 276.727
+InsertEqualElem 10000 24 512 267.885
+InsertEqualElem 10000 24 1024 265.765
+InsertEqualElem 10000 24 2048 265.659
+InsertEqualElem 10000 24 4096 264.245
+
+// 100 000 elements
+
+InsertEqualElem 100000 1 16 6993.24
+InsertEqualElem 100000 2 16 3732.74
+InsertEqualElem 100000 4 16 2242.41
+InsertEqualElem 100000 8 16 1936.66
+InsertEqualElem 100000 16 16 1952.51
+InsertEqualElem 100000 1 32 3566.82
+InsertEqualElem 100000 2 32 2025.57
+InsertEqualElem 100000 4 32 1215.86
+InsertEqualElem 100000 8 32 1029.53
+InsertEqualElem 100000 16 32 1053.8
+InsertEqualElem 100000 1 64 1824
+InsertEqualElem 100000 2 64 1478.94
+InsertEqualElem 100000 4 64 866.844
+InsertEqualElem 100000 8 64 912.217
+InsertEqualElem 100000 16 64 1078.99
+InsertEqualElem 100000 1 128 974.867
+InsertEqualElem 100000 2 128 758.563
+InsertEqualElem 100000 4 128 956.354
+InsertEqualElem 100000 8 128 2144.44
+InsertEqualElem 100000 16 128 2734.86
+InsertEqualElem 100000 1 256 550.45
+InsertEqualElem 100000 2 256 565.614
+InsertEqualElem 100000 4 256 1432.64
+InsertEqualElem 100000 8 256 2466.09
+InsertEqualElem 100000 16 256 2719.06
+InsertEqualElem 100000 1 512 356.104
+InsertEqualElem 100000 2 512 758.034
+InsertEqualElem 100000 4 512 1588.56
+InsertEqualElem 100000 8 512 2464.45
+InsertEqualElem 100000 16 512 2691.33
+InsertEqualElem 100000 1 1024 309.447
+InsertEqualElem 100000 2 1024 912.937
+InsertEqualElem 100000 4 1024 1646.66
+InsertEqualElem 100000 8 1024 2458.37
+InsertEqualElem 100000 16 1024 2667.99
+InsertEqualElem 100000 1 2048 276.986
+InsertEqualElem 100000 2 2048 908.492
+InsertEqualElem 100000 4 2048 1695.49
+InsertEqualElem 100000 8 2048 2457.38
+InsertEqualElem 100000 16 2048 2673.59
+InsertEqualElem 100000 1 4096 281.821
+InsertEqualElem 100000 2 4096 922.185
+InsertEqualElem 100000 4 4096 1703.97
+InsertEqualElem 100000 8 4096 2459.25
+
+// 1 000 000 elements
+
+InsertEqualElem 1000000 2 32 21080.6
+InsertEqualElem 1000000 2 64 13718.7
+InsertEqualElem 1000000 2 256 5831.77
+InsertEqualElem 1000000 2 512 5178.15
+InsertEqualElem 1000000 2 1024 6614.69
+InsertEqualElem 1000000 2 2048 7928.61
+InsertEqualElem 1000000 2 4096 7257.93

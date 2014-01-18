@@ -6,15 +6,15 @@
  *  Copyright (c) 2013 Karol Dzitkowski. All rights reserved.
  *
  *      NAZEWNICTWO
- * 1. nazwy klas:  CamelStyle z dużej litery np. StoreController
- * 2. nazwy struktur camelStyle z małej litery np. storeElement
- * 3. nazwy pól prywatnych camelStyle z małej litery z podkreśleniem _backBuffer
- * 4. nazwy pól publicznych i zmiennych globalnych słowa rozdzielamy _ i z małych liter np. memory_available
- * 5. define z dużych liter i rozdzielamy _ np. BUFFER_SIZE
- * 6. nazwy metod publicznych z dużej litery CamelStyle np. InsertValue() oraz parametry funkcji z małych liter camelStyle np. InsertValue(int valToInsert);
- * 7. nazwy metod prywatnych z małej litery camelStyle
- * 8. nazwy funkcji "prywatnych" w plikach cpp z małej litery z _ czyli, insert_value(int val_to_insert);
- * 9. nazwy funkcji globalnych czyli w plikach .h najczęściej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
+ * 1. nazwy klas:  CamelStyle z duÅ¼ej litery np. StoreController
+ * 2. nazwy struktur camelStyle z maÅ‚ej litery np. storeElement
+ * 3. nazwy pÃ³l prywatnych camelStyle z maÅ‚ej litery z podkreÅ›leniem _backBuffer
+ * 4. nazwy pÃ³l publicznych i zmiennych globalnych sÅ‚owa rozdzielamy _ i z maÅ‚ych liter np. memory_available
+ * 5. define z duÅ¼ych liter i rozdzielamy _ np. BUFFER_SIZE
+ * 6. nazwy metod publicznych z duÅ¼ej litery CamelStyle np. InsertValue() oraz parametry funkcji z maÅ‚ych liter camelStyle np. InsertValue(int valToInsert);
+ * 7. nazwy metod prywatnych z maÅ‚ej litery camelStyle
+ * 8. nazwy funkcji "prywatnych" w plikach cpp z maÅ‚ej litery z _ czyli, insert_value(int val_to_insert);
+ * 9. nazwy funkcji globalnych czyli w plikach .h najczÄ™Å›ciej inline h_InsertValue() dla funkcji na CPU g_InsertValue() dla funkcji na GPU
  */
 
 #include "StoreController.h"
@@ -23,23 +23,31 @@ namespace ddj {
 namespace store {
 
 	StoreController::StoreController(int gpuDeviceId)
+		: _logger(Logger::getRoot()), _config(Config::GetInstance())
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
+
 		this->_buffers = new Buffers_Map();
 
 		// PREPARE TASK FUNCTIONS DICTIONARY
 		this->populateTaskFunctions();
 
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
-		this->_cudaController = new CudaController(STREAMS_NUM_UPLOAD, STREAMS_NUM_QUERY);
+		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"), gpuDeviceId);
 
-		// CREATE GPU UPLOAD MONITOR
-		this->_gpuUploadMonitor = new GpuUploadMonitor(this->_cudaController);
+		// CREATE STORE QUERY CORE
+		this->_queryCore = new QueryCore(this->_cudaController);
 
-		// CREATE QUERY MONITOR
-		this->_queryMonitor = new QueryMonitor(this->_cudaController);
+		// CREATE STORE UPLOAD CORE
+		this->_uploadCore = new StoreUploadCore(this->_cudaController);
+
+		// CREATE STORE INFO CORE
+		this->_infoCore = new StoreInfoCore(this->_cudaController);
+
+		// SET THREAD POOL SIZES
+		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -49,16 +57,20 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
 		delete this->_buffers;
-		delete this->_queryMonitor;
-		delete this->_gpuUploadMonitor;
+		delete this->_cudaController;
+		this->_buffers = nullptr;
+		this->_cudaController = nullptr;
+		_taskThreadPool.wait();
+		_taskThreadPool.clear();
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}
 
-	void StoreController::ExecuteTask(StoreTask_Pointer task)
+	void StoreController::ExecuteTask(task::Task_Pointer task)
 	{
-		// Fire a function from _TaskFunctions with this taskId
-		this->_taskFunctions[task->GetType()](task);
+		// Sechedule a function from _TaskFunctions with this taskId
+		task::TaskType type = task->GetType();
+		this->_taskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
 	}
 
 	void StoreController::populateTaskFunctions()
@@ -66,82 +78,145 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
 
 		// INSERT
-		_taskFunctions.insert({ Insert, boost::bind(&StoreController::insertTask, this, _1) });
+		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
 
-		// SELECT ALL
-		_taskFunctions.insert({ SelectAll, boost::bind(&StoreController::selectAllTask, this, _1) });
+		// SELECT
+		_taskFunctions.insert({ task::Select, boost::bind(&StoreController::selectTask, this, _1) });
 
 		// FLUSH
-		_taskFunctions.insert({ Flush, boost::bind(&StoreController::flushTask, this, _1) });
+		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
+
+		// INFO
+		_taskFunctions.insert({ task::Info, boost::bind(&StoreController::infoTask, this, _1) });
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
-}
+	}
 
-	void StoreController::insertTask(StoreTask_Pointer task)
+	void StoreController::insertTask(task::Task_Pointer task)
 	{
 		// Check possible errors
-		if(task == nullptr || task->GetType() != Insert)
+		if(task == nullptr || task->GetType() != task::Insert)
 		{
 			throw std::runtime_error("Error in insertTask function - wrong argument");
 		}
 
-		// GET store element from task data
-		storeElement* element = (storeElement*)(task->GetData());
-
-		// Log element to insert
-		LOG4CPLUS_INFO_FMT(_logger, "Insert task - Insert element[ tag=%d, metric=%d, time=%llu, value=%f", element->tag, element->series, element->time, element->value);
-
-		// Create buffer with element's metric if not exists
-		if(!this->_buffers->count(element->tag))
-		{
-			StoreBuffer_Pointer newBuf(new StoreBuffer(element->tag, this->_gpuUploadMonitor));
-			this->_buffers->insert({element->tag, newBuf});
-		}
-		(*_buffers)[element->tag]->Insert(element);
-
-		// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
-		task->SetResult(true, nullptr, nullptr, 0);
-	}
-
-	void StoreController::selectAllTask(StoreTask_Pointer task)
-	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [BEGIN]"));
-
-		// Check possible errors
-		if(task == nullptr || task->GetType() != SelectAll)
-		{
-			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("selectAllTask function - wrong argument [FAILED]"));
-			throw std::runtime_error("Error in selectAllTask function - wrong argument");
-		}
-
-		// Get all data from GPU store
-		storeElement* queryResult;
-
-		// TODO: Implement all possible exceptions catching from SelectAll function
 		try
 		{
-			size_t sizeOfResult = this->_queryMonitor->SelectAll(&queryResult);
-			task->SetResult(true, nullptr, queryResult, sizeOfResult);
-			LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("SelectAll task [END]"));
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			// GET store element from task data
+			storeElement* element = static_cast<storeElement*>(task->GetData());
+
+			// Create buffer with element's metric if not exists
+			{
+				boost::mutex::scoped_lock lock(this->_buffersMutex);
+				if(!this->_buffers->count(element->metric))
+				{
+					StoreBuffer_Pointer newBuf(new StoreBuffer(element->metric, this->_config->GetIntValue("STORE_BUFFER_CAPACITY"), this->_uploadCore));
+					this->_buffers->insert({element->metric, newBuf});
+				}
+			}
+			// Log element to insert
+			LOG4CPLUS_DEBUG_FMT(_logger, "Insert task - Insert element[ metric=%d, tag=%d, time=%llu, value=%f", element->metric, element->tag, element->time, element->value);
+			(*_buffers)[element->metric]->Insert(element);
+
+			// TODO: Check this function for exceptions and errors and set result to error and some error message if failed
+			task->SetResult(true, nullptr, nullptr, 0);
 		}
 		catch(std::exception& ex)
 		{
-			LOG4CPLUS_ERROR_FMT(this->_logger, "SelectAll task error with exception - [%s] [FAILED]", ex.what());
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Insert task error with exception - [%s] [FAILED]", ex.what());
 			task->SetResult(false, ex.what(), nullptr, 0);
 		}
 		catch(...)
 		{
 			task->SetResult(false, nullptr, nullptr, 0);
-			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("SelectAll task error [FAILED]"));
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Insert task error [FAILED]"));
 		}
 	}
 
-	void StoreController::flushTask(StoreTask_Pointer task)
+	void StoreController::selectTask(task::Task_Pointer task)
+	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [BEGIN]"));
+
+		// Check possible errors
+		if(task == nullptr || task->GetType() != task::Select)
+		{
+			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("select Task function - wrong argument [FAILED]"));
+			throw std::runtime_error("Error in select Task function - wrong argument");
+		}
+
+		try
+		{
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			// Create query from task data
+			Query* query = new Query(task->GetData());
+			task->SetQuery(query);
+			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
+
+			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;
+			boost::container::vector<ullintPair>* locations = nullptr;
+
+			// if query should be filtered ask StoreBuffer for data location on GPU
+			if(query->metrics.size())
+			{
+				dataLocationInfo = new boost::container::vector<ullintPair>();
+				BOOST_FOREACH(metric_type &m, query->metrics)
+				{
+					if(_buffers->count(m))	// if elements with such a metric exist in store
+					{
+						locations = (*_buffers)[m]->Select(query->timePeriods);
+						dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+						delete locations;
+						locations = nullptr;
+					}
+				}
+			}
+			else // all dataLocationInfos should be returned
+			{
+				dataLocationInfo = new boost::container::vector<ullintPair>();
+				for(auto it=_buffers->begin(); it!=_buffers->end(); it++)
+				{
+					locations = it->second->Select(query->timePeriods);
+					dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+					delete locations;
+					locations = nullptr;
+				}
+			}
+
+			LOG4CPLUS_WARN(this->_logger, "Query: " << query->toString());
+
+			// Execute query with optional data locations using StoreQueryCore
+			void* queryResult = nullptr;
+			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
+			delete dataLocationInfo;
+
+			// Set task result and return
+			task->SetResult(true, nullptr, queryResult, size);
+			delete static_cast<char*>(queryResult);
+		}
+		catch(std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger, "Select task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch(...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Select task error [FAILED]"));
+		}
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [END]"));
+	}
+
+	void StoreController::flushTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [BEGIN]"));
 
 		// Check possible errors
-		if(task == nullptr || task->GetType() != Flush)
+		if(task == nullptr || task->GetType() != task::Flush)
 		{
 			LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("flushTask function - wrong argument [FAILED]"));
 			throw std::runtime_error("Error in flushTask function - wrong argument");
@@ -149,12 +224,16 @@ namespace store {
 
 		try
 		{
-			// Iterate through store buffers and flush them to GPU memory (Sync)
-			// TODO: Do it all flushes in parallel but sync them before returning from this function - flushTask should be sync.
-			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); it++)
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			// TODO: REPAIR FLUSH - and make integration tests for it
+			for(Buffers_Map::iterator it = _buffers->begin(); it != _buffers->end(); ++it)
 			{
-				it-> second->Flush();
+				it->second->Flush();
 			}
+
+			task->SetResult(true, "", nullptr, 0);
 		}
 		catch(std::exception& ex)
 		{
@@ -166,8 +245,37 @@ namespace store {
 			task->SetResult(false, nullptr, nullptr, 0);
 			LOG4CPLUS_FATAL(this->_logger, LOG4CPLUS_TEXT("Flush task error [FAILED]"));
 		}
-
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Flush task [END]"));
 	}
+
+	void StoreController::infoTask(task::Task_Pointer task)
+	{
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [BEGIN]"));
+		try
+		{
+			storeNodeInfo* queryResult = new storeNodeInfo();
+			// SET DEVICE TODO: Can be done once per thread
+			this->_cudaController->SetProperDevice();
+
+			size_t sizeOfResult = this->_infoCore->GetNodeInfo(&queryResult);
+			task->SetResult(true, nullptr, (void*)queryResult, sizeOfResult);
+			LOG4CPLUS_DEBUG(this->_logger, queryResult->toString());
+			delete queryResult;
+		}
+		catch (std::exception& ex)
+		{
+			LOG4CPLUS_ERROR_FMT(this->_logger,
+					"Info task error with exception - [%s] [FAILED]", ex.what());
+			task->SetResult(false, ex.what(), nullptr, 0);
+		}
+		catch (...)
+		{
+			task->SetResult(false, nullptr, nullptr, 0);
+			LOG4CPLUS_FATAL(this->_logger,
+					LOG4CPLUS_TEXT("Info task error [FAILED]"));
+		}
+		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
+	}
+
 } /* namespace store */
 } /* namespace ddj */

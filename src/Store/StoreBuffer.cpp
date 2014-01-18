@@ -21,142 +21,116 @@
 namespace ddj {
 namespace store {
 
-StoreBuffer::StoreBuffer(tag_type tag, GpuUploadMonitor* gpuUploadMonitor)
+StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore* uploadCore)
+	: _logger(Logger::getRoot())
 {
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [BEGIN]", tag);
+	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] constructor [BEGIN]", metric);
 
-	this->_tag = tag;
-	this->_areBuffersSwitched = false;
-	this->_bufferElementsCount = 0;
-	this->_backBufferElementsCount = 0;
-	this->_gpuUploadMonitor = gpuUploadMonitor;
-	this->_bufferInfoTreeMonitor = new BTreeMonitor(tag);
-	this->_uploaderBarrier = new boost::barrier(2);
+		this->_metric = metric;
+		this->_bufferElementsCount = 0;
+		this->_backBufferElementsCount = 0;
+		this->_uploadCore = uploadCore;
+		this->_bufferInfoTreeMonitor = new btree::BTreeMonitor(metric);
+		this->_bufferCapacity = bufferCapacity;
+		this->_bufferSize = bufferCapacity * sizeof(storeElement);
 
-	// ALLOCATE PINNED MEMORY FOR BUFFERS
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _buffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
-	CUDA_CHECK_RETURN(cudaMallocHost((void**)&(this -> _backBuffer), STORE_BUFFER_SIZE * sizeof(storeElement)));
+		// ALLOCATE MEMORY FOR BUFFERS
+		this->_buffer = new storeElement[bufferCapacity];
+		this->_backBuffer = new storeElement[bufferCapacity];
 
-	// START UPLOADER THRAED
-	this->_uploaderThread = new boost::thread(boost::bind(&StoreBuffer::uploaderThreadFunction, this));
-	this->_uploaderBarrier->wait();
-
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] constructor [END]", tag);
-}
-
-StoreBuffer::~StoreBuffer()
-{
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [BEGIN]", this->_tag);
-
-	// STOP UPLOADER THREAD
-	{
-		boost::mutex::scoped_lock lock(this->_uploaderMutex);
-		this->_uploaderThread->interrupt();
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] constructor [END]", metric);
 	}
-	this->_uploaderThread->join();
 
-	delete this->_bufferInfoTreeMonitor;
-	delete this->_uploaderBarrier;
-	delete this->_uploaderThread;
-
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [tag=%d] destructor [END]", this->_tag);
-}
-
-void StoreBuffer::Insert(storeElement* element)
-{
-	boost::mutex::scoped_lock lock(this->_bufferMutex);
-
-	this->_buffer[this->_bufferElementsCount] = *element;
-	this->_bufferElementsCount++;
-	if(_bufferElementsCount == STORE_BUFFER_SIZE)
+	StoreBuffer::~StoreBuffer()
 	{
-		while(this->_areBuffersSwitched)
-			this->_bufferCond.wait(lock);
-		this->switchBuffers();
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] destructor [BEGIN]", this->_metric);
+
+		delete this->_bufferInfoTreeMonitor;
+		delete this->_uploadCore;
+		this->_bufferInfoTreeMonitor = nullptr;
+		this->_uploadCore = nullptr;
+
+		LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] destructor [END]", this->_metric);
 	}
-}
 
-void StoreBuffer::Flush()
-{
-	boost::mutex::scoped_lock lock(this->_bufferMutex);
-
-	// Wait for back buffer to be uploaded to GPU
-	while(this->_areBuffersSwitched)
-			this->_bufferCond.wait(lock);
-
-	// Swap buffers
-	this->_backBufferElementsCount = this->_bufferElementsCount;
-	this->_bufferElementsCount = 0;
-	this->_buffer.swap(this->_backBuffer);
-
-	// UPLOAD BUFFER TO GPU
-	infoElement* elemToInsertToBTree =
-			this->_gpuUploadMonitor->Upload(&(this->_backBuffer), this->_backBufferElementsCount);
-
-	// INSERT INFO ELEMENT TO B+TREE
-	this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
-}
-
-void StoreBuffer::uploaderThreadFunction()
-{
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [BEGIN]", this->_tag);
-
-	infoElement* elemToInsertToBTree;
-	boost::unique_lock<boost::mutex> lock(this->_uploaderMutex);
-	this->_uploaderBarrier->wait();
-	try
+	void StoreBuffer::Insert(storeElement* element)
 	{
-		while(1)
+		this->_bufferMutex.lock();
+		this->_buffer[this->_bufferElementsCount] = *element;
+		this->_bufferElementsCount++;
+		LOG4CPLUS_DEBUG(this->_logger, "buffer elem count = " << this->_bufferElementsCount);
+		if(_bufferElementsCount == this->_bufferCapacity)
 		{
-			this->_uploaderCond.wait(lock);
-			{
-				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread is doing his JOB:) [tag=%d] [BEGIN]", this->_tag);
-
-				// UPLOAD BUFFER TO GPU
-				elemToInsertToBTree = this->_gpuUploadMonitor->Upload(
-																&(this->_backBuffer),
-																this->_backBufferElementsCount);
-
-				// INSERT INFO ELEMENT TO B+TREE
-				this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
-
-				// COMMUNICATE THAT BACK BUFFER WAS SUCCESSFULLY UPLOADED
-				boost::mutex::scoped_lock bufferLock(this->_bufferMutex);
-				this->_areBuffersSwitched = false;
-				this->_bufferCond.notify_one();
-
-				LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread ended his JOB:) [tag=%d] [END]", this->_tag);
-			}
+			uploadBufferToGPU();
+		} else {
+			this->_bufferMutex.unlock();
 		}
 	}
-	catch(boost::thread_interrupted& ex)
-	{
-		LOG4CPLUS_DEBUG_FMT(this->_logger, "Uploader thread [tag=%d] [END]", this->_tag);
-		return;
-	}
-	catch(std::exception& ex)
-	{
-		LOG4CPLUS_ERROR_FMT(this->_logger, "Uploader thread [tag=%d] failed with exception - [%s] [FAILED]", this->_tag, ex.what());
-	}
-	catch(...)
-	{
-		LOG4CPLUS_FATAL_FMT(this->_logger, "Uploader thread [tag=%d] error with unknown reason [FAILED]", this->_tag);
-		throw;
-	}
-}
 
-void StoreBuffer::switchBuffers()
-{
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [BEGIN]", this->_tag);
+	void StoreBuffer::Flush()
+	{
+		this->_bufferMutex.lock();
 
-	this->_areBuffersSwitched = true;
-	this->_backBufferElementsCount = this->_bufferElementsCount;
-	this->_bufferElementsCount = 0;
-	this->_buffer.swap(this->_backBuffer);
-	this->_uploaderCond.notify_one();
+		if (this->_bufferElementsCount != 0)
+		{
+			uploadBufferToGPU();
+		} else {
+			this->_bufferMutex.unlock();
+		}
+	}
 
-	LOG4CPLUS_DEBUG_FMT(this->_logger, "Switching buffers in store buffer [tag=%d] [END]", this->_tag);
-}
+	void StoreBuffer::uploadBufferToGPU()
+	{
+		this->_backBufferMutex.lock();
+		this->switchBuffers();
+		this->_bufferMutex.unlock();
+
+		// copy buffer to pinned memory
+		storeElement* pinnedMemory = nullptr;
+		CUDA_CHECK_RETURN( cudaMallocHost((void**)&(pinnedMemory), this->_bufferSize) );
+		CUDA_CHECK_RETURN
+		(
+			cudaMemcpy(pinnedMemory, this->_backBuffer, this->_bufferCapacity * sizeof(storeElement), cudaMemcpyHostToHost);
+		)
+
+		this->_backBufferMutex.unlock();
+
+		// UPLOAD BUFFER TO GPU (releases _backBufferMutex when element is already on GPU
+		storeTrunkInfo* elemToInsertToBTree = this->_uploadCore->Upload(pinnedMemory, this->_backBufferElementsCount);
+		CUDA_CHECK_RETURN( cudaFreeHost(pinnedMemory) );
+
+		// INSERT INFO ELEMENT TO B+TREE
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [START]");
+		this->_bufferInfoTreeMonitor->Insert(elemToInsertToBTree);
+		LOG4CPLUS_DEBUG(this->_logger, "Insert to BTREE [END]");
+
+		delete elemToInsertToBTree;
+		elemToInsertToBTree = nullptr;
+	}
+
+	void StoreBuffer::switchBuffers()
+	{
+		this->_backBufferElementsCount = this->_bufferElementsCount;
+		this->_bufferElementsCount = 0;
+		storeElement* temp;
+		temp = this->_buffer;
+		this->_buffer = this->_backBuffer;
+		this->_backBuffer = temp;
+	}
+
+	boost::container::vector<ullintPair>* StoreBuffer::Select(boost::container::vector<ullintPair> timePeriods)
+	{
+		if(timePeriods.size())
+		{
+			LOG4CPLUS_DEBUG(this->_logger, "StoreBuffer - Select data locations for time periods");
+			return this->_bufferInfoTreeMonitor->Select(timePeriods);
+		}
+		else
+		{
+			LOG4CPLUS_DEBUG(this->_logger, "StoreBuffer - Select all data locations");
+			return this->_bufferInfoTreeMonitor->SelectAll();
+		}
+	}
 
 } /* namespace store */
 } /* namespace ddj */

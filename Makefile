@@ -1,14 +1,14 @@
 RM := rm -rf
 OS := $(shell uname)
 
+NVCC := nvcc
+COMPILER := g++
 ifeq ($(OS),Darwin)
 	COMPILER := clang++
-	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++11 -stdlib=libc++
 else
-	#you can use g++ or clang or color-gcc
-	COMPILER := g++
-	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -llog4cplus
+	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++0x
 endif
 
@@ -16,74 +16,68 @@ INCLUDES := -I"/usr/local/cuda/include"
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
 
-OBJS += \
-./src/BTree/BTreeMonitor.o \
-./src/Store/StoreBuffer.o \
-./src/Store/StoreController.o \
-./src/GpuUpload/GpuUploadMonitor.o \
-./src/GpuUpload/GpuUploadCore.o \
-./src/Query/QueryMonitor.o \
-./src/Query/QueryCore.o \
-./src/Task/TaskResult.o \
-./src/Task/StoreTask.o \
-./src/Task/StoreTaskMonitor.o \
-./src/CUDA/CudaController.o \
-./src/Helpers/Semaphore.o \
-./src/CUDA/GpuStore.o \
-./src/Node.o \
-./src/Network/Client.o \
-./src/main.o
+VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 
-CPP_DEPS += \
-./src/BTree/BTreeMonitor.d \
-./src/Store/StoreBuffer.d \
-./src/Store/StoreController.d \
-./src/GpuUpload/GpuUploadMonitor.d \
-./src/GpuUpload/GpuUploadCore.d \
-./src/Query/QueryMonitor.d \
-./src/Query/QueryCore.d \
-./src/Task/TaskResult.d \
-./src/Task/StoreTask.d \
-./src/Task/StoreTaskMonitor.d \
-./src/CUDA/CudaController.d \
-./src/Helpers/Semaphore.d \
-./src/Node.d \
-./src/Network/Client.d \
-./src/main.d
+GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
+GENCODE_SM21    := -gencode arch=compute_20,code=sm_21
+GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
+GENCODE_FLAGS   := $(GENCODE_SM20) $(GENCODE_SM21) $(GENCODE_SM30) --relocatable-device-code true
 
-# CUDA code generation flags
-ifneq ($(OS_ARCH),armv7l)
-	GENCODE_SM10    := -gencode arch=compute_10,code=sm_10
-endif
-	GENCODE_SM20    := -gencode arch=compute_20,code=sm_21
-	GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\"
-	GENCODE_FLAGS   := $(GENCODE_SM21) $(GENCODE_SM30)
+SRC_FILES := $(wildcard src/*.cpp src/*/*.cpp src/*/*.cu)
+
+OBJS := $(SRC_FILES:.cpp=.o)
+OBJS := $(OBJS:.cu=.o)
+DEP := $(OBJS:.o=.d)
+
+all: DDJ_Store
+
+debug: COMPILER += -DDEBUG -g
+debug: NVCC += --debug --device-debug
+debug: all
+
+release: COMPILER += -O3
+release: NVCC += -O3
+release: all
 
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
-	@echo 'Invoking: $(COMPILER)'
-	$(COMPILER)  $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c -g $(STANDART) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Invoking: $(COMPILER) Compiler'
+	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(GCC_DEBUG_FLAGS) $(STANDART) -MMD -MP -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
-	@echo 'Invoking: NVCC Compiler'
-	nvcc $(GENCODE_FLAGS) $(INCLUDES) -c -g -o "$@" "$<"
+	@echo 'Invoking: $(NVCC) Compiler'
+	$(NVCC) $(GENCODE_FLAGS) $(INCLUDES) -c $(GCC_DEBUG_FLAGS) -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-all: DDJ_Store
+run: all
+	./DDJ_Store
 
-DDJ_Store: $(OBJS) $(USER_OBJS)
+DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C++ Linker'
-	$(COMPILER) -o "DDJ_Store" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: $(NVCC) Linker'
+	$(NVCC) $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
+	chmod +x DDJ_Store
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+test: all
+	./DDJ_Store --test 2> /dev/null
+
+leak-check: all
+	valgrind $(VALGRIND_OPTIONS) ./DDJ_Store --test
+
+check:
+	cppcheck --enable=all -j 4 -q ./src/
+
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) DDJ_Store
+	-$(RM) $(OBJS) $(DEP) DDJ_Store
 	-@echo ' '
 
-.PHONY: all clean dependents
+love:
+	curl -L http://j.mp/1bgQwqU
+
+.PHONY: all clean

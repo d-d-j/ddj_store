@@ -6,15 +6,14 @@
  */
 
 #include "Node.h"
-#include "CUDA/GpuStore.cuh"
 
 namespace ddj
 {
-	Node::Node()
+	Node::Node() : _logger(Logger::getRoot()), _config(Config::GetInstance())
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [BEGIN]"));
 
-		this->_storeTaskMonitor = new store::StoreTaskMonitor(&(this->_taskCond));
+		this->_taskMonitor = new task::TaskMonitor(&(this->_taskCond));
 		this->_taskBarrier = new boost::barrier(2);
 
 		// START TASK THRAED
@@ -24,19 +23,27 @@ namespace ddj
 		// connect CreateTaskMethod to _newTaskSignal
 		this->_requestSignal.connect(boost::bind(&Node::CreateTask, this, _1));
 
-		this->_cudaDevicesCount = gpuGetCudaDevicesCountAndPrint();
+		this->_cudaDevicesCount = _cudaCommons.CudaGetDevicesCountAndPrint();
 
 		StoreController_Pointer* controller;
 
-		//for(int i=0; i<this->_cudaDevicesCount; i++)
-		for(int i=0; i<1; i++)
+		boost::container::vector<int> devices;
+
+		for(int i=0; i<this->_cudaDevicesCount; i++)
 		{
 			// Check if GPU i satisfies ddj_store requirements
-			if(!gpuCheckCudaDevice(i)) continue;
+			if(!_cudaCommons.CudaCheckDeviceForRequirements(i))
+			{
+				continue;
+			}
 			controller = new StoreController_Pointer(new store::StoreController(i));
-			this->_controllers.insert({i,*controller});
-			delete controller;
+			this->_controllers.insert({i,*controller});	// copy shared pointer to map
+			LOG4CPLUS_INFO(this->_logger, "Created controller for device" << i);
+			devices.push_back(i);
+			delete controller;	// delete shared pointer to controller
+			controller = nullptr;
 		}
+		this->_cudaDevicesCount = this->_controllers.size();	// update number of devices
 
 		//throw exception if suitable cuda gpu devices count == 0
 		if(this->_controllers.empty())
@@ -46,7 +53,10 @@ namespace ddj
 			throw std::runtime_error(errString);
 		}
 
-		this->_client = new Client(&_requestSignal);
+		// CONNECT TO MASTER AND LOG IN
+		this->_client = new network::NetworkClient(&_requestSignal);
+		boost::scoped_ptr<network::networkLoginRequest> loginRequest(new network::networkLoginRequest(devices.data(), this->_cudaDevicesCount));
+		this->_client->SendLoginRequest(loginRequest.get());
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node constructor [END]"));
 	}
@@ -57,6 +67,7 @@ namespace ddj
 
 		// Disconnect and release client
 		delete this->_client;
+		this->_client = nullptr;
 
 		// Stop task thread and release it
 		{
@@ -67,18 +78,32 @@ namespace ddj
 
 		delete this->_taskBarrier;
 		delete this->_taskThread;
+		this->_taskBarrier = nullptr;
+		this->_taskThread = nullptr;
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Node destructor [END]"));
 	}
 
-	void Node::CreateTask(taskRequest request)
+	void Node::CreateTask(task::taskRequest request)
 	{
 		// Add a new task to task monitor
-		store::StoreTask_Pointer task =
-				this->_storeTaskMonitor->AddTask(request.task_id, request.type, request.data);
+		int expectedResultCount = request.device_id != TASK_ALL_DEVICES ? 1 : this->_cudaDevicesCount;
+		task::Task_Pointer task =
+				this->_taskMonitor->AddTask(request.task_id, request.type, request.data, expectedResultCount);
 
-		// TODO: Run this task in one selected StoreController when Insert or in all StoreControllers otherwise
-		this->_controllers[0]->ExecuteTask(task);
+		// Pass task to proper Store Controller (or all of them)
+		if(request.device_id != TASK_ALL_DEVICES)
+		{
+			this->_controllers[request.device_id]->ExecuteTask(task);
+		}
+		else	// all
+		{
+			for(auto it = this->_controllers.begin(); it != this->_controllers.end(); it++)
+			{
+				LOG4CPLUS_DEBUG(this->_logger, "Executing task on controller " << it->first);
+				it->second->ExecuteTask(task);
+			}
+		}
 	}
 
 	void Node::taskThreadFunction()
@@ -95,31 +120,23 @@ namespace ddj
 				this->_taskCond.wait(lock);
 
 				// Get all completed tasks
-				boost::container::vector<store::StoreTask_Pointer> compleatedTasks =
-						this->_storeTaskMonitor->PopCompleatedTasks();
+				boost::container::vector<task::Task_Pointer> compleatedTasks =
+						this->_taskMonitor->PopCompleatedTasks();
 
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
-				TaskResult* result;
+				LOG4CPLUS_INFO_FMT(this->_logger, "Completed %d tasks", compleatedTaskCount);
+				task::taskResult* result;
 
 				for(int i=0; i<compleatedTaskCount; i++)
 				{
-					if(compleatedTasks[i]->GetType() == SelectAll)
+					if(compleatedTasks[i]->GetType() != task::Insert)
 					{
 						// Get result of the task
 						result = compleatedTasks[i]->GetResult();
-
-						// TODO: only for testing purposes - should be removed
-						int n = result->result_size / sizeof(store::storeElement);
-						store::storeElement* elements = (store::storeElement*)result->result_data;
-						for(int k=0; k<n; k++)
-							LOG4CPLUS_DEBUG_FMT(this->_logger, "Select all element[%d]: {tag=%d, metric=%d, time=%llu, value=%f", k, elements[k].tag, elements[k].series, elements[k].time, elements[k].value);
-
+						LOG4CPLUS_INFO(this->_logger, "Sending result" << result->toString());
 						// Send result
 						this->_client->SendTaskResult(result);
-
-						// Destroy Task and TaskResult
-						delete result;
 					}
 				}
 			}

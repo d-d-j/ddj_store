@@ -1,33 +1,34 @@
-/*
- * TaskResult.h
- *
- *  Created on: 21-09-2013
- *      Author: ghashd
- */
-
-#include "../Store/StoreIncludes.h"
-#include "TaskType.h"
-
 #ifndef TASKRESULT_H_
 #define TASKRESULT_H_
 
-namespace ddj {
+#include "TaskType.h"
+#include <string>
+#include <sstream>
+#include <cstring>
 
-	struct TaskResult
+namespace ddj {
+namespace task {
+
+	struct taskResult
 	{
 	public:
-		int task_id;
+		int64_t task_id;
 		TaskType type;
-		int result_size;
+		int32_t result_size;
 		void* result_data;
 
-		TaskResult(
-				int taskId,
+		taskResult(
+				int64_t taskId,
 				TaskType type,
 				void* resultData = nullptr,
-				int resultSize = 0);
+				int32_t resultSize = 0,
+				char* message = nullptr):
+					task_id(taskId),
+					type(type),
+					result_size(resultSize),
+					result_data(resultData){}
 
-		TaskResult(const TaskResult & result)
+		taskResult(const taskResult & result)
 		{
 			task_id = result.task_id;
 			type = result.type;
@@ -35,7 +36,17 @@ namespace ddj {
 			result_data = result.result_data;
 		}
 
-		virtual ~TaskResult();
+		~taskResult(){}
+
+		bool operator== (const taskResult& rhs) const
+		{
+			if(task_id == rhs.task_id && type == rhs.type &&
+					result_size == rhs.result_size)
+			{
+				return true;
+			}
+			return false;
+		}
 
 		std::string toString()
 		{
@@ -45,5 +56,7 @@ namespace ddj {
 		}
 	};
 
+} /* namespace task */
 } /* namespace ddj */
+
 #endif /* TASKRESULT_H_ */
