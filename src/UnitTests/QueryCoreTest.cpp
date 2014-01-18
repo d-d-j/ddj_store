@@ -61,6 +61,40 @@ namespace query {
 		delete [] testArray;
 	}
 
+	size_t QueryCoreTest::createCompressedTestDataWithStoreElementsOneTrunk()
+	{
+		void* mainMemoryPointer = _cudaController->GetMainMemoryPointer();
+		size_t size = QUERY_CORE_TEST_MEM_SIZE;
+		storeElement* testArray = new storeElement[size];
+
+		// FILL TAST ARRAY WITH STORE ELEMENTS
+		for(unsigned long i=0; i<size; i++)
+		{
+			testArray[i].tag = i%20;
+			testArray[i].metric = 1;
+			testArray[i].time = i*10;
+			testArray[i].value = 3;
+		}
+		storeElement* device_elementsToCompress;
+		CUDA_CHECK_RETURN( cudaMalloc(&device_elementsToCompress, size*sizeof(storeElement)) );
+		CUDA_CHECK_RETURN( cudaMemcpy(device_elementsToCompress, testArray, size*sizeof(storeElement), cudaMemcpyHostToDevice) );
+
+		//Compress data and place it in main memory
+		void* device_compressedElements;
+		compression::Compression c;
+		size_t compressedDataSize = c.CompressTrunk(device_elementsToCompress, size*sizeof(storeElement), &device_compressedElements);
+		CUDA_CHECK_RETURN( cudaMemcpy(mainMemoryPointer, device_compressedElements, compressedDataSize, cudaMemcpyDeviceToDevice) );
+
+		_cudaController->SetMainMemoryOffset(compressedDataSize);
+
+		// CLEAN
+		delete [] testArray;
+		CUDA_CHECK_RETURN( cudaFree(device_elementsToCompress) );
+		CUDA_CHECK_RETURN( cudaFree(device_compressedElements) );
+
+		return compressedDataSize;
+	}
+
 	// check thrust version
 	TEST_F(QueryCoreTest, ThrustVersion)
 	{
@@ -485,7 +519,7 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaFree(deviceElements) );
 		}
 
-	//selectData
+	//selectData without compression
 
 		TEST_F(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation)
 		{
@@ -498,6 +532,7 @@ namespace query {
 			dataLocationInfo.push_back(ullintPair{64,127});
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&hostData ,&query, &dataLocationInfo);
 
 			// CHECK
@@ -549,6 +584,7 @@ namespace query {
 
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
@@ -589,6 +625,7 @@ namespace query {
 			results::sumResult* result;
 
 			// TEST
+			_queryCore->_enableCompression = false;
 			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
 
 			// CHECK
@@ -598,6 +635,45 @@ namespace query {
 			// CLEAN
 			free( result );
 		}
+
+	//selectData with compression
+
+		TEST_F(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation_OneTrunk_Compression)
+		{
+			// PREPARE
+			size_t sizeOfData = createCompressedTestDataWithStoreElementsOneTrunk();
+
+			Query query;
+			query.aggregationType = AggregationType::Sum;
+			boost::container::vector<ullintPair> dataLocationInfo;
+			dataLocationInfo.push_back(ullintPair{0,sizeOfData-1});	// all
+
+			query.tags.push_back(1);	// 52 elements
+			query.tags.push_back(6);	// 51 elements
+			query.tags.push_back(11);	// 51 elements
+			query.tags.push_back(19);	// 51 elements
+			query.timePeriods.push_back(ullintPair{1000,2000});	// all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{3000,4000}); // all: 100 elements, with good tags: 20
+			query.timePeriods.push_back(ullintPair{9000,10240});// all: 124 elements, with good tags: 25
+
+			// EXPECTED
+			int expected_elements_count = 1;
+			int expected_elements_size = expected_elements_count*sizeof(results::sumResult);
+			float expected_sum = 65*3.0f;
+			results::sumResult* result;
+
+			// TEST
+			_queryCore->_enableCompression = true;
+			size_t size = _queryCore->ExecuteQuery((void**)&result ,&query, &dataLocationInfo);
+
+			// CHECK
+			ASSERT_EQ(expected_elements_size, size);
+			EXPECT_FLOAT_EQ(expected_sum, result->sum);
+
+			// CLEAN
+			free( result );
+		}
+
 
 } /* namespace query */
 } /* namespace ddj */

@@ -5,10 +5,11 @@
 #define QUERY_CORE_TEST_MEM_SIZE 1024
 
 #include "../Query/QueryCore.h"
-#include "../Query/AggregationResults.cuh"
+#include "../Query/QueryAggregationResults.cuh"
 #include "../Cuda/CudaController.h"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaIncludes.h"
+#include "../Compression/Compression.h"
 #include <gtest/gtest.h>
 #include <cmath>
 
@@ -50,6 +51,7 @@ using namespace store;
 		void createSimpleCharTestData();
 		void createTestDataWithStoreElements();
 		void createTestDataWithStoreElements_100Elem();
+		size_t createCompressedTestDataWithStoreElementsOneTrunk();
 
 		QueryCore* _queryCore;
 		CudaController* _cudaController;

@@ -3,9 +3,10 @@
 namespace ddj {
 namespace query {
 
-	QueryCore::QueryCore(CudaController* cudaController)
+	QueryCore::QueryCore(CudaController* cudaController) : _logger(Logger::getRoot()),_config(Config::GetInstance())
 	{
 		this->_cudaController = cudaController;
+		this->_enableCompression = this->_config->GetIntValue("ENABLE_COMPRESSION");
 	}
 
 	QueryCore::~QueryCore(){}
@@ -14,20 +15,27 @@ namespace query {
 	{
 		// Read and copy data from mainMemoryPointer to temporary data buffer
 		// Update dalaLocationInfo to contain info about location in tempDataBuffer
-		storeElement* tempDataBuffer = nullptr;
-		size_t tempDataSize = this->mapData((void**)&tempDataBuffer, dataLocationInfo);
+		void* tempDataBuffer = nullptr;
+		size_t tempDataSize = this->mapData(&tempDataBuffer, dataLocationInfo);
 
-		// TODO: Decompress temporary data buffer
+		// Decompress temporary data buffer
+		storeElement* decompressedBuffer = static_cast<storeElement*>(tempDataBuffer);
+		size_t decompressedDataSize = tempDataSize;
+		if(this->_enableCompression)
+		{
+			decompressedDataSize =
+					this->decompressData(tempDataBuffer, tempDataSize, &decompressedBuffer, dataLocationInfo);
+			cudaFree( tempDataBuffer );
+		}
 
 		// Filter to set of tags and time periods specified in query (only if set is not empty)
-		size_t filteredDataSize = this->filterData(tempDataBuffer, tempDataSize, query, dataLocationInfo);
+		size_t filteredDataSize = this->filterData(decompressedBuffer, decompressedDataSize, query, dataLocationInfo);
 
 		// Aggregate all mapped and filtered data
 		size_t aggregatedDataSize =
-				this->aggregateData(tempDataBuffer, filteredDataSize, query, queryResult);
+				this->aggregateData(decompressedBuffer, filteredDataSize, query, queryResult);
 
-		cudaFree( tempDataBuffer );
-
+		cudaFree( decompressedBuffer );
 		return aggregatedDataSize;
 	}
 
@@ -101,9 +109,32 @@ namespace query {
 		return size;
 	}
 
-	storeElement* QueryCore::decompressData(void* data, size_t* size)
+	size_t QueryCore::decompressData(void* data, size_t size, storeElement** elements,
+			boost::container::vector<ullintPair>* dataLocationInfo)
 	{
-		return nullptr;
+		compression::Compression c;
+		size_t trunkSize = 0;
+		size_t allDataSize = 0;
+		boost::container::vector<std::pair<storeElement*, size_t> > decompressedTrunks;
+		storeElement* trunk;
+		BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)
+		{
+			trunkSize = c.DecompressTrunk((char*)data+dli.first, dli.length(), &trunk);
+			decompressedTrunks.push_back({trunk, trunkSize});
+			allDataSize += trunkSize;
+		}
+		char* result;
+		CUDA_CHECK_RETURN( cudaMalloc((void**)&result, allDataSize) );
+		int position = 0;
+		for(unsigned int i=0; i<decompressedTrunks.size(); i++)
+		{
+			trunk = decompressedTrunks[i].first;
+			trunkSize = decompressedTrunks[i].second;
+			CUDA_CHECK_RETURN( cudaMemcpy(result+position, trunk, trunkSize, cudaMemcpyDeviceToDevice) );
+			position += trunkSize;
+		}
+		(*elements) = (storeElement*)result;
+		return allDataSize;
 	}
 
 	size_t QueryCore::filterData(storeElement* elements, size_t dataSize, Query* query,

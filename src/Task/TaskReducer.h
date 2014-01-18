@@ -2,7 +2,7 @@
 #define TASKREDUCER_H_
 
 #include "../Query/Query.h"
-#include "../Query/AggregationData.h"
+#include "../Query/QueryAggregationData.h"
 
 namespace ddj {
 namespace task {

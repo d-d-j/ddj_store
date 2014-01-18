@@ -1,10 +1,10 @@
 #ifndef QUERYAGGREGATION_H_
 #define QUERYAGGREGATION_H_
 
-#include "AggregationType.h"
-#include "AggregationData.h"
+#include "QueryAggregationType.h"
+#include "QueryAggregationData.h"
+#include "QueryAggregation.cuh"
 #include "../Store/StoreElement.cuh"
-#include "../Cuda/CudaAggregation.cuh"
 #include <gtest/gtest.h>
 #include <boost/unordered_map.hpp>
 #include <boost/function.hpp>

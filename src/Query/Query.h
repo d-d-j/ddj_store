@@ -1,11 +1,11 @@
 #ifndef QUERY_H_
 #define QUERY_H_
 
-#include "AggregationType.h"
+#include "QueryAggregationType.h"
 #include "../Core/UllintPair.h"
 #include <boost/container/vector.hpp>
 #include <boost/foreach.hpp>
-#include "AggregationData.h"
+#include "QueryAggregationData.h"
 #include <string>
 #include <sstream>
 

@@ -3,11 +3,12 @@
 
 #include "Query.h"
 #include "QueryAggregation.h"
+#include "QueryFilter.cuh"
+#include "../Compression/Compression.h"
 #include "../Store/StoreElement.cuh"
 #include "../Core/Logger.h"
 #include "../Cuda/CudaController.h"
 #include "../Cuda/CudaIncludes.h"
-#include "../Cuda/CudaQuery.cuh"
 #include <boost/foreach.hpp>
 
 
@@ -20,7 +21,11 @@ namespace query {
 	{
 	private:
 		CudaController* _cudaController;
+		bool _enableCompression;
 
+		/* LOGGER & CONFIG */
+		Logger _logger;
+		Config* _config;
 	public:
 		QueryCore(CudaController* cudaController);
 		virtual ~QueryCore();
@@ -82,7 +87,8 @@ namespace query {
 		size_t filterData(storeElement* elements, size_t dataSize, Query* query,
 				boost::container::vector<ullintPair>* dataLocationInfo = nullptr);
 
-		storeElement* decompressData(void* data, size_t* size);
+		size_t decompressData(void* data, size_t size, storeElement** elements,
+				boost::container::vector<ullintPair>* dataLocationInfo);
 
 	private:
 		friend class QueryCoreTest;
@@ -107,6 +113,8 @@ namespace query {
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_SpecificTimeFrame_AllTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_NoAggregation);
 		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation);
+	//selectData with compression
+		FRIEND_TEST(QueryCoreTest, ExecuteQuery_ManyTimeFrames_SpecifiedTags_SumAggregation_OneTrunk_Compression);
 	};
 
 } /* namespace query */

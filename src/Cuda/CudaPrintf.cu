@@ -52,7 +52,7 @@
 #ifndef CUPRINTF_CU
 #define CUPRINTF_CU
 
-#include "cuPrintf.cuh"
+#include "CudaPrintf.cuh"
 #if __CUDA_ARCH__ > 100      // Atomics only used with > sm_10 architecture
 #include <sm_11_atomic_functions.h>
 #endif

@@ -22,7 +22,7 @@ namespace ddj {
 namespace store {
 
 StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore* uploadCore)
-	: _logger(Logger::getRoot())
+	: _logger(Logger::getRoot()),_config(Config::GetInstance())
 {
 	LOG4CPLUS_DEBUG_FMT(this->_logger, "Store buffer [metric=%d] constructor [BEGIN]", metric);
 
