@@ -33,3 +33,5 @@ InsertEqualElem 1000 2 512 29.6177
 SelectWithSeriesSumWhileInserting 14625.4
 InsertEqualElem 1000 2 512 32.9014
 SelectWithSeriesSumWhileInserting 22978.9
+InsertEqualElem 1000 2 512 8.29787
+SelectWithSeriesSumWhileInserting 17830.3

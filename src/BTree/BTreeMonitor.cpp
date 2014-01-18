@@ -67,7 +67,7 @@ namespace btree {
 		{
 			// get first element from B+Tree with greater or equal key than tp
 			auto it = this->_bufferInfoTree->lower_bound(tp);
-			if(it != this->_bufferInfoTree->end())
+			if(this->_bufferInfoTree->size())
 			{
 				/* check if the last smaller element isn't intersecting with tp because in this situation
 				 *	tp 						<----------->
