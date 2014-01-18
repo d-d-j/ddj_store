@@ -279,12 +279,12 @@ trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount)
 	trunkMinMax minMax = thrust::transform_reduce(elem_ptr, elem_ptr+elemCount, unary_op, init, binary_op);
 
 	// Calculate bytes needed for each storeElement field
-	int tag_bytes = (EasyFindLog2(minMax.tag_max - minMax.tag_min) + 7) / 8;
-	int metric_bytes = (EasyFindLog2(minMax.metric_max - minMax.metric_min) + 7) / 8;
+	int tag_bytes = (EasyFindLog2(1 + minMax.tag_max - minMax.tag_min) + 7) / 8;
+	int metric_bytes = (EasyFindLog2(1 + minMax.metric_max - minMax.metric_min) + 7) / 8;
 	int64_t timeDifference = minMax.time_max - minMax.time_min;
 	if(timeDifference > std::numeric_limits<int32_t>::max())
 		throw std::runtime_error("time difference in trunk is too big!");
-	int time_bytes = (EasyFindLog2((int32_t)(timeDifference)) + 7) / 8;
+	int time_bytes = (EasyFindLog2(1 + (int32_t)(timeDifference)) + 7) / 8;
 
 	// Fill trunk compress info
 	trunkCompressInfo info;
