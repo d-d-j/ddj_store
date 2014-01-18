@@ -97,7 +97,6 @@ namespace task {
 		memcpy((char*)query+position, &aggregationType, sizeof(int32_t));
 		position+=sizeof(int32_t);
 		memcpy((char*)query+position, &timePoints, sizeof(int32_t));
-		position+=sizeof(int32_t);
 		return query;
 	}
 

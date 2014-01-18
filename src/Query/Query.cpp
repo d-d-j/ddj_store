@@ -52,7 +52,6 @@ namespace query {
 			memcpy(&d->max, (int64_t*)((char*)queryData+position), sizeof(int64_t));
 			position += sizeof(int64_t);
 			memcpy(&d->bucketCount, (int32_t*)((char*)queryData+position), sizeof(int32_t));
-			position += sizeof(int32_t);
 			aggregationData = d;
 		}
 		else if (aggregationType == AggregationType::Histogram_Value) {
@@ -62,14 +61,12 @@ namespace query {
 			memcpy(&d->max, (float*)((char*)queryData+position), sizeof(float));
 			position += sizeof(float);
 			memcpy(&d->bucketCount, (int32_t*)((char*)queryData+position), sizeof(int32_t));
-			position += sizeof(int32_t);
 			aggregationData = d;
 		}
 		else if (aggregationType == AggregationType::SumSeries) {
 			int32_t samples;
 			memcpy(&samples, (int32_t*)((char*)queryData+position), sizeof(int32_t));
 			aggregationData = new data::interpolatedAggregationData(samples);
-			position += sizeof(int32_t);
 		}
 	}
 

@@ -29,6 +29,7 @@ namespace task {
 	protected:
 		StorePerformance()
 		{
+			_config = Config::GetInstance();
 			CudaCommons cudaC;
 			int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
 			_storeController = new store::StoreController(devId);
@@ -50,7 +51,7 @@ namespace task {
 
 		ofstream _resultFile;
 		Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));
-		Config* _config = Config::GetInstance();
+		Config* _config;
 		store::StoreController* _storeController;
 		TaskMonitor* _taskMonitor;
 		boost::condition_variable _taskCond;

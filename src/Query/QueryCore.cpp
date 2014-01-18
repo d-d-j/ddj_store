@@ -133,7 +133,7 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaMemcpy(result+position, trunk, trunkSize, cudaMemcpyDeviceToDevice) );
 			position += trunkSize;
 		}
-		(*elements) = (storeElement*)result;
+		(*elements) = reinterpret_cast<storeElement*>(result);
 		return allDataSize;
 	}
 
