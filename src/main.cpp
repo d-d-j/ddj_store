@@ -102,6 +102,11 @@ int main(int argc, char* argv[])
 				::testing::GTEST_FLAG(filter) = "*Performance*";
 				::testing::FLAGS_gtest_repeat = 1;
 			}
+			else if(!strcmp(argv[1], "--storePerformance"))
+			{
+				::testing::GTEST_FLAG(filter) = "*StorePerformance*";
+				::testing::FLAGS_gtest_repeat = 1;
+			}
 			return RUN_ALL_TESTS();
 		}
 	}

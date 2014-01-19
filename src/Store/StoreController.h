@@ -74,6 +74,8 @@ class StoreController : public boost::noncopyable
         StoreController(int gpuDeviceId);
         virtual ~StoreController();
         void ExecuteTask(task::Task_Pointer task);
+        size_t GetFreeMemory();
+        size_t GetUsedMemory();
     private:
         boost::container::vector<ullintPair>* getDataLocationInfo(Query* query);
 

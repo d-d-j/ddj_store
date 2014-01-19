@@ -8,13 +8,13 @@ namespace task {
 
 	INSTANTIATE_TEST_CASE_P(StorePerformanceInst,
 						StorePerformance,
-						::testing::Values(1000, 10000, 100000, 1000000));
+						::testing::Values(1000, 10000, 100000, 1000000, 5000000));
 
 	TEST_P(StorePerformance, InsertData_EqualElements)
 	{
 		int N = GetParam();
 		int X = 5;
-		int threadCount = _config->GetIntValue("THREAD_POOL_SIZE");
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
 		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
 		duration<double, milli> D;
 		for(int i=0; i<X; i++)
@@ -36,6 +36,32 @@ namespace task {
 			D += end - start;
 		}
 		printf("[InsertEqualElem|%d] (%f ms)\n", N, D.count()/X);
+		_resultFile << "InsertEqualElem " << N << " " << threadCount << " "
+				<< bufferSize << " " << D.count()/X << std::endl;
+	}
+
+	TEST_P(StorePerformance, InserData_LinearElements_10000ElemsManyTimes)
+	{
+		int N = 10000;
+		int X = 100;
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
+		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
+		duration<double, milli> D;
+		for(int i=0; i<X; i++)
+		{
+			auto start = system_clock::now();
+			for(int j=0; j<N; j++)
+			{
+				storeElement* elem = new storeElement(i%3, i%2, i, i*69.69);
+				Task_Pointer tp(new Task(1, Insert, elem, N, &_taskCond));
+				_storeController->ExecuteTask(tp);
+			}
+			delete this->_storeController;
+			auto end = system_clock::now();
+			D += end - start;
+			_storeController = new store::StoreController(this->_devId);
+		}
+		printf("[InserDataLinearElements|%d] (%f ms)\n", N, D.count()/X);
 		_resultFile << "InsertEqualElem " << N << " " << threadCount << " "
 				<< bufferSize << " " << D.count()/X << std::endl;
 	}
@@ -124,7 +150,7 @@ namespace task {
 
 	TEST_P(StorePerformance, SelectWithSeriesSum_While_InsertingLinearData_By_Two_Threads)
 	{
-		int N = GetParam();
+		int N = GetParam()/10;
 		duration<double, milli> D;
 		boost::thread insertThreadSin(boost::bind(insertDataSin, this->_storeController, 1, 1, &this->_taskCond));
 		boost::thread insertThreadCos(boost::bind(insertDataCos, this->_storeController, 2, 2, &this->_taskCond));
@@ -140,6 +166,43 @@ namespace task {
 		D = end - start;
 		printf("[SelectWithSeriesSumWhileInserting] (%f ms)\n", D.count());
 		_resultFile << "SelectWithSeriesSumWhileInserting " << D.count() << std::endl;
+	}
+
+	TEST_P(StorePerformance, CompressionRatioTest)
+	{
+		int N = GetParam();
+		int X = 3;
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
+		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
+		duration<double, milli> D;
+		size_t size = 0;
+		for(int i=0; i<X; i++)
+		{
+			auto start = system_clock::now();
+			for(int j=0; j<N; j++)
+			{
+				storeElement* elem = new storeElement(i%3, i%2, i, i*69.69);
+				Task_Pointer tp(new Task(1, Insert, elem, N, &_taskCond));
+				_storeController->ExecuteTask(tp);
+			}
+			Task_Pointer flushTp(new Task(2, Flush, nullptr, 1, &_taskCond));
+			this->_storeController->ExecuteTask(flushTp);
+			size += this->_storeController->GetUsedMemory();
+			delete this->_storeController;
+			auto end = system_clock::now();
+			D += end - start;
+			_storeController = new store::StoreController(this->_devId);
+		}
+		size /= X;
+		printf("[CompressionRatioTest|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", N, D.count()/X, N*24, size, ((float)N*24)/(float)size);
+		_resultFile << "CompressionRatioTest " << N
+				<< " " << threadCount
+				<< " " << bufferSize
+				<< " " << D.count()/X
+				<< " " << N*24
+				<< " " << size
+				<< " " << ((float)N*24)/(float)size
+				<< std::endl;
 	}
 
 } /* namespace task */

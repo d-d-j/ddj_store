@@ -333,5 +333,15 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
 	}
 
+	size_t StoreController::GetFreeMemory()
+	{
+		return this->_cudaController->GetMainMemoryCapacity() - this->_cudaController->GetMainMemoryOffset();
+	}
+
+	size_t StoreController::GetUsedMemory()
+	{
+		return this->_cudaController->GetMainMemoryOffset();
+	}
+
 } /* namespace store */
 } /* namespace ddj */
