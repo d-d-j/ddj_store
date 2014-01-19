@@ -93,7 +93,9 @@ namespace store {
 				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::selectTask, this, _1), task));
 				break;
 			case task::Flush:
+				this->_insertThreadPool.wait();
 				this->_insertThreadPool.schedule(boost::bind(boost::bind(&StoreController::flushTask, this, _1), task));
+				this->_insertThreadPool.wait();
 				break;
 			case task::Info:
 				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::infoTask, this, _1), task));
