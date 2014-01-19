@@ -96,7 +96,7 @@ namespace store {
 				this->flushTask(task);
 				break;
 			case task::Info:
-				this->_selectThreadPool.schedule(boost::bind(&StoreController::flushTask, this, task));
+				this->_selectThreadPool.schedule(boost::bind(&StoreController::infoTask, this, task));
 				break;
 			case task::Error:
 				LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Got task with type ERROR"));

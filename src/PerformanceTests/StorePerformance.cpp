@@ -8,7 +8,7 @@ namespace task {
 
 	INSTANTIATE_TEST_CASE_P(StorePerformanceInst,
 						StorePerformance,
-						::testing::Values(1000));//, 10000, 100000, 1000000));
+						::testing::Values(1000, 10000, 100000, 1000000));
 
 	TEST_P(StorePerformance, InsertData_EqualElements)
 	{
