@@ -76,6 +76,7 @@ namespace ddj
 		}
 		this->_taskThread->join();
 
+		delete this->_taskMonitor;
 		delete this->_taskBarrier;
 		delete this->_taskThread;
 		this->_taskBarrier = nullptr;
@@ -125,7 +126,7 @@ namespace ddj
 
 				// Send results of the tasks to master
 				int compleatedTaskCount = compleatedTasks.size();
-				LOG4CPLUS_INFO_FMT(this->_logger, "Completed %d tasks", compleatedTaskCount);
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Completed %d tasks", compleatedTaskCount);
 				task::taskResult* result;
 
 				for(int i=0; i<compleatedTaskCount; i++)

@@ -74,7 +74,9 @@ StoreBuffer::StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore
 		if (this->_bufferElementsCount != 0)
 		{
 			uploadBufferToGPU();
-		} else {
+		}
+		else
+		{
 			this->_bufferMutex.unlock();
 		}
 	}

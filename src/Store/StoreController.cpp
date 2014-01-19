@@ -39,9 +39,6 @@ namespace store {
 
 		this->_buffers = new Buffers_Map();
 
-		// PREPARE TASK FUNCTIONS DICTIONARY
-		this->populateTaskFunctions();
-
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
 		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"), gpuDeviceId);
 
@@ -55,7 +52,8 @@ namespace store {
 		this->_infoCore = new StoreInfoCore(this->_cudaController);
 
 		// SET THREAD POOL SIZES
-		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
+		this->_insertThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THREAD_POOL_SIZE"));
+		this->_selectThreadPool.size_controller().resize(this->_config->GetIntValue("SELECT_THREAD_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -64,12 +62,18 @@ namespace store {
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
-		_taskThreadPool.wait();
-		_taskThreadPool.clear();
+		// remove all pending tasks
+		_insertThreadPool.clear();
+		_selectThreadPool.clear();
+
+		// wait untill all active tasks are finished
+		_insertThreadPool.wait();
+		_selectThreadPool.wait();
 
 		delete this->_buffers;
 		delete this->_uploadCore;
 		delete this->_cudaController;
+
 		this->_buffers = nullptr;
 		this->_cudaController = nullptr;
 
@@ -80,26 +84,23 @@ namespace store {
 	{
 		// Sechedule a function from _TaskFunctions with this taskId
 		task::TaskType type = task->GetType();
-		this->_taskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
-	}
-
-	void StoreController::populateTaskFunctions()
-	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
-
-		// INSERT
-		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
-
-		// SELECT
-		_taskFunctions.insert({ task::Select, boost::bind(&StoreController::selectTask, this, _1) });
-
-		// FLUSH
-		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
-
-		// INFO
-		_taskFunctions.insert({ task::Info, boost::bind(&StoreController::infoTask, this, _1) });
-
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
+		switch(type)
+		{
+			case task::Insert:
+				this->_insertThreadPool.schedule(boost::bind(&StoreController::insertTask, this, task));
+				break;
+			case task::Select:
+				this->_selectThreadPool.schedule(boost::bind(&StoreController::selectTask, this, task));
+				break;
+			case task::Flush:
+				this->flushTask(task);
+				break;
+			case task::Info:
+				this->_selectThreadPool.schedule(boost::bind(&StoreController::flushTask, this, task));
+				break;
+			case task::Error:
+				LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Got task with type ERROR"));
+		}
 	}
 
 	boost::container::vector<ullintPair>* StoreController::getDataLocationInfo(Query* query)
