@@ -87,16 +87,16 @@ namespace store {
 		switch(type)
 		{
 			case task::Insert:
-				this->_insertThreadPool.schedule(boost::bind(&StoreController::insertTask, this, task));
+				this->_insertThreadPool.schedule(boost::bind(boost::bind(&StoreController::insertTask, this, _1), task));
 				break;
 			case task::Select:
-				this->_selectThreadPool.schedule(boost::bind(&StoreController::selectTask, this, task));
+				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::selectTask, this, _1), task));
 				break;
 			case task::Flush:
-				this->flushTask(task);
+				this->_insertThreadPool.schedule(boost::bind(boost::bind(&StoreController::flushTask, this, _1), task));
 				break;
 			case task::Info:
-				this->_selectThreadPool.schedule(boost::bind(&StoreController::infoTask, this, task));
+				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::infoTask, this, _1), task));
 				break;
 			case task::Error:
 				LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Got task with type ERROR"));

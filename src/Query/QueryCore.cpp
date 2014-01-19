@@ -76,7 +76,6 @@ namespace query {
 			CUDA_CHECK_RETURN( cudaMalloc(data, size) );
 
 			// Copy fragments of mainGpuArray specified in dataLocationInfo vector to mapped data array
-			// TODO: SPEED UP THIS COPING
 			int position = 0;
 			int oldPosition = 0;
 			BOOST_FOREACH(ullintPair &dli, *dataLocationInfo)

@@ -1,0 +1,8 @@
+InsertEqualElem 1000 -1 512 8.00434
+InsertEqualElem 10000 -1 512 82.9168
+InsertEqualElem 100000 -1 512 648.911
+InsertEqualElem 1000000 -1 512 6751.33
+SelectWithSeriesSumWhileInserting 12812.3
+SelectWithSeriesSumWhileInserting 12829.4
+SelectWithSeriesSumWhileInserting 11174.7
+SelectWithSeriesSumWhileInserting 6767.78
