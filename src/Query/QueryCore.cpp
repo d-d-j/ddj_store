@@ -132,6 +132,7 @@ namespace query {
 			trunkSize = decompressedTrunks[i].second;
 			CUDA_CHECK_RETURN( cudaMemcpy(result+position, trunk, trunkSize, cudaMemcpyDeviceToDevice) );
 			position += trunkSize;
+			CUDA_CHECK_RETURN( cudaFree(trunk) );
 		}
 		(*elements) = reinterpret_cast<storeElement*>(result);
 		return allDataSize;
