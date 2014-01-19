@@ -20,6 +20,8 @@
 #include <fstream>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include <random>
+#include <limits>
 
 namespace ddj {
 namespace task {

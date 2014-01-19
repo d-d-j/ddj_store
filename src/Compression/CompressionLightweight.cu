@@ -182,8 +182,8 @@ struct trunkMinMax
 	int32_t tag_max;
 	int32_t metric_min;
 	int32_t metric_max;
-	int64_t time_min;
-	int64_t time_max;
+	ullint time_min;
+	ullint time_max;
 
 	void initialize()
 	{
@@ -191,8 +191,8 @@ struct trunkMinMax
 		tag_max = std::numeric_limits<int32_t>::min();
 		metric_min = std::numeric_limits<int32_t>::max();
 		metric_max = std::numeric_limits<int32_t>::min();
-		time_min = std::numeric_limits<int64_t>::max();
-		time_max = std::numeric_limits<int64_t>::min();
+		time_min = std::numeric_limits<ullint>::max();
+		time_max = std::numeric_limits<ullint>::min();
 	}
 };
 
@@ -284,7 +284,7 @@ trunkCompressInfo AnalizeTrunkData(storeElement* elements, int elemCount)
 	int64_t timeDifference = minMax.time_max - minMax.time_min;
 	if(timeDifference > std::numeric_limits<int32_t>::max())
 		throw std::runtime_error("time difference in trunk is too big!");
-	int time_bytes = (EasyFindLog2(1 + (int32_t)(timeDifference)) + 7) / 8;
+	int time_bytes = (EasyFindLog2(1 + (int32_t)timeDifference ) + 7) / 8;
 
 	// Fill trunk compress info
 	trunkCompressInfo info;

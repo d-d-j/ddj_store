@@ -8,7 +8,7 @@ namespace task {
 
 	INSTANTIATE_TEST_CASE_P(StorePerformanceInst,
 						StorePerformance,
-						::testing::Values(1000, 10000, 100000, 1000000, 5000000));
+						::testing::Values(100, 1000, 10000, 100000, 1000000, 5000000));
 
 	TEST_P(StorePerformance, InsertData_EqualElements)
 	{
@@ -151,27 +151,32 @@ namespace task {
 	TEST_P(StorePerformance, SelectWithSeriesSum_While_InsertingLinearData_By_Two_Threads)
 	{
 		int N = GetParam()/10;
+		int X = 6;
 		duration<double, milli> D;
-		boost::thread insertThreadSin(boost::bind(insertDataSin, this->_storeController, 1, 1, &this->_taskCond));
-		boost::thread insertThreadCos(boost::bind(insertDataCos, this->_storeController, 2, 2, &this->_taskCond));
-		boost::thread selectThreadSumSeries(boost::bind(selectDataSumSeries,
-				this->_storeController, 1, 2, 1, 2, &this->_taskCond, N));
-		auto start = system_clock::now();
-		insertThreadSin.join();
-		insertThreadCos.join();
-		selectThreadSumSeries.join();
-		delete this->_storeController;
-		this->_storeController = nullptr;
-		auto end = system_clock::now();
-		D = end - start;
-		printf("[SelectWithSeriesSumWhileInserting] (%f ms)\n", D.count());
-		_resultFile << "SelectWithSeriesSumWhileInserting " << D.count() << std::endl;
+		for(int i=0; i<X; i++)
+		{
+			boost::thread insertThreadSin(boost::bind(insertDataSin, this->_storeController, 1, 1, &this->_taskCond));
+			boost::thread insertThreadCos(boost::bind(insertDataCos, this->_storeController, 2, 2, &this->_taskCond));
+			boost::thread selectThreadSumSeries(boost::bind(selectDataSumSeries,
+					this->_storeController, 1, 2, 1, 2, &this->_taskCond, N));
+			auto start = system_clock::now();
+			insertThreadSin.join();
+			insertThreadCos.join();
+			selectThreadSumSeries.join();
+			delete this->_storeController;
+			this->_storeController = nullptr;
+			auto end = system_clock::now();
+			D += end - start;
+			_storeController = new store::StoreController(this->_devId);
+		}
+		printf("[SelectWithSeriesSumWhileInsertingLinearData] (%f ms)\n", D.count()/X);
+		_resultFile << "SelectWithSeriesSumWhileInsertingLinearData " << D.count()/X << std::endl;
 	}
 
-	TEST_P(StorePerformance, CompressionRatioTest)
+	TEST_P(StorePerformance, CompressionRatioTest_Simple)
 	{
 		int N = GetParam();
-		int X = 3;
+		int X = 2;
 		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
 		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
 		duration<double, milli> D;
@@ -194,8 +199,161 @@ namespace task {
 			_storeController = new store::StoreController(this->_devId);
 		}
 		size /= X;
-		printf("[CompressionRatioTest|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", N, D.count()/X, N*24, size, ((float)N*24)/(float)size);
-		_resultFile << "CompressionRatioTest " << N
+		printf("[CompressionRatioTest_Simple|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", N, D.count()/X, N*24, size, ((float)N*24)/(float)size);
+		_resultFile << "CompressionRatioTest_Simple " << N
+				<< " " << threadCount
+				<< " " << bufferSize
+				<< " " << D.count()/X
+				<< " " << N*24
+				<< " " << size
+				<< " " << ((float)N*24)/(float)size
+				<< std::endl;
+	}
+
+	TEST_P(StorePerformance, CompressionRatioTest_Pessimistic_DefaultUniformRandom_1000Tags_10Metrics)
+	{
+		int N = GetParam();
+		int X = 2;
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
+		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
+		duration<double, milli> D;
+		size_t size = 0;
+		std::default_random_engine generator;
+		std::minstd_rand generator2;
+		std::minstd_rand generator3;
+		std::uniform_int_distribution<int> distribution(0, std::numeric_limits<int>::max());
+		std::uniform_int_distribution<int> indexTags(0, 999);
+		std::uniform_int_distribution<int> indexMetrics(0, 9);
+		for(int i=0; i<X; i++)
+		{
+			int tags[1000], metrics[10];
+			for(int k=0; k<1000; k++)
+				tags[k] = distribution(generator);
+			for(int l=0; l<10; l++)
+				metrics[l] = distribution(generator);
+
+			auto start = system_clock::now();
+			for(int j=0; j<N; j++)
+			{
+				int tag = tags[indexTags(generator2)];
+				int metric = metrics[indexMetrics(generator3)];
+				storeElement* elem = new storeElement(tag, metric, distribution(generator), i*69.69);
+				Task_Pointer tp(new Task(1, Insert, elem, 1, &_taskCond));
+				_storeController->ExecuteTask(tp);
+			}
+			Task_Pointer flushTp(new Task(2, Flush, nullptr, 1, &_taskCond));
+			this->_storeController->ExecuteTask(flushTp);
+			size += this->_storeController->GetUsedMemory();
+			delete this->_storeController;
+			auto end = system_clock::now();
+			D += end - start;
+
+			_storeController = new store::StoreController(this->_devId);
+		}
+		size /= X;
+		printf("[CompressionRatioTest_Pessimistic_NElems|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", N, D.count()/X, N*24, size, ((float)N*24)/(float)size);
+		_resultFile << "CompressionRatioTest_Pessimistic_NElems " << N
+				<< " " << threadCount
+				<< " " << bufferSize
+				<< " " << D.count()/X
+				<< " " << N*24
+				<< " " << size
+				<< " " << ((float)N*24)/(float)size
+				<< std::endl;
+	}
+
+	TEST_P(StorePerformance, CompressionRatioTest_Pessimistic_DefaultUniformRandom_NTags_20Metrics_1MElems)
+	{
+		int N = 1000000;
+		int T = GetParam();
+		int X = 2;
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
+		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
+		duration<double, milli> D;
+		size_t size = 0;
+		std::default_random_engine generator;
+		std::minstd_rand generator2;
+		std::minstd_rand generator3;
+		std::uniform_int_distribution<int> distribution(0, std::numeric_limits<int>::max());
+		std::uniform_int_distribution<int> indexTags(0, T-1);
+		std::uniform_int_distribution<int> indexMetrics(0, 19);
+		int* tags = new int[T];
+		for(int i=0; i<X; i++)
+		{
+			int metrics[20];
+			for(int k=0; k<T; k++)
+				tags[k] = distribution(generator);
+			for(int l=0; l<20; l++)
+				metrics[l] = distribution(generator);
+
+			auto start = system_clock::now();
+			for(int j=0; j<N; j++)
+			{
+				int tag = tags[indexTags(generator2)];
+				int metric = metrics[indexMetrics(generator3)];
+				storeElement* elem = new storeElement(tag, metric, distribution(generator), i*69.69);
+				Task_Pointer tp(new Task(1, Insert, elem, 1, &_taskCond));
+				_storeController->ExecuteTask(tp);
+			}
+			Task_Pointer flushTp(new Task(2, Flush, nullptr, 1, &_taskCond));
+			this->_storeController->ExecuteTask(flushTp);
+			size += this->_storeController->GetUsedMemory();
+			delete this->_storeController;
+			auto end = system_clock::now();
+			D += end - start;
+
+			_storeController = new store::StoreController(this->_devId);
+		}
+		delete [] tags;
+		size /= X;
+		printf("[CompressionRatioTest_Pessimistic_NTrunks|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", T, D.count()/X, N*24, size, ((float)N*24)/(float)size);
+		_resultFile << "CompressionRatioTest_Pessimistic_NTrunks " << N
+				<< " " << threadCount
+				<< " " << bufferSize
+				<< " " << D.count()/X
+				<< " " << N*24
+				<< " " << size
+				<< " " << ((float)N*24)/(float)size
+				<< std::endl;
+	}
+
+	TEST_P(StorePerformance, CompressionRatioTest_SuperPessimistic_DefaultUniformRandom)
+	{
+		if(GetParam()>10000) return;
+		int N = GetParam();
+		int X = 2;
+		int threadCount = _config->GetIntValue("INSERT_THREAD_POOL_SIZE");
+		int bufferSize = _config->GetIntValue("STORE_BUFFER_CAPACITY");
+		duration<double, milli> D;
+		size_t size = 0;
+		std::default_random_engine generator;
+		std::minstd_rand generator2;
+		std::minstd_rand generator3;
+		std::uniform_int_distribution<int> tags(0, std::numeric_limits<int>::max());
+		std::uniform_int_distribution<int> metrics(0, std::numeric_limits<int>::max());
+		std::uniform_int_distribution<int32_t> distribution64(0, std::numeric_limits<int32_t>::max());
+		for(int i=0; i<X; i++)
+		{
+			auto start = system_clock::now();
+			for(int j=0; j<N; j++)
+			{
+				int tag = tags(generator2);
+				int metric = metrics(generator3);
+				storeElement* elem = new storeElement(tag, metric, distribution64(generator), i*69.69);
+				Task_Pointer tp(new Task(1, Insert, elem, 1, &_taskCond));
+				_storeController->ExecuteTask(tp);
+			}
+			Task_Pointer flushTp(new Task(2, Flush, nullptr, 1, &_taskCond));
+			this->_storeController->ExecuteTask(flushTp);
+			size += this->_storeController->GetUsedMemory();
+			delete this->_storeController;
+			auto end = system_clock::now();
+			D += end - start;
+			_storeController = new store::StoreController(this->_devId);
+		}
+		size /= X;
+		printf("[CompressionRatioTest_SuperPessimistic|%d] time: %f ms, compression: from %d B to %lu B => ratio: %f\n", N, D.count()/X, N*24, size, ((float)N*24)/(float)size);
+		_resultFile << "CompressionRatioTest_SuperPessimistic " << N
 				<< " " << threadCount
 				<< " " << bufferSize
 				<< " " << D.count()/X
