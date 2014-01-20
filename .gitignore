@@ -14,6 +14,3 @@ ddj_store.log.*
 #Configuration
 config.ini
 ddj_logger.prop
-
-#Test results
-src/PerformanceTests/Results/*
