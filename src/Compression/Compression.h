@@ -8,6 +8,10 @@ namespace compression {
 
 	using namespace ddj::store;
 
+	/**
+	 * @class Compression
+	 *
+	 */
 	class Compression
 	{
 	public:
