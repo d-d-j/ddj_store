@@ -36,57 +36,35 @@
 </section>
 <section id="opis-ogólny">
     <section>
-        <h2>Ogólny opis systemu</h2>
+        <h2>Założenia</h2>
         <ul style="list-style: none;">
             <li class="fragment">Baza danych szeregów czasowych</li>
-            <li class="fragment">Rozproszona architektura - duża skalowalność</li>
-            <li class="fragment">Wykorzystanie wydajności kart graficznych</li>
-            <li class="fragment">Przechowywanie danych w pamięci kart graficznych</li>
+            <li class="fragment">Wykorzystanie technologi CUDA</li>
+            <li class="fragment">Zastosowanie kompresji na GPU</li>
         </ul>
     </section>
     <section>
-        <h2>Szeregi czasowe</h2>
+        <h2>Cele</h2>
         <ul style="list-style: none;">
-            <li class="fragment">Metryka</li>
-            <li class="fragment">Tag</li>
-            <li class="fragment">Czas</li>
-            <li class="fragment">Wartość</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Skalowalność</h2>
-        <ul style="list-style: none;">
-            <li class="fragment">Wielowatkowa architektura</li>
-                <ul style="list-style: none;">
-                    <li class="fragment">Go - wielowątkowość wpleciona w język</li>
-                    <li class="fragment">Wzorce usprawiniające programowanie równoległe</li>
-                </ul>
+            <li class="fragment">Szybkość</li>
+            <li class="fragment">Niezawodność</li>
+            <li class="fragment">Łatwość użycia</li>
+            <li class="fragment">Skalowalność</li>
             <li class="fragment">Konfigurowalność</li>
-            <li class="fragment">Łatwa rozbudowa</li>
         </ul>
-    </section>
-        <section>
-        <h2>Karty graficzne</h2>
-        <ul style="list-style: none;">
-            <li class="fragment">Rosnąca pojemność pamięci</li>
-            <li class="fragment">Przewaga w niektórych zastosowaniach nad zwykłym CPU</li>
-        </ul>
-    </section>
-    <section>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
-             alt="Deployment Diagram" src="img/SimpleDeployment.png">
     </section>
 </section>
 <section id="opis-architektury">
     <section>
         <h2>Opis Architektury</h2>
-
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
+             alt="Deployment Diagram" src="img/SimpleDeployment.png">
     </section>
 </section>
 <section id="wyniki">
     <section>
         <h2>Wyniki</h2>
-        Rezultatem projektu jest funkcjonujący na klastrze GPU wydziału MiNI prototyp rozproszonej bazy danych. Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej. 
+        Rezultatem projektu jest funkcjonujący na klastrze GPU wydziału MiNI prototyp rozproszonej bazy danych. Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
     </section>
     <section>
         <h3>Ilość zapytań obsługiwanych przez serwer główny na sekundę</h3>
@@ -116,7 +94,7 @@
 <section id="podsumowanie">
     <section>
         <h2>Podsumowanie</h2>
-        Stworzona baza danych cechuje się dużą skalowalnością. Kolejne węzły obliczeniowe mogą być dodawane, lub też wymieniane (utrata danych) w czasie działania całego systemu. 
+        Stworzona baza danych cechuje się dużą skalowalnością. Kolejne węzły obliczeniowe mogą być dodawane, lub też wymieniane (utrata danych) w czasie działania całego systemu.
     </section>
     <section>
         Ilość wpływających danych limitowana jest przede wszystkim samą wydajnością serwera głównego, a dokładniej wydajnością użytego REST'owego API.
