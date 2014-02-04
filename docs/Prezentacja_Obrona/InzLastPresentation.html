@@ -58,6 +58,19 @@
 <section id="wyniki">
     <section>
         <h2>Wyniki</h2>
+        Stworzona baza danych cechuje się dużą skalowalnością. Kolejne węzły obliczeniowe mogą być dodawane, lub też wymieniane (utrata danych) w czasie działania całego systemu. Ponadto ilość wpływających danych limitowana jest przede wszystkim samą wydajnością REST'owego API. Dzięki wydajności kart graficznych oraz przechowywaniu danych w pamięci podręcznej, zapytania wykonywane są z dużą szybkością nawet przy dużej ilości nieustannie wpływających danych.
+    </section>
+    <section>
+        <h3>Ilość zapytań obsługiwanych przez serwer główny na sekundę</h3>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="serverResponses" title="serverResponses"
+             alt="serverResponses" src="img/concurrencyTest-eps-converted-to.png">
+    </section>
+    <section>
+        <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
+        <img style="border: none; background: rgba(255, 255, 255, 0);" id="nodeInsert" title="nodeInsert"
+             alt="nodeInsert" src="img/uploadSpeed.png">
+    </section>
+    <section>
         <h3>Ilość przetrzymywanych danych</h3>
         Zakładając że:
         <ul>
@@ -70,9 +83,6 @@
             </br>
             <h4>Baza danych jest w stanie przechowywać dane z okresu </br>ponad <strong style="color: #eeeeee;">2</strong> dni wstecz.</h4>
         </p>
-    </section>
-    <section>
-        
     </section>
 
 <section id="podsumowanie">
