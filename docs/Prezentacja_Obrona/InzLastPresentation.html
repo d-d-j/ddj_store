@@ -89,6 +89,26 @@
                 Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
             </section>
             <section>
+                <h3>Funkcje które udało się zaimplementować:</h3>
+                <ul style="list-style: none;">
+                    <li class="fragment">Suma</li>
+                    <li class="fragment">Średnia</li>
+                    <li class="fragment">Min i Max</li>
+                    <li class="fragment">Odchylenie standardowe</li>
+                    <li class="fragment">Wariancja</li>
+                    <li class="fragment">Histogram po wartościach</li>
+                    <li class="fragment">Histogram po czasie</li>
+                    <li class="fragment">Suma szeregów z interpolacją</li>
+                    <li class="fragment">Całka pod szeregiem</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Wkładanie danych do bazy</h2>
+                <p>Zaimplementowany Load Balancer otrzymuje statystyki wszystkich połączonych węzłów.</p>
+                <p>Na podstawie otrzymanych statystyk wybierany jest węzeł do którego będą trafiać następne dane.</p>
+                <p>Węzeł wybierany jest na podstawie rankingu.</p>
+            </section>
+            <section>
                 <h3>Ilość zapytań obsługiwanych przez serwer główny na sekundę</h3>
                 <img style="border: none; background: rgba(255, 255, 255, 0);" id="serverResponses"
                      title="serverResponses"
@@ -96,8 +116,41 @@
             </section>
             <section>
                 <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
-                <img style="border: none; background: rgba(255, 255, 255, 0);" id="nodeInsert" title="nodeInsert"
-                     alt="nodeInsert" src="img/uploadSpeed.png">
+                <h4>Bez kompresji</h4>
+                <div style="float: left; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="InsertSpeedCompressionOff-1" title="InsertSpeedCompressionOff-1"
+                         alt="InsertSpeedCompressionOff-1" src="img/InsertSpeedCompressionOff-1.png">
+                    <p>Dane z tą samą metryką</p>
+                </div>
+                <div style="float: right; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="InsertSpeedCompressionOff" title="InsertSpeedCompressionOff"
+                         alt="InsertSpeedCompressionOff" src="img/InsertSpeedCompressionOff.png">
+                    <p>Dane z różnymi metrykami</p>
+                </div>
+            </section>
+            <section>
+                <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
+                <h4>Z kompresją</h4>
+                <div style="float: left; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="InsertSpeedCompressionOn" title="InsertSpeedCompressionOn"
+                         alt="InsertSpeedCompressionOn" src="img/InsertSpeedCompressionOn.png">
+                    <p>Dane z tą samą metryką</p>
+                </div>
+                <div style="float: right; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="InsertSpeedCompressionOn-1" title="InsertSpeedCompressionOn-1"
+                         alt="InsertSpeedCompressionOn-1" src="img/InsertSpeedCompressionOn-1.png">
+                    <p>Dane z różnymi metrykami</p>
+                </div>
+            </section>
+            <section>
+                <ul style="list-style: none;">
+                    <li class="fragment">Niezależnie od ilości wątków oraz rozmiaru bufora pojedyńczy węzeł z jedną kartą potrafi przyjąć ponad 50 tys. nowych elementów na sekundę</li>
+                    <li class="fragment">Zaimplementowana lekka kompresja oparta na algorytmie "Fixed Length Encoding" nie wpływa na szybkość wkładania nowych elementów do bazy danych</li>
+                </ul>
             </section>
             <section>
                 <h3>Ilość przetrzymywanych danych</h3>
