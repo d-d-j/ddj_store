@@ -100,6 +100,20 @@
                      alt="nodeInsert" src="img/uploadSpeed.png">
             </section>
             <section>
+                <h3>Ilość przetrzymywanych danych</h3>
+                Zakładając że:
+                <ul>
+                    <li>Dane wpływają ze średnią prędkością 25 000 elementów na sekundę</li>
+                    <li>Wielkość elementu po kompresji wynosi średnio 8 bajtów</li>
+                    <li>Posiadamy 3 klastry po 3 karty graficzne o pojemności 6 GB</li>
+                    <li>Baza danych ustawiona jest aby wykorzystywać 4GB na karcie na przechowywanie danych</li>
+                </ul>
+                <p>
+                    </br>
+                <h4>Baza danych jest w stanie przechowywać dane z okresu </br>ponad 2 dni.</h4>
+                </p>
+            </section>
+            <section>
                 <h4>Zapytania Select z równoleglymi Insert</h4>
 
                 <div style="float: left; width: 400px;">
@@ -112,7 +126,7 @@
                     <img style="border: none; background: rgba(255, 255, 255, 255);"
                          id="nodeConcurrent1m" title="nodeConcurrent"
                          alt="nodeConcurrent" src="img/concurrentSelectsTest1000000.png">
-                    <p>100 000 000</p>
+                    <p>1 000 000</p>
                 </div>
                 <div style="float: left; width: 400px;">
                     <img style="border: none; background: rgba(255, 255, 255, 255);"
@@ -128,18 +142,10 @@
                 </div>
             </section>
             <section>
-                <h3>Ilość przetrzymywanych danych</h3>
-                Zakładając że:
                 <ul>
-                    <li>Dane wpływają ze średnią prędkością 25 000 elementów na sekundę</li>
-                    <li>Wielkość elementu po kompresji wynosi średnio 8 bajtów</li>
-                    <li>Posiadamy 3 klastry po 3 karty graficzne o pojemności 6 GB</li>
-                    <li>Baza danych ustawiona jest aby wykorzystywać 4GB na karcie na przechowywanie danych</li>
+                    <li>Czas wykonania zapytań zdominowany przez obsługę zapytania poza węzłem</li>
+                    <li>...</li>
                 </ul>
-                <p>
-                    </br>
-                <h4>Baza danych jest w stanie przechowywać dane z okresu </br>ponad 2 dni.</h4>
-                </p>
             </section>
         </section>
         <section id="podsumowanie">
