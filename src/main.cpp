@@ -107,6 +107,16 @@ int main(int argc, char* argv[])
 				::testing::GTEST_FLAG(filter) = "*StorePerformance*";
 				::testing::FLAGS_gtest_repeat = 1;
 			}
+			else if(!strcmp(argv[1], "--insertPerformance"))
+			{
+				::testing::GTEST_FLAG(filter) = "*InsertPerformance*";
+				::testing::FLAGS_gtest_repeat = 1;
+			}
+			else if(!strcmp(argv[1], "--integralPerformance"))
+			{
+				::testing::GTEST_FLAG(filter) = "*IntegralPerformance*";
+				::testing::FLAGS_gtest_repeat = 1;
+			}
 			return RUN_ALL_TESTS();
 		}
 	}

@@ -116,6 +116,7 @@ namespace query {
 
 				FRIEND_TEST(QueryAggregationPerformance, SumAggregation_EqualIntegerValues);
 				FRIEND_TEST(QueryAggregationPerformance, IntegralAggregation_Sin_Trunk200);
+				FRIEND_TEST(IntegralPerformance, IntegralAggregation_Sin);
 
 	};
 
