@@ -86,10 +86,10 @@
             <section>
                 <h2>Wyniki</h2>
                 Rezultatem projektu jest funkcjonujący na klastrze GPU wydziału MiNI prototyp rozproszonej bazy danych.
-                Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
+                Baza ta, jak założono, przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
             </section>
             <section>
-                <h3>Funkcje które udało się zaimplementować:</h3>
+                <h3>Zaimplementowane funkcje:</h3>
                 <ul style="list-style: none;">
                     <li class="fragment">Suma</li>
                     <li class="fragment">Średnia</li>
@@ -104,8 +104,11 @@
             </section>
             <section>
                 <h2>Wkładanie danych do bazy</h2>
+
                 <p>Zaimplementowany Load Balancer otrzymuje statystyki wszystkich połączonych węzłów.</p>
+
                 <p>Na podstawie otrzymanych statystyk wybierany jest węzeł do którego będą trafiać następne dane.</p>
+
                 <p>Węzeł wybierany jest na podstawie rankingu.</p>
             </section>
             <section>
@@ -117,39 +120,25 @@
             <section>
                 <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
                 <h4>Bez kompresji</h4>
-                <div style="float: left; width: 400px;">
-                    <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="InsertSpeedCompressionOff-1" title="InsertSpeedCompressionOff-1"
-                         alt="InsertSpeedCompressionOff-1" src="img/InsertSpeedCompressionOff-1.png">
-                    <p>Dane z tą samą metryką</p>
-                </div>
-                <div style="float: right; width: 400px;">
-                    <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="InsertSpeedCompressionOff" title="InsertSpeedCompressionOff"
-                         alt="InsertSpeedCompressionOff" src="img/InsertSpeedCompressionOff.png">
-                    <p>Dane z różnymi metrykami</p>
-                </div>
+                <img style="border: none; background: rgba(255, 255, 255, 255);"
+                     id="InsertSpeedCompressionOff" title="InsertSpeedCompressionOff"
+                     alt="InsertSpeedCompressionOff" src="img/InsertSpeedCompressionOff.png">
             </section>
             <section>
                 <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
                 <h4>Z kompresją</h4>
-                <div style="float: left; width: 400px;">
-                    <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="InsertSpeedCompressionOn" title="InsertSpeedCompressionOn"
-                         alt="InsertSpeedCompressionOn" src="img/InsertSpeedCompressionOn.png">
-                    <p>Dane z tą samą metryką</p>
-                </div>
-                <div style="float: right; width: 400px;">
-                    <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="InsertSpeedCompressionOn-1" title="InsertSpeedCompressionOn-1"
-                         alt="InsertSpeedCompressionOn-1" src="img/InsertSpeedCompressionOn-1.png">
-                    <p>Dane z różnymi metrykami</p>
-                </div>
+                <img style="border: none; background: rgba(255, 255, 255, 255);"
+                     id="InsertSpeedCompressionOn" title="InsertSpeedCompressionOn"
+                     alt="InsertSpeedCompressionOn" src="img/InsertSpeedCompressionOn.png">
             </section>
             <section>
                 <ul style="list-style: none;">
-                    <li class="fragment">Niezależnie od ilości wątków oraz rozmiaru bufora pojedyńczy węzeł z jedną kartą potrafi przyjąć ponad 50 tys. nowych elementów na sekundę</li>
-                    <li class="fragment">Zaimplementowana lekka kompresja oparta na algorytmie "Fixed Length Encoding" nie wpływa na szybkość wkładania nowych elementów do bazy danych</li>
+                    <li class="fragment">Pojedynczy węzeł z jedną kartą potrafi przyjąć około 300 tys. elementów na
+                        sekundę
+                    </li>
+                    <li class="fragment">Zaimplementowana lekka kompresja oparta na algorytmie "Fixed Length Encoding"
+                        nie wpływa na szybkość wkładania nowych elementów do bazy danych
+                    </li>
                 </ul>
             </section>
             <section>
@@ -167,37 +156,38 @@
                 </p>
             </section>
             <section>
-                <h4>Zapytania Select z równoleglymi Insert</h4>
+                <h4>Zapytania Select z równoległymi Insert</h4>
 
                 <div style="float: left; width: 400px;">
                     <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="nodeConcurrent100k" title="nodeConcurrent"
-                         alt="nodeConcurrent" src="img/concurrentSelectsTest100000.png">
-                    <p>100 000</p>
+                         id="nodeConcurrent1m" title="nodeConcurrent"
+                         alt="nodeConcurrent" src="img/concurrentSelectsTest1000000.png">
+
+                    <p>1 000 000</p>
                 </div>
                 <div style="float: right; width: 400px;">
                     <img style="border: none; background: rgba(255, 255, 255, 255);"
-                         id="nodeConcurrent1m" title="nodeConcurrent"
-                         alt="nodeConcurrent" src="img/concurrentSelectsTest1000000.png">
-                    <p>1 000 000</p>
-                </div>
-                <div style="float: left; width: 400px;">
-                    <img style="border: none; background: rgba(255, 255, 255, 255);"
                          id="nodeConcurrent5m" title="nodeConcurrent"
                          alt="nodeConcurrent" src="img/concurrentSelectsTest5000000.png">
+
                     <p>5 000 000</p>
                 </div>
                 <div style="float: right; width: 400px;">
                     <img style="border: none; background: rgba(255, 255, 255, 255);"
                          id="nodeConcurrent10m" title="nodeConcurrent"
                          alt="nodeConcurrent" src="img/concurrentSelectsTest10000000.png">
+
                     <p>10 000 000</p>
                 </div>
             </section>
             <section>
+                <h4>Czas wykonania funkcji agregujących na samym węźle</h4>
+                <img src="img/IntegralSpeedSpeed.png" alt=""/>
+            </section>
+            <section>
                 <ul>
                     <li>Czas wykonania zapytań zdominowany przez obsługę zapytania poza węzłem</li>
-                    <li>...</li>
+                    <li>Wysyłanie zapytań Insert nie wpływa znacząco na czas obsługi zapytań Select</li>
                 </ul>
             </section>
         </section>
