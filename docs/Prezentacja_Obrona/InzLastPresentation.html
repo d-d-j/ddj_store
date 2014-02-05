@@ -13,120 +13,154 @@
 
 <body>
 <div class="reveal">
-<div class="slides">
-<section>
-    <h1>Rozproszona baza szeregów czasowych</h1>
-    <h4>dla klastra GPU</h4>
+    <div class="slides">
+        <section>
+            <h1>Rozproszona baza szeregów czasowych</h1>
+            <h4>dla klastra GPU</h4>
 
-    <p class="small">Karol Dzitkowski</p>
+            <p class="small">Karol Dzitkowski</p>
 
-    <p class="small">Jakub Dutkowski</p>
+            <p class="small">Jakub Dutkowski</p>
 
-    <p class="small">Tomasz Janiszewski</p>
-</section>
+            <p class="small">Tomasz Janiszewski</p>
+        </section>
 
-<section id="plan-prezentacji">
-    <h3>Plan prezentacji</h3>
-    <ol>
-        <li>Ogólny opis systemu</li>
-        <li>Opis Architektury</li>
-        <li>Wyniki</li>
-        <li>Podsumowanie</li>
-    </ol>
-</section>
-<section id="opis-ogólny">
-    <section>
-        <h2>Założenia</h2>
-        <ul style="list-style: none;">
-            <li class="fragment">Baza danych szeregów czasowych</li>
-            <li class="fragment">Wykorzystanie technologi CUDA</li>
-            <li class="fragment">Zastosowanie kompresji na GPU</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Cele</h2>
-        <ul style="list-style: none;">
-            <li class="fragment">Szybkość</li>
-            <li class="fragment">Niezawodność</li>
-            <li class="fragment">Łatwość użycia</li>
-            <li class="fragment">Skalowalność</li>
-            <li class="fragment">Konfigurowalność</li>
-        </ul>
-    </section>
-</section>
-<section id="opis-architektury">
-    <section>
-        <h2>Opis Architektury</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram" title="Deployment Diagram"
-             alt="Deployment Diagram" src="img/SimpleDeployment.png">
-    </section>
-    <section>
-        <h2>Master</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="MapReduce"
-             alt="MapReduce" src="img/MapReduce.png">
-    </section>
-    <section>
-        <h2>Master</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="DataFlow"
-             alt="DataFlow" src="img/DataFlow.png">
-    </section>
-    <section>
-        <h2>Node - insert</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="Insert"
-             alt="Insert" src="img/Insert.png">
-    </section>
-    <section>
-        <h2>Node - select</h2>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="Select"
-             alt="Select" src="img/Select.png">
-    </section>
-</section>
-<section id="wyniki">
-    <section>
-        <h2>Wyniki</h2>
-        Rezultatem projektu jest funkcjonujący na klastrze GPU wydziału MiNI prototyp rozproszonej bazy danych. Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
-    </section>
-    <section>
-        <h3>Ilość zapytań obsługiwanych przez serwer główny na sekundę</h3>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="serverResponses" title="serverResponses"
-             alt="serverResponses" src="img/concurrencyTest-eps-converted-to.png">
-    </section>
-    <section>
-        <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
-        <img style="border: none; background: rgba(255, 255, 255, 0);" id="nodeInsert" title="nodeInsert"
-             alt="nodeInsert" src="img/uploadSpeed.png">
-    </section>
-    <section>
-        <h3>Ilość przetrzymywanych danych</h3>
-        Zakładając że:
-        <ul>
-            <li>Dane wpływają ze średnią prędkością 25 000 elementów na sekundę</li>
-            <li>Wielkość elementu po kompresji wynosi średnio 8 bajtów</li>
-            <li>Posiadamy 3 klastry po 3 karty graficzne o pojemności 6 GB</li>
-            <li>Baza danych ustawiona jest aby wykorzystywać 4GB na karcie na przechowywanie danych</li>
-        </ul>
-        <p>
-            </br>
-            <h4>Baza danych jest w stanie przechowywać dane z okresu </br>ponad 2 dni wstecz.</h4>
-        </p>
-    </section>
-</section>
-<section id="podsumowanie">
-    <section>
-        <h2>Podsumowanie</h2>
-        Stworzona baza danych cechuje się dużą skalowalnością. Kolejne węzły obliczeniowe mogą być dodawane, lub też wymieniane (utrata danych) w czasie działania całego systemu.
-    </section>
-    <section>
-        Ilość wpływających danych limitowana jest przede wszystkim samą wydajnością serwera głównego, a dokładniej wydajnością użytego REST'owego API.
-    </section>
-    <section>
-        Dzięki wydajności kart graficznych oraz przechowywaniu danych w pamięci podręcznej, zapytania wykonywane są z dużą szybkością nawet przy dużej ilości nieustannie wpływających danych.
-    </section>
-</section>
-<section>
-    <h1>DZIĘKUJEMY</h1>
-</section>
-</div>
+        <section id="plan-prezentacji">
+            <h3>Plan prezentacji</h3>
+            <ol>
+                <li>Ogólny opis systemu</li>
+                <li>Opis Architektury</li>
+                <li>Wyniki</li>
+                <li>Podsumowanie</li>
+            </ol>
+        </section>
+        <section id="opis-ogólny">
+            <section>
+                <h2>Założenia</h2>
+                <ul style="list-style: none;">
+                    <li class="fragment">Baza danych szeregów czasowych</li>
+                    <li class="fragment">Wykorzystanie technologi CUDA</li>
+                    <li class="fragment">Zastosowanie kompresji na GPU</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Cele</h2>
+                <ul style="list-style: none;">
+                    <li class="fragment">Szybkość</li>
+                    <li class="fragment">Niezawodność</li>
+                    <li class="fragment">Łatwość użycia</li>
+                    <li class="fragment">Skalowalność</li>
+                    <li class="fragment">Konfigurowalność</li>
+                </ul>
+            </section>
+        </section>
+        <section id="opis-architektury">
+            <section>
+                <h2>Opis Architektury</h2>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="deploymentDiagram"
+                     title="Deployment Diagram"
+                     alt="Deployment Diagram" src="img/SimpleDeployment.png">
+            </section>
+            <section>
+                <h2>Master</h2>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="MapReduce"
+                     alt="MapReduce" src="img/MapReduce.png">
+            </section>
+            <section>
+                <h2>Master</h2>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="DataFlow"
+                     alt="DataFlow" src="img/DataFlow.png">
+            </section>
+            <section>
+                <h2>Node - insert</h2>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="Insert"
+                     alt="Insert" src="img/Insert.png">
+            </section>
+            <section>
+                <h2>Node - select</h2>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="mapReduce" title="Select"
+                     alt="Select" src="img/Select.png">
+            </section>
+        </section>
+        <section id="wyniki">
+            <section>
+                <h2>Wyniki</h2>
+                Rezultatem projektu jest funkcjonujący na klastrze GPU wydziału MiNI prototyp rozproszonej bazy danych.
+                Baza ta jak założono przechowuje dane po stronie kart graficznych i korzysta z ich mocy obliczeniowej.
+            </section>
+            <section>
+                <h3>Ilość zapytań obsługiwanych przez serwer główny na sekundę</h3>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="serverResponses"
+                     title="serverResponses"
+                     alt="serverResponses" src="img/concurrencyTest-eps-converted-to.png">
+            </section>
+            <section>
+                <h3>Ilość zapytań typu Insert obsługiwanych przez węzeł na sekundę</h3>
+                <img style="border: none; background: rgba(255, 255, 255, 0);" id="nodeInsert" title="nodeInsert"
+                     alt="nodeInsert" src="img/uploadSpeed.png">
+            </section>
+            <section>
+                <h4>Zapytania Select z równoleglymi Insert</h4>
+
+                <div style="float: left; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="nodeConcurrent100k" title="nodeConcurrent"
+                         alt="nodeConcurrent" src="img/concurrentSelectsTest100000.png">
+                    <p>100 000</p>
+                </div>
+                <div style="float: right; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="nodeConcurrent1m" title="nodeConcurrent"
+                         alt="nodeConcurrent" src="img/concurrentSelectsTest1000000.png">
+                    <p>100 000 000</p>
+                </div>
+                <div style="float: left; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="nodeConcurrent5m" title="nodeConcurrent"
+                         alt="nodeConcurrent" src="img/concurrentSelectsTest5000000.png">
+                    <p>5 000 000</p>
+                </div>
+                <div style="float: right; width: 400px;">
+                    <img style="border: none; background: rgba(255, 255, 255, 255);"
+                         id="nodeConcurrent10m" title="nodeConcurrent"
+                         alt="nodeConcurrent" src="img/concurrentSelectsTest10000000.png">
+                    <p>10 000 000</p>
+                </div>
+            </section>
+            <section>
+                <h3>Ilość przetrzymywanych danych</h3>
+                Zakładając że:
+                <ul>
+                    <li>Dane wpływają ze średnią prędkością 25 000 elementów na sekundę</li>
+                    <li>Wielkość elementu po kompresji wynosi średnio 8 bajtów</li>
+                    <li>Posiadamy 3 klastry po 3 karty graficzne o pojemności 6 GB</li>
+                    <li>Baza danych ustawiona jest aby wykorzystywać 4GB na karcie na przechowywanie danych</li>
+                </ul>
+                <p>
+                    </br>
+                <h4>Baza danych jest w stanie przechowywać dane z okresu </br>ponad 2 dni.</h4>
+                </p>
+            </section>
+        </section>
+        <section id="podsumowanie">
+            <section>
+                <h2>Podsumowanie</h2>
+                Stworzona baza danych cechuje się dużą skalowalnością. Kolejne węzły obliczeniowe mogą być dodawane, lub
+                też wymieniane (utrata danych) w czasie działania całego systemu.
+            </section>
+            <section>
+                Ilość wpływających danych limitowana jest przede wszystkim samą wydajnością serwera głównego, a
+                dokładniej wydajnością użytego REST'owego API.
+            </section>
+            <section>
+                Dzięki wydajności kart graficznych oraz przechowywaniu danych w pamięci podręcznej, zapytania wykonywane
+                są z dużą szybkością nawet przy dużej ilości nieustannie wpływających danych.
+            </section>
+        </section>
+        <section>
+            <h1>DZIĘKUJEMY</h1>
+        </section>
+    </div>
 </div>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
