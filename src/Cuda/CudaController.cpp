@@ -123,7 +123,6 @@ namespace store {
 
 	void* CudaController::GetMainMemoryPointer()
 	{
-		boost::mutex::scoped_lock lock(_offsetMutex);
 		return this->_mainMemoryPointer;
 	}
 

@@ -8,3 +8,5 @@ gpu
 metrices
 decompress
 sqrt
+const
+cos

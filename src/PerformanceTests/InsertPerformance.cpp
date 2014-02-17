@@ -17,7 +17,7 @@ namespace task {
 		duration<double, milli> D;
 		for(int i=0; i<X; i++)
 		{
-			storeElement* elem = new storeElement(1, 1, 1, 69.69);
+			storeElement* elem = new storeElement(1, 1, i, 69.69);
 			Task_Pointer tp(new Task(1, Insert, elem, N, &_taskCond));
 			auto start = system_clock::now();
 			for(int j=0; j<N; j++)
@@ -32,6 +32,9 @@ namespace task {
 			}
 			auto end = system_clock::now();
 			D += end - start;
+
+			delete this->_storeController;
+			_storeController = new store::StoreController(this->_devId);
 		}
 		printf("[InsertEqualElem|%d] (%f ms)\n", N, D.count()/X);
 		_resultFile << "InsertEqualElem " << N << " " << threadCount << " "
@@ -51,7 +54,7 @@ namespace task {
 //			auto start = system_clock::now();
 //			for(int j=0; j<N; j++)
 //			{
-//				storeElement* elem = new storeElement(i%3, i%2, i, i*69.69);
+//				storeElement* elem = new storeElement(i%3000, i%15, i, i*69.69);
 //				Task_Pointer tp(new Task(1, Insert, elem, N, &_taskCond));
 //				_storeController->ExecuteTask(tp);
 //			}

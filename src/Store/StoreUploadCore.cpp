@@ -37,6 +37,8 @@ namespace store {
 	{
 		if(elementsToUploadCount == 0) return nullptr;
 
+		this->_cudaController->SetProperDevice();
+
 		// GET CUDA STREAM
 		cudaStream_t stream = this->_cudaController->GetUploadStream();
 

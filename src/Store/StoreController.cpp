@@ -63,8 +63,8 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
 		// remove all pending tasks
-		_insertThreadPool.clear();
-		_selectThreadPool.clear();
+		//_insertThreadPool.clear();
+		//_selectThreadPool.clear();
 
 		// wait untill all active tasks are finished
 		_insertThreadPool.wait();

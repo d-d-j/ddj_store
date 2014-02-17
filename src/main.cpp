@@ -23,113 +23,42 @@
 #include <cmath>
 #include "Cuda/CudaCommons.h"
 #include "signal.h"
+#include <boost/program_options.hpp>
 
-void InitializeLogger() {
+namespace po = boost::program_options;
+
+po::variables_map initialize_options(int argc, char* argv[])
+{
+	// Declare the supported options.
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "shows help message")
+	    ("test", "runs all unit tests")
+	    ("performance", "runs all performance tests")
+	    ("exampleData", po::value<int>(), "inserts N elements to 4 different series")
+	;
+
+	po::variables_map options;
+	po::store(po::parse_command_line(argc, argv, desc), options);
+	po::notify(options);
+
+	if (options.count("help")) {
+	    std::cout << desc << std::endl;
+	    exit(0);
+	}
+
+	return options;
+}
+
+void initialize_logger()
+{
 	log4cplus::initialize();
 	LogLog::getLogLog()->setInternalDebugging(true);
 	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("ddj_logger.prop"));
 }
 
-// TODO: Refactor!!
-void loadExampleData(ddj::Node* node)
+int wait_to_terminate()
 {
-	int N = 2000000;
-	ddj::store::storeElement* elem = nullptr;
-	ddj::store::CudaCommons cudaC;
-	int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	int i1 = 0;
-	int i2 = 0;
-	int i3 = 0;
-	int i4 = 0;
-	for(; i1<N; i1++)
-	{
-		elem = new ddj::store::storeElement(0, 0, i1, std::sin(i1/100.0f*M_PI));
-		ddj::task::taskRequest req1(0*N+i1, ddj::task::Insert, devId, sizeof(storeElement), elem);
-		node->CreateTask(req1);
-		if(i1%99999==0) printf("Inserted %d from %d elements\n", 0*N+i1+1, 4*N);
-	}
-	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(; i2<N; i2++)
-	{
-		elem = new ddj::store::storeElement(1, 0, i2, std::cos(i2/100.0f*M_PI));
-		ddj::task::taskRequest req2(1*N+i2, ddj::task::Insert, devId, sizeof(storeElement), elem);
-		node->CreateTask(req2);
-		if(i2%99999==0) printf("Inserted %d from %d elements\n", 1*N+i2+1, 4*N);
-	}
-	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(; i3<N; i3++)
-	{
-		elem = new ddj::store::storeElement(2, 1, i3, 1.0f);
-		ddj::task::taskRequest req3(2*N+i3, ddj::task::Insert, devId, sizeof(storeElement), elem);
-		node->CreateTask(req3);
-		if(i3%99999==0) printf("Inserted %d from %d elements\n", 2*N+i3+1, 4*N);
-	}
-	devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-	for(; i4<N; i4++)
-	{
-		elem = new ddj::store::storeElement(3, 1, i4, i4*1.0f);
-		ddj::task::taskRequest req4(3*N+i4, ddj::task::Insert, devId, sizeof(storeElement), elem);
-		node->CreateTask(req4);
-		if(i4%99999==0) printf("Inserted %d from %d elements\n", 3*N+i4+1, 4*N);
-	}
-	printf("All data inserted!\n");
-}
-
-// TODO: Refactor!!
-int main(int argc, char* argv[])
-{
-	ddj::Config::GetInstance();
-	InitializeLogger();
-	Logger logger = Logger::getRoot();
-	bool enableExampleData = false;
-
-	if (argc >= 2)
-	{
-		if(!strcmp(argv[1], "--exampleData"))
-		{
-			enableExampleData = true;
-		}
-		else
-		{
-			Logger::getRoot().removeAllAppenders();
-			::testing::InitGoogleTest(&argc, argv);
-			if(!strcmp(argv[1], "--test"))
-			{
-				::testing::GTEST_FLAG(filter) = "*Test*";
-			}
-			else if(!strcmp(argv[1], "--performance"))
-			{
-				::testing::GTEST_FLAG(filter) = "*Performance*";
-				::testing::FLAGS_gtest_repeat = 1;
-			}
-			else if(!strcmp(argv[1], "--storePerformance"))
-			{
-				::testing::GTEST_FLAG(filter) = "*StorePerformance*";
-				::testing::FLAGS_gtest_repeat = 1;
-			}
-			else if(!strcmp(argv[1], "--insertPerformance"))
-			{
-				::testing::GTEST_FLAG(filter) = "*InsertPerformance*";
-				::testing::FLAGS_gtest_repeat = 1;
-			}
-			else if(!strcmp(argv[1], "--integralPerformance"))
-			{
-				::testing::GTEST_FLAG(filter) = "*IntegralPerformance*";
-				::testing::FLAGS_gtest_repeat = 1;
-			}
-			return RUN_ALL_TESTS();
-		}
-	}
-	else
-	{
-		Logger::getInstance(LOG4CPLUS_TEXT("test")).removeAllAppenders();
-	}
-
-	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("Node main application started"));
-
-	ddj::Node n;
-	if(enableExampleData) loadExampleData(&n);
-
 	//wait for SIGINT
 	int sig_number;
 	sigset_t signal_set;
@@ -138,5 +67,93 @@ int main(int argc, char* argv[])
 	sigwait (&signal_set, &sig_number);
 
 	return EXIT_SUCCESS;
+}
+
+int configure_tests(po::variables_map options, int argc, char* argv[])
+{
+	bool enableTest = false;
+	if(options.count("test"))
+	{
+		::testing::GTEST_FLAG(filter) = "*Test*";
+		enableTest = true;
+	}
+	else if(options.count("performance"))
+	{
+		::testing::GTEST_FLAG(filter) = "*Performance*";
+		enableTest = true;
+	}
+	if(enableTest)
+	{
+		Logger::getRoot().removeAllAppenders();
+		::testing::InitGoogleTest(&argc, argv);
+		::testing::FLAGS_gtest_repeat = 1;
+		return 1;
+	}
+	return 0;
+}
+
+float sinElem(int i){ return std::sin(i/100.0f*M_PI); }
+float cosElem(int i){ return std::cos(i/100.0f*M_PI); }
+float constElem(int i){ return 1.0f; }
+float linElem(int i){ return i; }
+
+/* 4 series of data will be inserted to store
+ *
+ *	tag		metric		data
+ * 	0		0			sin
+ *	1		0			cos
+ *	2		1			1.0
+ *	3		1			y = x
+ *
+ * N - number of elements to insert to each series
+ */
+void load_example_data(ddj::Node* node, int N, int tag, int metric, float (*f) (int))
+{
+	// Select best device
+	ddj::store::CudaCommons cudaC;
+	int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+
+	for(int i=0; i<N; i++)
+	{
+		ddj::store::storeElement* elem = new ddj::store::storeElement(tag, metric, i, f(i));
+		ddj::task::taskRequest req(i, ddj::task::Insert, devId, sizeof(storeElement), elem);
+		node->CreateTask(req);
+		if(i%99999==0) printf("Inserted %d from %d elements\n", i+1, N);
+	}
+}
+
+void configure_system_after_start(po::variables_map options, ddj::Node* node)
+{
+	if(options.count("exampleData"))
+	{
+		int N = options["exampleData"].as<int>();
+		printf("Inserting %d sin elements...", N);
+		load_example_data(node, N, 0, 0, &sinElem);
+		printf("Inserting %d cos elements...", N);
+		load_example_data(node, N, 1, 0, &cosElem);
+		printf("Inserting %d const elements...", N);
+		load_example_data(node, N, 2, 1, &constElem);
+		printf("Inserting %d linear elements...", N);
+		load_example_data(node, N, 3, 1, &linElem);
+		printf("INSERTED ALL EXAMPLE DATA!\n");
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	ddj::Config::GetInstance();
+	initialize_logger();
+	Logger logger = Logger::getRoot();
+	auto options = initialize_options(argc, argv);
+
+	if(configure_tests(options, argc, argv)) return RUN_ALL_TESTS();
+
+	// HERE WHOLE NODE SYSTEM STARTS
+	ddj::Node n;
+	LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("NODE START SUCCESS"));
+
+	configure_system_after_start(options, &n);
+
+	return wait_to_terminate();
 }
 
