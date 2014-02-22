@@ -2,6 +2,7 @@
 /.metadata
 /Debug
 /Release
+/src/PerformanceTests/Results
 .src
 *.o
 *.d
