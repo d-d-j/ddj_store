@@ -30,7 +30,7 @@ namespace task {
 	    return newTask;
 	}
 
-	boost::container::vector<Task_Pointer> TaskMonitor::PopCompleatedTasks()
+	boost::container::vector<Task_Pointer> TaskMonitor::PopCompletedTasks()
 	{
 	    boost::mutex::scoped_lock lock(this->_mutex);
 
@@ -40,7 +40,7 @@ namespace task {
           _tasks.begin(),
           _tasks.end(),
           result.begin(),
-          [](Task_Pointer task){ return task->IsCompleated(); }
+          [](Task_Pointer task){ return task->IsCompleted(); }
      	);
 	    result.resize(std::distance(result.begin(),it));
 

@@ -9,7 +9,7 @@ namespace task {
 	    EXPECT_TRUE(taskMonitor != nullptr);
 	}
 
-	TEST_F(TaskMonitorTest, PopCompleatedTasks_Should_Removed_Only_Tasks_That_Are_Returned)
+	TEST_F(TaskMonitorTest, PopCompletedTasks_Should_Removed_Only_Tasks_That_Are_Returned)
 	{
 		//simulate normal work adding and completing task
 		for (int iteration=1;iteration<4;iteration++) {
@@ -24,14 +24,14 @@ namespace task {
 			std::vector<int64_t> notCompletedTaskId;
 			for (unsigned int i=0;i<taskMonitor->_tasks.size();i++) {
 				auto id = taskMonitor->_tasks[i]->_taskId;
-		    	taskMonitor->_tasks[i]->_isCompleated = id % iteration;
-		    	if (taskMonitor->_tasks[i]->_isCompleated == true)
+		    	taskMonitor->_tasks[i]->_isCompleted = id % iteration;
+		    	if (taskMonitor->_tasks[i]->_isCompleted == true)
 		    		completedTaskId.push_back(id);
 		    	else
 		    		notCompletedTaskId.push_back(id);
 			}
 
-			auto actual = taskMonitor->PopCompleatedTasks();
+			auto actual = taskMonitor->PopCompletedTasks();
 
 			ASSERT_EQ(completedTaskId.size(), actual.size());
 			for (unsigned int i=0;i<completedTaskId.size();i++) {

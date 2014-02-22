@@ -33,9 +33,9 @@ namespace task {
 			TaskMonitor(boost::condition_variable* condResponseReady);
 			virtual ~TaskMonitor();
 			Task_Pointer AddTask(int taskId, TaskType type, void* taskData, int expectedResultCount);
-			boost::container::vector<Task_Pointer> PopCompleatedTasks();
+			boost::container::vector<Task_Pointer> PopCompletedTasks();
 
-		FRIEND_TEST(TaskMonitorTest, PopCompleatedTasks_Should_Removed_Only_Tasks_That_Are_Returned);
+		FRIEND_TEST(TaskMonitorTest, PopCompletedTasks_Should_Removed_Only_Tasks_That_Are_Returned);
 	};
 
 } /* namespace store */

@@ -27,7 +27,7 @@ namespace task {
 			while(1)
 			{
 				_taskCond.wait(lock);
-				if(tp->IsCompleated())
+				if(tp->IsCompleted())
 					break;
 			}
 			auto end = system_clock::now();

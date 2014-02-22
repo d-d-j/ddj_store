@@ -9,7 +9,7 @@ namespace task
 TEST_F(TaskTest, Constructor)
 {
 	ASSERT_TRUE(_task != nullptr);
-	EXPECT_FALSE(_task->IsCompleated());
+	EXPECT_FALSE(_task->IsCompleted());
 	EXPECT_EQ(nullptr, _task->GetResult());
 }
 
@@ -39,7 +39,7 @@ TEST_F(TaskTest, SetResult_SingleResult)
 	task.SetResult(true, "success", nullptr, 0);
 
 	// CHECK
-	ASSERT_TRUE(task.IsCompleated());
+	ASSERT_TRUE(task.IsCompleted());
 	EXPECT_EQ(nullptr, task.GetResult()->result_data);
 	EXPECT_EQ(0, task.GetResult()->result_size);
 	EXPECT_EQ(1, task.GetResult()->task_id);
@@ -68,21 +68,21 @@ TEST_F(TaskTest, SetResult_MultipleResults_Info_Success)
 	task.SetResult(true, "success_1;", info_1, infoSize);
 
 	// CHECK
-	ASSERT_FALSE(task.IsCompleated());
+	ASSERT_FALSE(task.IsCompleted());
 	EXPECT_EQ(nullptr, task.GetResult());
 
 	// TEST
 	task.SetResult(true, "success_2;", info_2, infoSize);
 
 	// CHECK
-	ASSERT_FALSE(task.IsCompleated());
+	ASSERT_FALSE(task.IsCompleted());
 	EXPECT_EQ(nullptr, task.GetResult());
 
 	// TEST
 	task.SetResult(true, "success_3;", info_3, infoSize);
 
 	// CHECK
-	ASSERT_TRUE(task.IsCompleated());
+	ASSERT_TRUE(task.IsCompleted());
 	EXPECT_EQ(expected_result, *task.GetResult());
 	EXPECT_EQ(*info_1,
 			((store::storeNodeInfo* )task.GetResult()->result_data)[0]);

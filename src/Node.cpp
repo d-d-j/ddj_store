@@ -121,20 +121,20 @@ namespace ddj
 				this->_taskCond.wait(lock);
 
 				// Get all completed tasks
-				boost::container::vector<task::Task_Pointer> compleatedTasks =
-						this->_taskMonitor->PopCompleatedTasks();
+				boost::container::vector<task::Task_Pointer> completedTasks =
+						this->_taskMonitor->PopCompletedTasks();
 
 				// Send results of the tasks to master
-				int compleatedTaskCount = compleatedTasks.size();
-				LOG4CPLUS_DEBUG_FMT(this->_logger, "Completed %d tasks", compleatedTaskCount);
+				int completedTaskCount = completedTasks.size();
+				LOG4CPLUS_DEBUG_FMT(this->_logger, "Completed %d tasks", completedTaskCount);
 				task::taskResult* result;
 
-				for(int i=0; i<compleatedTaskCount; i++)
+				for(int i=0; i<completedTaskCount; i++)
 				{
-					if(compleatedTasks[i]->GetType() != task::Insert)
+					if(completedTasks[i]->GetType() != task::Insert)
 					{
 						// Get result of the task
-						result = compleatedTasks[i]->GetResult();
+						result = completedTasks[i]->GetResult();
 						LOG4CPLUS_INFO(this->_logger, "Sending result" << result->toString());
 						// Send result
 						this->_client->SendTaskResult(result);

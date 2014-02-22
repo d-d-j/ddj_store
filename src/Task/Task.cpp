@@ -21,7 +21,7 @@ namespace task {
 		this->_type = type;
 		this->_taskData = taskData;
 		this->_condResponseReady = cond;
-		this->_isCompleated = false;
+		this->_isCompleted = false;
 		this->_isSuccessfull = true;
 		this->_message = nullptr;
 		this->_resultData = nullptr;
@@ -95,7 +95,7 @@ namespace task {
 		this->_currentResultCount++;
 		if(this->_currentResultCount == this->_expectedResultCount)
 		{
-			this->_isCompleated = true;
+			this->_isCompleted = true;
 
 			// REDUCE TASK RESULTS
 			if(this->_query != nullptr)
@@ -153,10 +153,10 @@ namespace task {
 		return this->_taskData;
 	}
 
-	bool Task::IsCompleated()
+	bool Task::IsCompleted()
 	{
 		boost::mutex::scoped_lock lock(this->_mutex);
-		return this->_isCompleated;
+		return this->_isCompleted;
 	}
 
 	int64_t Task::GetId()

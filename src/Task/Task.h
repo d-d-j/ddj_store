@@ -26,7 +26,7 @@ namespace task {
 		size_t _resultSize;
 		char* _message;
 		bool _isSuccessfull;
-		bool _isCompleated;
+		bool _isCompleted;
 		int _currentResultCount;
 		int _expectedResultCount;
 		taskResult* _result;
@@ -60,7 +60,7 @@ namespace task {
 		TaskType GetType();
 		void* GetData();
 		int GetDevice();
-		bool IsCompleated();
+		bool IsCompleted();
 		int64_t GetId();
 		int GetCurrentResultCount();
 
@@ -70,7 +70,7 @@ namespace task {
 		friend class TaskTest;
 
 		FRIEND_TEST(TaskTest, AppendMessage);
-		FRIEND_TEST(TaskMonitorTest, PopCompleatedTasks_Should_Removed_Only_Tasks_That_Are_Returned);
+		FRIEND_TEST(TaskMonitorTest, PopCompletedTasks_Should_Removed_Only_Tasks_That_Are_Returned);
 	};
 
 	typedef boost::shared_ptr<Task> Task_Pointer;
