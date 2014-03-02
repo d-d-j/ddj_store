@@ -14,7 +14,7 @@ endif
 
 INCLUDES := -I"/usr/local/cuda/include"
 DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
-WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare
+WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
 VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
 
