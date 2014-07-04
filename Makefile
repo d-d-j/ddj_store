@@ -1,19 +1,20 @@
 RM := rm -rf
 OS := $(shell uname)
 
-NVCC := nvcc
+NVCC := nvcc -Xcompiler "-arch x86_64" --no-align-double
 COMPILER := g++
 ifeq ($(OS),Darwin)
 	COMPILER := clang++
-	LIBS := -L"/usr/local/cuda/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
-	STANDART := -std=c++11 -stdlib=libc++
+	LIBS := -L"/usr/local/cuda/lib" -L"/opt/local/lib/gcc47" -L"/usr/local/lib" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
+	STANDART := -std=c++11 -stdlib=libstdc++
 else
 	LIBS := -L"/usr/local/cuda/lib64" -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread -lboost_program_options -llog4cplus -lgtest -lgtest_main
 	STANDART := -std=c++0x
 endif
 
-INCLUDES := -I"/usr/local/cuda/include"
-DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__
+CUDAINCLUDES := -I"/usr/local/cuda/include" 
+STDINCLUDES := -I"/opt/local/include/gcc47/c++" -I"/opt/local/include/gcc47/c++/x86_64-apple-darwin12"
+DEFINES := -D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
 VALGRIND_OPTIONS = --tool=memcheck --leak-check=yes -q
@@ -32,7 +33,7 @@ DEP := $(OBJS:.o=.d)
 all: DDJ_Store
 
 debug: COMPILER += -DDEBUG -g
-debug: NVCC += --debug --device-debug
+#debug: NVCC += --debug --device-debug
 debug: all
 
 release: COMPILER += -O3
@@ -42,14 +43,14 @@ release: all
 src/%.o: ./src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(COMPILER) Compiler'
-	$(COMPILER) $(DEFINES) $(INCLUDES) $(WARNINGS_ERRORS) -c $(GCC_DEBUG_FLAGS) $(STANDART) -MMD -MP -o "$@" "$<"
+	$(COMPILER) $(DEFINES) $(STDINCLUDES) $(CUDAINCLUDES) $(WARNINGS_ERRORS) -c $(GCC_DEBUG_FLAGS) $(STANDART) -MMD -MP -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ./src/%.cu
 	@echo 'Building file: $<'
 	@echo 'Invoking: $(NVCC) Compiler'
-	$(NVCC) $(GENCODE_FLAGS) $(INCLUDES) -c $(GCC_DEBUG_FLAGS) -o "$@" "$<"
+	$(NVCC) $(GENCODE_FLAGS) $(CUDAINCLUDES) -c $(GCC_DEBUG_FLAGS) -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -59,7 +60,7 @@ run: all
 DDJ_Store: $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: $(NVCC) Linker'
-	$(NVCC) $(GENCODE_FLAGS) $(LIBS)  -o "DDJ_Store" $(OBJS)
+	$(NVCC) $(GENCODE_FLAGS) $(LIBS) -o "DDJ_Store" $(OBJS)
 	chmod +x DDJ_Store
 	@echo 'Finished building target: $@'
 	@echo ' '

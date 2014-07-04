@@ -8,7 +8,6 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#include "Logger.h"
 #include <iostream>
 #include <fstream>
 #include <iterator>
@@ -26,7 +25,6 @@ namespace ddj
 
 		po::variables_map _configMap;
 
-		//Logger _logger = Logger::getRoot();
 		Config();
 		virtual ~Config();
 

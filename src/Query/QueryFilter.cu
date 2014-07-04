@@ -132,7 +132,15 @@ __global__ void sum_stencil_in_trunks(int* stencil, size_t elemSize, ddj::ullint
 	result[idx] = sum;
 }
 
-int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Query* query)
+int* gpu_produceStencil(
+		storeElement* elements,
+		size_t dataSize,
+		int metricesSize,
+		metric_type* metrices,
+		int tagsSize,
+		int* tags,
+		int periodsSize,
+		ddj::ullintPair* timePeriods)
 {
 	int elemCount = dataSize/sizeof(storeElement);
 	int* stencil;
@@ -140,48 +148,56 @@ int* gpu_produceStencil(storeElement* elements, size_t dataSize, ddj::query::Que
 	int blocksPerGrid = (elemCount + CUDA_THREADS_PER_BLOCK - 1) / CUDA_THREADS_PER_BLOCK;
 
 	// CREATE TIME PERIODS VECTOR ON GPU
-	thrust::device_vector<ddj::ullintPair> timePeriods(query->timePeriods.begin(), query->timePeriods.end());
+	thrust::device_vector<ddj::ullintPair> timePeriodsGpu(timePeriods, timePeriods+periodsSize);
 	// CREATE TAGS VECTOR ON GPU
-	thrust::device_vector<int> tags(query->tags.begin(), query->tags.end());
+	thrust::device_vector<int> tagsGpu(tags, tags+tagsSize);
 
 	// RUN STENCIL KERNEL
-	int filterTags = query->tags.size();
-	int filterTimePeriods = query->timePeriods.size();
+	int filterTags = tagsSize;
+	int filterTimePeriods = periodsSize;
 	if(filterTags && filterTimePeriods)
 	{
 		cuda_produce_stencil_using_tag_and_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 				elements,
 				elemCount,
-				tags.data().get(),
-				tags.size(),
-				timePeriods.data().get(),
-				timePeriods.size(),
+				tagsGpu.data().get(),
+				tagsGpu.size(),
+				timePeriodsGpu.data().get(),
+				timePeriodsGpu.size(),
 				stencil);
 	} else if(filterTags){
 		cuda_produce_stencil_using_tag<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 				elements,
 				elemCount,
-				tags.data().get(),
-				tags.size(),
+				tagsGpu.data().get(),
+				tagsGpu.size(),
 				stencil);
 	} else {
 		cuda_produce_stencil_using_time<<<blocksPerGrid, CUDA_THREADS_PER_BLOCK>>>(
 				elements,
 				elemCount,
-				timePeriods.data().get(),
-				timePeriods.size(),
+				timePeriodsGpu.data().get(),
+				timePeriodsGpu.size(),
 				stencil);
 	}
 	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
 	return stencil;
 }
 
-size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query* query)
+size_t gpu_filterData(
+		storeElement* elements,
+		size_t dataSize,
+		int metricesSize,
+		metric_type* metrices,
+		int tagsSize,
+		int* tags,
+		int periodsSize,
+		ddj::ullintPair* timePeriods)
 {
 	int elemCount = dataSize/sizeof(storeElement);
 
 	// CREATE STENCIL
-	int* stencil = gpu_produceStencil(elements, dataSize, query);
+	int* stencil = gpu_produceStencil(elements, dataSize, metricesSize, metrices, tagsSize, tags, periodsSize, timePeriods);
 
 	// PARTITION ELEMENTS
 	thrust::device_ptr<storeElement> elem_ptr(elements);
@@ -196,13 +212,22 @@ size_t gpu_filterData(storeElement* elements, size_t dataSize, ddj::query::Query
 	return resultSize;
 }
 
-size_t gpu_filterData_in_trunks(storeElement* elements, size_t dataSize, Query* query,
-				ddj::ullintPair* dataLocationInfo, int locationInfoCount)
+size_t gpu_filterData_in_trunks(
+		storeElement* elements,
+		size_t dataSize,
+		int metricesSize,
+		metric_type* metrices,
+		int tagsSize,
+		int* tags,
+		int periodsSize,
+		ddj::ullintPair* timePeriods,
+		ddj::ullintPair* dataLocationInfo,
+		int locationInfoCount)
 {
 	int elemCount = dataSize/sizeof(storeElement);
 
 	// CREATE STENCIL
-	int* stencil = gpu_produceStencil(elements, dataSize, query);
+	int* stencil = gpu_produceStencil(elements, dataSize, metricesSize, metrices, tagsSize, tags, periodsSize, timePeriods);
 
 	// CREATE TIME PERIODS VECTOR ON GPU
 	thrust::device_vector<ddj::ullintPair> locations(dataLocationInfo, dataLocationInfo+locationInfoCount);

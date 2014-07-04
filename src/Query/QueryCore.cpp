@@ -147,7 +147,12 @@ namespace query {
 				size_t size = gpu_filterData_in_trunks(
 						elements,
 						dataSize,
-						query,
+						query->metrics.size(),
+						query->metrics.data(),
+						query->tags.size(),
+						query->tags.data(),
+						query->timePeriods.size(),
+						query->timePeriods.data(),
 						dataLocationInfo->data(),
 						dataLocationInfo->size());
 
@@ -161,7 +166,15 @@ namespace query {
 				query->aggregationData = dataLocationInfo;
 				return size;
 			}
-			return gpu_filterData(elements, dataSize, query);
+			return gpu_filterData(
+					elements,
+					dataSize,
+					query->metrics.size(),
+					query->metrics.data(),
+					query->tags.size(),
+					query->tags.data(),
+					query->timePeriods.size(),
+					query->timePeriods.data());
 		}
 		else return dataSize;
 	}

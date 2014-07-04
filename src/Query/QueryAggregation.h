@@ -4,6 +4,7 @@
 #include "QueryAggregationType.h"
 #include "QueryAggregationData.h"
 #include "QueryAggregation.cuh"
+#include "Query.h"
 #include "../Store/StoreElement.cuh"
 #include <gtest/gtest.h>
 #include <boost/unordered_map.hpp>

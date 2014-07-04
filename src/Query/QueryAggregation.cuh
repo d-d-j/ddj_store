@@ -4,8 +4,8 @@
 #include "../Store/StoreElement.cuh"
 #include "../Query/QueryAggregationResults.cuh"
 #include "../Query/QueryAggregationData.h"
-#include "../Query/Query.h"
 #include "../Store/StoreTypedefs.h"
+#include "../Core/UllintPair.h"
 #include <vector_types.h>
 
 // TODO: Move this define to config

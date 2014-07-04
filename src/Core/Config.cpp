@@ -18,6 +18,7 @@ namespace ddj
 		{
 			_instance = new Config;
 		}
+
 		return _instance;
 	}
 
@@ -27,7 +28,7 @@ namespace ddj
 		{
 			return _configMap[settingName].as<int>();
 		}
-		//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("value for the setting not found"));
+
 		return -1;
 	}
 
@@ -37,7 +38,7 @@ namespace ddj
 		{
 			return _configMap[settingName].as<string>();
 		}
-		//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("value for the setting not found"));
+
 		return nullptr;
 	}
 
@@ -72,8 +73,8 @@ namespace ddj
 			("MASTER_IP_ADDRESS", po::value<string>()->default_value("127.0.0.1"), "address of master server")
 			("MASTER_LOGIN_PORT", po::value<string>()->default_value("8080"), "port of master server login service")
 			("ENABLE_COMPRESSION", po::value<int>()->default_value(1), "1 if compression enabled, 0 otherwise")
-			("MAX_JOB_MEMORY_SIZE", po::value<int>()->default_value(61440), "Maximal size of data used in one query job");
-
+			("MAX_JOB_MEMORY_SIZE", po::value<int>()->default_value(61440), "Maximal size of data used in one query job")
+			;
 
 			po::options_description config_file_options;
 			config_file_options.add(hidden);
@@ -83,7 +84,6 @@ namespace ddj
 			{
 				string msg = "can not open config file: ";
 				msg.append(config_file);
-				//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(msg.c_str()));
 				return;
 			}
 			else
@@ -91,12 +91,9 @@ namespace ddj
 				store(parse_config_file(ifs, config_file_options), _configMap);
 				notify(_configMap);
 			}
-
-			//LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Finished loading settings from file"));
-
-		} catch (exception& e)
+		}
+		catch (exception& e)
 		{
-			//LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT(e.what()));
 			return;
 		}
 		return;
@@ -104,7 +101,6 @@ namespace ddj
 
 	Config::~Config()
 	{
-		// TODO Auto-generated destructor stub
 	}
 
 
