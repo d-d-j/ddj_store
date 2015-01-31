@@ -129,11 +129,11 @@ namespace store{
 
 	TEST_F(CompressionTest, EncodeInt32UsingNBytes_ForSmallInt)
 	{
+		const int N = 2;
 		int32_t input = 0x24;
-		unsigned char output[2];
-		EncodeInt32UsingNBytes(output, input, 2);
-		int *actual = (int*)output;
-		EXPECT_EQ(input, *actual);
+		unsigned char output[N];
+		EncodeInt32UsingNBytes(output, input, N);
+		EXPECT_EQ(input, (int32_t)*output);
 	}
 
 	TEST_F(CompressionTest, EncodeInt32UsingNBytes_ForSmallInt_With_Overflow)
@@ -149,26 +149,28 @@ namespace store{
 		int64_t input = 0xBA5EBALL;
 		unsigned char output[2];
 		EncodeInt64UsingNBytes(output, input, 6);
-		int64_t *actual = (int64_t*)output;
-		EXPECT_EQ(input, *actual);
+		EXPECT_EQ(input, (int64_t)*output);
 	}
 
 	TEST_F(CompressionTest, EncodeInt64UsingNBytes_ForBigInt)
 	{
+		const int N = 8;
 		int64_t input = 0xDEADBEEF;
 		unsigned char output[8];
-		EncodeInt64UsingNBytes(output, input, 8);
+		for(int i=0; i<8; i++) output[i] = 0;
+		EncodeInt64UsingNBytes(output, input, N);
 		int64_t *actual = (int64_t*)output;
 		EXPECT_EQ(input, *actual);
 	}
 
 	TEST_F(CompressionTest, EncodeInt64UsingNBytes_ForBigInt_With_Overflow)
 	{
+		const int N = 2;
 		int64_t input = 0xDEADBEEF , expected = 0xBEEF;
-		unsigned char output[2];
-		EncodeInt64UsingNBytes(output, input, 2);
-		int64_t *actual = (int64_t*)output;
-		EXPECT_EQ(expected, *actual);
+		unsigned char output[8];
+		for(int i=0; i<8; i++) output[i] = 0;
+		EncodeInt64UsingNBytes(output, input, N);
+		EXPECT_EQ(expected, *(int64_t*)output);
 	}
 }
 }
