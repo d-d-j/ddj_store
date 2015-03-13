@@ -32,12 +32,15 @@
 namespace ddj {
 namespace store {
 
-	/*! \class StoreBuffer
-	 \brief Coordinates inserts of new data to store and support info about data location
-
-	 Implement async function of inserting new data to store (UploaderThread)
-	 Implement sync function of getting trunks with their location on GPU with this tag
-	 and specified time (from - to)
+	/**
+	* @class StoreBuffer
+	* Coordinates inserts of new data to store and support info about data location.
+	* Implements public method for inserting new data to store.
+	* Implements public method for flushing data in buffer to a main memory of DB on GPU.
+	* Implements public method for getting locations of data from provided time periods.
+	* @see Insert()
+	* @see Select()
+	* @see Flush()
 	*/
     class StoreBuffer : public boost::noncopyable
     {
@@ -47,8 +50,9 @@ namespace store {
 			btree::BTreeMonitor* _bufferInfoTreeMonitor;	/**< protects access to B+Tree structure */
 			StoreUploadCore* _uploadCore;			/**< protects access to GpuUploadCore class */
 
-			/* LOGGER */
+			/* LOGGER & CONFIG */
 			Logger _logger;
+			Config* _config;
 
 			/* BUFFERS */
 			int _bufferElementsCount;		/**< how many elements are now in _buffer */
@@ -62,34 +66,42 @@ namespace store {
 
 		/* METHODS */
 		public:
-			//! StoreBuffer constructor.
-			/*!
-			  It creates a new instance of BTreeMonitor class and starts Upload thread
+			/** StoreBuffer constructor.
+			* It creates a new instance of BTreeMonitor class.
 			*/
 			StoreBuffer(metric_type metric, int bufferCapacity, StoreUploadCore* uploadCore);
 
-			//! BTreeMonitor destructor.
-			/*!
-		  	  releases BTreeMonitor and stops (+ joins) UploaderThread
+			/** StoreBuffer destructor.
+			* Releases BTreeMonitor.
 			*/
 			virtual ~StoreBuffer();
 
-			/*! \fn  void Insert(storeElement* element);
-			 * \brief Function inserts storeElement to Buffer (stores data in DB on GPU)
-			 *
-			 * If buffer if full or Flush method is executed, buffer is uploaded to GPU.
-			 * After uploading data to GPU and execution of Kernel which appends data to
-			 * store array in GPU, infoElement is inserted to B+Tree structure in order
-			 * to store location of a trunk in GPU.
-			 * \param storeElement* a pointer to storeElement to store in our DB
+			/**
+			 * @fn void Insert(storeElement* element);
+			 * Function inserts storeElement to Buffer (stores data in DB on GPU).
+			 * If buffer if full, buffer is uploaded to GPU. After uploading data to GPU and execution
+			 * of Kernel which appends data to store array in GPU, infoElement is inserted to B+Tree structure
+			 * in order to store location of a trunk in GPU.
+			 * @param storeElement* a pointer to storeElement to store in our DB
 			 */
 			void Insert(storeElement* element);
 
-			/*! \fn  void Flush();
-			 * \brief Forces StoreBuffer to switchBuffers and upload buffer to GPU
+			/**
+			 * @fn void Flush();
+			 * Forces StoreBuffer to switchBuffers and upload buffer to GPU.
 			 */
 			void Flush();
 
+			/**
+			 * Gets locations of trunks which contain data with time from any of specified time periods.
+			 * Each StoreBuffer object is used to Insert and Select locations of data with one metric specified
+			 * in StoreBuffer constructor. This method is using BTreeMonitor to select from B+Tree structure
+			 * locations of data with his metric and from time periods.
+			 * @param timePeriods [in] a boost vector of ullintPari structs indicating from which time periods
+			 * data needs to be selected.
+			 * @return a pointer to boost vector of ullintPair structs which stores locations of selected data in
+			 * main memory of database on GPU.
+			 */
 			boost::container::vector<ullintPair>* Select(boost::container::vector<ullintPair> timePeriods);
 
 		private:

@@ -12,11 +12,15 @@ namespace ddj {
 namespace store {
 
 	StoreUploadCore::StoreUploadCore(CudaController* cudaController)
+		: _logger(Logger::getRoot()),_config(Config::GetInstance())
 	{
 		this->_cudaController = cudaController;
+		this->_enableCompression = this->_config->GetIntValue("ENABLE_COMPRESSION");
 	}
 
-	StoreUploadCore::~StoreUploadCore(){}
+	StoreUploadCore::~StoreUploadCore()
+	{
+	}
 
 	storeTrunkInfo* StoreUploadCore::sortTrunkAndPrepareInfo(storeElement* elementsToUpload, int elementsToUploadCount)
 	{
@@ -47,13 +51,15 @@ namespace store {
 		copyToGpu(elementsToUpload, deviceBufferPointer, elementsToUploadCount, stream);
 
 		// COMPRESSION (returns pointer to new memory)
-		void* compressedBufferPointer;
-		size_t size = compressGpuBuffer(deviceBufferPointer, elementsToUploadCount, &compressedBufferPointer, stream);
+		void* compressedBufferPointer = deviceBufferPointer;
+		size_t size = sizeof(storeElement)*elementsToUploadCount;
+		if(this->_enableCompression)
+			size = compressGpuBuffer(deviceBufferPointer, elementsToUploadCount, &compressedBufferPointer, stream);
 
 		// AFTER GPU BUFFER COMPRESSION WE CAN REUSE STREAM AND RELEASE DEVICE BUFFER
 		CUDA_CHECK_RETURN( cudaStreamSynchronize(stream) );
 		this->_cudaController->ReleaseUploadStream(stream);
-		CUDA_CHECK_RETURN( cudaFree(deviceBufferPointer) );
+		if(this->_enableCompression) CUDA_CHECK_RETURN( cudaFree(deviceBufferPointer) );
 
 		// APPEND UPLOADED BUFFER TO MAIN GPU STORE (IN STREAM 0)
 		{
@@ -107,19 +113,8 @@ namespace store {
 	size_t StoreUploadCore::compressGpuBuffer(storeElement* deviceBufferPointer, int elemToUploadCount, void** result, cudaStream_t stream)
 	{
 		size_t size = sizeof(storeElement)*elemToUploadCount;
-		CUDA_CHECK_RETURN( cudaMalloc(result, size) );
-		CUDA_CHECK_RETURN
-						(
-								cudaMemcpyAsync
-								(
-										*result,
-										deviceBufferPointer,
-										size,
-										cudaMemcpyDeviceToDevice,
-										stream
-								)
-						);
-		return size;
+		compression::Compression c;
+		return c.CompressTrunk(deviceBufferPointer, size, result, stream);
 	}
 
 } /* namespace store */

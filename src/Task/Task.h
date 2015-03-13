@@ -46,17 +46,17 @@ namespace task {
 
 		virtual ~Task();
 
+		/* SETTERS */
 		void SetResult(
 				bool isSuccessfull,
 				const char* message = nullptr,
 				void* resultData = nullptr,
 				size_t resultSize = 0);
-
 		void SetQuery(query::Query* query);
-
-		taskResult* GetResult();
+		void SetPart(int partialCount);
 
 		/* GETTERS */
+		taskResult* GetResult();
 		TaskType GetType();
 		void* GetData();
 		int GetDevice();

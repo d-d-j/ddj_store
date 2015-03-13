@@ -61,9 +61,9 @@ class StoreController : public boost::noncopyable
     	boost::mutex _buffersMutex;
 
     	/* TASKS */
-        boost::unordered_map<int, taskFunc> _taskFunctions;
-        boost::threadpool::fifo_pool _taskThreadPool;
-
+        boost::threadpool::fifo_pool _insertThreadPool;
+        boost::threadpool::fifo_pool _selectThreadPool;
+        int _maxLocationsPerJob;
 
         /* LOGGER & CONFIG */
 		Logger _logger = Logger::getRoot();
@@ -74,8 +74,10 @@ class StoreController : public boost::noncopyable
         StoreController(int gpuDeviceId);
         virtual ~StoreController();
         void ExecuteTask(task::Task_Pointer task);
+        size_t GetFreeMemory();
+        size_t GetUsedMemory();
     private:
-        void populateTaskFunctions();
+        boost::container::vector<ullintPair>* getDataLocationInfo(Query* query);
 
 	/* TASK FUNCTIONS */
     private:

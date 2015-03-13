@@ -1,5 +1,5 @@
-#include "CudaAggregation.cuh"
-#include "CudaIncludes.h"
+#include "QueryAggregation.cuh"
+#include "../Cuda/CudaIncludes.h"
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/device_ptr.h>
@@ -17,7 +17,7 @@
 #include <assert.h>
 // CUDA runtime
 #include <cuda_runtime.h>
-#include "cuPrintf.cuh"
+#include "../Cuda/CudaPrintf.cuh"
 
 #define CUPRINTF(fmt, ...) printf("[%d, %d]:\t" fmt, \
                                   blockIdx.y*gridDim.x+blockIdx.x,\

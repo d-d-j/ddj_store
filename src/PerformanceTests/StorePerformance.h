@@ -18,6 +18,10 @@
 #include <cmath>
 #include <chrono>
 #include <fstream>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <random>
+#include <limits>
 
 namespace ddj {
 namespace task {
@@ -27,9 +31,10 @@ namespace task {
 	protected:
 		StorePerformance()
 		{
+			_config = Config::GetInstance();
 			CudaCommons cudaC;
-			int devId = cudaC.SetCudaDeviceWithMaxFreeMem();
-			_storeController = new store::StoreController(devId);
+			this->_devId = cudaC.SetCudaDeviceWithMaxFreeMem();
+			_storeController = new store::StoreController(this->_devId);
 			_taskMonitor = new task::TaskMonitor(&_taskCond);
 			_resultFile.open("./src/PerformanceTests/Results/StorePerformanceResult.txt", std::ofstream::app);
 			if(!_resultFile.is_open())
@@ -46,9 +51,10 @@ namespace task {
 		}
 
 
+		int _devId;
 		ofstream _resultFile;
 		Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));
-		Config* _config = Config::GetInstance();
+		Config* _config;
 		store::StoreController* _storeController;
 		TaskMonitor* _taskMonitor;
 		boost::condition_variable _taskCond;

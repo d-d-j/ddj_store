@@ -1,9 +1,9 @@
-#ifndef CUDAQUERY_CUH_
-#define CUDAQUERY_CUH_
+#ifndef QUERYFILTER_CUH_
+#define QUERYFILTER_CUH_
 
+#include "QueryAggregationResults.cuh"
+#include "Query.h"
 #include "../Store/StoreElement.cuh"
-#include "../Query/AggregationResults.cuh"
-#include "../Query/Query.h"
 #include "../Store/StoreTypedefs.h"
 
 // TODO: Move this define to config
@@ -21,4 +21,4 @@ extern "C" {
 }
 
 
-#endif /* CUDAQUERY_CUH_ */
+#endif /* QUERYFILTER_CUH_ */

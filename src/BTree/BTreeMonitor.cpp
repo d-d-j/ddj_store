@@ -15,13 +15,15 @@ namespace btree {
 
 	BTreeMonitor::~BTreeMonitor()
 	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+
 		delete this->_bufferInfoTree;
 		this->_bufferInfoTree = nullptr;
 	}
 
 	void BTreeMonitor::Insert(store::storeTrunkInfo* element)
 	{
-		boost::lock_guard<boost::mutex> guard(this->_mutex);
+		boost::mutex::scoped_lock lock(this->_mutex);
 
 		try
 		{
@@ -44,6 +46,8 @@ namespace btree {
 
 	boost::container::vector<ullintPair>* BTreeMonitor::SelectAll()
 	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+
 		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
 
 		auto it = this->_bufferInfoTree->begin();
@@ -55,34 +59,39 @@ namespace btree {
 
 	boost::container::vector<ullintPair>* BTreeMonitor::Select(boost::container::vector<ullintPair> timePeriods)
 	{
+		boost::mutex::scoped_lock lock(this->_mutex);
+
 		boost::container::vector<ullintPair>* result = new boost::container::vector<ullintPair>();
 
 		BOOST_FOREACH(ullintPair &tp, timePeriods)
 		{
 			// get first element from B+Tree with greater or equal key than tp
 			auto it = this->_bufferInfoTree->lower_bound(tp);
-			/* check if the last smaller element isn't intersecting with tp because in this situation
-			 *	tp 						<----------->
-			 * 	elems in tree	|-----A1-----| |-----A2-----|
-			 * 	A2 will be returned as lower_bound so we must check if A1 isn't intersecting with tp
-			 */
-			it--;
-			while(it->first.isIntersecting(tp) && it != this->_bufferInfoTree->begin())
+			if(this->_bufferInfoTree->size())
 			{
+				/* check if the last smaller element isn't intersecting with tp because in this situation
+				 *	tp 						<----------->
+				 * 	elems in tree	|-----A1-----| |-----A2-----|
+				 * 	A2 will be returned as lower_bound so we must check if A1 isn't intersecting with tp
+				 */
 				it--;
-			}
-			// now it is not intersecting tp or it is begin
-			if(!it->first.isIntersecting(tp))
-			{
-				it++;
-			}
-			/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
-			 * are inside selected time period and if it is not and end of data from B+Tree
-			 */
-			while(it != this->_bufferInfoTree->end() && it->first.isIntersecting(tp))
-			{
-				result->push_back(it->second);
-				it++;
+				while(it->first.isIntersecting(tp) && it != this->_bufferInfoTree->begin())
+				{
+					it--;
+				}
+				// now it is not intersecting tp or it is begin
+				if(!it->first.isIntersecting(tp))
+				{
+					it++;
+				}
+				/* items returned by iterator are sorted, so we have to check only if beginnings of it.first (time)
+				 * are inside selected time period and if it is not and end of data from B+Tree
+				 */
+				while(it != this->_bufferInfoTree->end() && it->first.isIntersecting(tp))
+				{
+					result->push_back(it->second);
+					it++;
+				}
 			}
 		}
 

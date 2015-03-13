@@ -28,11 +28,16 @@ namespace store {
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [BEGIN]"));
 
 		this->_gpuDeviceId = gpuDeviceId;
+		this->_maxLocationsPerJob =
+				_config->GetIntValue("MAX_JOB_MEMORY_SIZE") /
+				(_config->GetIntValue("STORE_BUFFER_CAPACITY")*sizeof(storeElement));
+
+		LOG4CPLUS_DEBUG_FMT(this->_logger,
+				LOG4CPLUS_TEXT("Store controller %d -> max locations per job = %d"),
+				gpuDeviceId,
+				_maxLocationsPerJob);
 
 		this->_buffers = new Buffers_Map();
-
-		// PREPARE TASK FUNCTIONS DICTIONARY
-		this->populateTaskFunctions();
 
 		// CREATE CUDA CONTROLLER (Controlls gpu store side)
 		this->_cudaController = new CudaController(_config->GetIntValue("STREAMS_NUM_UPLOAD"), _config->GetIntValue("STREAMS_NUM_QUERY"), gpuDeviceId);
@@ -47,7 +52,8 @@ namespace store {
 		this->_infoCore = new StoreInfoCore(this->_cudaController);
 
 		// SET THREAD POOL SIZES
-		this->_taskThreadPool.size_controller().resize(this->_config->GetIntValue("THREAD_POOL_SIZE"));
+		this->_insertThreadPool.size_controller().resize(this->_config->GetIntValue("INSERT_THREAD_POOL_SIZE"));
+		this->_selectThreadPool.size_controller().resize(this->_config->GetIntValue("SELECT_THREAD_POOL_SIZE"));
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller constructor [END]"));
 	}
@@ -56,12 +62,20 @@ namespace store {
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 
+		// remove all pending tasks
+		_insertThreadPool.clear();
+		_selectThreadPool.clear();
+
+		// wait untill all active tasks are finished
+		_insertThreadPool.wait();
+		_selectThreadPool.wait();
+
 		delete this->_buffers;
+		delete this->_uploadCore;
 		delete this->_cudaController;
+
 		this->_buffers = nullptr;
 		this->_cudaController = nullptr;
-		_taskThreadPool.wait();
-		_taskThreadPool.clear();
 
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller destructor [BEGIN]"));
 	}
@@ -70,26 +84,59 @@ namespace store {
 	{
 		// Sechedule a function from _TaskFunctions with this taskId
 		task::TaskType type = task->GetType();
-		this->_taskThreadPool.schedule(boost::bind(this->_taskFunctions[type], task));
+		switch(type)
+		{
+			case task::Insert:
+				this->_insertThreadPool.schedule(boost::bind(boost::bind(&StoreController::insertTask, this, _1), task));
+				break;
+			case task::Select:
+				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::selectTask, this, _1), task));
+				break;
+			case task::Flush:
+				this->_insertThreadPool.wait();
+				this->_insertThreadPool.schedule(boost::bind(boost::bind(&StoreController::flushTask, this, _1), task));
+				this->_insertThreadPool.wait();
+				break;
+			case task::Info:
+				this->_selectThreadPool.schedule(boost::bind(boost::bind(&StoreController::infoTask, this, _1), task));
+				break;
+			case task::Error:
+				LOG4CPLUS_ERROR(this->_logger, LOG4CPLUS_TEXT("Got task with type ERROR"));
+		}
 	}
 
-	void StoreController::populateTaskFunctions()
+	boost::container::vector<ullintPair>* StoreController::getDataLocationInfo(Query* query)
 	{
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [BEGIN]"));
+		boost::container::vector<ullintPair>* dataLocationInfo =
+				new boost::container::vector<ullintPair>();
+		boost::container::vector<ullintPair>* locations = nullptr;
 
-		// INSERT
-		_taskFunctions.insert({ task::Insert, boost::bind(&StoreController::insertTask, this, _1) });
+		// if query should be filtered ask StoreBuffer for data location on GPU
+		if(query->metrics.size())
+		{
+			BOOST_FOREACH(metric_type &m, query->metrics)
+			{
+				if(_buffers->count(m))	// if elements with such a metric exist in store
+				{
+					locations = (*_buffers)[m]->Select(query->timePeriods);
+					dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+					delete locations;
+					locations = nullptr;
+				}
+			}
+		}
+		else // all dataLocationInfos should be returned
+		{
+			for(auto it=_buffers->begin(); it!=_buffers->end(); it++)
+			{
+				locations = it->second->Select(query->timePeriods);
+				dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
+				delete locations;
+				locations = nullptr;
+			}
+		}
 
-		// SELECT
-		_taskFunctions.insert({ task::Select, boost::bind(&StoreController::selectTask, this, _1) });
-
-		// FLUSH
-		_taskFunctions.insert({ task::Flush, boost::bind(&StoreController::flushTask, this, _1) });
-
-		// INFO
-		_taskFunctions.insert({ task::Info, boost::bind(&StoreController::infoTask, this, _1) });
-
-		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Store controller - populate task functions [END]"));
+		return dataLocationInfo;
 	}
 
 	void StoreController::insertTask(task::Task_Pointer task)
@@ -136,6 +183,15 @@ namespace store {
 		}
 	}
 
+	boost::container::vector<ullintPair>* splitVector(boost::container::vector<ullintPair>* v, int partSize, int partNum)
+	{
+		unsigned int size = v->size();
+		unsigned int start = partNum*partSize;
+		unsigned int end = (partNum+1)*partSize;
+		end = end >= size ? size : end;
+		return new boost::container::vector<ullintPair>(v->begin()+start, v->begin()+end);
+	}
+
 	void StoreController::selectTask(task::Task_Pointer task)
 	{
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Select task [BEGIN]"));
@@ -157,45 +213,45 @@ namespace store {
 			task->SetQuery(query);
 			LOG4CPLUS_INFO(this->_logger, "Select task - " << query->toString());
 
-			boost::container::vector<ullintPair>* dataLocationInfo = nullptr;
-			boost::container::vector<ullintPair>* locations = nullptr;
-
-			// if query should be filtered ask StoreBuffer for data location on GPU
-			if(query->metrics.size())
-			{
-				dataLocationInfo = new boost::container::vector<ullintPair>();
-				BOOST_FOREACH(metric_type &m, query->metrics)
-				{
-					if(_buffers->count(m))	// if elements with such a metric exist in store
-					{
-						locations = (*_buffers)[m]->Select(query->timePeriods);
-						dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
-						delete locations;
-						locations = nullptr;
-					}
-				}
-			}
-			else // all dataLocationInfos should be returned
-			{
-				dataLocationInfo = new boost::container::vector<ullintPair>();
-				for(auto it=_buffers->begin(); it!=_buffers->end(); it++)
-				{
-					locations = it->second->Select(query->timePeriods);
-					dataLocationInfo->insert(dataLocationInfo->end(), locations->begin(), locations->end());
-					delete locations;
-					locations = nullptr;
-				}
-			}
-
-			LOG4CPLUS_WARN(this->_logger, "Query: " << query->toString());
-
-			// Execute query with optional data locations using StoreQueryCore
+			// Get data locations
+			boost::container::vector<ullintPair>* dataLocationInfo = getDataLocationInfo(query);
 			void* queryResult = nullptr;
-			size_t size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
-			delete dataLocationInfo;
+			size_t size = 0;
 
-			// Set task result and return
-			task->SetResult(true, nullptr, queryResult, size);
+			// Break the job into smaller ones if necessary
+			int jobPartCount = (dataLocationInfo->size() + this->_maxLocationsPerJob - 1) / this->_maxLocationsPerJob;
+
+			if(jobPartCount > 1)	// split dataLocationInfo
+			{
+				printf("\n\njobPartCount = %d\n\n", jobPartCount);
+
+				task->SetPart(jobPartCount);
+
+				boost::container::vector<ullintPair>* dataLocationInfoPart;
+				for(int i=0; i<jobPartCount; i++)
+				{
+					dataLocationInfoPart = splitVector(dataLocationInfo, this->_maxLocationsPerJob, i);
+
+					// Execute query
+					size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfoPart);
+
+					// Set query part result
+					delete dataLocationInfoPart;
+					task->SetResult(true, nullptr, queryResult, size);
+					delete static_cast<char*>(queryResult);
+					queryResult = nullptr;
+				}
+			}
+			else			// Job doesn't have to be split
+			{
+				if(jobPartCount == 1) // Execute query
+					size = this->_queryCore->ExecuteQuery(&queryResult, query, dataLocationInfo);
+
+				// Set query result
+				task->SetResult(true, nullptr, queryResult, size);
+			}
+
+			delete dataLocationInfo;
 			delete static_cast<char*>(queryResult);
 		}
 		catch(std::exception& ex)
@@ -275,6 +331,16 @@ namespace store {
 					LOG4CPLUS_TEXT("Info task error [FAILED]"));
 		}
 		LOG4CPLUS_DEBUG(this->_logger, LOG4CPLUS_TEXT("Info task [END]"));
+	}
+
+	size_t StoreController::GetFreeMemory()
+	{
+		return this->_cudaController->GetMainMemoryCapacity() - this->_cudaController->GetMainMemoryOffset();
+	}
+
+	size_t StoreController::GetUsedMemory()
+	{
+		return this->_cudaController->GetMainMemoryOffset();
 	}
 
 } /* namespace store */

@@ -2,8 +2,8 @@
 #define CUDAAGGREGATION_CUH_
 
 #include "../Store/StoreElement.cuh"
-#include "../Query/AggregationResults.cuh"
-#include "../Query/AggregationData.h"
+#include "../Query/QueryAggregationResults.cuh"
+#include "../Query/QueryAggregationData.h"
 #include "../Query/Query.h"
 #include "../Store/StoreTypedefs.h"
 #include <vector_types.h>
