@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Dutkowski"
+  given-names: "Jakub"
+- family-names: "Dzitkowski"
+  given-names: "Karol"
+- family-names: "Janiszewski"
+  given-names: "Tomasz"
+
+title: "ddj_store"
+version: 1.0.0
+date-released: 2022-02-06
+url: "https://github.com/d-d-j/ddj_store"
